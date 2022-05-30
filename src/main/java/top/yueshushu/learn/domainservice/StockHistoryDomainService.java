@@ -2,7 +2,6 @@ package top.yueshushu.learn.domainservice;
 
 import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.extension.service.IService;
-import top.yueshushu.learn.domain.StockDo;
 import top.yueshushu.learn.domain.StockHistoryDo;
 import top.yueshushu.learn.mode.dto.StockHistoryQueryDto;
 import top.yueshushu.learn.mode.dto.StockPriceCacheDto;
@@ -18,17 +17,28 @@ import java.util.List;
 public interface StockHistoryDomainService extends IService<StockHistoryDo> {
     /**
      * 根据股票的编码和时间范围搜索对应的历史记录
-     * @param code 股票编码
+     *
+     * @param code      股票编码
      * @param startDate 开始日期
-     * @param endDate 结束日期
+     * @param endDate   结束日期
      * @return 根据股票的编码和时间范围搜索对应的历史记录
      */
     List<StockHistoryDo> listStockHistoryAndDate(String code, DateTime startDate, DateTime endDate);
 
     /**
+     * 查询该股票最近十天的交易信息记录
+     *
+     * @param stockCode 股票编码
+     * @param lastDay   最近的标识时间
+     * @return 查询该股票最近十天的交易信息记录
+     */
+    List<StockHistoryDo> limit10Desc(String stockCode, DateTime lastDay);
+
+    /**
      * 查询股票列表昨天的收盘价
+     *
      * @param codeList 股票编码列表
-     * @param yesDate 昨天的日期
+     * @param yesDate  昨天的日期
      * @return 查询股票列表昨天的收盘价
      */
     List<StockPriceCacheDto> listYesterdayClosePrice(List<String> codeList, Date yesDate);

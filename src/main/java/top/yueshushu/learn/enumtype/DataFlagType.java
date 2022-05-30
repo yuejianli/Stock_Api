@@ -1,16 +1,17 @@
 package top.yueshushu.learn.enumtype;
 
 /**
- * 交易地的类型
+ * 数据信息
+ *
  * @author 两个蝴蝶飞
  */
 public enum DataFlagType {
     /**
-     * 深圳
+     * 正常
      */
     NORMAL(1,"正常"),
     /**
-     * 上海
+     * 删除
      */
     DELETE(0,"删除");
 

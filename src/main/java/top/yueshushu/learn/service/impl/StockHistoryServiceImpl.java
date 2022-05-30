@@ -11,6 +11,7 @@ import top.yueshushu.learn.assembler.StockHistoryAssembler;
 import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.domain.StockHistoryDo;
 import top.yueshushu.learn.domainservice.StockHistoryDomainService;
+import top.yueshushu.learn.entity.StockHistory;
 import top.yueshushu.learn.helper.DateHelper;
 import top.yueshushu.learn.mode.dto.StockHistoryQueryDto;
 import top.yueshushu.learn.mode.dto.StockPriceCacheDto;
@@ -89,10 +90,25 @@ public class StockHistoryServiceImpl  implements StockHistoryService {
         return stockHistoryAssembler.entityToVo(
                 stockHistoryAssembler.doToEntity(
                         stockHistoryDomainService.getByCodeAndCurrDate(
-                                code,currDate
+                                code, currDate
                         )
                 )
         );
+    }
+
+    @Override
+    public List<StockHistory> limit10Desc(String stockCode, DateTime lastDay) {
+        List<StockHistoryDo> stockHistoryDoList = stockHistoryDomainService.limit10Desc(stockCode, lastDay);
+        if (CollectionUtils.isEmpty(stockHistoryDoList)) {
+            return Collections.EMPTY_LIST;
+        }
+        List<StockHistory> stockHistoryList = new ArrayList<>(stockHistoryDoList.size());
+        stockHistoryDoList.forEach(
+                n -> {
+                    stockHistoryList.add(stockHistoryAssembler.doToEntity(n));
+                }
+        );
+        return stockHistoryList;
     }
 
     @Override
@@ -102,7 +118,7 @@ public class StockHistoryServiceImpl  implements StockHistoryService {
         return stockHistoryAssembler.entityToVo(
                 stockHistoryAssembler.doToEntity(
                         stockHistoryDomainService.getRecentyHistoryBeforeDate(
-                                code,endDate
+                                code, endDate
                         )
                 )
         );

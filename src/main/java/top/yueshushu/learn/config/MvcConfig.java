@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import top.yueshushu.learn.interceptor.AuthorizationInterceptor;
 
 /**
@@ -31,12 +30,5 @@ public class MvcConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("doc.html").addResourceLocations("classpath:/META-INF/resources/");
         registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
-        //映射 static 目录
-        registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");
-        //favicon.ico
-        registry.addResourceHandler("/favicon.ico")
-                .addResourceLocations("classpath:/static/");
-        //放置其他 业务页面资源
-        registry.addResourceHandler("/**").addResourceLocations("classpath:/templates/");
     }
 }

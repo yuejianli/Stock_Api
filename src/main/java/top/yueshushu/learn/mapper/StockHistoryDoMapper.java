@@ -73,6 +73,16 @@ public interface StockHistoryDoMapper extends BaseMapper<StockHistoryDo> {
                                             @Param("currDate") Date currDate);
 
     /**
+     * 查询该股票最近十天的交易信息记录
+     *
+     * @param code     股票编码
+     * @param currDate 最近的标识时间
+     * @return 查询该股票最近十天的交易信息记录
+     */
+    List<StockHistoryDo> limit10Desc(@Param("code") String code,
+                                     @Param("currDate") DateTime currDate);
+
+    /**
      * 根据股票的编码和日期，获取距离这一天最近的股票历史记录数据。
      *
      * @param code    股票编码

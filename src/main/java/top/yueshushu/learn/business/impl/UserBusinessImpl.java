@@ -10,6 +10,7 @@ import top.yueshushu.learn.mode.vo.UserVo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.service.MenuService;
 import top.yueshushu.learn.service.UserService;
+import top.yueshushu.learn.util.JasypUtil;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -58,5 +59,15 @@ public class UserBusinessImpl implements UserBusiness {
     @Override
     public OutputResult tradePassword(String password) {
         return userService.tradePassword(password);
+    }
+
+    @Override
+    public OutputResult encrypt(String text) {
+        return OutputResult.buildSucc(JasypUtil.encrypt(text));
+    }
+
+    @Override
+    public OutputResult decrypt(String text) {
+        return OutputResult.buildSucc(JasypUtil.decrypt(text));
     }
 }

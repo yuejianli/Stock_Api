@@ -117,4 +117,10 @@
         </if>
         order by t.curr_date asc
     </select>
+    <select id="limit10Desc" resultMap="stockHistoryMap">
+        select t.curr_date,t.amplitude_proportion from stock_history t
+        where t.code=#{code}
+        and date_format(curr_date,'%Y%m%d') >=date_format( #{currDate,jdbcType=TIMESTAMP},'%Y%m%d')
+        order by t.curr_date asc
+    </select>
 </mapper>

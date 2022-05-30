@@ -1,9 +1,7 @@
 package top.yueshushu.learn.domainservice;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import top.yueshushu.learn.domain.StockHistoryDo;
 import top.yueshushu.learn.domain.StockSelectedDo;
-import top.yueshushu.learn.domain.UserDo;
 
 import java.util.List;
 
@@ -40,7 +38,6 @@ public interface StockSelectedDomainService extends IService<StockSelectedDo> {
      * @return 根据用户信息，股票信息和状态查询相应的股票记录
      */
     List<StockSelectedDo> listByUserIdAndCodeAndStatus(Integer userId, String stockCode, Integer status);
-
     /**
      * 根据用户信息和状态，获取相应的数量
      * @param userId 用户编号

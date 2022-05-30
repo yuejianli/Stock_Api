@@ -1,7 +1,6 @@
 package top.yueshushu.learn.controller;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
@@ -19,19 +18,6 @@ public class PageController {
      */
     @RequestMapping("/")
     public String index(){
-        return "index";
-    }
-
-    @RequestMapping("/favicon.ico")
-    public String favicon(){
-        return "../static/favicon.ico";
-    }
-    /**
-     * 跳转到股票统计的相关信息
-     * @return
-     */
-    @RequestMapping("/{page}")
-    public String page(@PathVariable("page") String page){
-        return page;
+        return "page";
     }
 }

@@ -57,7 +57,7 @@ public class Const {
     public static final String CACHE_KEY_TRADE_USER = Const.CACHE_KEY_TRADE_PREFIX + "tradeUser";
     public static final String CACHE_KEY_TRADE_METHOD = Const.CACHE_KEY_TRADE_PREFIX + "tradeMethod";
 
-    public static final String AUTH = "auth:";
+    public static final String Jasypt_KEY = "enc_safe";
 
     public static final String CACHE_KEY_TRADE_STRATEGY = CACHE_PUBLIC_KEY_PREFIX + "trade:tradeStrategy";
 

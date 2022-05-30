@@ -5,13 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
-import top.yueshushu.learn.domain.StockHistoryDo;
 import top.yueshushu.learn.domain.StockSelectedDo;
-import top.yueshushu.learn.domain.UserDo;
 import top.yueshushu.learn.domainservice.StockSelectedDomainService;
-import top.yueshushu.learn.domainservice.UserDomainService;
 import top.yueshushu.learn.mapper.StockSelectedDoMapper;
-import top.yueshushu.learn.mapper.UserDoMapper;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -56,6 +52,7 @@ public class StockSelectedDomainServiceImpl extends ServiceImpl<StockSelectedDoM
                 .eq(status!=null, StockSelectedDo::getStatus,status)
                 .list();
     }
+
 
     @Override
     public int countByUserIdAndStatus(Integer userId, Integer status) {

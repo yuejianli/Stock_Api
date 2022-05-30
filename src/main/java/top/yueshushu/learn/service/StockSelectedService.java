@@ -5,6 +5,7 @@ import top.yueshushu.learn.mode.ro.IdRo;
 import top.yueshushu.learn.mode.ro.StockSelectedRo;
 import top.yueshushu.learn.mode.vo.StockSelectedVo;
 import top.yueshushu.learn.response.OutputResult;
+import top.yueshushu.learn.response.PageResponse;
 
 import java.util.List;
 import java.util.Map;
@@ -64,10 +65,11 @@ public interface StockSelectedService {
 
     /**
      * 分页查询自选表信息
+     *
      * @param stockSelectedRo 自选股票对象
      * @return 分页查询自选表信息
      */
-    OutputResult pageSelected(StockSelectedRo stockSelectedRo);
+    OutputResult<PageResponse<StockSelectedVo>> pageSelected(StockSelectedRo stockSelectedRo);
 
     /**
      * 股票自选时，进行添加验证操作

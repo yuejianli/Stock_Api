@@ -56,4 +56,16 @@ public class UserController extends BaseController {
     public OutputResult tradePassword(String password) {
         return userBusiness.tradePassword(password);
     }
+
+    @GetMapping("/encrypt")
+    @ApiOperation("配置文件敏感信息加密")
+    public OutputResult encrypt(String text) {
+        return userBusiness.encrypt(text);
+    }
+
+    @GetMapping("/decrypt")
+    @ApiOperation("配置文件敏感信息解密")
+    public OutputResult decrypt(String text) {
+        return userBusiness.decrypt(text);
+    }
 }

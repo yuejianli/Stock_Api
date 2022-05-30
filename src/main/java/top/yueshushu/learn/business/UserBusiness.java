@@ -25,8 +25,25 @@ public interface UserBusiness {
 
     /**
      * 转换交易用户的密码
+     *
      * @param password 交易用户密码
      * @return 转换交易用户的密码
      */
     OutputResult tradePassword(String password);
+
+    /**
+     * 将配置文件中的敏感信息加密
+     *
+     * @param text 要加密的信息
+     * @return 将配置文件中的敏感信息加密
+     */
+    OutputResult encrypt(String text);
+
+    /**
+     * 将配置文件中的敏感信息解密
+     *
+     * @param text 要解密的信息
+     * @return 将配置文件中的敏感信息解密
+     */
+    OutputResult decrypt(String text);
 }

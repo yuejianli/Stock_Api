@@ -1,6 +1,7 @@
 package top.yueshushu.learn.service;
 
 import cn.hutool.core.date.DateTime;
+import top.yueshushu.learn.entity.StockHistory;
 import top.yueshushu.learn.mode.dto.StockPriceCacheDto;
 import top.yueshushu.learn.mode.ro.StockDayStatRo;
 import top.yueshushu.learn.mode.ro.StockRo;
@@ -33,9 +34,20 @@ public interface StockHistoryService{
      */
     List<StockPriceCacheDto> listClosePrice(List<String> codeList);
 
+
+    /**
+     * 查询最近十天的股票交易信息
+     *
+     * @param stockCode 股票编码
+     * @param lastDay   最大的日期天数
+     * @return 查询最近十天的股票交易信息
+     */
+    List<StockHistory> limit10Desc(String stockCode, DateTime lastDay);
+
     /**
      * 根据股票的编码和当前日期获取对应的历史记录信息
-     * @param code 股票编码
+     *
+     * @param code     股票编码
      * @param currDate 股票记录日期
      * @return 根据股票的编码和当前日期获取对应的历史记录信息
      */

@@ -30,21 +30,26 @@ public class StockHistoryDomainServiceImpl extends ServiceImpl<StockHistoryDoMap
     @Override
     public List<StockHistoryDo> listStockHistoryAndDate(String code, DateTime startDate, DateTime endDate) {
         return stockHistoryDoMapper.listStockHistoryAndDateDesc(
-                code,startDate,endDate
+                code, startDate, endDate
         );
     }
 
     @Override
     public List<StockPriceCacheDto> listYesterdayClosePrice(List<String> codeList, Date yesDate) {
         return stockHistoryDoMapper.listClosePrice(
-                codeList,yesDate
+                codeList, yesDate
         );
+    }
+
+    @Override
+    public List<StockHistoryDo> limit10Desc(String stockCode, DateTime lastDay) {
+        return stockHistoryDoMapper.limit10Desc(stockCode, lastDay);
     }
 
     @Override
     public StockHistoryDo getByCodeAndCurrDate(String code, DateTime currDate) {
         return stockHistoryDoMapper.getStockForDate(
-                code,currDate
+                code, currDate
         );
     }
 

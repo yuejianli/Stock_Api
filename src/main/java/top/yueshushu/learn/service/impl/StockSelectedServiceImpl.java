@@ -12,10 +12,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+import top.yueshushu.learn.assembler.StockHistoryAssembler;
 import top.yueshushu.learn.assembler.StockSelectedAssembler;
 import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.common.ResultCode;
-import top.yueshushu.learn.crawler.business.CrawlerStockHistoryBusiness;
 import top.yueshushu.learn.crawler.service.CrawlerStockHistoryService;
 import top.yueshushu.learn.domain.StockSelectedDo;
 import top.yueshushu.learn.domainservice.StockSelectedDomainService;
@@ -64,6 +64,8 @@ public class StockSelectedServiceImpl implements StockSelectedService {
     private StockCrawlerService stockCrawlerService;
     @Resource
     private CrawlerStockHistoryService crawlerStockHistoryService;
+    @Resource
+    private StockHistoryAssembler stockHistoryAssembler;
 
     @SuppressWarnings("all")
     @Resource(name = Const.ASYNC_SERVICE_EXECUTOR_BEAN_NAME)
@@ -71,7 +73,7 @@ public class StockSelectedServiceImpl implements StockSelectedService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public StockSelected add(StockSelectedRo stockSelectedRo,String stockName) {
+    public StockSelected add(StockSelectedRo stockSelectedRo, String stockName) {
         StockSelected stockSelected = stockSelectedAssembler.doToEntity(
                 stockSelectedDomainService.getByUserIdAndCodeAndStatus(
                         stockSelectedRo.getUserId(),
@@ -165,8 +167,9 @@ public class StockSelectedServiceImpl implements StockSelectedService {
         );
         return OutputResult.buildSucc(stockSelected.getJobId());
     }
+
     @Override
-    public OutputResult pageSelected(StockSelectedRo stockSelectedRo) {
+    public OutputResult<PageResponse<StockSelectedVo>> pageSelected(StockSelectedRo stockSelectedRo) {
         Page<Object> pageGithubResult = PageHelper.startPage(stockSelectedRo.getPageNum(), stockSelectedRo.getPageSize());
         List<StockSelectedVo> pageResultList = listSelf(
                 stockSelectedRo.getUserId(),
@@ -182,7 +185,6 @@ public class StockSelectedServiceImpl implements StockSelectedService {
                 pageGithubResult.getTotal(), pageInfo.getList()
         ));
     }
-
     @Override
     public OutputResult validateAdd(StockSelectedRo stockSelectedRo, int maxSelectedNum) {
         StockSelected stockSelected = stockSelectedAssembler.doToEntity(

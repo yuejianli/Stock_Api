@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import top.yueshushu.learn.business.StatBusiness;
 import top.yueshushu.learn.common.ResultCode;
+import top.yueshushu.learn.mode.ro.StatTen10Ro;
 import top.yueshushu.learn.mode.ro.StockStatRo;
 import top.yueshushu.learn.response.OutputResult;
 
@@ -21,24 +22,39 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping("/stat")
 @ApiOperation("股票爬虫程序")
-public class StatisticalController {
+public class StatisticalController extends BaseController {
 
     @Resource
     private StatBusiness statBusiness;
+
     @ApiOperation("股票周统计信息")
     @PostMapping("/getWeekStat")
     public OutputResult getWeekStat(@RequestBody StockStatRo stockStatRo) {
-        if (!StringUtils.hasText(stockStatRo.getCode())){
+        if (!StringUtils.hasText(stockStatRo.getCode())) {
             return OutputResult.buildAlert(ResultCode.STOCK_CODE_IS_EMPTY);
         }
         return statBusiness.getWeekStat(stockStatRo);
     }
+
     @ApiOperation("股票图形统计信息")
     @PostMapping("/getCharStat")
     public OutputResult getCharStat(@RequestBody StockStatRo stockStatRo) {
-        if (!StringUtils.hasText(stockStatRo.getCode())){
+        if (!StringUtils.hasText(stockStatRo.getCode())) {
             return OutputResult.buildAlert(ResultCode.STOCK_CODE_IS_EMPTY);
         }
         return statBusiness.getCharStat(stockStatRo);
+    }
+
+    @ApiOperation("查询最近十天的交易日信息")
+    @PostMapping("/getTenTradeDay")
+    public OutputResult getTenTradeDay() {
+        return statBusiness.getTenTradeDay();
+    }
+
+    @ApiOperation("查询当前用户自选表里面最近十天的交易信息")
+    @PostMapping("/getTenTradeData")
+    public OutputResult getTenTrade(@RequestBody StatTen10Ro statTen10Ro) {
+        statTen10Ro.setUserId(getUserId());
+        return statBusiness.getTenTradeData(statTen10Ro);
     }
 }

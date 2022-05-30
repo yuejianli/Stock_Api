@@ -8,11 +8,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import top.yueshushu.learn.business.StockSelectedBusiness;
-import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.entity.Stock;
 import top.yueshushu.learn.enumtype.SyncStockHistoryType;
 import top.yueshushu.learn.helper.DateHelper;
+import top.yueshushu.learn.mode.dto.StockPriceCacheDto;
 import top.yueshushu.learn.mode.ro.IdRo;
 import top.yueshushu.learn.mode.ro.StockRo;
 import top.yueshushu.learn.mode.ro.StockSelectedRo;
@@ -94,19 +94,22 @@ public class StockSelectedBusinessImpl implements StockSelectedBusiness {
      */
     @Async
     public void syncCodeInfo(String stockCode) {
-        // 设置当前的价格信息
-        stockCrawlerService.updateCodePrice(stockCode);
-        // 获取价格信息.
-        BigDecimal nowCachePrice = stockCacheService.getNowCachePrice(stockCode);
-        stockCacheService.setLastBuyCachePrice(stockCode, nowCachePrice);
-        stockCacheService.setLastSellCachePrice(stockCode, nowCachePrice);
-        stockCacheService.setYesterdayCloseCachePrice(stockCode, nowCachePrice);
-
         // 同步股票的历史交易记录。 同步最近一个月的.
         StockRo stockRo = new StockRo();
         stockRo.setCode(stockCode);
         stockRo.setType(SyncStockHistoryType.MONTH.getCode());
         stockCrawlerService.stockHistoryAsync(stockRo);
+        // 设置当前的价格信息
+        stockCrawlerService.updateCodePrice(stockCode);
+        BigDecimal nowCachePrice1 = stockCacheService.getNowCachePrice(stockCode);
+        // 获取价格信息, 获取该股票昨天的价格
+        List<StockPriceCacheDto> priceCacheDtoList = stockHistoryService.listClosePrice(Collections.singletonList(stockCode));
+        if (!CollectionUtils.isEmpty(priceCacheDtoList)) {
+            StockPriceCacheDto stockPriceCacheDto = priceCacheDtoList.get(0);
+            stockCacheService.setLastBuyCachePrice(stockCode, stockPriceCacheDto.getPrice());
+            stockCacheService.setLastSellCachePrice(stockCode, stockPriceCacheDto.getPrice());
+            stockCacheService.setYesterdayCloseCachePrice(stockCode, stockPriceCacheDto.getPrice());
+        }
     }
 
     @Override

@@ -238,6 +238,12 @@
             <artifactId>reflections</artifactId>
             <version>0.9.12</version>
         </dependency>
+        <!--配置文件加密-->
+        <dependency>
+            <groupId>com.github.ulisesbocchio</groupId>
+            <artifactId>jasypt-spring-boot-starter</artifactId>
+            <version>3.0.2</version>
+        </dependency>
     </dependencies>
     <build>
         <!--将该目录下的文件全部打包成类的路径-->
