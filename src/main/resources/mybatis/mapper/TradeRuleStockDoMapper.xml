@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.yueshushu.learn.mapper.TradeRuleStockDoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="top.yueshushu.learn.domain.TradeRuleStockDo">
+        <id column="id" property="id" />
+        <result column="rule_id" property="ruleId" />
+        <result column="stock_code" property="stockCode" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, rule_id,stock_code, create_time
+    </sql>
+    <delete id="removeOtherStock">
+        delete from trade_rule_stock t
+        <where>
+            <if test="removeCodeList != null and removeCodeList.size() != 0">
+                and t.stock_code in
+                <foreach collection="removeCodeList" separator="," open="(" close=")" item="stockCode">
+                    #{stockCode}
+                </foreach>
+            </if>
+            <if test="userId != null">
+                 and rule_id in (
+                    select r.id from trade_rule r
+                    where r.userId =#{userId}
+                    and r.mock_type =#{mockType}
+                )
+            </if>
+        </where>
+    </delete>
+    <select id="listNotInRuleId" resultType="top.yueshushu.learn.domain.TradeRuleStockDo">
+         select s.id,s.rule_id,s.stock_code,s.create_time from trade_rule_stock s,trade_rule r
+         where s.rule_id = r.id
+         and r.user_id =#{tradeRuleStockQueryDto.userId}
+         and s.rule_id != #{tradeRuleStockQueryDto.ruleId}
+         and r.rule_type =#{tradeRuleStockQueryDto.ruleType}
+        <if test="tradeRuleStockQueryDto.mockType != null">
+            and r.mock_type =#{tradeRuleStockQueryDto.mockType}
+        </if>
+    </select>
+
+</mapper>

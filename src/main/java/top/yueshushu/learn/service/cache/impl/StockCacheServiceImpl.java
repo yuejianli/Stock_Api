@@ -1,0 +1,52 @@
+package top.yueshushu.learn.service.cache.impl;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
+import top.yueshushu.learn.common.Const;
+import top.yueshushu.learn.service.cache.StockCacheService;
+import top.yueshushu.learn.util.RedisUtil;
+
+import javax.annotation.Resource;
+import java.math.BigDecimal;
+
+/**
+ * @Description 股票相关的缓存实现
+ * @Author yuejianli
+ * @Date 2022/5/20 23:38
+ **/
+@Service
+@Slf4j
+public class StockCacheServiceImpl implements StockCacheService {
+    private static final BigDecimal DEFAULT_PRICE = BigDecimal.ZERO;
+    @Resource
+    private RedisUtil redisUtil;
+
+    @Override
+    public void setNowCachePrice(String code, BigDecimal price) {
+        redisUtil.set(Const.STOCK_PRICE+code,price);
+    }
+
+    @Override
+    public BigDecimal getNowCachePrice(String code) {
+        Object o = redisUtil.get(Const.STOCK_PRICE + code);
+        if (ObjectUtils.isEmpty(o)) {
+            return DEFAULT_PRICE;
+        }
+        return (BigDecimal)o;
+    }
+
+    @Override
+    public void setYesterdayCloseCachePrice(String code, BigDecimal price) {
+        redisUtil.set(Const.STOCK_YES_PRICE+code,price);
+    }
+
+    @Override
+    public BigDecimal getYesterdayCloseCachePrice(String code) {
+        Object o = redisUtil.get(Const.STOCK_YES_PRICE + code);
+        if (ObjectUtils.isEmpty(o)) {
+            return DEFAULT_PRICE;
+        }
+        return (BigDecimal)o;
+    }
+}

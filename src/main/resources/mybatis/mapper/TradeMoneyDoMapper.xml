@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.yueshushu.learn.mapper.TradeMoneyDoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="top.yueshushu.learn.domain.TradeMoneyDo">
+        <id column="id" property="id" />
+        <result column="total_money" property="totalMoney" />
+        <result column="use_money" property="useMoney" />
+        <result column="market_money" property="marketMoney" />
+        <result column="takeout_money" property="takeoutMoney" />
+        <result column="user_id" property="userId" />
+        <result column="mock_type" property="mockType" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, total_money, use_money, market_money, takeout_money,user_id, mock_type
+    </sql>
+
+</mapper>

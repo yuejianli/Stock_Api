@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.yueshushu.learn.mapper.TradeRuleDoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="top.yueshushu.learn.domain.TradeRuleDo">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="condition_code" property="conditionCode" />
+        <result column="condition_type" property="conditionType" />
+        <result column="rule_value_type" property="ruleValueType" />
+        <result column="rule_value" property="ruleValue" />
+        <result column="trade_num" property="tradeNum" />
+        <result column="trade_value_type" property="tradeValueType" />
+        <result column="trade_price" property="tradePrice" />
+        <result column="rule_type" property="ruleType" />
+        <result column="status" property="status" />
+        <result column="user_id" property="userId" />
+        <result column="mock_type" property="mockType" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="flag" property="flag" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,name, condition_code, condition_type, rule_value_type, rule_value, trade_num, trade_value_type, trade_price, rule_type, status, user_id, mock_type, create_time, update_time, flag
+    </sql>
+    <select id="listRuleByQuery" resultType="top.yueshushu.learn.mode.dto.StockRuleDto">
+        select trs.stock_code as stockCode,
+        tr.id as ruleId,tr.name as ruleName,
+        trs.create_time as createTime,
+        tr.status as status,tr.rule_type as ruleType,
+        tr.mock_type as mockType
+        from trade_rule tr ,trade_rule_stock trs
+        where tr.id =trs.rule_id
+          and trs.stock_code = #{tradeRuleStockQueryDto.stockCode}
+          and tr.user_id = #{tradeRuleStockQueryDto.userId}
+          and tr.rule_type = #{tradeRuleStockQueryDto.ruleType}
+          and tr.mock_type = #{tradeRuleStockQueryDto.mockType}
+    </select>
+</mapper>

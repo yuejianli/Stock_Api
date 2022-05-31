@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.yueshushu.learn.mapper.StockHistoryDoMapper">
+    <resultMap id="stockHistoryMap" type="top.yueshushu.learn.domain.StockHistoryDo">
+        <id property="id" column="id"></id>
+        <result property="currDate" column="curr_date"></result>
+        <result property="code" column="code"></result>
+        <result property="name" column="name"></result>
+        <result property="closingPrice" column="closing_price"></result>
+        <result property="highestPrice" column="highest_price"></result>
+        <result property="lowestPrice" column="lowest_price"></result>
+        <result property="openingPrice" column="opening_price"></result>
+        <result property="yesClosingPrice" column="yesClosing_price"></result>
+        <result property="amplitude" column="amplitude"></result>
+        <result property="amplitudeProportion" column="amplitude_proportion"></result>
+        <result property="tradingVolume" column="trading_volume"></result>
+        <result property="tradingValue" column="trading_value"></result>
+        <result property="flag" column="flag"></result>
+    </resultMap>
+    <sql id="baseSql">
+        id,curr_date,code,name,closing_price,highest_price,lowest_price,
+        opening_price,yesClosing_price,amplitude,amplitude_proportion,
+        trading_volume,trading_value,flag
+    </sql>
+    <select id="getStockHistory" resultMap="stockHistoryMap">
+        select <include refid="baseSql"/> from stock_history t
+        where t.code=#{code}
+        order by t.curr_date desc
+    </select>
+    <delete id="deleteAsyncData">
+        delete from stock_history where code=#{code}
+        and date_format(curr_date,'%Y%m%d') &gt;=date_format( #{startDate,jdbcType=TIMESTAMP},'%Y%m%d')
+        and date_format(curr_date,'%Y%m%d') &lt;=date_format( #{endDate,jdbcType=TIMESTAMP},'%Y%m%d')
+        <!--        <![CDATA[ when t.curr_date >=#{startDate} and t.curr_date <=#{endDate} ]]>-->
+    </delete>
+    <select id="listStockHistoryAndDateDesc" resultMap="stockHistoryMap">
+        select <include refid="baseSql"/> from stock_history t
+        where t.code=#{code}
+        <if test="startDate!=null">
+            and date_format(curr_date,'%Y%m%d') &gt;=date_format( #{startDate,jdbcType=TIMESTAMP},'%Y%m%d')
+        </if>
+        <if test="endDate!=null">
+            and date_format(curr_date,'%Y%m%d') &lt;=date_format( #{endDate,jdbcType=TIMESTAMP},'%Y%m%d')
+        </if>
+        order by t.curr_date desc
+    </select>
+    <select id="getStockForDate" resultMap="stockHistoryMap">
+        select <include refid="baseSql"/> from stock_history t
+        where t.code=#{code}
+        and date_format(curr_date,'%Y%m%d') =date_format( #{currDate,jdbcType=TIMESTAMP},'%Y%m%d')
+        order by curr_date
+        limit 1
+    </select>
+    <select id="listClosePrice" resultType="top.yueshushu.learn.mode.dto.StockPriceCacheDto">
+        select code,closing_price as price from stock_history t
+        where
+        1=1
+        <if test="codeList != null and codeList.size() != 0">
+           and code in
+            <foreach collection="codeList" open="(" close=")" separator="," item="code">
+                #{code}
+            </foreach>
+         </if>
+        and date_format(curr_date,'%Y%m%d') =date_format( #{currDate,jdbcType=TIMESTAMP},'%Y%m%d')
+    </select>
+    <select id="getRecentyHistoryBeforeDate" resultMap="stockHistoryMap">
+        select <include refid="baseSql"/> from stock_history t
+        where t.code=#{code}
+        and curr_date  &lt; #{endDate}
+        order by curr_date desc
+        limit 1
+    </select>
+    <select id="listStockHistoryAndDateAsc" resultMap="stockHistoryMap">
+        select <include refid="baseSql"/> from stock_history t
+        where t.code=#{code}
+        <if test="startDate!=null">
+            and curr_date > #{startDate}
+        </if>
+        <if test="endDate!=null">
+            and curr_date &lt; #{endDate}
+        </if>
+        order by t.curr_date asc
+    </select>
+    <select id="listDayRange" resultType="top.yueshushu.learn.domain.StockHistoryDo">
+        select <include refid="baseSql"/> from stock_history t
+        where t.code=#{stockHistoryQueryDto.code}
+        <if test="stockHistoryQueryDto.startDate!=null">
+            and curr_date > #{stockHistoryQueryDto.startDate}
+        </if>
+        <if test="stockHistoryQueryDto.endDate!=null">
+            and curr_date &lt; #{stockHistoryQueryDto.endDate}
+        </if>
+        <if test="stockHistoryQueryDto.startDayNum != null">
+           and date_format(curr_date,'%d') &gt;= #{stockHistoryQueryDto.startDayNum}
+        </if>
+        <if test="stockHistoryQueryDto.endDayNum != null">
+            and date_format(curr_date,'%d') &lt;= #{stockHistoryQueryDto.endDayNum}
+        </if>
+        order by date_format(t.curr_date,'%Y') desc,date_format(t.curr_date,'%m') asc,
+        date_format(t.curr_date,'%d') asc
+    </select>
+
+    <delete id="deleteAsyncRangeDateData">
+        delete from stock_history where code=#{code}
+        and date_format(curr_date,'%Y%m%d') &gt;=date_format( #{startDate,jdbcType=TIMESTAMP},'%Y%m%d')
+        and date_format(curr_date,'%Y%m%d') &lt;=date_format( #{endDate,jdbcType=TIMESTAMP},'%Y%m%d')
+        <!--        <![CDATA[ when t.curr_date >=#{startDate} and t.curr_date <=#{endDate} ]]>-->
+    </delete>
+</mapper>

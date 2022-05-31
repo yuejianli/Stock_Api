@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.yueshushu.learn.mapper.HolidayCalendarDoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="top.yueshushu.learn.domain.HolidayCalendarDo">
+        <id column="id" property="id" />
+        <result column="holiday_date" property="holidayDate" />
+        <result column="curr_year" property="currYear" />
+        <result column="date_type" property="dateType" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, holiday_date, curr_year, date_type
+    </sql>
+</mapper>

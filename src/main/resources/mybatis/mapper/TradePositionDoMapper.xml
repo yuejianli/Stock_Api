@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.yueshushu.learn.mapper.TradePositionDoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="top.yueshushu.learn.domain.TradePositionDo">
+        <id column="id" property="id" />
+        <result column="code" property="code" />
+        <result column="name" property="name" />
+        <result column="all_amount" property="allAmount" />
+        <result column="use_amount" property="useAmount" />
+        <result column="avg_price" property="avgPrice" />
+        <result column="price" property="price" />
+        <result column="all_money" property="allMoney" />
+        <result column="float_money" property="floatMoney" />
+        <result column="float_proportion" property="floatProportion" />
+        <result column="user_id" property="userId" />
+        <result column="mock_type" property="mockType" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, code, name, all_amount, use_amount, avg_price, price, all_money, float_money, float_proportion, user_id, mock_type
+    </sql>
+    <update id="syncUseAmount">
+        update trade_position set use_amount= all_amount
+        where flag =1
+    </update>
+    <delete id="deleteByUserIdAndMockType">
+        delete from trade_position where user_id =#{userId} and mock_type =#{mockType}
+    </delete>
+
+</mapper>

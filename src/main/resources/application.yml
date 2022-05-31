@@ -1,0 +1,132 @@
+# 配置 Mysql 需要修改的常量
+MYSQL_HOST: 139.155.90.176:3306
+MYSQL_USERNAME: fund
+MYSQL_PASSWORD: fund
+
+# 配置 Druid 的用户名和密码
+DRUID_USERNAME: yuejianli
+DRUID_PASSWORD: yuezelin
+
+# 配置Redis 的信息:
+REDIS_HOST: 139.155.90.176
+REDIS_PORT: 6379
+REDIS_PASSWORD: zk123
+REDIS_DATABASE: 8
+
+# 配置 swagger 的用户名和密码
+SWAGGER_USERNAME: admin
+SWAGGER_PASSWORD: yuezelin
+
+# 是否开启xxl_job的相应时间验证
+xxlJobTime: true
+
+server:
+  port: 8088
+  servlet:
+    context-path: /StockApi
+  #设置头的大小
+  max-http-header-size: 102400
+# 指定目录
+uploadFilePath: /usr/app
+# 引入 数据库的相关配置
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  # 配置 json
+  jackson:
+    #参数意义：
+    #JsonInclude.Include.ALWAYS       默认
+    #JsonInclude.Include.NON_DEFAULT   属性为默认值不序列化
+    #JsonInclude.Include.NON_EMPTY     属性为 空（””） 或者为 NULL 都不序列化
+    #JsonInclude.Include.NON_NULL      属性为NULL  不序列化
+    default-property-inclusion: ALWAYS
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss
+  # 配置数据库
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_HOST}/stock?serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=UTF-8&useSSL=false&allowMultiQueries=true&allowPublicKeyRetrieval=true
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
+    type: com.alibaba.druid.pool.DruidDataSource
+    initialSize: 100
+    maxActive: 100
+    minIdle: 100
+    # 配置监控统计拦截的filters，去掉后监控界面sql将无法统计，'wall'用于防火墙
+    # filters: stat, wall, log4j   # wall暂不启用，如果启用，需要设置multiStatementAllow为true
+    filters: stat
+    # 通过connectProperties属性来打开mergeSql功能，慢SQL记录
+    connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=2000
+    druid:
+      aop-patterns: top.yueshushu.learn.mapper.*,top.yueshushu.learn.service.impl.*
+  # 配置Redis的使用
+  redis:
+    database: ${REDIS_DATABASE}
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT}
+    password: ${REDIS_PASSWORD}
+    # 超时时间  5000毫秒
+    timeout: 5000
+    # 连接池 lettuce 的配置
+    lettuce:
+      pool:
+        max-active: 100
+        min-idle: 10
+        max-wait: 100000
+#整合mybatis时使用的。   去掉整合 MyBatis的配置信息
+mybatis-plus:
+  # 配置 mapper文件的位置
+  mapper-locations: classpath:mybatis/mapper/**/*.xml
+  # 配置日志
+  configuration:
+    map-underscore-to-camel-case: true #  配置数据库表的列别名设置
+    # 关闭mybatis一级缓存，防止事务和缓存同时打开引起的查询异常
+    local-cache-scope: STATEMENT
+    #查看mybatis的SQL, 线上服务器关闭
+    #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      logic-delete-field: flag   # 逻辑删除的字段
+      logic-not-delete-value: 1  # 正常状态下，该字段的值
+      logic-delete-value: 0      # 删除后，该字段的值
+      table-underline: true # 驼峰方式转换
+#分页插件
+pagehelper:
+  helperDialect: mysql
+  reasonable: true
+  supportMethodsArguments: true
+  params: count=countSql
+# 配置token生成
+jwt:
+  key: "saaa-ihrm"
+  ttl: "3600000"
+#配置 swagger
+swagger:
+  show: true
+  production: false
+  basic:
+    enable: true
+    username: ${SWAGGER_USERNAME}
+    password: ${SWAGGER_PASSWORD}
+# 支持上传文件
+multipart:
+  enabled: true
+# 默认的查询接口配置
+default:
+  # 展示今天的股票信息
+  show_day_url: https://hq.sinajs.cn/list={0}
+  # 展示所有的股票信息
+  all_stock_url: >
+    https://20.push2.eastmoney.com/api/qt/clist/get?pn=1&pz=10000000&np=1&fid=f3&fields={0}&fs=m:0+t:6,m:0+t:13,m:0+t:80,m:1+t:2,m:1+t:23,b:MK0021,b:MK0022,b:MK0023,b:MK0024
+  # 查询这个股票的历史信息
+  stock_history_url: >
+    http://push2his.eastmoney.com/api/qt/stock/kline/get?
+    fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61
+    &klt=101&fqt=1&secid={}&beg={}&end={}
+  stock_history_download_url: >
+    http://quotes.money.163.com/service/chddata.html?code={0}&start={1}&end={2}&fields=TCLOSE;HIGH;LOW;TOPEN;LCLOSE;CHG;PCHG;TURNOVER;VOTURNOVER;VATURNOVER;TCAP;MCAP
+  #k线图
+  min_url: http://image.sinajs.cn/newchart/min/n/{0}.gif
+  daily_url: http://image.sinajs.cn/newchart/daily/n/{0}.gif
+  weekly_url: http://image.sinajs.cn/newchart/weekly/n/{0}.gif
+  monthly_url: http://image.sinajs.cn/newchart/monthly/n/{0}.gif

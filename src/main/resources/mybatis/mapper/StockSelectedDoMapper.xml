@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.yueshushu.learn.mapper.StockSelectedDoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="top.yueshushu.learn.domain.StockSelectedDo">
+        <id column="id" property="id"/>
+        <result column="stock_code" property="stockCode"/>
+        <result column="stock_name" property="stockName"/>
+        <result column="user_id" property="userId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="job_id" property="jobId"/>
+        <result column="code_notes" property="notes"/>
+        <result column="status" property="status"/>
+        <result column="flag" property="flag"/>
+    </resultMap>
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, stock_code,stock_name, user_id, create_time,job_id,code_notes,status,flag
+    </sql>
+    <select id="listByUserIdAndKeyword" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from stock_selected t
+        <where>
+            <if test="userId != null">
+                and t.user_id =#{userId}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                and (
+                t.stock_code like concat('%',concat(#{keyword},'%'))
+                or t.stock_name like concat('%',concat(#{keyword},'%'))
+                )
+            </if>
+            <if test="1==1">
+                and t.status=1
+            </if>
+        </where>
+        order by t.create_time asc
+    </select>
+    <select id="findCodeList" resultType="java.lang.String">
+        select distinct stock_code as code
+        from stock_selected
+        <where>
+            <if test="userId != null">
+                and user_id =#{userId}
+            </if>
+            <if test="1==1">
+                and status=1
+            </if>
+        </where>
+    </select>
+
+</mapper>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.yueshushu.learn.mapper.TradeDealDoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="top.yueshushu.learn.domain.TradeDealDo">
+        <id column="id" property="id" />
+        <result column="code" property="code" />
+        <result column="name" property="name" />
+        <result column="deal_date" property="dealDate" />
+        <result column="deal_type" property="dealType" />
+        <result column="deal_num" property="dealNum" />
+        <result column="deal_price" property="dealPrice" />
+        <result column="deal_money" property="dealMoney" />
+        <result column="deal_code" property="dealCode" />
+        <result column="entrust_code" property="entrustCode" />
+        <result column="entrust_type" property="entrustType" />
+        <result column="user_id" property="userId" />
+        <result column="mock_type" property="mockType" />
+        <result column="flag" property="flag" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, code, name, deal_date, deal_type, deal_num, deal_price, deal_money, deal_code, entrust_code,entrust_type,
+         user_id, mock_type, flag
+    </sql>
+    <select id="listByQuery" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from trade_deal
+        where user_id=#{tradeDealQueryDto.userId}
+        and mock_type =#{tradeDealQueryDto.mockType}
+        <if test="tradeDealQueryDto.dealDate != null">
+            and date_format(deal_date,'%Y%m%d') = date_format(
+            #{tradeDealQueryDto.dealDate,jdbcType=TIMESTAMP},'%Y%m%d')
+        </if>
+        <if test="tradeDealQueryDto.dealType != null">
+            and entrust_status =#{tradeDealQueryDto.dealType}
+        </if>
+        order by deal_date desc
+    </select>
+    <delete id="deleteToDayByQuery">
+        delete from trade_deal
+        where user_id=#{tradeDealQueryDto.userId}
+        and mock_type =#{tradeDealQueryDto.mockType}
+        and date_format(deal_date,'%Y%m%d') =date_format(
+        #{tradeDealQueryDto.dealDate,jdbcType=TIMESTAMP},'%Y%m%d')
+    </delete>
+    <select id="listHistoryByQuery" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from trade_deal
+        where user_id=#{tradeDealQueryDto.userId}
+        and mock_type =#{tradeDealQueryDto.mockType}
+        <if test="tradeDealQueryDto.startDealDate != null">
+            and deal_date >= #{tradeDealQueryDto.startDealDate}
+        </if>
+        <if test="tradeDealQueryDto.endDealDate != null">
+            and deal_date &lt; #{tradeDealQueryDto.endDealDate}
+        </if>
+        <if test="tradeDealQueryDto.code != null and tradeDealQueryDto.code != ''">
+            and code = #{tradeDealQueryDto.code}
+        </if>
+        <if test="tradeDealQueryDto.dealType != null">
+            and deal_type = #{tradeDealQueryDto.dealType}
+        </if>
+        order by deal_date desc
+    </select>
+
+</mapper>

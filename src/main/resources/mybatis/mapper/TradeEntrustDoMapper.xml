@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.yueshushu.learn.mapper.TradeEntrustDoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="top.yueshushu.learn.domain.TradeEntrustDo">
+        <id column="id" property="id" />
+        <result column="code" property="code" />
+        <result column="name" property="name" />
+        <result column="entrust_date" property="entrustDate" />
+        <result column="deal_type" property="dealType" />
+        <result column="entrust_num" property="entrustNum" />
+        <result column="entrust_price" property="entrustPrice" />
+        <result column="entrust_status" property="entrustStatus" />
+        <result column="entrust_code" property="entrustCode" />
+        <result column="use_money" property="useMoney" />
+        <result column="takeout_money" property="takeoutMoney" />
+        <result column="entrust_money" property="entrustMoney" />
+        <result column="hand_money" property="handMoney" />
+        <result column="total_money" property="totalMoney" />
+        <result column="user_id" property="userId" />
+        <result column="entrust_type" property="entrustType" />
+        <result column="mock_type" property="mockType" />
+        <result column="flag" property="flag" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, code, name, entrust_date, deal_type, entrust_num, entrust_price, entrust_status, entrust_code,
+        use_money,takeout_money,entrust_money,
+        hand_money
+        total_money,user_id,
+        entrust_type,mock_type, flag
+    </sql>
+    <select id="listByQuery" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from trade_entrust
+        where user_id=#{tradeEntrustQueryDto.userId}
+        and mock_type =#{tradeEntrustQueryDto.mockType}
+        <if test="tradeEntrustQueryDto.entrustDate != null">
+            and date_format(entrust_date,'%Y%m%d') = date_format(
+            #{tradeEntrustQueryDto.entrustDate,jdbcType=TIMESTAMP},'%Y%m%d')
+        </if>
+        <if test="tradeEntrustQueryDto.entrustStatus != null">
+            and entrust_status =#{tradeEntrustQueryDto.entrustStatus}
+        </if>
+        order by entrust_date desc
+    </select>
+    <delete id="deleteToDayByQuery">
+        delete from trade_entrust
+        where user_id=#{tradeEntrustQueryDto.userId}
+        and mock_type =#{tradeEntrustQueryDto.mockType}
+        and date_format(entrust_date,'%Y%m%d') =date_format(
+        #{tradeEntrustQueryDto.entrustDate,jdbcType=TIMESTAMP},'%Y%m%d')
+    </delete>
+    <select id="listHistoryByQuery" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from trade_entrust
+        where user_id=#{tradeEntrustQueryDto.userId}
+        and mock_type =#{tradeEntrustQueryDto.mockType}
+        <if test="tradeEntrustQueryDto.startEntrustDate != null">
+            and entrust_date >= #{tradeEntrustQueryDto.startEntrustDate}
+        </if>
+        <if test="tradeEntrustQueryDto.endEntrustDate != null">
+            and entrust_date &lt; #{tradeEntrustQueryDto.endEntrustDate}
+        </if>
+        order by entrust_date desc
+    </select>
+
+</mapper>

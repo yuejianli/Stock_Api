@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.yueshushu.learn.mapper.TradePositionHistoryDoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="top.yueshushu.learn.domain.TradePositionHistoryDo">
+        <id column="id" property="id" />
+        <result column="code" property="code" />
+        <result column="name" property="name" />
+        <result column="curr_date" property="currDate" />
+        <result column="all_amount" property="allAmount" />
+        <result column="use_amount" property="useAmount" />
+        <result column="avg_price" property="avgPrice" />
+        <result column="price" property="price" />
+        <result column="all_money" property="allMoney" />
+        <result column="float_money" property="floatMoney" />
+        <result column="float_proportion" property="floatProportion" />
+        <result column="user_id" property="userId" />
+        <result column="mock_type" property="mockType" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, code, name, curr_date,all_amount, use_amount, avg_price, price, all_money, float_money, float_proportion, user_id, mock_type
+    </sql>
+    <delete id="deleteByUserIdAndMockTypeAndDate">
+        delete from trade_position_history t
+        where user_id = #{userId} and mock_type =#{mockType} and date_format(curr_date,'%Y%m%d')=date_format( #{currDate,jdbcType=TIMESTAMP},'%Y%m%d')
+    </delete>
+    <select id="listPositionHistoryAndDateDesc" resultType="top.yueshushu.learn.domain.TradePositionHistoryDo">
+        select <include refid="Base_Column_List"/> from trade_position_history t
+        where t.code=#{code}
+        <if test="startDate!=null">
+            and date_format(curr_date,'%Y%m%d') &gt;=date_format( #{startDate,jdbcType=TIMESTAMP},'%Y%m%d')
+        </if>
+        <if test="endDate!=null">
+            and date_format(curr_date,'%Y%m%d') &lt;=date_format( #{endDate,jdbcType=TIMESTAMP},'%Y%m%d')
+        </if>
+        order by t.curr_date desc
+    </select>
+</mapper>
