@@ -14,6 +14,7 @@ import top.yueshushu.learn.mode.vo.ConfigVo;
 import top.yueshushu.learn.service.ConfigService;
 import top.yueshushu.learn.service.StockService;
 import top.yueshushu.learn.service.TradeStrategyService;
+import top.yueshushu.learn.service.cache.StockCacheService;
 import top.yueshushu.learn.util.BigDecimalUtil;
 import top.yueshushu.learn.util.StockRedisUtil;
 
@@ -39,7 +40,7 @@ public class TradeStrategyServiceImpl implements TradeStrategyService {
     @Resource
     private SellBusiness sellBusiness;
     @Resource
-    private StockRedisUtil stockRedisUtil;
+    private StockCacheService stockCacheService;
     @Resource
     private ConfigService configService;
     @Resource
@@ -56,15 +57,16 @@ public class TradeStrategyServiceImpl implements TradeStrategyService {
 
         List<String> codeList = stockSelectedDomainService.findCodeList(null);
         //查询该员工最开始的收盘价
-        for(String code:codeList){
+        for(String code:codeList) {
             //获取昨天的价格
-            BigDecimal yesPrice = stockRedisUtil.getYesPrice(code);
+            BigDecimal lastBuyPrice = stockCacheService.getLastBuyCachePrice(code);
+            BigDecimal lastSellPrice = stockCacheService.getLastSellCachePrice(code);
             //获取今天的价格
-            BigDecimal currentPrice = stockRedisUtil.getPrice(code);
+            BigDecimal currentPrice = stockCacheService.getNowCachePrice(code);
             //查询当前股票的名称
             Stock stock = stockService.selectByCode(code);
-            //+ 相差 2元，就    110  2    --->  108 107
-            if(BigDecimalUtil.subBigDecimal(yesPrice, buySubPrice).compareTo(currentPrice)>0){
+            //+ 相差 2元，就    110  2    --->  108 106  2
+            if (BigDecimalUtil.subBigDecimal(lastBuyPrice, currentPrice).compareTo(buySubPrice) > 0) {
                 //可以买入
                 BuyRo mockBuyRo = new BuyRo();
                 mockBuyRo.setUserId(buyRo.getUserId());
@@ -72,21 +74,15 @@ public class TradeStrategyServiceImpl implements TradeStrategyService {
                 mockBuyRo.setCode(code);
                 mockBuyRo.setAmount(100);
                 mockBuyRo.setName(stock.getName());
-                mockBuyRo.setPrice(
-                        BigDecimalUtil.subBigDecimal(
-                                yesPrice,
-                                buySubPrice
-                        )
-                );
-                log.info(">>>可以买入股票{}",code);
+                mockBuyRo.setPrice(currentPrice);
+                log.info(">>>可以买入股票{}", code);
                 mockBuyRo.setEntrustType(EntrustType.AUTO.getCode());
                 buyBusiness.buy(mockBuyRo);
+                //立即修改当前买入的价格
+                stockCacheService.setLastBuyCachePrice(code, currentPrice);
             }
 
-            if(BigDecimalUtil.subBigDecimal(
-                    currentPrice,
-                    sellSubPrice
-            ).compareTo(yesPrice)>=0){
+            if (BigDecimalUtil.subBigDecimal(currentPrice, lastSellPrice).compareTo(sellSubPrice) > 0) {
                 //开始买
                 SellRo sellRo = new SellRo();
                 sellRo.setUserId(buyRo.getUserId());
@@ -94,12 +90,10 @@ public class TradeStrategyServiceImpl implements TradeStrategyService {
                 sellRo.setCode(code);
                 sellRo.setAmount(100);
                 sellRo.setName(stock.getName());
-                sellRo.setPrice(
-                        BigDecimalUtil.addBigDecimal(yesPrice, sellSubPrice
-                        )
-                );
+                sellRo.setPrice(currentPrice);
                 sellRo.setEntrustType(EntrustType.AUTO.getCode());
-                log.info(">>>可以卖出股票{}",code);
+                log.info(">>>可以卖出股票{}", code);
+                stockCacheService.setLastSellCachePrice(code, currentPrice);
                 sellBusiness.sell(sellRo);
             }
         }

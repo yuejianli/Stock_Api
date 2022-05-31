@@ -22,6 +22,7 @@ import top.yueshushu.learn.service.TradeDealService;
 import top.yueshushu.learn.service.TradeEntrustService;
 import top.yueshushu.learn.service.TradeMoneyService;
 import top.yueshushu.learn.service.TradePositionService;
+import top.yueshushu.learn.service.cache.StockCacheService;
 import top.yueshushu.learn.util.BigDecimalUtil;
 import top.yueshushu.learn.util.StockRedisUtil;
 import top.yueshushu.learn.util.StockUtil;
@@ -48,7 +49,7 @@ public class DealBusinessImpl implements DealBusiness {
     @Resource
     private TradeDealService tradeDealService;
     @Resource
-    private StockRedisUtil stockRedisUtil;
+    private StockCacheService stockCacheService;
     @Resource
     private TradePositionAssembler tradePositionAssembler;
     @Resource
@@ -82,8 +83,7 @@ public class DealBusinessImpl implements DealBusiness {
     @Override
     public void mockDealXxlJob(DealRo dealRo) {
         //获取当前所有的今日委托单信息，正在委托的.
-        List<TradeEntrust> tradeEntrustDoList = tradeEntrustService.listNowRunEntrust(dealRo.getUserId(),
-                dealRo.getMockType());
+        List<TradeEntrust> tradeEntrustDoList = tradeEntrustService.listNowRunEntrust(dealRo.getUserId(), dealRo.getMockType());
         if(CollectionUtils.isEmpty(tradeEntrustDoList)){
             return ;
         }
@@ -92,10 +92,9 @@ public class DealBusinessImpl implements DealBusiness {
             //获取当前的股票
             String code = tradeEntrustDo.getCode();
             //获取信息
-            BigDecimal price = stockRedisUtil.getPrice(code);
+            BigDecimal price = stockCacheService.getNowCachePrice(code);
             if(price.compareTo(SystemConst.DEFAULT_DEAL_PRICE)<=0){
                 //没有从缓存里面获取到价格
-                //todo 异常
                 return ;
             }
             if(DealType.BUY.getCode().equals(tradeEntrustDo.getDealType())){
@@ -105,10 +104,6 @@ public class DealBusinessImpl implements DealBusiness {
                     BeanUtils.copyProperties(dealRo,newRo);
                     newRo.setId(tradeEntrustDo.getId());
                     deal(newRo);
-                    //重置昨天的价格 为当天买入的价格.
-                    stockRedisUtil.setYesPrice(
-                            code,price
-                    );
                 }
             }else{
                 //卖的时候，  当前价格 > 卖出价格，则成交.
@@ -117,10 +112,6 @@ public class DealBusinessImpl implements DealBusiness {
                     BeanUtils.copyProperties(dealRo,newRo);
                     newRo.setId(tradeEntrustDo.getId());
                     deal(newRo);
-                    //重置昨天的价格 为当天买入的价格.
-                    stockRedisUtil.setYesPrice(
-                            code,price
-                    );
                 }
             }
         }

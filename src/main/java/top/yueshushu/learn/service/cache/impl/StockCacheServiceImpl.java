@@ -47,6 +47,35 @@ public class StockCacheServiceImpl implements StockCacheService {
         if (ObjectUtils.isEmpty(o)) {
             return DEFAULT_PRICE;
         }
-        return (BigDecimal)o;
+        return (BigDecimal) o;
     }
+
+    @Override
+    public void setLastBuyCachePrice(String code, BigDecimal price) {
+        redisUtil.set(Const.STOCK_BUY_PRICE + code, price);
+    }
+
+    @Override
+    public BigDecimal getLastBuyCachePrice(String code) {
+        Object o = redisUtil.get(Const.STOCK_BUY_PRICE + code);
+        if (ObjectUtils.isEmpty(o)) {
+            return DEFAULT_PRICE;
+        }
+        return (BigDecimal) o;
+    }
+
+    @Override
+    public void setLastSellCachePrice(String code, BigDecimal price) {
+        redisUtil.set(Const.STOCK_SELL_PRICE + code, price);
+    }
+
+    @Override
+    public BigDecimal getLastSellCachePrice(String code) {
+        Object o = redisUtil.get(Const.STOCK_SELL_PRICE + code);
+        if (ObjectUtils.isEmpty(o)) {
+            return DEFAULT_PRICE;
+        }
+        return (BigDecimal) o;
+    }
+
 }

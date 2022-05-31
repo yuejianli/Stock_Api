@@ -318,10 +318,12 @@ public class StockSelectedServiceImpl implements StockSelectedService {
             return;
         }
         for (StockPriceCacheDto priceCacheDto : priceCacheDtoList) {
-            if (priceCacheDto.getPrice()==null){
+            if (priceCacheDto.getPrice() == null) {
                 continue;
             }
             stockCacheService.setYesterdayCloseCachePrice(priceCacheDto.getCode(), priceCacheDto.getPrice());
+            stockCacheService.setLastBuyCachePrice(priceCacheDto.getCode(), priceCacheDto.getPrice());
+            stockCacheService.setLastSellCachePrice(priceCacheDto.getCode(), priceCacheDto.getPrice());
         }
     }
 

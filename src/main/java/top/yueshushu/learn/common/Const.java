@@ -22,12 +22,16 @@ public class Const {
 
 
     public static final String STOCK_PRICE = CACHE_PUBLIC_KEY_PREFIX;
-    public static final String STOCK_YES_PRICE = CACHE_PUBLIC_KEY_PREFIX +"yes:";
+    public static final String STOCK_YES_PRICE = CACHE_PUBLIC_KEY_PREFIX + "yes:";
+    public static final String STOCK_BUY_PRICE = CACHE_PUBLIC_KEY_PREFIX + "buy:";
+    public static final String STOCK_SELL_PRICE = CACHE_PUBLIC_KEY_PREFIX + "sell:";
 
     public static final String X_REAL_IP = "x-real-ip";
     public static final int TOKEN_EXPIRE_TIME = 7 * 24 * 3600;
 
-    /**定义日期的格式*/
+    /**
+     * 定义日期的格式
+     */
     public static final String SIMPLE_DATE_FORMAT = "yyyy-MM-dd";
     public static final String DATE_FORMAT = "yyyy-MM-dd hh:mm:ss";
     public static final String STOCK_DATE_FORMAT = "yyyyMMdd";
