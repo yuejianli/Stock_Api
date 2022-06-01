@@ -28,8 +28,8 @@ import top.yueshushu.learn.enumtype.MockType;
 import top.yueshushu.learn.mode.dto.TradeDealQueryDto;
 import top.yueshushu.learn.mode.ro.TradeDealRo;
 import top.yueshushu.learn.mode.vo.TradeDealVo;
-import top.yueshushu.learn.response.PageResponse;
 import top.yueshushu.learn.response.OutputResult;
+import top.yueshushu.learn.response.PageResponse;
 import top.yueshushu.learn.service.TradeDealService;
 import top.yueshushu.learn.util.BigDecimalUtil;
 import top.yueshushu.learn.util.PageUtil;
@@ -50,7 +50,7 @@ import java.util.stream.Collectors;
  * @since 2022-01-03
  */
 @Service
-@Slf4j
+@Slf4j(topic = "tradeDeal")
 public class TradeDealServiceImpl implements TradeDealService {
     @Resource
     private TradeDealDomainService tradeDealDomainService;
@@ -88,6 +88,7 @@ public class TradeDealServiceImpl implements TradeDealService {
         tradeDealDo.setUserId(tradeEntrustDo.getUserId());
         tradeDealDo.setMockType(tradeEntrustDo.getMockType());
         tradeDealDo.setFlag(DataFlagType.NORMAL.getCode());
+        log.info("用户{},成交买入委托单{},添加成交记录成功", tradeEntrustDo.getUserId(), tradeEntrustDo.getId());
         tradeDealDomainService.save(tradeDealDo);
     }
     /**

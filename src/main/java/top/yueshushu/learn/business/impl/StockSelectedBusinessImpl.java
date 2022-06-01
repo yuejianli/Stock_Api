@@ -1,29 +1,26 @@
 package top.yueshushu.learn.business.impl;
 
-import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import top.yueshushu.learn.business.StockBusiness;
 import top.yueshushu.learn.business.StockSelectedBusiness;
 import top.yueshushu.learn.common.ResultCode;
-import top.yueshushu.learn.common.XxlJobConst;
 import top.yueshushu.learn.entity.Stock;
-import top.yueshushu.learn.entity.StockSelected;
 import top.yueshushu.learn.helper.DateHelper;
 import top.yueshushu.learn.mode.ro.IdRo;
 import top.yueshushu.learn.mode.ro.StockSelectedRo;
 import top.yueshushu.learn.mode.vo.StockHistoryVo;
-import top.yueshushu.learn.mode.vo.StockVo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.response.PageResponse;
 import top.yueshushu.learn.service.*;
+import top.yueshushu.learn.service.cache.StockCacheService;
 import top.yueshushu.learn.util.PageUtil;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -44,6 +41,10 @@ public class StockSelectedBusinessImpl implements StockSelectedBusiness {
     private StockHistoryService stockHistoryService;
     @Resource
     private DateHelper dateHelper;
+    @Resource
+    private StockCrawlerService stockCrawlerService;
+    @Resource
+    private StockCacheService stockCacheService;
 
     @Override
     public OutputResult listSelected(StockSelectedRo stockSelectedRo) {
@@ -51,6 +52,7 @@ public class StockSelectedBusinessImpl implements StockSelectedBusiness {
                 stockSelectedRo
         );
     }
+
     @Transactional(rollbackFor = Exception.class)
     @Override
     public OutputResult add(StockSelectedRo stockSelectedRo) {
@@ -60,39 +62,29 @@ public class StockSelectedBusinessImpl implements StockSelectedBusiness {
         );
         // 根据股票的编码，获取相应的股票记录信息
         Stock stock = stockService.selectByCode(stockSelectedRo.getStockCode());
-        if (null == stock){
+        if (null == stock) {
             return OutputResult.buildAlert(
                     ResultCode.STOCK_CODE_NO_EXIST
             );
         }
         // 验证添加用户
         OutputResult addValidateResult = stockSelectedService
-                .validateAdd(stockSelectedRo,maxSelectedNum);
-        if (!addValidateResult.getSuccess()){
+                .validateAdd(stockSelectedRo, maxSelectedNum);
+        if (!addValidateResult.getSuccess()) {
             return addValidateResult;
         }
         //获取到股票的名称，进行添加到股票自选对象里面.
-        StockSelected stockSelected = stockSelectedService.add(
-                stockSelectedRo,stock.getName()
+        stockSelectedService.add(
+                stockSelectedRo, stock.getName()
         );
-        // 对定时任务进行处理
-        if (null == stockSelected.getJobId()){
-          // Integer jobId = addJob(stockSelected.getUserId(),stockSelected.getStockCode());
-           Integer jobId = 1;
-           if ( jobId == null){
-               throw new RuntimeException();
-           }
-           //否则，更新 任务编号
-            stockSelected.setJobId(jobId);
-            stockSelectedService.updateSelected(
-                    stockSelected
-            );
-        }else{
-            //定时任务开启
-//            xxlJobService.enableJob(
-//                    stockSelected.getJobId()
-//            );
-        }
+        String addStockCode = stockSelectedRo.getStockCode();
+        // 设置当前的价格信息
+        stockCrawlerService.updateCodePrice(addStockCode);
+        // 获取价格信息.
+        BigDecimal nowCachePrice = stockCacheService.getNowCachePrice(addStockCode);
+        stockCacheService.setLastBuyCachePrice(addStockCode, nowCachePrice);
+        stockCacheService.setLastSellCachePrice(addStockCode, nowCachePrice);
+
         // 处理缓存信息
         return OutputResult.buildSucc(
                 ResultCode.SUCCESS
@@ -108,12 +100,6 @@ public class StockSelectedBusinessImpl implements StockSelectedBusiness {
         if (!deleteResult.getSuccess()){
             return deleteResult;
         }
-        // 获取定时任务编号
-        Integer jobId = (Integer) deleteResult.getData();
-        if (jobId !=null){
-            // 不对自选的定时任务进行处理
-            // xxlJobService.disableJob(jobId);
-        }
         return OutputResult.buildSucc();
     }
 
@@ -125,12 +111,6 @@ public class StockSelectedBusinessImpl implements StockSelectedBusiness {
         );
         if (!deleteResult.getSuccess()){
             return deleteResult;
-        }
-        // 获取定时任务编号
-        Integer jobId = (Integer) deleteResult.getData();
-        if (jobId !=null){
-            // 不对自选的定时任务进行处理
-            // xxlJobService.disableJob(jobId);
         }
         return OutputResult.buildSucc();
     }

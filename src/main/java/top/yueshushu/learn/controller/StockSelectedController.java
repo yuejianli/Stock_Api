@@ -3,21 +3,16 @@ package top.yueshushu.learn.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-
 import org.springframework.web.bind.annotation.RestController;
 import top.yueshushu.learn.business.StockSelectedBusiness;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.mode.ro.IdRo;
 import top.yueshushu.learn.mode.ro.StockSelectedRo;
 import top.yueshushu.learn.response.OutputResult;
-import top.yueshushu.learn.service.StockSelectedService;
-import top.yueshushu.learn.util.ThreadLocalUtils;
 
 import javax.annotation.Resource;
 
@@ -55,9 +50,7 @@ public class StockSelectedController extends BaseController{
     @ApiOperation("添加到自选表")
     public OutputResult add(@RequestBody StockSelectedRo stockSelectedRo){
         if (!StringUtils.hasText(stockSelectedRo.getStockCode())){
-            return OutputResult.buildAlert(
-                    ResultCode.STOCK_CODE_IS_EMPTY
-            );
+            return OutputResult.buildAlert(ResultCode.STOCK_CODE_IS_EMPTY);
         }
         stockSelectedRo.setUserId(getUserId());
         return stockSelectedBusiness.add(stockSelectedRo);
@@ -66,9 +59,7 @@ public class StockSelectedController extends BaseController{
     @ApiOperation("单个移出自选表")
     public OutputResult delete(@RequestBody IdRo idRo){
         if (idRo.getId() == null){
-            return OutputResult.buildAlert(
-                  ResultCode.ID_IS_EMPTY
-            );
+            return OutputResult.buildAlert(ResultCode.ID_IS_EMPTY);
         }
         return stockSelectedBusiness.delete(idRo,getUserId());
     }

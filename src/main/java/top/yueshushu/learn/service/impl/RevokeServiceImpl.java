@@ -70,7 +70,7 @@ public class RevokeServiceImpl implements RevokeService {
 
     private OutputResult sellRevoke(TradeEntrustDo tradeEntrustDo) {
         //取消的话，改变这个记录的状态。
-        tradeEntrustDo.setEntrustStatus(EntrustStatusType.REVOKE.getCode());
+        tradeEntrustDo.setEntrustStatus(EntrustStatusType.HAND_REVOKE.getCode());
         //更新
         tradeEntrustDomainService.updateById(tradeEntrustDo);
 
@@ -93,7 +93,7 @@ public class RevokeServiceImpl implements RevokeService {
 
     private OutputResult buyRevoke(TradeEntrustDo tradeEntrustDo) {
         //取消的话，改变这个记录的状态。
-        tradeEntrustDo.setEntrustStatus(EntrustStatusType.REVOKE.getCode());
+        tradeEntrustDo.setEntrustStatus(EntrustStatusType.HAND_REVOKE.getCode());
         //更新
         tradeEntrustDomainService.updateById(tradeEntrustDo);
 

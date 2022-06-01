@@ -1,9 +1,6 @@
 package top.yueshushu.learn.common;
 
-import top.yueshushu.learn.response.BaseResultCode;
-
-import java.util.ArrayList;
-import java.util.List;
+import lombok.Data;
 
 /**
  * @ClassName:ResultCode
@@ -12,7 +9,27 @@ import java.util.List;
  * @Date 2022/5/20 20:14
  * @Version 1.0
  **/
-public class ResultCode extends BaseResultCode {
+@Data
+public class ResultCode {
+    /**
+     * 系统层面， 20000 成交， 30000提示， 50000报错.
+     */
+    public static final ResultCode SUCCESS = new ResultCode(true, 20000, "操作成功");
+    public static final ResultCode ALERT = new ResultCode(false, 30000, "传入信息有误");
+    public static final ResultCode FAIL = new ResultCode(false, 50000, "操作失败");
+    /**
+     * 爬虫 提示信息：  200 10 （编排）+ 001 (三位随机)
+     */
+    public static final ResultCode STOCK_ASYNC_FAIL =
+            new ResultCode(true, 20010001, "股票同步失败");
+    public static final ResultCode STOCK_ASYNC_SUCCESS =
+            new ResultCode(true, 20010002, "股票同步成功");
+    public static final ResultCode STOCK_HIS_ASYNC_FAIL =
+            new ResultCode(false, 20010003, "股票历史数据同步失败");
+    public static final ResultCode STOCK_HIS_ASYNC_SUCCESS =
+            new ResultCode(true, 20010004, "股票历史数据同步成功");
+    public static final ResultCode STOCK_CODE_ERROR =
+            new ResultCode(false, 20010005, "股票编码不存在");
     /**
      * 用户层提示信息：  100 10 （编排）+ 001 (三位随机)
      */
@@ -186,56 +203,35 @@ public class ResultCode extends BaseResultCode {
     public static final ResultCode TRADE_POSITION_NUM_SUPPORT=
             new ResultCode(true, 10019010, "份额不足，请检查目前持仓数量");
 
-    public static final ResultCode TRADE_ENTRUST_ID_EMPTY=
+    public static final ResultCode TRADE_ENTRUST_ID_EMPTY =
             new ResultCode(true, 10019011, "传入的委托编号id不正确");
 
-    public static final ResultCode TRADE_ENTRUST_STATUS_ERROR=
+    public static final ResultCode TRADE_ENTRUST_STATUS_ERROR =
             new ResultCode(true, 10019012, "委托状态不正确");
 
-    public static final ResultCode TRADE_DEAL_FAIL=
+    public static final ResultCode TRADE_DEAL_FAIL =
             new ResultCode(true, 10019013, "查询真实今日成交信息失败");
-    public static final ResultCode TRADE_DEAL_HISTORY_FAIL=
+    public static final ResultCode TRADE_DEAL_HISTORY_FAIL =
             new ResultCode(true, 10019014, "查询真实历史成交信息失败");
+    public static final ResultCode STOCK_ASYNC_NO_CHANGE =
+            new ResultCode(false, 20010007, "股票信息未发生改变");
+    public static final ResultCode STOCK_ASYNC_NO_START_DATE =
+            new ResultCode(false, 20010008, "同步历史数据未选择开始日期");
+    public static final ResultCode STOCK_ASYNC_NO_END_DATE =
+            new ResultCode(false, 20010009, "同步历史数据未选择结束日期");
+    private boolean success;
+    private int code;
+    private String message;
 
-    private static final BaseResultCode[] VALUES;
+    public ResultCode() {
 
-    static {
-        VALUES = getStaticFieldValues(ResultCode.class);
     }
 
-    private ResultCode(boolean success, int code, String message) {
-        super(success, code, message);
+    public ResultCode(boolean success, int code, String message) {
+        this.success = success;
+        this.code = code;
+        this.message = message;
     }
 
-    public static BaseResultCode[] values() {
-        return VALUES;
-    }
 
-    public static BaseResultCode getByCode(int code) {
-
-        for (BaseResultCode typeEnum : values()) {
-            if (typeEnum.getCode() == code) {
-                return typeEnum;
-            }
-        }
-
-        return null;
-    }
-
-    public static BaseResultCode getResultCodeByMessage(String message){
-        for(BaseResultCode resultCode : VALUES){
-            if(resultCode.getMessage().equals(message)){
-                return resultCode;
-            }
-        }
-        return null;
-    }
-
-    public static List<Integer> getCodeList(){
-        List<Integer> result = new ArrayList<>();
-        for(BaseResultCode resultCode:values()){
-            result.add(resultCode.getCode());
-        }
-        return result;
-    }
 }

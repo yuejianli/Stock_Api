@@ -24,7 +24,6 @@ import top.yueshushu.learn.service.TradeMoneyService;
 import top.yueshushu.learn.service.TradePositionService;
 import top.yueshushu.learn.service.cache.StockCacheService;
 import top.yueshushu.learn.util.BigDecimalUtil;
-import top.yueshushu.learn.util.StockRedisUtil;
 import top.yueshushu.learn.util.StockUtil;
 
 import javax.annotation.Resource;
@@ -36,7 +35,7 @@ import java.util.List;
  * @Author yuejianli
  * @Date 2022/5/28 21:58
  **/
-@Slf4j
+@Slf4j(topic = "deal")
 @Service
 public class DealBusinessImpl implements DealBusiness {
 
@@ -58,6 +57,7 @@ public class DealBusinessImpl implements DealBusiness {
     private TradePositionDomainService tradePositionDomainService;
     @Override
     public OutputResult deal(DealRo dealRo) {
+        log.info("用户{},试图成交委托单{}", dealRo.getUserId(), dealRo.getId());
         //查询单号信息
         TradeEntrustDo tradeEntrustDo = tradeEntrustDomainService.getById(dealRo.getId());
         if(null== tradeEntrustDo){
@@ -203,6 +203,7 @@ public class DealBusinessImpl implements DealBusiness {
 
     private OutputResult buyDeal(TradeEntrustDo tradeEntrustDo) {
         //取消的话，改变这个记录的状态。
+        log.info("用户{},成交买入委托单{}", tradeEntrustDo.getUserId(), tradeEntrustDo.getId());
         tradeEntrustDo.setEntrustStatus(EntrustStatusType.SUCCESS.getCode());
         //更新
         tradeEntrustDomainService.updateById(tradeEntrustDo);
@@ -249,6 +250,7 @@ public class DealBusinessImpl implements DealBusiness {
             tradePositionDomainService.updateById(tradePositionAssembler.entityToDo(tradePositionDo));
         }
 
+        log.info("用户{},成交买入委托单{},持仓信息更新成功", tradeEntrustDo.getUserId(), tradeEntrustDo.getId());
         //对个人的资产，需要进行减少的操作.
         TradeMoney tradeMoneyDo = tradeMoneyService.getByUserIdAndMockType(
                 tradeEntrustDo.getUserId(),
@@ -275,6 +277,7 @@ public class DealBusinessImpl implements DealBusiness {
                 )
         );
         tradeMoneyService.updateMoney(tradeMoneyDo);
+        log.info("用户{},成交买入委托单{},金额信息更新成功", tradeEntrustDo.getUserId(), tradeEntrustDo.getId());
         //添加一条记录到成交表里面
         tradeDealService.addDealRecord(tradeEntrustDo);
         return OutputResult.buildSucc("成交买的委托");

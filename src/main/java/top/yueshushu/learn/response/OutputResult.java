@@ -2,6 +2,7 @@ package top.yueshushu.learn.response;
 
 import lombok.Data;
 import lombok.Getter;
+import top.yueshushu.learn.common.ResultCode;
 
 import java.io.Serializable;
 
@@ -26,11 +27,10 @@ public class OutputResult<T> implements Serializable {
     private Boolean success;
     private String message;
     private String exceptionMessage;
-    private T data ;
-
-    private static BaseResultCode DEFAULT_SUCCESS = BaseResultCode.SUCCESS;
-    private static BaseResultCode DEFAULT_ALERT = BaseResultCode.ALERT;
-    private static BaseResultCode DEFAULT_FAIL = BaseResultCode.FAIL;
+    private static ResultCode DEFAULT_SUCCESS = ResultCode.SUCCESS;
+    private static ResultCode DEFAULT_ALERT = ResultCode.ALERT;
+    private static ResultCode DEFAULT_FAIL = ResultCode.FAIL;
+    private T data;
 
     /**
      * 构造方法 私有。 避免外部构造
@@ -39,11 +39,11 @@ public class OutputResult<T> implements Serializable {
 
     }
 
-    public OutputResult(BaseResultCode baseResultCode) {
-        this(baseResultCode, null);
+    public OutputResult(ResultCode ResultCode) {
+        this(ResultCode, null);
     }
 
-    public OutputResult(BaseResultCode resultCode, T data) {
+    public OutputResult(ResultCode resultCode, T data) {
         this(resultCode.isSuccess(), resultCode.getCode(), resultCode.getMessage(), data);
     }
 
@@ -55,14 +55,14 @@ public class OutputResult<T> implements Serializable {
     }
 
     public static <T> OutputResult<T> buildFail() {
-        return buildFail(BaseResultCode.FAIL);
+        return buildFail(ResultCode.FAIL);
     }
 
     public static <T> OutputResult<T> buildFail(String message) {
-        return buildFail(BaseResultCode.FAIL.getCode(), message);
+        return buildFail(ResultCode.FAIL.getCode(), message);
     }
 
-    public static <T> OutputResult<T> buildFail(BaseResultCode resultCode) {
+    public static <T> OutputResult<T> buildFail(ResultCode resultCode) {
         return buildFail(resultCode.getCode(), resultCode.getMessage());
     }
 
@@ -70,15 +70,15 @@ public class OutputResult<T> implements Serializable {
         return build(false, code, message, null);
     }
 
-    public static <T> OutputResult<T> buildFail(BaseResultCode resultCode, T data) {
+    public static <T> OutputResult<T> buildFail(ResultCode resultCode, T data) {
         return buildFail(resultCode, null, data);
     }
 
-    public static <T> OutputResult<T> buildFail(BaseResultCode resultCode, String message) {
+    public static <T> OutputResult<T> buildFail(ResultCode resultCode, String message) {
         return new OutputResult<>(resultCode.isSuccess(), resultCode.getCode(), message, null);
     }
 
-    public static <T> OutputResult<T> buildFail(BaseResultCode resultCode, String message, T data) {
+    public static <T> OutputResult<T> buildFail(ResultCode resultCode, String message, T data) {
         return buildFail(resultCode.getCode(), message, data);
     }
 
@@ -88,14 +88,14 @@ public class OutputResult<T> implements Serializable {
 
 
     public static <T> OutputResult<T> buildAlert() {
-        return buildAlert(BaseResultCode.ALERT);
+        return buildAlert(ResultCode.ALERT);
     }
 
     public static <T> OutputResult<T> buildAlert(String message) {
-        return buildAlert(BaseResultCode.ALERT.getCode(), message);
+        return buildAlert(ResultCode.ALERT.getCode(), message);
     }
 
-    public static <T> OutputResult<T> buildAlert(BaseResultCode resultCode) {
+    public static <T> OutputResult<T> buildAlert(ResultCode resultCode) {
         return buildAlert(resultCode.getCode(), resultCode.getMessage());
     }
 
@@ -103,15 +103,15 @@ public class OutputResult<T> implements Serializable {
         return build(false, code, message, null);
     }
 
-    public static <T> OutputResult<T> buildAlert(BaseResultCode resultCode, T data) {
+    public static <T> OutputResult<T> buildAlert(ResultCode resultCode, T data) {
         return buildAlert(resultCode, null, data);
     }
 
-    public static <T> OutputResult<T> buildAlert(BaseResultCode resultCode, String message) {
+    public static <T> OutputResult<T> buildAlert(ResultCode resultCode, String message) {
         return new OutputResult<>(resultCode.isSuccess(), resultCode.getCode(), message, null);
     }
 
-    public static <T> OutputResult<T> buildAlert(BaseResultCode resultCode, String message, T data) {
+    public static <T> OutputResult<T> buildAlert(ResultCode resultCode, String message, T data) {
         return buildFail(resultCode.getCode(), message, data);
     }
 
@@ -121,14 +121,14 @@ public class OutputResult<T> implements Serializable {
 
 
     public static <T> OutputResult<T> buildSucc() {
-        return buildSucc(BaseResultCode.SUCCESS);
+        return buildSucc(ResultCode.SUCCESS);
     }
 
     public static <T> OutputResult<T> buildSucc(T data) {
-        return buildSucc(BaseResultCode.SUCCESS, data);
+        return buildSucc(ResultCode.SUCCESS, data);
     }
 
-    public static <T> OutputResult<T> buildSucc(BaseResultCode resultCode) {
+    public static <T> OutputResult<T> buildSucc(ResultCode resultCode) {
         return buildSucc(resultCode.getCode(), resultCode.getMessage());
     }
 
@@ -136,11 +136,11 @@ public class OutputResult<T> implements Serializable {
         return buildSucc(code, message, null);
     }
 
-    public static <T> OutputResult<T> buildSucc(BaseResultCode resultCode, T data) {
+    public static <T> OutputResult<T> buildSucc(ResultCode resultCode, T data) {
         return buildSucc(resultCode, null, data);
     }
 
-    public static <T> OutputResult<T> buildSucc(BaseResultCode resultCode, String message, T data) {
+    public static <T> OutputResult<T> buildSucc(ResultCode resultCode, String message, T data) {
         return buildSucc(resultCode.getCode(), message, data);
     }
 

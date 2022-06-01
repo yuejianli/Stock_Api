@@ -13,10 +13,18 @@ import top.yueshushu.learn.mode.ro.BuyRo;
 public interface TradeStrategyService {
     /**
      * 交易策略处理
-     * @date 2022/1/11 20:34
-     * @author zk_yjl
+     *
      * @param buyRo
      * @return void
+     * @date 2022/1/11 20:34
+     * @author zk_yjl
      */
     void mockEntructXxlJob(BuyRo buyRo);
+
+    /**
+     * @param userId   用户编号
+     * @param mockType 类型
+     * @date 2022/6/1 13:51
+     */
+    void revokeEntrustJob(Integer userId, Integer mockType);
 }

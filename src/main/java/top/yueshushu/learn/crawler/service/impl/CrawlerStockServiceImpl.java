@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import top.yueshushu.learn.assembler.StockAssembler;
-import top.yueshushu.learn.common.CrawlerResultCode;
+import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.crawler.crawler.CrawlerService;
 import top.yueshushu.learn.crawler.entity.DownloadStockInfo;
 import top.yueshushu.learn.crawler.service.CrawlerStockService;
@@ -16,8 +16,8 @@ import top.yueshushu.learn.entity.Stock;
 import top.yueshushu.learn.enumtype.DataFlagType;
 import top.yueshushu.learn.enumtype.KType;
 import top.yueshushu.learn.mode.info.StockShowInfo;
-import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.mode.ro.StockRo;
+import top.yueshushu.learn.response.OutputResult;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -50,7 +50,7 @@ public class CrawlerStockServiceImpl implements CrawlerStockService {
         );
         if (stock == null){
             return OutputResult.buildFail(
-                    CrawlerResultCode.STOCK_CODE_ERROR
+                    ResultCode.STOCK_CODE_ERROR
             );
         }
         StockShowInfo nowInfo = crawlerService.getNowInfo(
@@ -77,7 +77,7 @@ public class CrawlerStockServiceImpl implements CrawlerStockService {
                 stockDomainService.getByFullCode(code)
         );
         if(null ==stock){
-            return OutputResult.buildAlert(CrawlerResultCode.STOCK_CODE_ERROR);
+            return OutputResult.buildAlert(ResultCode.STOCK_CODE_ERROR);
         }
         String result="";
         switch (kType){
@@ -113,7 +113,7 @@ public class CrawlerStockServiceImpl implements CrawlerStockService {
         List<DownloadStockInfo> downloadStockInfoList = crawlerService.getStockList();
         if(CollectionUtils.isEmpty(downloadStockInfoList)){
             log.error("同步时未获取到股票列表信息");
-            return OutputResult.buildFail(CrawlerResultCode.STOCK_ASYNC_FAIL);
+            return OutputResult.buildFail(ResultCode.STOCK_ASYNC_FAIL);
         }
         log.info(">>获取网络股票信息并转换使用时间:{}",timer.intervalMs());
         //获取到当前的股票列表信息
@@ -130,7 +130,7 @@ public class CrawlerStockServiceImpl implements CrawlerStockService {
                 }
         );
         if (CollectionUtils.isEmpty(stockList)){
-            return OutputResult.buildSucc(CrawlerResultCode.STOCK_ASYNC_NO_CHANGE);
+            return OutputResult.buildSucc(ResultCode.STOCK_ASYNC_NO_CHANGE);
         }
         log.info("本次同步时增加的股票编码依次为:{}",
                 stockList.stream().map(
@@ -140,7 +140,7 @@ public class CrawlerStockServiceImpl implements CrawlerStockService {
                 ));
         stockDomainService.saveBatch(stockList,1000);
         log.info("同步信息到数据库共用时 {}",timer.intervalMs());
-        return OutputResult.buildSucc(CrawlerResultCode.STOCK_ASYNC_SUCCESS);
+        return OutputResult.buildSucc(ResultCode.STOCK_ASYNC_SUCCESS);
     }
 
     @Override

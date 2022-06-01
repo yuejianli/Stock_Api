@@ -19,7 +19,6 @@ import top.yueshushu.learn.mode.vo.ConfigVo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.service.ConfigService;
 import top.yueshushu.learn.service.StockService;
-import top.yueshushu.learn.service.TradeEntrustService;
 import top.yueshushu.learn.service.TradePositionService;
 import top.yueshushu.learn.util.BigDecimalUtil;
 import top.yueshushu.learn.util.StockUtil;
@@ -33,11 +32,8 @@ import javax.annotation.Resource;
  * @date 2022-05-26
  */
 @Service
-@Slf4j
+@Slf4j(topic = "sell")
 public class SellBusinessImpl implements SellBusiness {
-
-    @Resource
-    private TradeEntrustService tradeEntrustService;
     @Resource
     private TradePositionService tradePositionService;
     @Resource
@@ -48,26 +44,30 @@ public class SellBusinessImpl implements SellBusiness {
     private TradeEntrustDomainService tradeEntrustDomainService;
     @Override
     public OutputResult sell(SellRo sellRo) {
+        log.info(">>>试图卖出股票 {},股票信息是:{}", sellRo.getCode(), sellRo);
         Stock stock = stockService.selectByCode(sellRo.getCode());
         if (stock ==null){
             return OutputResult.buildAlert(ResultCode.STOCK_CODE_NO_EXIST);
         }
-
+        log.info("卖出股票时用户{}的股票编码验证通过", sellRo.getUserId());
         //获取当前该股票的持仓数和可用数.
         TradePosition tradePosition = tradePositionService.getPositionByCode(
                 sellRo.getUserId(), sellRo.getMockType(), sellRo.getCode());
         if(tradePosition ==null){
             return OutputResult.buildAlert(ResultCode.TRADE_POSITION_NO);
         }
+        log.info("卖出股票时用户{}的资产验证通过", sellRo.getUserId());
         if(tradePosition.getUseAmount()<sellRo.getAmount()){
             return OutputResult.buildAlert(ResultCode.TRADE_POSITION_NUM_SUPPORT);
         }
+        log.info("卖出股票时用户{}的可用数量验证通过", sellRo.getUserId());
         tradePosition.setUseAmount(
                 tradePosition.getUseAmount()
                         - sellRo.getAmount()
         );
         //更新
         tradePositionService.updateById(tradePosition);
+        log.info("卖出股票时用户{}修改可用数量成功", sellRo.getUserId());
         //获取对应的交易手续费
         ConfigVo priceConfigVo = configService.getConfigByCode(
                 sellRo.getUserId(), ConfigCodeType.TRAN_PRICE.getCode()
@@ -109,6 +109,7 @@ public class SellBusinessImpl implements SellBusiness {
         tradeEntrustDo.setMockType(sellRo.getMockType());
         tradeEntrustDo.setFlag(DataFlagType.NORMAL.getCode());
         //放入一条记录到委托信息里面.
+        log.info("卖出股票时用户{}生成委托信息{}", sellRo.getUserId(), tradeEntrustDo);
         tradeEntrustDomainService.save(tradeEntrustDo);
         return OutputResult.buildSucc();
     }

@@ -24,7 +24,6 @@
     </sql>
     <update id="syncUseAmount">
         update trade_position set use_amount= all_amount
-        where flag =1
     </update>
     <delete id="deleteByUserIdAndMockType">
         delete from trade_position where user_id =#{userId} and mock_type =#{mockType}

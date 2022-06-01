@@ -32,6 +32,7 @@ import top.yueshushu.learn.service.StockSelectedService;
 import top.yueshushu.learn.service.cache.StockCacheService;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -313,17 +314,21 @@ public class StockSelectedServiceImpl implements StockSelectedService {
         //获取相关的信息，根据历史记录查询。
         List<StockPriceCacheDto> priceCacheDtoList = stockHistoryService.listClosePrice(codeList);
         //循环设置缓存信息
-        if (CollectionUtils.isEmpty(priceCacheDtoList)) {
-            log.error(">>>未查询出昨天的价格记录，对应的股票信息是:{}", codeList);
-            return;
-        }
-        for (StockPriceCacheDto priceCacheDto : priceCacheDtoList) {
-            if (priceCacheDto.getPrice() == null) {
-                continue;
+        Map<String, StockPriceCacheDto> priceCacheCodeMap = priceCacheDtoList.stream().collect(Collectors.toMap(StockPriceCacheDto::getCode, n -> n));
+        // 对每一条股票记录进行处理
+        for (String code : codeList) {
+            //如果不存在的话
+            StockPriceCacheDto priceCacheDto = priceCacheCodeMap.get(code);
+            //为空的话，将当前的最后价格，设置成昨天的价格.
+            BigDecimal yesClosePrice;
+            if (priceCacheDto != null) {
+                yesClosePrice = priceCacheDto.getPrice();
+            } else {
+                yesClosePrice = stockCacheService.getNowCachePrice(code);
             }
-            stockCacheService.setYesterdayCloseCachePrice(priceCacheDto.getCode(), priceCacheDto.getPrice());
-            stockCacheService.setLastBuyCachePrice(priceCacheDto.getCode(), priceCacheDto.getPrice());
-            stockCacheService.setLastSellCachePrice(priceCacheDto.getCode(), priceCacheDto.getPrice());
+            stockCacheService.setYesterdayCloseCachePrice(priceCacheDto.getCode(), yesClosePrice);
+            stockCacheService.setLastBuyCachePrice(priceCacheDto.getCode(), yesClosePrice);
+            stockCacheService.setLastSellCachePrice(priceCacheDto.getCode(), yesClosePrice);
         }
     }
 

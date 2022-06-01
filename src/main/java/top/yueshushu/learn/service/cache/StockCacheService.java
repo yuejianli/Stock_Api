@@ -1,7 +1,5 @@
 package top.yueshushu.learn.service.cache;
 
-import top.yueshushu.learn.entity.User;
-
 import java.math.BigDecimal;
 
 /**
@@ -12,13 +10,23 @@ import java.math.BigDecimal;
 public interface StockCacheService {
     /**
      * 设置股票的当前价格缓存信息
-     * @param code 股票代码
+     *
+     * @param code  股票代码
      * @param price 股票的价格
      */
     void setNowCachePrice(String code, BigDecimal price);
 
     /**
+     * 删除当前价格的缓存信息
+     *
+     * @param code 股票代码
+     */
+    void deleteNowCachePrice(String code);
+
+
+    /**
      * 获取当前缓存中的股票的当前价格信息
+     *
      * @param code 股票代码
      */
     BigDecimal getNowCachePrice(String code);
@@ -26,10 +34,20 @@ public interface StockCacheService {
 
     /**
      * 设置股票的昨天的收盘价
-     * @param code 股票代码
+     *
+     * @param code  股票代码
      * @param price 股票的价格
      */
     void setYesterdayCloseCachePrice(String code, BigDecimal price);
+
+
+    /**
+     * 删除股票的昨天的收盘价
+     *
+     * @param code 股票代码
+     */
+    void deleteYesterdayCloseCachePrice(String code);
+
 
     /**
      * 获取缓存中股票的昨天的收盘价
@@ -47,6 +65,13 @@ public interface StockCacheService {
     void setLastBuyCachePrice(String code, BigDecimal price);
 
     /**
+     * 删除缓存中股票的最近一次买入的价格  第二天为重置成昨晚的收盘价
+     *
+     * @param code 股票代码
+     */
+    void deleteLastBuyCachePrice(String code);
+
+    /**
      * 获取缓存中股票的最近一次买入的价格
      *
      * @param code 股票代码
@@ -60,6 +85,13 @@ public interface StockCacheService {
      * @param price 股票的价格
      */
     void setLastSellCachePrice(String code, BigDecimal price);
+
+    /**
+     * 删除缓存中股票的最近一次卖出的价格  第二天为重置成昨晚的收盘价
+     *
+     * @param code 股票代码
+     */
+    void deleteLastSellCachePrice(String code);
 
     /**
      * 获取缓存中股票的最近一次卖出的价格

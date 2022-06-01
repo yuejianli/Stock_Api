@@ -6,7 +6,7 @@ import lombok.Data;
 
 /**
  * @ClassName:RevokeRo
- * @Description TODO
+ * @Description 撤消单处理
  * @Author 岳建立
  * @Date 2022/1/8 16:58
  * @Version 1.0
@@ -16,4 +16,6 @@ import lombok.Data;
 public class RevokeRo extends TradeRo {
     @ApiModelProperty("撤销单的id信息")
     private Integer id;
+    @ApiModelProperty("类型 1为手动，0为自动. 默认是手动")
+    private Integer entrustType = 1;
 }

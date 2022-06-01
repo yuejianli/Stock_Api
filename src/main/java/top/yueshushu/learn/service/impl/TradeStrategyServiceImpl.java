@@ -2,21 +2,25 @@ package top.yueshushu.learn.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import top.yueshushu.learn.business.BuyBusiness;
+import top.yueshushu.learn.business.RevokeBusiness;
 import top.yueshushu.learn.business.SellBusiness;
 import top.yueshushu.learn.domainservice.StockSelectedDomainService;
 import top.yueshushu.learn.entity.Stock;
+import top.yueshushu.learn.entity.TradeEntrust;
 import top.yueshushu.learn.enumtype.ConfigCodeType;
 import top.yueshushu.learn.enumtype.EntrustType;
 import top.yueshushu.learn.mode.ro.BuyRo;
+import top.yueshushu.learn.mode.ro.RevokeRo;
 import top.yueshushu.learn.mode.ro.SellRo;
 import top.yueshushu.learn.mode.vo.ConfigVo;
 import top.yueshushu.learn.service.ConfigService;
 import top.yueshushu.learn.service.StockService;
+import top.yueshushu.learn.service.TradeEntrustService;
 import top.yueshushu.learn.service.TradeStrategyService;
 import top.yueshushu.learn.service.cache.StockCacheService;
 import top.yueshushu.learn.util.BigDecimalUtil;
-import top.yueshushu.learn.util.StockRedisUtil;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -45,6 +49,11 @@ public class TradeStrategyServiceImpl implements TradeStrategyService {
     private ConfigService configService;
     @Resource
     private StockService stockService;
+    @Resource
+    private TradeEntrustService tradeEntrustService;
+    @Resource
+    private RevokeBusiness revokeBusiness;
+
     @Override
     public void mockEntructXxlJob(BuyRo buyRo) {
         // 查询虚拟的买入差值价
@@ -96,6 +105,24 @@ public class TradeStrategyServiceImpl implements TradeStrategyService {
                 stockCacheService.setLastSellCachePrice(code, currentPrice);
                 sellBusiness.sell(sellRo);
             }
+        }
+    }
+
+    @Override
+    public void revokeEntrustJob(Integer userId, Integer mockType) {
+        //获取当前所有的今日委托单信息，正在委托的.
+        List<TradeEntrust> tradeEntrustDoList = tradeEntrustService.listNowRunEntrust(userId, mockType);
+        if (CollectionUtils.isEmpty(tradeEntrustDoList)) {
+            return;
+        }
+        //进行处理.
+        for (TradeEntrust tradeEntrustDo : tradeEntrustDoList) {
+            RevokeRo revokeRo = new RevokeRo();
+            revokeRo.setUserId(userId);
+            revokeRo.setMockType(mockType);
+            revokeRo.setId(tradeEntrustDo.getId());
+            revokeRo.setEntrustType(EntrustType.AUTO.getCode());
+            revokeBusiness.revoke(revokeRo);
         }
     }
 }

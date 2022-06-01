@@ -32,7 +32,7 @@ import java.math.BigDecimal;
  * @Author yuejianli
  * @Date 2022/5/28 19:44
  **/
-@Slf4j
+@Slf4j(topic = "buy")
 @Service
 public class BuyBusinessImpl implements BuyBusiness {
 
@@ -48,10 +48,12 @@ public class BuyBusinessImpl implements BuyBusiness {
     private StockService stockService;
     @Override
     public OutputResult buy(BuyRo buyRo) {
+        log.info(">>>试图买入股票 {},股票信息是:{}", buyRo.getCode(), buyRo);
         Stock stock = stockService.selectByCode(buyRo.getCode());
         if (stock ==null){
             return OutputResult.buildAlert(ResultCode.STOCK_CODE_NO_EXIST);
         }
+        log.info("买入股票时用户{}的股票编码验证通过", buyRo.getUserId());
         //查询该员工对应的资产信息
        TradeMoney tradeMoney = tradeMoneyService.getByUserIdAndMockType(
                 buyRo.getUserId(), buyRo.getMockType());
@@ -59,6 +61,7 @@ public class BuyBusinessImpl implements BuyBusiness {
             log.error("查询用户{}资产信息失败",buyRo.getUserId());
            return OutputResult.buildAlert(ResultCode.TRADE_NO_MONEY);
         }
+        log.info("买入股票时用户{}的资产验证通过", buyRo.getUserId());
         //验证钱够不够
         ConfigVo priceConfigVo = configService.getConfigByCode(
                 buyRo.getUserId(),
@@ -74,6 +77,7 @@ public class BuyBusinessImpl implements BuyBusiness {
             log.error("查询用户{}资产信息不足",buyRo.getUserId());
             return OutputResult.buildAlert(ResultCode.TRADE_MONEY_LESS);
         }
+        log.info("买入股票时用户{}的资产信息验证通过", buyRo.getUserId());
         //可以买入了
         //计算出，可用的与可取的之间的差值信息.
         BigDecimal takeoutMoney = tradeMoney.getTakeoutMoney();
@@ -106,7 +110,7 @@ public class BuyBusinessImpl implements BuyBusiness {
         tradeMoneyService.updateMoney(
                 tradeMoney
         );
-
+        log.info("买入股票时用户{}修改金额成功", buyRo.getUserId());
         // 生成一个买入的委托单
         TradeEntrustDo tradeEntrustDo = new TradeEntrustDo();
         tradeEntrustDo.setCode(buyRo.getCode());
@@ -138,6 +142,7 @@ public class BuyBusinessImpl implements BuyBusiness {
         tradeEntrustDo.setMockType(buyRo.getMockType());
         tradeEntrustDo.setFlag(DataFlagType.NORMAL.getCode());
         //放入一条记录到委托信息里面.
+        log.info("买入股票时用户{}生成委托信息{}", buyRo.getUserId(), tradeEntrustDo);
         tradeEntrustDomainService.save(tradeEntrustDo);
         return OutputResult.buildSucc();
     }
