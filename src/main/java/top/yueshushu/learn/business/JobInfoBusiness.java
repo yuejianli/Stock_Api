@@ -1,6 +1,7 @@
 package top.yueshushu.learn.business;
 
 import top.yueshushu.learn.enumtype.DataFlagType;
+import top.yueshushu.learn.enumtype.JobInfoType;
 import top.yueshushu.learn.mode.ro.JobInfoRo;
 import top.yueshushu.learn.response.OutputResult;
 
@@ -32,4 +33,26 @@ public interface JobInfoBusiness {
      * @author yuejianli
      */
     OutputResult changeStatus(Integer id, DataFlagType dataFlagType);
+
+    /**
+     * 执行任务
+     *
+     * @param jobInfoType 任务类型
+     * @param triggerType 执行类型
+     */
+    void execJob(JobInfoType jobInfoType, Integer triggerType);
+
+    /**
+     * 删除定时任务
+     *
+     * @param id 任务编号id
+     */
+    OutputResult deleteById(Integer id);
+
+    /**
+     * 手动执行定时任务
+     *
+     * @param id 任务编号id
+     */
+    OutputResult handlerById(Integer id);
 }

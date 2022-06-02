@@ -41,4 +41,25 @@ public interface JobInfoService {
      * @param jobInfoType 任务类型
      */
     JobInfo getByCode(JobInfoType jobInfoType);
+
+    /**
+     * 更新定时任务
+     *
+     * @param jobInfo 定时任务对象
+     */
+    void updateInfoById(JobInfo jobInfo);
+
+    /**
+     * 删除定时任务
+     *
+     * @param id 定时任务编号
+     */
+    OutputResult deleteById(Integer id);
+
+    /**
+     * 根据任务编号，获取对应的任务信息
+     *
+     * @param id 傻编号
+     */
+    JobInfo getById(Integer id);
 }

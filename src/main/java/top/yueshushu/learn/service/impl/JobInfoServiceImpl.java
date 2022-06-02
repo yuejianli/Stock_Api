@@ -78,4 +78,21 @@ public class JobInfoServiceImpl implements JobInfoService {
         JobInfoDo jobInfoDo = jobInfoDomainService.getByCode(jobInfoType.getCode());
         return jobInfoAssembler.doToEntity(jobInfoDo);
     }
+
+    @Override
+    public void updateInfoById(JobInfo jobInfo) {
+        jobInfoDomainService.updateById(jobInfoAssembler.entityToDo(jobInfo));
+    }
+
+    @Override
+    public OutputResult deleteById(Integer id) {
+        jobInfoDomainService.removeById(id);
+        return OutputResult.buildSucc();
+    }
+
+    @Override
+    public JobInfo getById(Integer id) {
+        JobInfoDo jobInfoDo = jobInfoDomainService.getById(id);
+        return jobInfoAssembler.doToEntity(jobInfoDo);
+    }
 }

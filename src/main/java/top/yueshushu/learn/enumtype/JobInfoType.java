@@ -34,7 +34,7 @@ public enum JobInfoType {
      * @param code
      * @return
      */
-    public static JobInfoType getExchangeType(String code) {
+    public static JobInfoType getJobInfoType(String code) {
         Assert.notNull(code, "code编号不能为空");
         for (JobInfoType exchangeType : JobInfoType.values()) {
             if (exchangeType.code.equalsIgnoreCase(code)) {

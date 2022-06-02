@@ -54,4 +54,21 @@ public class JobInfoController extends BaseController {
         return jobInfoBusiness.changeStatus(jobInfoRo.getId(), DataFlagType.NORMAL);
     }
 
+    @PostMapping("/delete")
+    @ApiOperation("删除定时任务")
+    public OutputResult delete(@RequestBody JobInfoRo jobInfoRo) {
+        if (jobInfoRo.getId() == null) {
+            return OutputResult.buildAlert(ResultCode.ID_IS_EMPTY);
+        }
+        return jobInfoBusiness.deleteById(jobInfoRo.getId());
+    }
+
+    @PostMapping("/handler")
+    @ApiOperation("手动执行定时任务")
+    public OutputResult handler(@RequestBody JobInfoRo jobInfoRo) {
+        if (jobInfoRo.getId() == null) {
+            return OutputResult.buildAlert(ResultCode.ID_IS_EMPTY);
+        }
+        return jobInfoBusiness.handlerById(jobInfoRo.getId());
+    }
 }

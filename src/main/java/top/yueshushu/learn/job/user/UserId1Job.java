@@ -5,13 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import top.yueshushu.learn.business.DealBusiness;
+import top.yueshushu.learn.business.JobInfoBusiness;
 import top.yueshushu.learn.enumtype.EntrustType;
-import top.yueshushu.learn.enumtype.MockType;
+import top.yueshushu.learn.enumtype.JobInfoType;
 import top.yueshushu.learn.helper.DateHelper;
-import top.yueshushu.learn.mode.ro.BuyRo;
-import top.yueshushu.learn.mode.ro.DealRo;
-import top.yueshushu.learn.service.TradeStrategyService;
 
 import javax.annotation.Resource;
 
@@ -26,12 +23,9 @@ public class UserId1Job {
     @Value("${xxlJobTime}")
     boolean xxlJobTime;
     @Resource
-    private DealBusiness dealBusiness;
-    @Resource
     private DateHelper dateHelper;
-
     @Resource
-    private TradeStrategyService tradeStrategyService;
+    private JobInfoBusiness jobInfoBusiness;
 
     @Scheduled(cron = "2/5 * 9,10,11,13,14,15 ? * 2,3,4,5,6")
     public void mockDeal(){
@@ -40,13 +34,7 @@ public class UserId1Job {
                 return ;
             }
         }
-        String userId = "1";
-        log.info(">>>扫描当前的用户id 为{}", userId);
-        DealRo dealRo = new DealRo();
-        dealRo.setMockType(MockType.MOCK.getCode());
-        dealRo.setUserId(Integer.parseInt(userId));
-        dealRo.setEntrustType(EntrustType.AUTO.getCode());
-        dealBusiness.mockDealXxlJob(dealRo);
+        jobInfoBusiness.execJob(JobInfoType.MOCK_DEAL, EntrustType.AUTO.getCode());
     }
 
     @Scheduled(cron = "2/5 * 9,10,11,13,14,15 ? * 2,3,4,5,6")
@@ -56,11 +44,6 @@ public class UserId1Job {
                 return;
             }
         }
-        String userId = "1";
-        log.info(">>>扫描当前的用户id 为{}", userId);
-        BuyRo buyRo = new BuyRo();
-        buyRo.setMockType(MockType.MOCK.getCode());
-        buyRo.setUserId(Integer.parseInt(userId));
-        tradeStrategyService.mockEntrustXxlJob(buyRo);
+        jobInfoBusiness.execJob(JobInfoType.MOCK_ENTRUST, EntrustType.AUTO.getCode());
     }
 }
