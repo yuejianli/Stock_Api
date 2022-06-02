@@ -41,25 +41,26 @@ public class UserId1Job {
             }
         }
         String userId = "1";
-        log.info(">>>扫描当前的用户id 为{}",userId);
+        log.info(">>>扫描当前的用户id 为{}", userId);
         DealRo dealRo = new DealRo();
         dealRo.setMockType(MockType.MOCK.getCode());
         dealRo.setUserId(Integer.parseInt(userId));
         dealRo.setEntrustType(EntrustType.AUTO.getCode());
         dealBusiness.mockDealXxlJob(dealRo);
     }
+
     @Scheduled(cron = "2/5 * 9,10,11,13,14,15 ? * 2,3,4,5,6")
-    public void mockEntruct(){
-        if(xxlJobTime){
+    public void mockEntrust() {
+        if (xxlJobTime) {
             if (!dateHelper.isTradeTime(DateUtil.date())) {
-                return ;
+                return;
             }
         }
         String userId = "1";
-        log.info(">>>扫描当前的用户id 为{}",userId);
+        log.info(">>>扫描当前的用户id 为{}", userId);
         BuyRo buyRo = new BuyRo();
         buyRo.setMockType(MockType.MOCK.getCode());
         buyRo.setUserId(Integer.parseInt(userId));
-        tradeStrategyService.mockEntructXxlJob(buyRo);
+        tradeStrategyService.mockEntrustXxlJob(buyRo);
     }
 }

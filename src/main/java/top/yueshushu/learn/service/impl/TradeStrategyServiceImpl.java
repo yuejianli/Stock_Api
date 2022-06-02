@@ -55,7 +55,7 @@ public class TradeStrategyServiceImpl implements TradeStrategyService {
     private RevokeBusiness revokeBusiness;
 
     @Override
-    public void mockEntructXxlJob(BuyRo buyRo) {
+    public void mockEntrustXxlJob(BuyRo buyRo) {
         // 查询虚拟的买入差值价
         ConfigVo buyPriceVo = configService.getConfig(buyRo.getUserId(), ConfigCodeType.MOCK_BUY_SUB_PRICE);
         BigDecimal buySubPrice = BigDecimalUtil.toBigDecimal(buyPriceVo.getCodeValue());

@@ -84,7 +84,7 @@ public class StockSelectedBusinessImpl implements StockSelectedBusiness {
         BigDecimal nowCachePrice = stockCacheService.getNowCachePrice(addStockCode);
         stockCacheService.setLastBuyCachePrice(addStockCode, nowCachePrice);
         stockCacheService.setLastSellCachePrice(addStockCode, nowCachePrice);
-
+        stockCacheService.setYesterdayCloseCachePrice(addStockCode, nowCachePrice);
         // 处理缓存信息
         return OutputResult.buildSucc(
                 ResultCode.SUCCESS

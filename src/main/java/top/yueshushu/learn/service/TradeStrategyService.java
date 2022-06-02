@@ -14,14 +14,16 @@ public interface TradeStrategyService {
     /**
      * 交易策略处理
      *
-     * @param buyRo
+     * @param buyRo 买入对象
      * @return void
      * @date 2022/1/11 20:34
      * @author zk_yjl
      */
-    void mockEntructXxlJob(BuyRo buyRo);
+    void mockEntrustXxlJob(BuyRo buyRo);
 
     /**
+     * 撤消当日的委托信息
+     *
      * @param userId   用户编号
      * @param mockType 类型
      * @date 2022/6/1 13:51

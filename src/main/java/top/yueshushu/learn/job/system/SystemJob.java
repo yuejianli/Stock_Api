@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import top.yueshushu.learn.business.JobInfoBusiness;
 import top.yueshushu.learn.enumtype.MockType;
 import top.yueshushu.learn.helper.DateHelper;
 import top.yueshushu.learn.service.*;
@@ -33,6 +34,9 @@ public class SystemJob {
 
     @Resource
     private TradeStrategyService tradeStrategyService;
+
+    @Resource
+    private JobInfoBusiness jobInfoBusiness;
 
     @Value("${xxlJobTime}")
     boolean xxlJobTime;

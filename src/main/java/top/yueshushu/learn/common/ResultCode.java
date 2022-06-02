@@ -177,13 +177,19 @@ public class ResultCode {
             new ResultCode(true, 10018003, "没有权限操作");
 
     /**
+     * 定时任务列表  100 19（编排）+ 001 (三位随机)
+     */
+    public static final ResultCode JOB_ID_NOT_EXIST =
+            new ResultCode(true, 10018001, "交易规则条件关键字不存在,请刷新后重试");
+
+    /**
      * 持仓信息 100 19（编排）+ 001 (三位随机)
      */
     public static final ResultCode TRADE_MOCK_TYPE_IS_EMPTY =
             new ResultCode(true, 10019001, "未选择交易的类型");
-    public static final ResultCode TRADE_MOCK_TYPE_NOT_EXIST=
+    public static final ResultCode TRADE_MOCK_TYPE_NOT_EXIST =
             new ResultCode(true, 10019002, "交易的类型只支持模拟和真实两种");
-    public static final ResultCode TRADE_POSITION_FAIL=
+    public static final ResultCode TRADE_POSITION_FAIL =
             new ResultCode(true, 10019003, "查询真实持仓信息失败");
     public static final ResultCode TRADE_MONEY_FAIL=
             new ResultCode(true, 10019004, "查询真实持仓金额信息失败");
@@ -219,6 +225,8 @@ public class ResultCode {
             new ResultCode(false, 20010008, "同步历史数据未选择开始日期");
     public static final ResultCode STOCK_ASYNC_NO_END_DATE =
             new ResultCode(false, 20010009, "同步历史数据未选择结束日期");
+
+
     private boolean success;
     private int code;
     private String message;
