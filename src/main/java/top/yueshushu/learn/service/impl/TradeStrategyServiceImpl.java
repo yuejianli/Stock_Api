@@ -9,21 +9,21 @@ import top.yueshushu.learn.business.SellBusiness;
 import top.yueshushu.learn.domainservice.StockSelectedDomainService;
 import top.yueshushu.learn.entity.Stock;
 import top.yueshushu.learn.entity.TradeEntrust;
+import top.yueshushu.learn.entity.User;
 import top.yueshushu.learn.enumtype.ConfigCodeType;
 import top.yueshushu.learn.enumtype.EntrustType;
+import top.yueshushu.learn.message.weixin.service.WeChatService;
 import top.yueshushu.learn.mode.ro.BuyRo;
 import top.yueshushu.learn.mode.ro.RevokeRo;
 import top.yueshushu.learn.mode.ro.SellRo;
 import top.yueshushu.learn.mode.vo.ConfigVo;
-import top.yueshushu.learn.service.ConfigService;
-import top.yueshushu.learn.service.StockService;
-import top.yueshushu.learn.service.TradeEntrustService;
-import top.yueshushu.learn.service.TradeStrategyService;
+import top.yueshushu.learn.service.*;
 import top.yueshushu.learn.service.cache.StockCacheService;
 import top.yueshushu.learn.util.BigDecimalUtil;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.text.MessageFormat;
 import java.util.List;
 
 /**
@@ -53,6 +53,10 @@ public class TradeStrategyServiceImpl implements TradeStrategyService {
     private TradeEntrustService tradeEntrustService;
     @Resource
     private RevokeBusiness revokeBusiness;
+    @Resource
+    private UserService userService;
+    @Resource
+    private WeChatService weChatService;
 
     @Override
     public void mockEntrustXxlJob(BuyRo buyRo) {
@@ -89,6 +93,15 @@ public class TradeStrategyServiceImpl implements TradeStrategyService {
                 buyBusiness.buy(mockBuyRo);
                 //立即修改当前买入的价格
                 stockCacheService.setLastBuyCachePrice(code, currentPrice);
+
+                User user = userService.getById(buyRo.getUserId());
+                String message = MessageFormat.format(
+                        "委托买入提醒: 买入股票 {},股票名称{},买入{}份，买入的价格是:{}",
+                        mockBuyRo.getCode(), mockBuyRo.getName(),
+                        mockBuyRo.getAmount(), mockBuyRo.getPrice()
+                );
+                weChatService.sendMessage(user.getWxUserId(),
+                        message);
             }
 
             if (BigDecimalUtil.subBigDecimal(currentPrice, lastSellPrice).compareTo(sellSubPrice) > 0) {
@@ -104,6 +117,15 @@ public class TradeStrategyServiceImpl implements TradeStrategyService {
                 log.info(">>>可以卖出股票{}", code);
                 stockCacheService.setLastSellCachePrice(code, currentPrice);
                 sellBusiness.sell(sellRo);
+
+                User user = userService.getById(buyRo.getUserId());
+                String message = MessageFormat.format(
+                        "委托卖出提醒: 卖出股票 {},股票名称{},卖出{}份，卖出的价格是:{}",
+                        sellRo.getCode(), sellRo.getName(),
+                        sellRo.getAmount(), sellRo.getPrice()
+                );
+                weChatService.sendMessage(user.getWxUserId(),
+                        message);
             }
         }
     }

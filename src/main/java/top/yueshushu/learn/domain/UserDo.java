@@ -1,14 +1,14 @@
 package top.yueshushu.learn.domain;
 
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableField;
-import java.io.Serializable;
-import java.util.Date;
-
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * <p>
@@ -67,6 +67,11 @@ public class UserDo implements Serializable {
      */
     @TableField("email")
     private String email;
+    /**
+     * 企业用户发送的微信用户id
+     */
+    @TableField("wx_user_id")
+    private String wxUserId;
 
     /**
      * 用户创建时间

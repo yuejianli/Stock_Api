@@ -10,6 +10,7 @@ import org.springframework.util.StringUtils;
 import top.yueshushu.learn.assembler.UserAssembler;
 import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.common.ResultCode;
+import top.yueshushu.learn.domain.UserDo;
 import top.yueshushu.learn.domainservice.UserDomainService;
 import top.yueshushu.learn.entity.User;
 import top.yueshushu.learn.mode.ro.UserRo;
@@ -22,6 +23,7 @@ import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -87,20 +89,30 @@ public class UserServiceImpl implements UserService {
         String encryPs = md5.digestHex16(password.getBytes());
         return OutputResult.buildSucc(encryPs);
     }
+
     @Override
     public OutputResult tradePassword(String password) {
-         byte[] key = Const.TRADE_PASSWORD_AES_KEY.getBytes();
-         SymmetricCrypto symmetricCrypto = new SymmetricCrypto(SymmetricAlgorithm.AES,key);
-         //加密
-         return OutputResult.buildSucc(symmetricCrypto.encryptHex(password));
+        byte[] key = Const.TRADE_PASSWORD_AES_KEY.getBytes();
+        SymmetricCrypto symmetricCrypto = new SymmetricCrypto(SymmetricAlgorithm.AES, key);
+        //加密
+        return OutputResult.buildSucc(symmetricCrypto.encryptHex(password));
     }
+
+    @Override
+    public List<User> listNotice() {
+        List<UserDo> userDoList = userDomainService.list();
+        return userDoList.stream().map(
+                n -> userAssembler.doToEntity(n)
+        ).collect(Collectors.toList());
+    }
+
     @Override
     public OutputResult validateUserRo(UserRo userRo) {
 
         //进行账号验证
         User user = getUserByAccount(userRo.getAccount());
-        if(null == user){
-            log.info("账号 {} 不存在",userRo.getAccount());
+        if (null == user) {
+            log.info("账号 {} 不存在", userRo.getAccount());
             return OutputResult.buildAlert(ResultCode.ACCOUNT_NOT_EXIST);
         }
         //进行密码验证
@@ -119,6 +131,16 @@ public class UserServiceImpl implements UserService {
         return userAssembler.doToEntity(
                 userDomainService.getByAccount(account)
         );
+    }
+
+    @Override
+    public User getDefaultUser() {
+        return userAssembler.doToEntity(userDomainService.getById(1));
+    }
+
+    @Override
+    public User getById(Integer id) {
+        return userAssembler.doToEntity(userDomainService.getById(id));
     }
 
     @Override

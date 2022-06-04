@@ -135,3 +135,8 @@ default:
                              f4,f5,f6,f12,f14,f15,f16,f17,f18&fs=m:0+t:6,m:0+t:13,m:0+t:80,m:0+t:81+s:2048,m:1+t:2,\
                              m:1+t:23,b:MK0021,\
                              b:MK0022,b:MK0023,b:MK0024%22"
+# 微信发送的配置信息
+weixin:
+  corpId: ww5c184c4bc6e3bc4b
+  coprsecret: 5MskXTWJjddfXxYY2ffdEO9FwP9BwNWz_rTqufx75_A
+  agentId: 1000003

@@ -12,25 +12,27 @@ import top.yueshushu.learn.crawler.business.CrawlerStockBusiness;
 import top.yueshushu.learn.crawler.business.CrawlerStockHistoryBusiness;
 import top.yueshushu.learn.crawler.crawler.CrawlerService;
 import top.yueshushu.learn.crawler.entity.DownloadStockInfo;
-import top.yueshushu.learn.crawler.service.CrawlerStockService;
 import top.yueshushu.learn.domain.StockDo;
 import top.yueshushu.learn.domain.StockUpdateLogDo;
 import top.yueshushu.learn.domainservice.StockDomainService;
 import top.yueshushu.learn.domainservice.StockUpdateLogDomainService;
+import top.yueshushu.learn.entity.User;
 import top.yueshushu.learn.enumtype.DataFlagType;
 import top.yueshushu.learn.enumtype.StockUpdateType;
 import top.yueshushu.learn.enumtype.SyncStockHistoryType;
+import top.yueshushu.learn.message.weixin.service.WeChatService;
 import top.yueshushu.learn.mode.info.StockShowInfo;
 import top.yueshushu.learn.mode.ro.StockRo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.service.StockCrawlerService;
-import top.yueshushu.learn.service.StockUpdateLogService;
+import top.yueshushu.learn.service.UserService;
 import top.yueshushu.learn.service.cache.StockCacheService;
 import top.yueshushu.learn.util.BigDecimalUtil;
 import top.yueshushu.learn.util.StockUtil;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -63,6 +65,10 @@ public class StockCrawlerServiceImpl implements StockCrawlerService {
     private StockAssembler stockAssembler;
     @Resource
     private StockUpdateLogAssembler stockUpdateLogAssembler;
+    @Resource
+    private UserService userService;
+    @Resource
+    private WeChatService weChatService;
 
 
     @Override
@@ -192,16 +198,23 @@ public class StockCrawlerServiceImpl implements StockCrawlerService {
             //如果不存在的话，为新增.
             if (!dbStockCodeMap.containsKey(downloadStockInfo.getCode())){
                 //不包含，说明为新增.
-                StockDo addStockDo =stockAssembler.downInfoToDO(downloadStockInfo);
+                StockDo addStockDo = stockAssembler.downInfoToDO(downloadStockInfo);
                 addStockDo.setCreateTime(now);
                 addStockDo.setCreateUser("job");
                 addStockDo.setFlag(DataFlagType.NORMAL.getCode());
                 addStockDoList.add(addStockDo);
-                log.info(">>>>>添加股票:{}",addStockDo);
+                log.info(">>>>>添加股票:{}", addStockDo);
                 StockUpdateLogDo stockUpdateLogDo = stockUpdateLogAssembler.stockEntityToDo(addStockDo);
                 stockUpdateLogDo.setUpdateTime(now);
                 stockUpdateLogDo.setUpdateType(StockUpdateType.NEW.getCode());
                 stockUpdateLogDoList.add(stockUpdateLogDo);
+                List<User> userList = userService.listNotice();
+                String newStockMessage = MessageFormat.format("打新股提醒:股票 {}今天上市了", downloadStockInfo.getCode());
+                userList.forEach(
+                        n -> {
+                            weChatService.sendMessage(n.getWxUserId(), newStockMessage);
+                        }
+                );
             }else{
                 //如果编码相同，看名称是否相同.
                 StockDo updateStockDo = dbStockCodeMap.get(downloadStockInfo.getCode());

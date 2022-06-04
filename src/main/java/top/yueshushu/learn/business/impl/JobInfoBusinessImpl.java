@@ -6,14 +6,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import top.yueshushu.learn.business.DealBusiness;
 import top.yueshushu.learn.business.JobInfoBusiness;
-import top.yueshushu.learn.business.StockBusiness;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.entity.JobInfo;
+import top.yueshushu.learn.entity.User;
 import top.yueshushu.learn.enumtype.DataFlagType;
 import top.yueshushu.learn.enumtype.EntrustType;
 import top.yueshushu.learn.enumtype.JobInfoType;
 import top.yueshushu.learn.enumtype.MockType;
 import top.yueshushu.learn.helper.DateHelper;
+import top.yueshushu.learn.message.weixin.service.WeChatService;
 import top.yueshushu.learn.mode.ro.BuyRo;
 import top.yueshushu.learn.mode.ro.DealRo;
 import top.yueshushu.learn.mode.ro.JobInfoRo;
@@ -22,6 +23,7 @@ import top.yueshushu.learn.service.*;
 import top.yueshushu.learn.util.CronExpression;
 
 import javax.annotation.Resource;
+import java.text.MessageFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -56,6 +58,8 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
     private TradeStrategyService tradeStrategyService;
     @Resource
     private StockCrawlerService stockCrawlerService;
+    @Resource
+    private WeChatService weChatService;
 
 
     @Override
@@ -136,7 +140,6 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
                 case MOCK_DEAL: {
                     String userIdList = jobInfo.getParam();
                     for (String userId : userIdList.split(",")) {
-                        log.info(">>>扫描当前的用户id 为{}", userId);
                         DealRo dealRo = new DealRo();
                         dealRo.setMockType(MockType.MOCK.getCode());
                         dealRo.setUserId(Integer.parseInt(userId));
@@ -148,7 +151,6 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
                 case MOCK_ENTRUST: {
                     String userIdList = jobInfo.getParam();
                     for (String userId : userIdList.split(",")) {
-                        log.info(">>>扫描当前的用户id 为{}", userId);
                         BuyRo buyRo = new BuyRo();
                         buyRo.setMockType(MockType.MOCK.getCode());
                         buyRo.setUserId(Integer.parseInt(userId));
@@ -170,7 +172,12 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
         } catch (Exception e) {
             jobInfo.setTriggerLastResult(0);
             jobInfo.setTriggerLastErrorMessage(e.getMessage());
-            log.info("执行任务失败{}", e);
+            //执行任务失败，会发送消息到当前的用户.
+            User user = userService.getDefaultUser();
+            String errorWxMessage = MessageFormat.format("执行任务 {} 失败，失败原因是:{}",
+                    jobInfoType.getDesc(), e.getMessage());
+            weChatService.sendMessage(user.getWxUserId(), errorWxMessage);
+            log.error("执行任务失败{}", e);
         }
         //设置下次触发的时间
         jobInfo.setTriggerType(triggerType);

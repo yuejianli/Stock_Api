@@ -14,20 +14,20 @@ import top.yueshushu.learn.domainservice.TradePositionDomainService;
 import top.yueshushu.learn.entity.TradeEntrust;
 import top.yueshushu.learn.entity.TradeMoney;
 import top.yueshushu.learn.entity.TradePosition;
+import top.yueshushu.learn.entity.User;
 import top.yueshushu.learn.enumtype.DealType;
 import top.yueshushu.learn.enumtype.EntrustStatusType;
+import top.yueshushu.learn.message.weixin.service.WeChatService;
 import top.yueshushu.learn.mode.ro.DealRo;
 import top.yueshushu.learn.response.OutputResult;
-import top.yueshushu.learn.service.TradeDealService;
-import top.yueshushu.learn.service.TradeEntrustService;
-import top.yueshushu.learn.service.TradeMoneyService;
-import top.yueshushu.learn.service.TradePositionService;
+import top.yueshushu.learn.service.*;
 import top.yueshushu.learn.service.cache.StockCacheService;
 import top.yueshushu.learn.util.BigDecimalUtil;
 import top.yueshushu.learn.util.StockUtil;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.text.MessageFormat;
 import java.util.List;
 
 /**
@@ -55,15 +55,20 @@ public class DealBusinessImpl implements DealBusiness {
     private TradeEntrustDomainService tradeEntrustDomainService;
     @Resource
     private TradePositionDomainService tradePositionDomainService;
+    @Resource
+    private WeChatService weChatService;
+    @Resource
+    private UserService userService;
+
     @Override
     public OutputResult deal(DealRo dealRo) {
         log.info("用户{},试图成交委托单{}", dealRo.getUserId(), dealRo.getId());
         //查询单号信息
         TradeEntrustDo tradeEntrustDo = tradeEntrustDomainService.getById(dealRo.getId());
-        if(null== tradeEntrustDo){
+        if (null == tradeEntrustDo) {
             return OutputResult.buildAlert(ResultCode.TRADE_ENTRUST_ID_EMPTY);
         }
-        if(!tradeEntrustDo.getUserId().equals(dealRo.getUserId())){
+        if (!tradeEntrustDo.getUserId().equals(dealRo.getUserId())) {
             return OutputResult.buildAlert(ResultCode.NO_AUTH);
         }
         if(!EntrustStatusType.ING.getCode().equals(tradeEntrustDo.getEntrustStatus())){
@@ -99,19 +104,38 @@ public class DealBusinessImpl implements DealBusiness {
             }
             if(DealType.BUY.getCode().equals(tradeEntrustDo.getDealType())){
                 //买的时候，  当前价格 < 买入价格，则成交.
-                if(price.compareTo(tradeEntrustDo.getEntrustPrice())<0){
+                if(price.compareTo(tradeEntrustDo.getEntrustPrice())<0) {
                     DealRo newRo = new DealRo();
-                    BeanUtils.copyProperties(dealRo,newRo);
+                    BeanUtils.copyProperties(dealRo, newRo);
                     newRo.setId(tradeEntrustDo.getId());
                     deal(newRo);
+                    User user = userService.getById(dealRo.getUserId());
+                    String message = MessageFormat.format(
+                            "成交提醒: 买入股票 {},股票名称{},买入{}份，买入的价格是:{},花费金额:{}",
+                            tradeEntrustDo.getCode(), tradeEntrustDo.getName(),
+                            tradeEntrustDo.getEntrustNum(), tradeEntrustDo.getEntrustPrice(),
+                            tradeEntrustDo.getEntrustMoney()
+                    );
+                    weChatService.sendMessage(user.getWxUserId(),
+                            message);
                 }
             }else{
                 //卖的时候，  当前价格 > 卖出价格，则成交.
-                if(price.compareTo(tradeEntrustDo.getEntrustPrice())>0){
+                if(price.compareTo(tradeEntrustDo.getEntrustPrice())>0) {
                     DealRo newRo = new DealRo();
-                    BeanUtils.copyProperties(dealRo,newRo);
+                    BeanUtils.copyProperties(dealRo, newRo);
                     newRo.setId(tradeEntrustDo.getId());
                     deal(newRo);
+
+                    User user = userService.getById(dealRo.getUserId());
+                    String message = MessageFormat.format(
+                            "成交提醒: 卖出股票 {},股票名称{},卖出{}份，卖出的价格是:{},卖出金额:{}",
+                            tradeEntrustDo.getCode(), tradeEntrustDo.getName(),
+                            tradeEntrustDo.getEntrustNum(), tradeEntrustDo.getEntrustPrice(),
+                            tradeEntrustDo.getEntrustMoney()
+                    );
+                    weChatService.sendMessage(user.getWxUserId(),
+                            message);
                 }
             }
         }

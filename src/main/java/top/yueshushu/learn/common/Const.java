@@ -19,7 +19,7 @@ public class Const {
 
     public static final String CACHE_PUBLIC_KEY_PREFIX = "stock:public:";
     public static final String CACHE_PRIVATE_KEY_PREFIX = "stock:private:";
-
+    public static final String CACHE_WE_CHAT = "stock:wechat";
 
     public static final String STOCK_PRICE = CACHE_PUBLIC_KEY_PREFIX;
     public static final String STOCK_YES_PRICE = CACHE_PUBLIC_KEY_PREFIX + "yes:";

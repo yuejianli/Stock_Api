@@ -38,21 +38,46 @@ public interface UserService  {
 
     /**
      * 通过账号查询相应的用户信息
+     *
      * @param account 账号
      * @return 返回相应的用户信息，查询不出来，返回 null
      */
     User getUserByAccount(String account);
 
     /**
+     * 获取默认的用户
+     *
+     * @return 返回相应的用户信息，查询不出来，返回 null
+     */
+    User getDefaultUser();
+
+    /**
+     * 获取默认的用户
+     *
+     * @param id 用户的id
+     * @return 返回相应的用户信息，查询不出来，返回 null
+     */
+    User getById(Integer id);
+
+    /**
      * 查询所有的用户id信息
+     *
      * @return 返回所有的用户id集合
      */
     List<Integer> listUserId();
 
     /**
      * 转换交易用户的密码
+     *
      * @param password 交易用户密码
      * @return 转换交易用户的密码
      */
     OutputResult tradePassword(String password);
+
+    /**
+     * 查询需要通知的用户列表
+     *
+     * @return 查询需要通知的用户列表
+     */
+    List<User> listNotice();
 }
