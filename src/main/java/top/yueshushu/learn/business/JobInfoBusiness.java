@@ -40,7 +40,7 @@ public interface JobInfoBusiness {
      * @param jobInfoType 任务类型
      * @param triggerType 执行类型
      */
-    void execJob(JobInfoType jobInfoType, Integer triggerType);
+    OutputResult execJob(JobInfoType jobInfoType, Integer triggerType);
 
     /**
      * 删除定时任务

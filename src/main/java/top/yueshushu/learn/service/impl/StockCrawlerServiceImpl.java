@@ -2,22 +2,40 @@ package top.yueshushu.learn.service.impl;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import top.yueshushu.learn.assembler.StockAssembler;
+import top.yueshushu.learn.assembler.StockUpdateLogAssembler;
 import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.crawler.business.CrawlerStockBusiness;
 import top.yueshushu.learn.crawler.business.CrawlerStockHistoryBusiness;
+import top.yueshushu.learn.crawler.crawler.CrawlerService;
+import top.yueshushu.learn.crawler.entity.DownloadStockInfo;
+import top.yueshushu.learn.crawler.service.CrawlerStockService;
+import top.yueshushu.learn.domain.StockDo;
+import top.yueshushu.learn.domain.StockUpdateLogDo;
+import top.yueshushu.learn.domainservice.StockDomainService;
+import top.yueshushu.learn.domainservice.StockUpdateLogDomainService;
+import top.yueshushu.learn.enumtype.DataFlagType;
+import top.yueshushu.learn.enumtype.StockUpdateType;
 import top.yueshushu.learn.enumtype.SyncStockHistoryType;
 import top.yueshushu.learn.mode.info.StockShowInfo;
 import top.yueshushu.learn.mode.ro.StockRo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.service.StockCrawlerService;
+import top.yueshushu.learn.service.StockUpdateLogService;
 import top.yueshushu.learn.service.cache.StockCacheService;
 import top.yueshushu.learn.util.BigDecimalUtil;
 import top.yueshushu.learn.util.StockUtil;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @ClassName:StockCrawlerServiceImpl
@@ -27,6 +45,7 @@ import java.util.Date;
  * @Version 1.0
  **/
 @Service
+@Slf4j
 public class StockCrawlerServiceImpl implements StockCrawlerService {
     @Resource
     private StockCacheService  stockCacheService;
@@ -34,6 +53,16 @@ public class StockCrawlerServiceImpl implements StockCrawlerService {
     private CrawlerStockBusiness crawlerStockBusiness;
     @Resource
     private CrawlerStockHistoryBusiness crawlerStockHistoryBusiness;
+    @Resource
+    private StockDomainService stockDomainService;
+    @Resource
+    private CrawlerService crawlerService;
+    @Resource
+    private StockUpdateLogDomainService stockUpdateLogDomainService;
+    @Resource
+    private StockAssembler stockAssembler;
+    @Resource
+    private StockUpdateLogAssembler stockUpdateLogAssembler;
 
 
     @Override
@@ -139,6 +168,92 @@ public class StockCrawlerServiceImpl implements StockCrawlerService {
         //生成真实数据。
         generateRealPriceData(code);
     }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateAllStock() {
+        //1. 查询当前所有的股票信息
+        List<StockDo> dbAllStockList = stockDomainService.list();
+        log.info(">>>数据库查询所有的股票记录成功，查询条数为:{}",dbAllStockList.size());
+        Map<String, StockDo> dbStockCodeMap = dbAllStockList.stream().collect(Collectors.toMap(StockDo::getCode, n -> n));
+        //爬虫查询，目前的股票列表记录.
+        List<DownloadStockInfo> webStockList = crawlerService.getStockList();
+        List<String> webStockCodeList = webStockList.stream().map(DownloadStockInfo::getCode).collect(Collectors.toList());
+        log.info(">>> 查询当前网络系统上，共存在的股票条数为:{}",webStockList.size());
+
+        List<StockDo> addStockDoList = new ArrayList<>();
+        List<StockDo> updateStockDoList = new ArrayList<>();
+        List<Integer> deleteStockIdList = new ArrayList<>();
+
+        List<StockUpdateLogDo> stockUpdateLogDoList = new ArrayList<>();
+        // 股票更新历史记录
+        Date now = DateUtil.date();
+        for (DownloadStockInfo downloadStockInfo :webStockList){
+            //如果不存在的话，为新增.
+            if (!dbStockCodeMap.containsKey(downloadStockInfo.getCode())){
+                //不包含，说明为新增.
+                StockDo addStockDo =stockAssembler.downInfoToDO(downloadStockInfo);
+                addStockDo.setCreateTime(now);
+                addStockDo.setCreateUser("job");
+                addStockDo.setFlag(DataFlagType.NORMAL.getCode());
+                addStockDoList.add(addStockDo);
+                log.info(">>>>>添加股票:{}",addStockDo);
+                StockUpdateLogDo stockUpdateLogDo = stockUpdateLogAssembler.stockEntityToDo(addStockDo);
+                stockUpdateLogDo.setUpdateTime(now);
+                stockUpdateLogDo.setUpdateType(StockUpdateType.NEW.getCode());
+                stockUpdateLogDoList.add(stockUpdateLogDo);
+            }else{
+                //如果编码相同，看名称是否相同.
+                StockDo updateStockDo = dbStockCodeMap.get(downloadStockInfo.getCode());
+                //名称还一样，说明没有变。
+                if (updateStockDo.getName().equals(downloadStockInfo.getName())){
+                    continue;
+                }
+                String oldName = updateStockDo.getName();
+                //更新名称.
+                updateStockDo.setName(downloadStockInfo.getName());
+
+                log.info(">>>>>更新股票:{}",updateStockDo);
+                updateStockDoList.add(updateStockDo);
+
+                StockUpdateLogDo stockUpdateLogDo = stockUpdateLogAssembler.stockEntityToDo(updateStockDo);
+                stockUpdateLogDo.setUpdateTime(now);
+                stockUpdateLogDo.setName(oldName+"--->"+downloadStockInfo.getName());
+                //id为空，避免使用的是股票编码的id
+                stockUpdateLogDo.setId(null);
+                stockUpdateLogDo.setUpdateType(StockUpdateType.CHANGE.getCode());
+                stockUpdateLogDoList.add(stockUpdateLogDo);
+            }
+        }
+        // 处理删除的
+        dbStockCodeMap.entrySet().forEach(
+                n->{
+                    StockDo dbStockDo = n.getValue();
+                    if (!webStockCodeList.contains(dbStockDo.getCode())){
+                        //不包含，如果被删除了
+                        log.info(">>>>>删除股票:{}",dbStockDo);
+                        deleteStockIdList.add(dbStockDo.getId());
+
+                        //处理日志记录
+                        StockUpdateLogDo stockUpdateLogDo = stockUpdateLogAssembler.stockEntityToDo(dbStockDo);
+                        stockUpdateLogDo.setUpdateTime(now);
+                        //id为空，避免使用的是股票编码的id
+                        stockUpdateLogDo.setId(null);
+                        stockUpdateLogDo.setUpdateType(StockUpdateType.DELISTING.getCode());
+                        stockUpdateLogDoList.add(stockUpdateLogDo);
+                    }
+                }
+        );
+
+        //接下来，进行插入和修改相关操作.
+        stockDomainService.removeByIds(deleteStockIdList);
+        stockDomainService.updateBatchById(updateStockDoList);
+        stockDomainService.saveBatch(addStockDoList);
+
+        //对日志处理
+        stockUpdateLogDomainService.saveBatch(stockUpdateLogDoList);
+    }
+
     /**
      * 生成虚拟的股票信息  P(t) = P(t-1) + random(0,1)*1 - 0.5
      * @param code 股票编码

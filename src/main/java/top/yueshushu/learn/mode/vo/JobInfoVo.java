@@ -46,7 +46,7 @@ public class JobInfoVo implements Serializable {
     /**
      * 使用@JsonFormat注解格式化日期
      */
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty("更新时间")
     private LocalDateTime updateTime;
 
@@ -63,7 +63,7 @@ public class JobInfoVo implements Serializable {
     /**
      * 使用@JsonFormat注解格式化日期
      */
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty("上次触发的时间")
     private LocalDateTime triggerLastTime;
 
@@ -75,7 +75,7 @@ public class JobInfoVo implements Serializable {
     /**
      * 使用@JsonFormat注解格式化日期
      */
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty("下次触发的时间")
     private LocalDateTime triggerNextTime;
 

@@ -81,4 +81,17 @@ public class StockHistoryDomainServiceImpl extends ServiceImpl<StockHistoryDoMap
                 )
         );
     }
+
+    @Override
+    public List<String> listDate(String code, String startDate, String endDate) {
+       return stockHistoryDoMapper.listDate(
+                code,
+                DateUtil.parse(
+                        startDate,"yyyyMMdd"
+                ),
+                DateUtil.parse(
+                        endDate,"yyyyMMdd"
+                )
+        );
+    }
 }

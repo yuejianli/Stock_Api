@@ -109,4 +109,13 @@ public class SystemJob {
         log.info(">>> {} 时,保存股票的当前持仓信息", DateUtil.now());
         jobInfoBusiness.execJob(JobInfoType.TRADE_POSITION_HISTORY, EntrustType.AUTO.getCode());
     }
+    @Scheduled(cron = "1 20 8 ? * 2,3,4,5,6")
+    public void stockUpdate() {
+        if (!dateHelper.isWorkingDay(DateUtil.date())) {
+            log.info("当前时间{}不是交易日，不需要同步", DateUtil.now());
+            return;
+        }
+        log.info(">>> {} 时,更新股票信息", DateUtil.now());
+        jobInfoBusiness.execJob(JobInfoType.STOCK_UPDATE, EntrustType.AUTO.getCode());
+    }
 }

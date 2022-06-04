@@ -1,5 +1,6 @@
 package top.yueshushu.learn.crawler.crawler;
 
+import cn.hutool.core.date.DateTime;
 import top.yueshushu.learn.crawler.entity.DownloadStockInfo;
 import top.yueshushu.learn.crawler.entity.StockHistoryCsvInfo;
 import top.yueshushu.learn.mode.info.StockShowInfo;
@@ -82,4 +83,12 @@ public interface CrawlerService {
      * @return 新浪获取股票当前的价格
      */
     String sinaGetPrice(String fullCode);
+
+    /**
+     * 东方财富，同步股票交易信息
+     * @param codeList 股票编码集合
+     * @param beforeLastWorking 最近的一个工作日
+     * @return 东方财富，同步股票交易信息
+     */
+    List<StockHistoryCsvInfo> parseEasyMoneyYesHistory(List<String> codeList, DateTime beforeLastWorking);
 }

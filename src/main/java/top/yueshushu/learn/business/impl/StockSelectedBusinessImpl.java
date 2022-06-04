@@ -3,14 +3,18 @@ package top.yueshushu.learn.business.impl;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import top.yueshushu.learn.business.StockSelectedBusiness;
+import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.entity.Stock;
+import top.yueshushu.learn.enumtype.SyncStockHistoryType;
 import top.yueshushu.learn.helper.DateHelper;
 import top.yueshushu.learn.mode.ro.IdRo;
+import top.yueshushu.learn.mode.ro.StockRo;
 import top.yueshushu.learn.mode.ro.StockSelectedRo;
 import top.yueshushu.learn.mode.vo.StockHistoryVo;
 import top.yueshushu.learn.response.OutputResult;
@@ -77,18 +81,32 @@ public class StockSelectedBusinessImpl implements StockSelectedBusiness {
         stockSelectedService.add(
                 stockSelectedRo, stock.getName()
         );
-        String addStockCode = stockSelectedRo.getStockCode();
-        // 设置当前的价格信息
-        stockCrawlerService.updateCodePrice(addStockCode);
-        // 获取价格信息.
-        BigDecimal nowCachePrice = stockCacheService.getNowCachePrice(addStockCode);
-        stockCacheService.setLastBuyCachePrice(addStockCode, nowCachePrice);
-        stockCacheService.setLastSellCachePrice(addStockCode, nowCachePrice);
-        stockCacheService.setYesterdayCloseCachePrice(addStockCode, nowCachePrice);
+        syncCodeInfo(stockSelectedRo.getStockCode());
         // 处理缓存信息
         return OutputResult.buildSucc(
                 ResultCode.SUCCESS
         );
+    }
+
+    /**
+     * 添加股票到自选后，同步股票的信息记录
+     * @param stockCode 股票编码
+     */
+    @Async
+    public void syncCodeInfo(String stockCode) {
+        // 设置当前的价格信息
+        stockCrawlerService.updateCodePrice(stockCode);
+        // 获取价格信息.
+        BigDecimal nowCachePrice = stockCacheService.getNowCachePrice(stockCode);
+        stockCacheService.setLastBuyCachePrice(stockCode, nowCachePrice);
+        stockCacheService.setLastSellCachePrice(stockCode, nowCachePrice);
+        stockCacheService.setYesterdayCloseCachePrice(stockCode, nowCachePrice);
+
+        // 同步股票的历史交易记录。 同步最近一个月的.
+        StockRo stockRo = new StockRo();
+        stockRo.setCode(stockCode);
+        stockRo.setType(SyncStockHistoryType.MONTH.getCode());
+        stockCrawlerService.stockHistoryAsync(stockRo);
     }
 
     @Override

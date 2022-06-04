@@ -21,6 +21,7 @@ import top.yueshushu.learn.response.OutputResult;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -120,10 +121,13 @@ public class CrawlerStockServiceImpl implements CrawlerStockService {
         List<String> allStockCodeList = stockDomainService.listAllCode();
         //进行批量保存
         List<StockDo> stockList=new ArrayList<>();
+        Date now = DateUtil.date();
         downloadStockInfoList.stream().forEach(
                 n->{
                     if(!allStockCodeList.contains(n.getCode())){
                         StockDo stockDo = stockAssembler.downInfoToDO(n);
+                        stockDo.setCreateUser("async");
+                        stockDo.setCreateTime(now);
                         stockDo.setFlag(DataFlagType.NORMAL.getCode());
                         stockList.add(stockDo);
                     }

@@ -17,6 +17,7 @@ public enum JobInfoType {
     TRADE_POSITION_HISTORY("tradePositionHistory", "交易持仓信息同步"),
     MOCK_DEAL("mockDeal", "虚拟成交"),
     MOCK_ENTRUST("mockEntrust", "虚拟委托"),
+    STOCK_UPDATE("stockUpdate", "股票更新"),
     ;
 
     private String code;

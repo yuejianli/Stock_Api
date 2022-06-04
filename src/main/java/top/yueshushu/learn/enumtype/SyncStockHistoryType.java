@@ -9,7 +9,7 @@ import org.springframework.util.Assert;
 public enum SyncStockHistoryType {
     SELF(0,"自定义"),
     WEEK(1,"一周内"),
-    MONTH(2,"一年内"),
+    MONTH(2,"一月内"),
     YEAR(3,"一年内"),
     THREE_YEAR(4,"三年内"),
     FIVE_YEAR(5,"五年内"),

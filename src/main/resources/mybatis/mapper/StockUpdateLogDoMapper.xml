@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.yueshushu.learn.mapper.StockUpdateLogDoMapper">
+    <resultMap id="stockMap" type="top.yueshushu.learn.domain.StockUpdateLogDo">
+        <result property="id" column="id"></result>
+        <result property="code" column="code"></result>
+        <result property="name" column="name"></result>
+        <result property="exchange" column="exchange"></result>
+        <result property="fullCode" column="full_code"></result>
+        <result property="updateTime" column="update_time"></result>
+        <result property="updateType" column="update_type"></result>
+    </resultMap>
+    <select id="listStockLogAndDate" resultMap="stockMap">
+        select t.id,t.code,t.name,t.exchange,t.full_code,t.update_time,t.update_type from stock_update_log t
+        <where>
+            <if test="code != null and code != ''">
+                and t.code=#{code}
+            </if>
+            <if test="startDate!=null">
+                and date_format(update_time,'%Y%m%d') &gt;=date_format( #{startDate,jdbcType=TIMESTAMP},'%Y%m%d')
+            </if>
+            <if test="endDate!=null">
+                and date_format(update_time,'%Y%m%d') &lt;=date_format( #{endDate,jdbcType=TIMESTAMP},'%Y%m%d')
+            </if>
+            order by t.update_time desc
+        </where>
+    </select>
+
+
+</mapper>

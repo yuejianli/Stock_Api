@@ -123,10 +123,15 @@ default:
     http://push2his.eastmoney.com/api/qt/stock/kline/get?
     fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61
     &klt=101&fqt=1&secid={}&beg={}&end={}
-  stock_history_download_url: >
-    http://quotes.money.163.com/service/chddata.html?code={0}&start={1}&end={2}&fields=TCLOSE;HIGH;LOW;TOPEN;LCLOSE;CHG;PCHG;TURNOVER;VOTURNOVER;VATURNOVER;TCAP;MCAP
+  stock_history_download_url: "http://quotes.money.163.com/service/chddata.html?code={0}&start={1}&end={2}\
+  &fields=TCLOSE;HIGH;LOW;TOPEN;LCLOSE;CHG;PCHG;TURNOVER;VOTURNOVER;VATURNOVER;TCAP;MCAP"
   #k线图
   min_url: http://image.sinajs.cn/newchart/min/n/{0}.gif
   daily_url: http://image.sinajs.cn/newchart/daily/n/{0}.gif
   weekly_url: http://image.sinajs.cn/newchart/weekly/n/{0}.gif
   monthly_url: http://image.sinajs.cn/newchart/monthly/n/{0}.gif
+  # 东方财富的最近一个交易日的数据
+  easy_money_history_url: "https://20.push2.eastmoney.com/api/qt/clist/get?pn=1&pz=10000000&np=1&fid=f3&fields=f2,f3,\
+                             f4,f5,f6,f12,f14,f15,f16,f17,f18&fs=m:0+t:6,m:0+t:13,m:0+t:80,m:0+t:81+s:2048,m:1+t:2,\
+                             m:1+t:23,b:MK0021,\
+                             b:MK0022,b:MK0023,b:MK0024%22"

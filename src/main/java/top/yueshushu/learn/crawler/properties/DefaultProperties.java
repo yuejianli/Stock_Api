@@ -37,6 +37,12 @@ public class DefaultProperties implements Serializable {
      */
     @Value("${default.stock_history_download_url}")
     private String stockHistoryDownloadUrl;
+
+    /**
+     * 东方财富的股票的历史url
+     */
+    @Value("${default.easy_money_history_url}")
+    private String easyMoneyHistoryUrl;
     /**
      * 分钟的K线图
      */

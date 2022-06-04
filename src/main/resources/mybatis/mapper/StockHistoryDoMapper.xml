@@ -106,4 +106,15 @@
         and date_format(curr_date,'%Y%m%d') &lt;=date_format( #{endDate,jdbcType=TIMESTAMP},'%Y%m%d')
         <!--        <![CDATA[ when t.curr_date >=#{startDate} and t.curr_date <=#{endDate} ]]>-->
     </delete>
+    <select id="listDate" resultType="java.lang.String">
+        select date_format(curr_date,'%Y-%m-%d') from stock_history t
+        where t.code=#{code}
+        <if test="startDate!=null">
+            and date_format(curr_date,'%Y%m%d') &gt;=date_format( #{startDate,jdbcType=TIMESTAMP},'%Y%m%d')
+        </if>
+        <if test="endDate!=null">
+            and date_format(curr_date,'%Y%m%d') &lt;=date_format( #{endDate,jdbcType=TIMESTAMP},'%Y%m%d')
+        </if>
+        order by t.curr_date asc
+    </select>
 </mapper>

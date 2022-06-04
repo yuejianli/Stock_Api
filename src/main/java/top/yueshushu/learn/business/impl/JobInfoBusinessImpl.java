@@ -3,8 +3,11 @@ package top.yueshushu.learn.business.impl;
 import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import top.yueshushu.learn.business.DealBusiness;
 import top.yueshushu.learn.business.JobInfoBusiness;
+import top.yueshushu.learn.business.StockBusiness;
+import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.entity.JobInfo;
 import top.yueshushu.learn.enumtype.DataFlagType;
 import top.yueshushu.learn.enumtype.EntrustType;
@@ -51,6 +54,8 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
     private DealBusiness dealBusiness;
     @Resource
     private TradeStrategyService tradeStrategyService;
+    @Resource
+    private StockCrawlerService stockCrawlerService;
 
 
     @Override
@@ -64,20 +69,21 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
     }
 
     @Override
-    public void execJob(JobInfoType jobInfoType, Integer triggerType) {
+    public OutputResult execJob(JobInfoType jobInfoType, Integer triggerType) {
         if (jobInfoType == null) {
-            return;
+            return OutputResult.buildAlert(ResultCode.NO_AUTH);
         }
         //查询任务
         JobInfo jobInfo = jobInfoService.getByCode(jobInfoType);
         if (jobInfo == null) {
             log.info("当前任务 {} 已经被删除", jobInfoType.getDesc());
-            return;
+            return OutputResult.buildAlert(ResultCode.JOB_ID_NOT_EXIST);
         }
-        if (!DataFlagType.NORMAL.getCode().equals(jobInfo.getTriggerStatus())) {
-            log.info(">>当前任务 {}是禁用状态，不执行", jobInfoType.getDesc());
-            return;
-        }
+        //if (!DataFlagType.NORMAL.getCode().equals(jobInfo.getTriggerStatus())) {
+        //    log.info(">>当前任务 {}是禁用状态，不执行", jobInfoType.getDesc());
+        //    return OutputResult.buildAlert(ResultCode.JOB_ID_NOT_EXIST);
+        //}
+        jobInfo.setTriggerLastTime(DateUtil.date().toLocalDateTime());
         try {
             switch (jobInfoType) {
                 case HOLIDAY: {
@@ -150,24 +156,28 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
                     }
                     break;
                 }
+                case STOCK_UPDATE:{
+                    stockCrawlerService.updateAllStock();
+                    break;
+                }
                 default: {
                     break;
                 }
 
             }
             jobInfo.setTriggerLastResult(1);
+            jobInfo.setTriggerLastErrorMessage(null);
         } catch (Exception e) {
             jobInfo.setTriggerLastResult(0);
             jobInfo.setTriggerLastErrorMessage(e.getMessage());
             log.info("执行任务失败{}", e);
-
         }
         //设置下次触发的时间
         jobInfo.setTriggerType(triggerType);
         jobInfo.setTriggerLastTime(LocalDateTime.now());
         try {
             CronExpression cronExpression = new CronExpression(jobInfo.getCron());
-            Date date = cronExpression.getNextInvalidTimeAfter(new Date());
+            Date date = cronExpression.getNextValidTimeAfter(new Date());
             Instant instant = date.toInstant();
             ZoneId zoneId = ZoneId.systemDefault();
             LocalDateTime localDateTime = instant.atZone(zoneId).toLocalDateTime();
@@ -176,6 +186,11 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
             log.error("获取下一次触发时间失败", e);
         }
         jobInfoService.updateInfoById(jobInfo);
+        if (StringUtils.isEmpty(jobInfo.getTriggerLastErrorMessage())){
+            return OutputResult.buildSucc();
+        }else{
+            return OutputResult.buildFail(jobInfo.getTriggerLastErrorMessage());
+        }
     }
 
     @Override
@@ -187,7 +202,7 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
     public OutputResult handlerById(Integer id) {
         //立即执行
         JobInfo job = jobInfoService.getById(id);
-        execJob(JobInfoType.getJobInfoType(job.getCode()), EntrustType.HANDLER.getCode());
-        return OutputResult.buildSucc();
+       OutputResult outputResult= execJob(JobInfoType.getJobInfoType(job.getCode()), EntrustType.HANDLER.getCode());
+        return outputResult;
     }
 }

@@ -48,4 +48,8 @@ public interface StockCrawlerService {
      */
     void updateCodePrice(String code);
 
+    /**
+     * 更新所有的股票信息
+     */
+    void updateAllStock();
 }

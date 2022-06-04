@@ -1,5 +1,6 @@
 package top.yueshushu.learn.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.pagehelper.Page;
@@ -14,6 +15,8 @@ import org.springframework.util.StringUtils;
 import top.yueshushu.learn.assembler.StockSelectedAssembler;
 import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.common.ResultCode;
+import top.yueshushu.learn.crawler.business.CrawlerStockHistoryBusiness;
+import top.yueshushu.learn.crawler.service.CrawlerStockHistoryService;
 import top.yueshushu.learn.domain.StockSelectedDo;
 import top.yueshushu.learn.domainservice.StockSelectedDomainService;
 import top.yueshushu.learn.entity.StockSelected;
@@ -59,6 +62,8 @@ public class StockSelectedServiceImpl implements StockSelectedService {
 
     @Resource
     private StockCrawlerService stockCrawlerService;
+    @Resource
+    private CrawlerStockHistoryService crawlerStockHistoryService;
 
     @SuppressWarnings("all")
     @Resource(name = Const.ASYNC_SERVICE_EXECUTOR_BEAN_NAME)
@@ -311,8 +316,29 @@ public class StockSelectedServiceImpl implements StockSelectedService {
     public void cacheClosePrice() {
         ////查询出所有的自选表里面的股票记录信息
         List<String> codeList = stockSelectedDomainService.findCodeList(null);
+        if (CollectionUtil.isEmpty(codeList)){
+            return ;
+        }
         //获取相关的信息，根据历史记录查询。
         List<StockPriceCacheDto> priceCacheDtoList = stockHistoryService.listClosePrice(codeList);
+        // 获取到没有历史记录的股票信息.
+        //筛选了所有的股票信息
+        List<String> hasHistoryList = priceCacheDtoList.stream().map(StockPriceCacheDto::getCode).collect(Collectors.toList());
+       List<String> noHistoryList = new ArrayList<>();
+        if(CollectionUtil.isEmpty(hasHistoryList)){
+            noHistoryList = codeList;
+        }else{
+            Collection<String> disjunction = CollectionUtil.disjunction(codeList, hasHistoryList);
+            if (CollectionUtil.isNotEmpty(disjunction)){
+                noHistoryList = new ArrayList<>(disjunction);
+            }
+        }
+        //没有历史的数据。
+        if (!CollectionUtils.isEmpty(noHistoryList)){
+            //东方财富同步没有的历史记录。
+            crawlerStockHistoryService.easyMoneyYesStockHistory(noHistoryList);
+        }
+        priceCacheDtoList = stockHistoryService.listClosePrice(codeList);
         //循环设置缓存信息
         Map<String, StockPriceCacheDto> priceCacheCodeMap = priceCacheDtoList.stream().collect(Collectors.toMap(StockPriceCacheDto::getCode, n -> n));
         // 对每一条股票记录进行处理

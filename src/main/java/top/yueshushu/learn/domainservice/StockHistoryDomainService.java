@@ -71,4 +71,11 @@ public interface StockHistoryDomainService extends IService<StockHistoryDo> {
      * @param endDate 结束日期
      */
     void deleteAsyncRangeDateData(String code, String startDate, String endDate);
+    /**
+     * 查询该股票这期间内的历史日期数据
+     * @param code 股票编码
+     * @param startDate 开始日期
+     * @param endDate 结束日期
+     */
+    List<String> listDate(String code, String startDate, String endDate);
 }

@@ -180,8 +180,9 @@ public class ResultCode {
      * 定时任务列表  100 19（编排）+ 001 (三位随机)
      */
     public static final ResultCode JOB_ID_NOT_EXIST =
-            new ResultCode(true, 10018001, "交易规则条件关键字不存在,请刷新后重试");
-
+            new ResultCode(true, 10018001, "任务编号不正确,请刷新后重试");
+    public static final ResultCode JOB_ID_DISABLE =
+            new ResultCode(true, 10018002, "任务编号是禁用状态，不能执行");
     /**
      * 持仓信息 100 19（编排）+ 001 (三位随机)
      */

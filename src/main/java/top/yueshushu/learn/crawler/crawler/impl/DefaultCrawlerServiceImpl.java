@@ -1,6 +1,7 @@
 package top.yueshushu.learn.crawler.crawler.impl;
 
 import cn.hutool.core.codec.Base64;
+import cn.hutool.core.date.DateTime;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.springframework.http.ResponseEntity;
@@ -209,6 +210,24 @@ public class DefaultCrawlerServiceImpl implements CrawlerService {
         } catch (Exception e) {
             log.error("获取股票{} 当前 价格 出错",fullCode,e);
             return "0.00";
+        }
+    }
+
+    @Override
+    public List<StockHistoryCsvInfo> parseEasyMoneyYesHistory(List<String> codeList, DateTime beforeLastWorking) {
+        //处理，拼接成信息
+        String url = defaultProperties.getEasyMoneyHistoryUrl();
+        log.info(">>>访问地址:" + url);
+        try {
+            //获取内容
+            String content = HttpUtil.sendGet(httpClient,url);
+            //将内容进行转换，解析
+            List<StockHistoryCsvInfo> stockHistoryCsvInfoList = dailyTradingInfoParse.parseEasyMoneyHistory(content,
+                    codeList,beforeLastWorking);
+            return stockHistoryCsvInfoList;
+        } catch (Exception e) {
+            log.error("获取股票 {} 最近交易日数据列表出错",codeList,e);
+            return Collections.emptyList();
         }
     }
 
