@@ -111,7 +111,7 @@ public class DealBusinessImpl implements DealBusiness {
                     deal(newRo);
                     User user = userService.getById(dealRo.getUserId());
                     String message = MessageFormat.format(
-                            "成交提醒: 买入股票 {},股票名称{},买入{}份，买入的价格是:{},花费金额:{}",
+                            "成交提醒: 买入股票 {0},股票名称{1},买入{2}份，买入的价格是:{3},花费金额:{4}",
                             tradeEntrustDo.getCode(), tradeEntrustDo.getName(),
                             tradeEntrustDo.getEntrustNum(), tradeEntrustDo.getEntrustPrice(),
                             tradeEntrustDo.getEntrustMoney()
@@ -129,7 +129,7 @@ public class DealBusinessImpl implements DealBusiness {
 
                     User user = userService.getById(dealRo.getUserId());
                     String message = MessageFormat.format(
-                            "成交提醒: 卖出股票 {},股票名称{},卖出{}份，卖出的价格是:{},卖出金额:{}",
+                            "成交提醒: 卖出股票 {0},股票名称{},卖出{1}份，卖出的价格是:{2},卖出金额:{3}",
                             tradeEntrustDo.getCode(), tradeEntrustDo.getName(),
                             tradeEntrustDo.getEntrustNum(), tradeEntrustDo.getEntrustPrice(),
                             tradeEntrustDo.getEntrustMoney()

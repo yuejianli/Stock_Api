@@ -96,7 +96,7 @@ public class TradeStrategyServiceImpl implements TradeStrategyService {
 
                 User user = userService.getById(buyRo.getUserId());
                 String message = MessageFormat.format(
-                        "委托买入提醒: 买入股票 {},股票名称{},买入{}份，买入的价格是:{}",
+                        "委托买入提醒: 买入股票 {0},股票名称{1},买入{2}份，买入的价格是:{3}",
                         mockBuyRo.getCode(), mockBuyRo.getName(),
                         mockBuyRo.getAmount(), mockBuyRo.getPrice()
                 );
@@ -120,7 +120,7 @@ public class TradeStrategyServiceImpl implements TradeStrategyService {
 
                 User user = userService.getById(buyRo.getUserId());
                 String message = MessageFormat.format(
-                        "委托卖出提醒: 卖出股票 {},股票名称{},卖出{}份，卖出的价格是:{}",
+                        "委托卖出提醒: 卖出股票 {0},股票名称{1},卖出{2}份，卖出的价格是:{3}",
                         sellRo.getCode(), sellRo.getName(),
                         sellRo.getAmount(), sellRo.getPrice()
                 );

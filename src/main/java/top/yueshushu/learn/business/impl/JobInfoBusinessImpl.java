@@ -174,7 +174,7 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
             jobInfo.setTriggerLastErrorMessage(e.getMessage());
             //执行任务失败，会发送消息到当前的用户.
             User user = userService.getDefaultUser();
-            String errorWxMessage = MessageFormat.format("执行任务 {} 失败，失败原因是:{}",
+            String errorWxMessage = MessageFormat.format("执行任务 {0} 失败，失败原因是:{1}",
                     jobInfoType.getDesc(), e.getMessage());
             weChatService.sendMessage(user.getWxUserId(), errorWxMessage);
             log.error("执行任务失败{}", e);

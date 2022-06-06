@@ -32,7 +32,6 @@ import top.yueshushu.learn.util.StockUtil;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -209,7 +208,7 @@ public class StockCrawlerServiceImpl implements StockCrawlerService {
                 stockUpdateLogDo.setUpdateType(StockUpdateType.NEW.getCode());
                 stockUpdateLogDoList.add(stockUpdateLogDo);
                 List<User> userList = userService.listNotice();
-                String newStockMessage = MessageFormat.format("打新股提醒:股票 {}今天上市了", downloadStockInfo.getCode());
+                String newStockMessage = "打新股提醒:股票 " + downloadStockInfo.getCode() + "今天上市了";
                 userList.forEach(
                         n -> {
                             weChatService.sendMessage(n.getWxUserId(), newStockMessage);
