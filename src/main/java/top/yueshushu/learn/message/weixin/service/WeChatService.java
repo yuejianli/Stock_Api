@@ -2,18 +2,21 @@ package top.yueshushu.learn.message.weixin.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+
+import java.util.concurrent.TimeUnit;
+
+import javax.annotation.Resource;
+
+import lombok.extern.slf4j.Slf4j;
 import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.message.weixin.model.TextMessage;
 import top.yueshushu.learn.message.weixin.model.WxText;
 import top.yueshushu.learn.message.weixin.properties.DefaultWXProperties;
 import top.yueshushu.learn.message.weixin.util.WeChatUtil;
 import top.yueshushu.learn.util.RedisUtil;
-
-import javax.annotation.Resource;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @Description 微信企业号发送消息
@@ -42,7 +45,7 @@ public class WeChatService {
         if (StringUtils.isEmpty(accessToken)) {
             accessToken = WeChatUtil.getAccessToken(defaultWXProperties.getCorpId(), defaultWXProperties.getCoprsecret())
                     .getToken();
-            redisUtil.set(Const.CACHE_WE_CHAT, accessToken, 2, TimeUnit.HOURS);
+            redisUtil.set(Const.CACHE_WE_CHAT, accessToken, 10, TimeUnit.MINUTES);
         }
         // 2.获取发送对象，并转成json
         Gson gson = new Gson();
@@ -58,7 +61,7 @@ public class WeChatService {
         message.setAgentid(defaultWXProperties.getAgentId());
         WxText wxText = new WxText();
         wxText.setContent(content);
-        message.setWxText(wxText);
+        message.setText(wxText);
         String jsonMessage = gson.toJson(message);
         // 3.获取请求的url
         String url = sendMessage_url.replace("ACCESS_TOKEN", accessToken);
