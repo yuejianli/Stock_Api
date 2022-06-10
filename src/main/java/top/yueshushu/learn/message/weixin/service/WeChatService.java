@@ -2,6 +2,7 @@ package top.yueshushu.learn.message.weixin.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -13,10 +14,10 @@ import javax.annotation.Resource;
 
 import lombok.extern.slf4j.Slf4j;
 import top.yueshushu.learn.common.Const;
-import top.yueshushu.learn.message.weixin.model.MarkDownMessage;
+import top.yueshushu.learn.message.weixin.model.TextCardMessage;
 import top.yueshushu.learn.message.weixin.model.TextMessage;
-import top.yueshushu.learn.message.weixin.model.WxMarkdown;
 import top.yueshushu.learn.message.weixin.model.WxText;
+import top.yueshushu.learn.message.weixin.model.WxTextCard;
 import top.yueshushu.learn.message.weixin.properties.DefaultWXProperties;
 import top.yueshushu.learn.message.weixin.util.WeChatUtil;
 import top.yueshushu.learn.util.RedisUtil;
@@ -46,7 +47,7 @@ public class WeChatService {
 		// 1. 获取 token
 		String accessToken = getWeiXinToken();
 		// 2 构建普通文本对象
-		Gson gson = new Gson();
+		Gson gson = new GsonBuilder().disableHtmlEscaping().create();
 		TextMessage message = new TextMessage();
 		// 1.1非必需
 		// 不区分大小写
@@ -70,28 +71,30 @@ public class WeChatService {
 	 * 通过微信企业号发送 markdown 消息
 	 *
 	 * @param wxUserId 微信用户标识
-	 * @param content  发送的内容
+	 * @param title    标题
+	 * @param content  发送的内容，支持 html 格式
 	 * @return 通过微信企业号发送消息
 	 */
-	public String sendMarkDownMessage(String wxUserId, String content) {
+	public String sendTextCardMessage(String wxUserId, String title, String content) {
 		// 1.获取access_token:根据企业id和应用密钥获取access_token,并拼接请求url
 		String accessToken = getWeiXinToken();
 		// 2.获取发送对象，并转成json
-		Gson gson = new Gson();
-		MarkDownMessage markDownMessage = new MarkDownMessage();
+		Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+		TextCardMessage textCardMessage = new TextCardMessage();
 		// 1.1非必需
 		// 不区分大小写
-		markDownMessage.setTouser(wxUserId);
+		textCardMessage.setTouser(wxUserId);
 		//message.setToparty("1");
 		//message.getTouser(totag);
-		// txtMsg.setSafe(0);
 		// 1.2必需
-		markDownMessage.setMsgtype("markdown");
-		markDownMessage.setAgentid(defaultWXProperties.getAgentId());
-		WxMarkdown wxMarkdown = new WxMarkdown();
-		wxMarkdown.setContent(content);
-		markDownMessage.setMarkdown(wxMarkdown);
-		String jsonMessage = gson.toJson(markDownMessage);
+		textCardMessage.setMsgtype("textcard");
+		textCardMessage.setAgentid(defaultWXProperties.getAgentId());
+		WxTextCard wxTextCard = new WxTextCard();
+		wxTextCard.setTitle(title);
+		wxTextCard.setDescription(content);
+		wxTextCard.setUrl("https://www.yueshushu.top");
+		textCardMessage.setTextcard(wxTextCard);
+		String jsonMessage = gson.toJson(textCardMessage);
 		// 3.获取请求的url
 		return messageResponse(accessToken, jsonMessage);
 	}

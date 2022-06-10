@@ -73,6 +73,13 @@ spring:
         max-active: 100
         min-idle: 10
         max-wait: 100000
+  # 配置发送邮件# 配置发送邮件
+  mail:
+    host: smtp.qq.com
+    username: 2048146495@qq.com
+    password: pkhpawgntceyejei
+  velocity:
+    FILE_RESOURCE_LOADER_PATH: src/main/resources/templates
 #整合mybatis时使用的。   去掉整合 MyBatis的配置信息
 mybatis-plus:
   # 配置 mapper文件的位置

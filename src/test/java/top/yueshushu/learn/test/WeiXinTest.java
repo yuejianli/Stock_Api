@@ -35,27 +35,10 @@ public class WeiXinTest {
 	@Test
 	public void wxMarkdownMessageTest() {
 		// 0.设置消息内容
-		String content = "#h1 信息 #h2 及时参加";
+		String content = "<div class=\\\"gray\\\">2016年9月26日</div> <div class=\\\"normal\\\">恭喜你抽中iPhone 7一台，领奖码：xxxx</div><div class=\\\"highlight\\\">请于2016年10月10日前联系行政同事领取</div>";
 		//userId为企业用户的id
 		String userId = "YueJianLi";
 		// 3.发送消息：调用业务类，发送消息
-		weChatService.sendMarkDownMessage(userId, content);
-	}
-	
-	@Test
-	public void sendCardTest() {
-		String token = weChatService.getWeiXinToken();
-		String message = "{\n" +
-				"   \"touser\" : \"YueJianLi\",\n" +
-				"   \"msgtype\" : \"textcard\",\n" +
-				"   \"agentid\" : 1000003,\n" +
-				"   \"textcard\" : {\n" +
-				"            \"title\" : \"领奖通知\",\n" +
-				"            \"description\" : \"<div class=\\\"gray\\\">2016年9月26日</div> <div class=\\\"normal\\\">恭喜你抽中iPhone 7一台，领奖码：xxxx</div><div class=\\\"highlight\\\">请于2016年10月10日前联系行政同事领取</div>\",\n" +
-				"            \"url\" : \"URL\",\n" +
-				"                        \"btntxt\":\"更多\"\n" +
-				"   },\n" +
-				"}";
-		weChatService.messageResponse(token, message);
+		weChatService.sendTextCardMessage(userId, "具体的内容", content);
 	}
 }

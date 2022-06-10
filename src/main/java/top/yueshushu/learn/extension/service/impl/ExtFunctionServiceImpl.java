@@ -1,7 +1,7 @@
-package top.yueshushu.learn.extension;
+package top.yueshushu.learn.extension.service.impl;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
@@ -10,7 +10,6 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import cn.hutool.core.date.DateUtil;
-import lombok.extern.slf4j.Slf4j;
 import top.yueshushu.learn.extension.model.gaodeweather.WeatherResponse;
 import top.yueshushu.learn.extension.model.shanbeici.TranslateResponse;
 import top.yueshushu.learn.extension.model.shici.PoemResponse;
@@ -19,16 +18,16 @@ import top.yueshushu.learn.extension.model.tianxing.ProverbInfo;
 import top.yueshushu.learn.extension.model.tianxing.TianXingInfo;
 import top.yueshushu.learn.extension.model.tianxing.TianXingResponse;
 import top.yueshushu.learn.extension.model.tianxing.ZiMiInfo;
+import top.yueshushu.learn.extension.service.ExtFunctionService;
 
 /**
- * ext job任务具体的服务信息
+ * 用途描述
  *
  * @author yuejianli
- * @date 2022-06-07
+ * @date 2022-06-10
  */
-@Component
-@Slf4j
-public class ExtJobService {
+@Service
+public class ExtFunctionServiceImpl implements ExtFunctionService {
 	
 	@Resource
 	private RestTemplate restTemplate;
@@ -43,15 +42,14 @@ public class ExtJobService {
 	private String tianxingKey1;
 	
 	/**
-	 * wangzheyuhou  2048146495@qq.com   1234abcd
+	 * 王者 wangzheyuhou  2048146495@qq.com   1234abcd
 	 */
 	@Value("${tianxing.key2}")
 	private String tianxingKey2;
 	
+	@Override
 	/**
-	 * 获取天气情况
-	 *
-	 * @param city 城市
+	 * 获取天气
 	 */
 	public WeatherResponse getWeather(String city) {
 		Map<String, String> paramMap = new HashMap<>();
@@ -68,9 +66,8 @@ public class ExtJobService {
 	
 	/**
 	 * 获取每日一句
-	 *
-	 * @param
 	 */
+	@Override
 	public TranslateResponse getTranslate() {
 		Map<String, String> paramMap = new HashMap<>();
 		paramMap.put("date", DateUtil.format(DateUtil.date(), "yyyyMMdd"));
@@ -84,9 +81,8 @@ public class ExtJobService {
 	
 	/**
 	 * 获取一句诗词
-	 *
-	 * @param
 	 */
+	@Override
 	public PoemResponse getPoem() {
 		Map<String, String> paramMap = new HashMap<>();
 		return restTemplate.getForEntity(
@@ -98,9 +94,8 @@ public class ExtJobService {
 	
 	/**
 	 * 获取对联信息
-	 *
-	 * @param
 	 */
+	@Override
 	public TianXingResponse<TianXingInfo> getCouplets() {
 		Map<String, String> paramMap = new HashMap<>();
 		paramMap.put("key", tianxingKey1);
@@ -115,6 +110,7 @@ public class ExtJobService {
 	/**
 	 * 获取古典诗句
 	 */
+	@Override
 	public TianXingResponse<TianXingInfo> getClassical() {
 		Map<String, String> paramMap = new HashMap<>();
 		paramMap.put("key", tianxingKey1);
@@ -129,6 +125,7 @@ public class ExtJobService {
 	/**
 	 * 获取经典对话
 	 */
+	@Override
 	public TianXingResponse<TianXingInfo> getDialogue() {
 		Map<String, String> paramMap = new HashMap<>();
 		paramMap.put("key", tianxingKey1);
@@ -147,6 +144,7 @@ public class ExtJobService {
 	 * "content": "她脸上的不是汗水而是玫瑰花的露水。"
 	 * }
 	 */
+	@Override
 	public TianXingResponse<TianXingInfo> getCaiHongPi() {
 		Map<String, String> paramMap = new HashMap<>();
 		paramMap.put("key", tianxingKey1);
@@ -161,6 +159,7 @@ public class ExtJobService {
 	/**
 	 * 获取百科题库信息
 	 */
+	@Override
 	public TianXingResponse<BaiKeTiKuInfo> getBaiKeTiKu() {
 		Map<String, String> paramMap = new HashMap<>();
 		paramMap.put("key", tianxingKey1);
@@ -175,6 +174,7 @@ public class ExtJobService {
 	/**
 	 * 获取英语信息
 	 */
+	@Override
 	public TianXingResponse<TianXingInfo> getEnglish() {
 		Map<String, String> paramMap = new HashMap<>();
 		paramMap.put("key", tianxingKey1);
@@ -193,6 +193,7 @@ public class ExtJobService {
 	 * "content": "用努力去喂养梦想，愿跌倒不哭，明媚如初，早安。"
 	 * }
 	 */
+	@Override
 	public TianXingResponse<TianXingInfo> getZaoAn() {
 		Map<String, String> paramMap = new HashMap<>();
 		paramMap.put("key", tianxingKey1);
@@ -207,6 +208,7 @@ public class ExtJobService {
 	/**
 	 * 获取晚安的信息
 	 */
+	@Override
 	public TianXingResponse<TianXingInfo> getWanAn() {
 		Map<String, String> paramMap = new HashMap<>();
 		paramMap.put("key", tianxingKey1);
@@ -221,6 +223,7 @@ public class ExtJobService {
 	/**
 	 * 获取十万个为什么
 	 */
+	@Override
 	public TianXingResponse<TianXingInfo> getTenWhy() {
 		Map<String, String> paramMap = new HashMap<>();
 		paramMap.put("key", tianxingKey1);
@@ -235,6 +238,7 @@ public class ExtJobService {
 	/**
 	 * 获取字迷信息
 	 */
+	@Override
 	public TianXingResponse<ZiMiInfo> getZiMi() {
 		Map<String, String> paramMap = new HashMap<>();
 		paramMap.put("key", tianxingKey1);
@@ -250,6 +254,7 @@ public class ExtJobService {
 	/**
 	 * 获取文化谚语
 	 */
+	@Override
 	public TianXingResponse<ProverbInfo> getProverb() {
 		Map<String, String> paramMap = new HashMap<>();
 		paramMap.put("key", tianxingKey2);
@@ -261,4 +266,3 @@ public class ExtJobService {
 		return couplets;
 	}
 }
-

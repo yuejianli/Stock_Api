@@ -1,5 +1,8 @@
 package top.yueshushu.learn.test.exttest;
 
+import com.alibaba.fastjson.JSONObject;
+
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -8,8 +11,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import javax.annotation.Resource;
 
 import lombok.extern.slf4j.Slf4j;
+import top.yueshushu.learn.domain.ext.ExtCustomerDo;
 import top.yueshushu.learn.extension.ExtJobSechduler;
 import top.yueshushu.learn.extension.ExtJobService;
+import top.yueshushu.learn.extension.business.ExtJobBusiness;
 import top.yueshushu.learn.extension.model.gaodeweather.WeatherResponse;
 import top.yueshushu.learn.extension.model.shanbeici.TranslateResponse;
 import top.yueshushu.learn.extension.model.shici.PoemResponse;
@@ -28,11 +33,27 @@ public class ExtTest {
     private ExtJobService extJobService;
     @Resource
     private ExtJobSechduler extJobSechduler;
+    @Resource
+    private ExtJobBusiness extJobBusiness;
+    
+    private ExtCustomerDo extCustomerDo;
+    
+    @Before
+    public void initCustomerDo() {
+        extCustomerDo = new ExtCustomerDo();
+        extCustomerDo.setId(1);
+        extCustomerDo.setUserAccount("岳泽霖");
+        extCustomerDo.setName("岳泽霖");
+        extCustomerDo.setUserId("yuejianli");
+        extCustomerDo.setSex(1);
+        extCustomerDo.setCity("330114");
+        extCustomerDo.setFlag(1);
+    }
     
     @Test
     public void weatherTest() {
         WeatherResponse weather = extJobService.getWeather("522701");
-        log.info("获取天气信息:{}", weather);
+        log.info("获取天气信息:{}", JSONObject.toJSONString(weather));
     }
     
     @Test
@@ -116,7 +137,7 @@ public class ExtTest {
     
     @Test
     public void moringTest() {
-        extJobSechduler.morning();
+        extJobBusiness.morning(extCustomerDo);
     }
     
     @Test
