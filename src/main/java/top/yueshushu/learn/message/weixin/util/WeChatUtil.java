@@ -1,18 +1,21 @@
 package top.yueshushu.learn.message.weixin.util;
 
 import com.alibaba.fastjson.JSONObject;
-import lombok.extern.slf4j.Slf4j;
-import top.yueshushu.learn.message.weixin.model.AccessToken;
 
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URL;
+import java.text.MessageFormat;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+
+import lombok.extern.slf4j.Slf4j;
+import top.yueshushu.learn.message.weixin.model.AccessToken;
 
 /**
  * @Description 微信工具使用
@@ -21,10 +24,10 @@ import java.net.URL;
  **/
 @Slf4j
 public class WeChatUtil {
-    /**
-     * 微信的请求url 获取access_token的接口地址（GET） 限200（次/天）
-     */
-    public final static String access_token_url = "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid={corpId}&corpsecret={corpsecret}";
+	/**
+	 * 微信的请求url 获取access_token的接口地址（GET） 限200（次/天）
+	 */
+	public final static String access_token_url = "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid={0}&corpsecret={1}";
 
     /**
      * 1.发起https请求并获取结果
@@ -91,9 +94,9 @@ public class WeChatUtil {
      * @return 微信用户登录，登录成功后，返回相应的token 值
      */
     public static AccessToken getAccessToken(String appid, String appsecret) {
-        AccessToken accessToken = null;
-        String requestUrl = access_token_url.replace("{corpId}", appid).replace("{corpsecret}", appsecret);
-        JSONObject jsonObject = httpRequest(requestUrl, "GET", null);
+		AccessToken accessToken = null;
+		String requestUrl = MessageFormat.format(access_token_url, appid, appsecret);
+		JSONObject jsonObject = httpRequest(requestUrl, "GET", null);
         // 如果请求成功
         if (null != jsonObject) {
             try {

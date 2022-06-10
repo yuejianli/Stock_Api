@@ -145,3 +145,7 @@ weixin:
 jasypt:
   encryptor:
     bean: CodeEncrypBean
+# 天行接口使用
+tianxing:
+  key1: bdea38f89ed9d2f98f626225ffe453f4
+  key2: 682b53e4b8e13c01a94200c5815c49e4

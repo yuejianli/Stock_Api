@@ -1,21 +1,19 @@
 package top.yueshushu.learn.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import top.yueshushu.learn.business.MoneyBusiness;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.mode.ro.MoneyRo;
-import top.yueshushu.learn.mode.vo.MoneyVo;
 import top.yueshushu.learn.response.OutputResult;
-import top.yueshushu.learn.service.MoneyService;
-
-import javax.annotation.Resource;
 
 /**
  * @ClassName:MoneyController
@@ -122,12 +120,12 @@ public class MoneyController {
             );
         }
         //手续费验证
-        if (moneyRo.getPlatformFee() ==null){
+        if (moneyRo.getPlatformFee() == null) {
             return OutputResult.buildAlert(
                     ResultCode.TOOL_FEE_IS_EMPTY
             );
         }
-        if (moneyRo.getPlatformFee() < 0.02 ||moneyRo.getPlatformFee() >0.03){
+        if (moneyRo.getPlatformFee() < 0.00 || moneyRo.getPlatformFee() > 0.03) {
             return OutputResult.buildAlert(
                     ResultCode.TOOL_FEE_NOT_SUPPORT
             );
@@ -212,12 +210,12 @@ public class MoneyController {
             );
         }
         //手续费验证
-        if (moneyRo.getPlatformFee() ==null){
+        if (moneyRo.getPlatformFee() == null) {
             return OutputResult.buildAlert(
                     ResultCode.TOOL_FEE_IS_EMPTY
             );
         }
-        if (moneyRo.getPlatformFee() < 0.02 ||moneyRo.getPlatformFee() >0.03){
+        if (moneyRo.getPlatformFee() < 0.00 || moneyRo.getPlatformFee() > 0.03) {
             return OutputResult.buildAlert(
                     ResultCode.TOOL_FEE_NOT_SUPPORT
             );
@@ -286,12 +284,12 @@ public class MoneyController {
             );
         }
         //手续费验证
-        if (moneyRo.getPlatformFee() ==null){
+        if (moneyRo.getPlatformFee() == null) {
             return OutputResult.buildAlert(
                     ResultCode.TOOL_FEE_IS_EMPTY
             );
         }
-        if (moneyRo.getPlatformFee() < 0.02 ||moneyRo.getPlatformFee() >0.03){
+        if (moneyRo.getPlatformFee() < 0.00 || moneyRo.getPlatformFee() > 0.03) {
             return OutputResult.buildAlert(
                     ResultCode.TOOL_FEE_NOT_SUPPORT
             );

@@ -1,9 +1,16 @@
 package top.yueshushu.learn.business.impl;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+
+import java.math.BigDecimal;
+import java.text.MessageFormat;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import lombok.extern.slf4j.Slf4j;
 import top.yueshushu.learn.assembler.TradePositionAssembler;
 import top.yueshushu.learn.business.DealBusiness;
 import top.yueshushu.learn.common.ResultCode;
@@ -20,15 +27,14 @@ import top.yueshushu.learn.enumtype.EntrustStatusType;
 import top.yueshushu.learn.message.weixin.service.WeChatService;
 import top.yueshushu.learn.mode.ro.DealRo;
 import top.yueshushu.learn.response.OutputResult;
-import top.yueshushu.learn.service.*;
+import top.yueshushu.learn.service.TradeDealService;
+import top.yueshushu.learn.service.TradeEntrustService;
+import top.yueshushu.learn.service.TradeMoneyService;
+import top.yueshushu.learn.service.TradePositionService;
+import top.yueshushu.learn.service.UserService;
 import top.yueshushu.learn.service.cache.StockCacheService;
 import top.yueshushu.learn.util.BigDecimalUtil;
 import top.yueshushu.learn.util.StockUtil;
-
-import javax.annotation.Resource;
-import java.math.BigDecimal;
-import java.text.MessageFormat;
-import java.util.List;
 
 /**
  * @Description 委托单
@@ -116,8 +122,8 @@ public class DealBusinessImpl implements DealBusiness {
                             tradeEntrustDo.getEntrustNum(), tradeEntrustDo.getEntrustPrice(),
                             tradeEntrustDo.getEntrustMoney()
                     );
-                    weChatService.sendMessage(user.getWxUserId(),
-                            message);
+					weChatService.sendTextMessage(user.getWxUserId(),
+							message);
                 }
             }else{
                 //卖的时候，  当前价格 > 卖出价格，则成交.
@@ -134,8 +140,8 @@ public class DealBusinessImpl implements DealBusiness {
                             tradeEntrustDo.getEntrustNum(), tradeEntrustDo.getEntrustPrice(),
                             tradeEntrustDo.getEntrustMoney()
                     );
-                    weChatService.sendMessage(user.getWxUserId(),
-                            message);
+					weChatService.sendTextMessage(user.getWxUserId(),
+							message);
                 }
             }
         }

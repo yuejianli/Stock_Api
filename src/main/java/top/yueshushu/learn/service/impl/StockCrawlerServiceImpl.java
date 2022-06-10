@@ -1,10 +1,20 @@
 package top.yueshushu.learn.service.impl;
 
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import javax.annotation.Resource;
+
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import top.yueshushu.learn.assembler.StockAssembler;
 import top.yueshushu.learn.assembler.StockUpdateLogAssembler;
 import top.yueshushu.learn.common.Const;
@@ -29,14 +39,6 @@ import top.yueshushu.learn.service.UserService;
 import top.yueshushu.learn.service.cache.StockCacheService;
 import top.yueshushu.learn.util.BigDecimalUtil;
 import top.yueshushu.learn.util.StockUtil;
-
-import javax.annotation.Resource;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @ClassName:StockCrawlerServiceImpl
@@ -211,7 +213,7 @@ public class StockCrawlerServiceImpl implements StockCrawlerService {
                 String newStockMessage = "打新股提醒:股票 " + downloadStockInfo.getCode() + "今天上市了";
                 userList.forEach(
                         n -> {
-                            weChatService.sendMessage(n.getWxUserId(), newStockMessage);
+							weChatService.sendTextMessage(n.getWxUserId(), newStockMessage);
                         }
                 );
             }else{

@@ -1,9 +1,19 @@
 package top.yueshushu.learn.business.impl;
 
-import cn.hutool.core.date.DateUtil;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+
+import java.text.MessageFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import cn.hutool.core.date.DateUtil;
+import lombok.extern.slf4j.Slf4j;
 import top.yueshushu.learn.business.DealBusiness;
 import top.yueshushu.learn.business.JobInfoBusiness;
 import top.yueshushu.learn.common.ResultCode;
@@ -19,16 +29,14 @@ import top.yueshushu.learn.mode.ro.BuyRo;
 import top.yueshushu.learn.mode.ro.DealRo;
 import top.yueshushu.learn.mode.ro.JobInfoRo;
 import top.yueshushu.learn.response.OutputResult;
-import top.yueshushu.learn.service.*;
+import top.yueshushu.learn.service.HolidayCalendarService;
+import top.yueshushu.learn.service.JobInfoService;
+import top.yueshushu.learn.service.StockCrawlerService;
+import top.yueshushu.learn.service.StockSelectedService;
+import top.yueshushu.learn.service.TradePositionService;
+import top.yueshushu.learn.service.TradeStrategyService;
+import top.yueshushu.learn.service.UserService;
 import top.yueshushu.learn.util.CronExpression;
-
-import javax.annotation.Resource;
-import java.text.MessageFormat;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
-import java.util.List;
 
 /**
  * 用途描述
@@ -176,8 +184,8 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
             User user = userService.getDefaultUser();
             String errorWxMessage = MessageFormat.format("执行任务 {0} 失败，失败原因是:{1}",
                     jobInfoType.getDesc(), e.getMessage());
-            weChatService.sendMessage(user.getWxUserId(), errorWxMessage);
-            log.error("执行任务失败{}", e);
+			weChatService.sendTextMessage(user.getWxUserId(), errorWxMessage);
+			log.error("执行任务失败{}", e);
         }
         //设置下次触发的时间
         jobInfo.setTriggerType(triggerType);

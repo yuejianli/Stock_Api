@@ -1,5 +1,6 @@
 package top.yueshushu.learn.extension;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -13,6 +14,11 @@ import lombok.extern.slf4j.Slf4j;
 import top.yueshushu.learn.extension.model.gaodeweather.WeatherResponse;
 import top.yueshushu.learn.extension.model.shanbeici.TranslateResponse;
 import top.yueshushu.learn.extension.model.shici.PoemResponse;
+import top.yueshushu.learn.extension.model.tianxing.BaiKeTiKuInfo;
+import top.yueshushu.learn.extension.model.tianxing.ProverbInfo;
+import top.yueshushu.learn.extension.model.tianxing.TianXingInfo;
+import top.yueshushu.learn.extension.model.tianxing.TianXingResponse;
+import top.yueshushu.learn.extension.model.tianxing.ZiMiInfo;
 
 /**
  * ext job任务具体的服务信息
@@ -23,17 +29,24 @@ import top.yueshushu.learn.extension.model.shici.PoemResponse;
 @Component
 @Slf4j
 public class ExtJobService {
+	
 	@Resource
 	private RestTemplate restTemplate;
 	
-	/**
-	 * 获取天气情况
-	 *
-	 * @param
+	/*
+	 使用的key
 	 */
-	public String getMorning() {
-		return "早上好,欢欢";
-	}
+	/**
+	 * towBufferfly  129@qq.com   1234abcd
+	 */
+	@Value("${tianxing.key1}")
+	private String tianxingKey1;
+	
+	/**
+	 * wangzheyuhou  2048146495@qq.com   1234abcd
+	 */
+	@Value("${tianxing.key2}")
+	private String tianxingKey2;
 	
 	/**
 	 * 获取天气情况
@@ -47,12 +60,12 @@ public class ExtJobService {
 	/**
 	 * 获取天气情况
 	 *
-	 * @param
+	 * @param city 城市
 	 */
-	public WeatherResponse getWeather() {
+	public WeatherResponse getWeather(String city) {
 		Map<String, String> paramMap = new HashMap<>();
 		paramMap.put("key", "3060ad090681f5c501f5ca3cf5798b53");
-		paramMap.put("city", "522701");
+		paramMap.put("city", city);
 		paramMap.put("extensions", "all");
 		WeatherResponse weatherResponse = restTemplate.getForEntity(
 				"https://restapi.amap.com/v3/weather/weatherInfo?key={key}&city={city}&extensions={extensions}",
@@ -91,4 +104,170 @@ public class ExtJobService {
 				paramMap
 		).getBody();
 	}
+	
+	/**
+	 * 获取对联信息
+	 *
+	 * @param
+	 */
+	public TianXingResponse<TianXingInfo> getCouplets() {
+		Map<String, String> paramMap = new HashMap<>();
+		paramMap.put("key", tianxingKey1);
+		TianXingResponse<TianXingInfo> couplets = restTemplate.getForEntity(
+				"http://api.tianapi.com/duilian/index?key={key}",
+				TianXingResponse.class,
+				paramMap
+		).getBody();
+		return couplets;
+	}
+	
+	/**
+	 * 获取古典诗句
+	 */
+	public TianXingResponse<TianXingInfo> getClassical() {
+		Map<String, String> paramMap = new HashMap<>();
+		paramMap.put("key", tianxingKey1);
+		TianXingResponse<TianXingInfo> couplets = restTemplate.getForEntity(
+				"http://api.tianapi.com/gjmj/index?key={key}",
+				TianXingResponse.class,
+				paramMap
+		).getBody();
+		return couplets;
+	}
+	
+	/**
+	 * 获取经典对话
+	 */
+	public TianXingResponse<TianXingInfo> getDialogue() {
+		Map<String, String> paramMap = new HashMap<>();
+		paramMap.put("key", tianxingKey1);
+		TianXingResponse<TianXingInfo> couplets = restTemplate.getForEntity(
+				"http://api.tianapi.com/dialogue/index?key={key}",
+				TianXingResponse.class,
+				paramMap
+		).getBody();
+		return couplets;
+	}
+	
+	/**
+	 * 获取彩虹屁
+	 * <p>
+	 * {
+	 * "content": "她脸上的不是汗水而是玫瑰花的露水。"
+	 * }
+	 */
+	public TianXingResponse<TianXingInfo> getCaiHongPi() {
+		Map<String, String> paramMap = new HashMap<>();
+		paramMap.put("key", tianxingKey1);
+		TianXingResponse<TianXingInfo> couplets = restTemplate.getForEntity(
+				"http://api.tianapi.com/caihongpi/index?key={key}",
+				TianXingResponse.class,
+				paramMap
+		).getBody();
+		return couplets;
+	}
+	
+	/**
+	 * 获取百科题库信息
+	 */
+	public TianXingResponse<BaiKeTiKuInfo> getBaiKeTiKu() {
+		Map<String, String> paramMap = new HashMap<>();
+		paramMap.put("key", tianxingKey1);
+		TianXingResponse<BaiKeTiKuInfo> couplets = restTemplate.getForEntity(
+				"http://api.tianapi.com/baiketiku/index?key={key}",
+				TianXingResponse.class,
+				paramMap
+		).getBody();
+		return couplets;
+	}
+	
+	/**
+	 * 获取英语信息
+	 */
+	public TianXingResponse<TianXingInfo> getEnglish() {
+		Map<String, String> paramMap = new HashMap<>();
+		paramMap.put("key", tianxingKey1);
+		TianXingResponse<TianXingInfo> couplets = restTemplate.getForEntity(
+				"http://api.tianapi.com/everyday/index?key={key}",
+				TianXingResponse.class,
+				paramMap
+		).getBody();
+		return couplets;
+	}
+	
+	
+	/**
+	 * 获取早安的信息
+	 * {
+	 * "content": "用努力去喂养梦想，愿跌倒不哭，明媚如初，早安。"
+	 * }
+	 */
+	public TianXingResponse<TianXingInfo> getZaoAn() {
+		Map<String, String> paramMap = new HashMap<>();
+		paramMap.put("key", tianxingKey1);
+		TianXingResponse<TianXingInfo> couplets = restTemplate.getForEntity(
+				"http://api.tianapi.com/zaoan/index?key={key}",
+				TianXingResponse.class,
+				paramMap
+		).getBody();
+		return couplets;
+	}
+	
+	/**
+	 * 获取晚安的信息
+	 */
+	public TianXingResponse<TianXingInfo> getWanAn() {
+		Map<String, String> paramMap = new HashMap<>();
+		paramMap.put("key", tianxingKey1);
+		TianXingResponse<TianXingInfo> couplets = restTemplate.getForEntity(
+				"http://api.tianapi.com/wanan/index?key={key}",
+				TianXingResponse.class,
+				paramMap
+		).getBody();
+		return couplets;
+	}
+	
+	/**
+	 * 获取十万个为什么
+	 */
+	public TianXingResponse<TianXingInfo> getTenWhy() {
+		Map<String, String> paramMap = new HashMap<>();
+		paramMap.put("key", tianxingKey1);
+		TianXingResponse<TianXingInfo> couplets = restTemplate.getForEntity(
+				"http://api.tianapi.com/tenwhy/index?key={key}",
+				TianXingResponse.class,
+				paramMap
+		).getBody();
+		return couplets;
+	}
+	
+	/**
+	 * 获取字迷信息
+	 */
+	public TianXingResponse<ZiMiInfo> getZiMi() {
+		Map<String, String> paramMap = new HashMap<>();
+		paramMap.put("key", tianxingKey1);
+		TianXingResponse<ZiMiInfo> couplets = restTemplate.getForEntity(
+				"http://api.tianapi.com/zimi/index?key={key}",
+				TianXingResponse.class,
+				paramMap
+		).getBody();
+		return couplets;
+	}
+	
+	
+	/**
+	 * 获取文化谚语
+	 */
+	public TianXingResponse<ProverbInfo> getProverb() {
+		Map<String, String> paramMap = new HashMap<>();
+		paramMap.put("key", tianxingKey2);
+		TianXingResponse<ProverbInfo> couplets = restTemplate.getForEntity(
+				"http://api.tianapi.com/proverb/index?key={key}",
+				TianXingResponse.class,
+				paramMap
+		).getBody();
+		return couplets;
+	}
 }
+
