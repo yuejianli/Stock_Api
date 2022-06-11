@@ -1,5 +1,11 @@
-每日一句>>>
 ${line}
-
+经典台词:
 ${line}
+台词: ${dialogue}
+#if($english)
+    ${line}
+翻译: ${english}
+#end
+${line}
+出处: ${source}
 

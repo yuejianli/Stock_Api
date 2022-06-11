@@ -1,5 +1,5 @@
-每日一句>>>
 ${line}
-
+诗词:
 ${line}
+${content}  ${origin}  ${author} 类别: ${category}
 

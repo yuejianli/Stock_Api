@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <META http-equiv=Content-Type content='text/html; charset=UTF-8'>
+    <title>Title</title>
+    <style type="text/css">
+        table.reference {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 4px;
+            margin-top: 4px;
+        }
+
+        table.reference tr:nth-child(even) {
+            background-color: #fff;
+        }
+
+        table.reference tr:nth-child(odd) {
+            background-color: #f6f4f0;
+        }
+
+        table.reference td {
+            line-height: 2em;
+            min-width: 40px;
+            border: 1px solid #d4d4d4;
+            padding: 5px;
+            padding-top: 7px;
+            padding-bottom: 7px;
+            vertical-align: top;
+        }
+    </style>
+</head>
+<body>
+<h3>亲爱的 ${account} 投资者:</h3>
+    ${line}
+愿你明天心想事成，股票都是红
+<br/>
+    ${line}
+您自选股票五个交易日内涨跌记录如下:
+    ${line}
+<div>
+    ${line}
+    <table class="reference">
+        <tr>
+            <td width="60px;">名称</td>
+            #if(${currDateList})
+                #foreach($currDate in ${currDateList})
+                    <td width="55px;">${currDate} (%)</td>
+                #end
+            #end
+        </tr>
+        #if(${dataList})
+            #foreach($stockInfo in ${dataList})
+                <tr>
+                    <td>${stockInfo.name}</td>
+                    #if(${stockInfo.ten10List})
+                        #foreach($ten10Vo in ${stockInfo.ten10List})
+                            <td>
+                                #if(${ten10Vo.type} ==1)
+                                    <span style="color:red;">赚</span>
+                                    ${line}
+                                    ${ten10Vo.amplitudeProportion}
+                                #elseif(${ten10Vo.type} ==-1)
+                                    <span style="color:green;">赔</span>
+                                    ${line}
+                                    ${ten10Vo.amplitudeProportion}
+                                #elseif(${ten10Vo.type} ==0)
+                                    <span style="color:#999999;">平</span>
+                                    ${line}
+                                    ${ten10Vo.amplitudeProportion}
+                                #else
+                                    <span style="color:pink;">未同步</span>
+
+                                    ${line}
+                                    0.00
+                                #end
+                            </td>
+                        #end
+                    #end
+                </tr>
+            #end
+        #end
+    </table>
+</div>
+<div style="float: left; margin-top: 300px;;">
+    <p>系统邮件(请勿回复) | 打个广告，抖音/视频号 搜索 岳叔叔教你背古诗</p>
+</div>
+</body>
+</html>

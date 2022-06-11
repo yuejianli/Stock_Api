@@ -1,28 +1,27 @@
-天气预报>>>
+${line}
+今日天气:
 ${line}
 你所在的省份:  ${province}
 ${line}
 你所在的城市:  ${city}
-${line}
 #if ($casts.size() > 0)
     #foreach($element in  $casts)
         #if ( ${foreach.index} ==0)
+            ${line}
         今天是: ${element.date} , 星期: ${element.week}
             ${line}
         白天天气: ${element.dayweather} ,晚上天气: ${element.nightweather}
             ${line}
         白天温度: ${element.daytemp} ,晚上温度: ${element.nighttemp}
-            ${line}
         #end
         #if ( ${foreach.index} ==1)
+            ${line}
         明天是: ${element.date} , 星期: ${element.week}
             ${line}
         明天白天天气: ${element.dayweather} ,明天晚上天气: ${element.nightweather}
             ${line}
         明天白天温度: ${element.daytemp} ,明天晚上温度: ${element.nighttemp}
-            ${line}
         #end
     #end
 #end
-${line}
 

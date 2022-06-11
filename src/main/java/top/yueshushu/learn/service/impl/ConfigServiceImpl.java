@@ -122,11 +122,23 @@ public class ConfigServiceImpl implements ConfigService {
         if (null == configDo) {
             return OutputResult.buildAlert(ResultCode.CONFIG_ID_NO_EXIST);
         }
+        // 如果是自选股票列表配置的话，最多只能有50个.
+        if (ConfigCodeType.SELECT_MAX_NUM.getCode().equals(configDo.getCode())) {
+            //获取值.
+            try {
+                Integer maxNum = Integer.parseInt(configRo.getCodeValue());
+                if (maxNum > 10) {
+                    return OutputResult.buildAlert(ResultCode.CONFIG_SELECTED_MAX);
+                }
+            } catch (Exception e) {
+                return OutputResult.buildAlert(ResultCode.CONFIG_SELECTED_MAX);
+            }
+        }
         //获取对应的code信息
         ConfigDo userConfigDo = configDomainService.getByUserIdAndCode(
                 configRo.getUserId(), configDo.getCode()
         );
-        if (null == userConfigDo){
+        if (null == userConfigDo) {
             //不是用户配置，则重新添加一份.
             ConfigDo addConfigDo = new ConfigDo();
             BeanUtils.copyProperties(configDo, addConfigDo);

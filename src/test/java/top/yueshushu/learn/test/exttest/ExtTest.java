@@ -1,24 +1,24 @@
 package top.yueshushu.learn.test.exttest;
 
 import com.alibaba.fastjson.JSONObject;
-
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import top.yueshushu.learn.enumtype.EntrustType;
+import top.yueshushu.learn.enumtype.ExtJobInfoType;
+import top.yueshushu.learn.extension.business.ExtJobInfoBusiness;
+import top.yueshushu.learn.extension.domain.ExtCustomerDo;
+import top.yueshushu.learn.extension.job.ExtJobSechduler;
+import top.yueshushu.learn.extension.model.dto.gaodeweather.WeatherResponse;
+import top.yueshushu.learn.extension.model.dto.shanbeici.TranslateResponse;
+import top.yueshushu.learn.extension.model.dto.shici.PoemResponse;
+import top.yueshushu.learn.extension.model.dto.tianxing.TianXingResponse;
+import top.yueshushu.learn.extension.service.ExtFunctionService;
 
 import javax.annotation.Resource;
-
-import lombok.extern.slf4j.Slf4j;
-import top.yueshushu.learn.domain.ext.ExtCustomerDo;
-import top.yueshushu.learn.extension.ExtJobSechduler;
-import top.yueshushu.learn.extension.ExtJobService;
-import top.yueshushu.learn.extension.business.ExtJobBusiness;
-import top.yueshushu.learn.extension.model.gaodeweather.WeatherResponse;
-import top.yueshushu.learn.extension.model.shanbeici.TranslateResponse;
-import top.yueshushu.learn.extension.model.shici.PoemResponse;
-import top.yueshushu.learn.extension.model.tianxing.TianXingResponse;
 
 /**
  * @Description TODO
@@ -30,12 +30,11 @@ import top.yueshushu.learn.extension.model.tianxing.TianXingResponse;
 @Slf4j
 public class ExtTest {
     @Resource
-    private ExtJobService extJobService;
+    private ExtFunctionService extFunctionService;
     @Resource
     private ExtJobSechduler extJobSechduler;
     @Resource
-    private ExtJobBusiness extJobBusiness;
-    
+    private ExtJobInfoBusiness extJobInfoBusiness;
     private ExtCustomerDo extCustomerDo;
     
     @Before
@@ -44,7 +43,7 @@ public class ExtTest {
         extCustomerDo.setId(1);
         extCustomerDo.setUserAccount("岳泽霖");
         extCustomerDo.setName("岳泽霖");
-        extCustomerDo.setUserId("yuejianli");
+        extCustomerDo.setWxId("yuejianli");
         extCustomerDo.setSex(1);
         extCustomerDo.setCity("330114");
         extCustomerDo.setFlag(1);
@@ -52,96 +51,145 @@ public class ExtTest {
     
     @Test
     public void weatherTest() {
-        WeatherResponse weather = extJobService.getWeather("522701");
+        WeatherResponse weather = extFunctionService.getWeather("522701");
         log.info("获取天气信息:{}", JSONObject.toJSONString(weather));
     }
     
     @Test
     public void translateResponseTest() {
-        TranslateResponse weather = extJobService.getTranslate();
-        log.info("获取每日一句信息:{}", weather);
+        TranslateResponse weather = extFunctionService.getTranslate();
+        log.info("获取每日一句信息:{}", JSONObject.toJSONString(weather));
     }
     
     
     @Test
     public void poemTest() {
-        PoemResponse poemResponse = extJobService.getPoem();
-        log.info("获取一句诗信息:{}", poemResponse);
+        PoemResponse poemResponse = extFunctionService.getPoem();
+        log.info("获取一句诗信息:{}", JSONObject.toJSONString(poemResponse));
     }
     
     @Test
     public void coupletsTest() {
-        TianXingResponse couplets = extJobService.getCouplets();
-        log.info("获取对联信息:{}", couplets);
+        TianXingResponse couplets = extFunctionService.getCouplets();
+        log.info("获取对联信息:{}", JSONObject.toJSONString(couplets));
     }
     
     @Test
     public void getClassicalTest() {
-        TianXingResponse couplets = extJobService.getClassical();
-        log.info("获取古典诗句信息:{}", couplets);
+        TianXingResponse couplets = extFunctionService.getClassical();
+        log.info("获取古典诗句信息:{}", JSONObject.toJSONString(couplets));
     }
     
     @Test
     public void getDialogueTest() {
-        TianXingResponse couplets = extJobService.getDialogue();
-        log.info("获取经典台词信息:{}", couplets);
+        TianXingResponse couplets = extFunctionService.getDialogue();
+        log.info("获取经典台词信息:{}", JSONObject.toJSONString(couplets));
     }
     
     @Test
     public void getCaiHongPiTest() {
-        TianXingResponse caihongPi = extJobService.getCaiHongPi();
-        log.info("获取彩虹屁信息:{}", caihongPi);
+        TianXingResponse caihongPi = extFunctionService.getCaiHongPi();
+        log.info("获取彩虹屁信息:{}", JSONObject.toJSONString(caihongPi));
     }
     
     @Test
     public void getBaiKeTiKuTest() {
-        TianXingResponse baiKeTiKu = extJobService.getBaiKeTiKu();
-        log.info("获取百科题库:{}", baiKeTiKu);
+        TianXingResponse baiKeTiKu = extFunctionService.getBaiKeTiKu();
+        log.info("获取百科题库:{}", JSONObject.toJSONString(baiKeTiKu));
     }
     
     @Test
     public void getEnglishTest() {
-        TianXingResponse yingYu = extJobService.getEnglish();
-        log.info("获取英语信息:{}", yingYu);
+        TianXingResponse yingYu = extFunctionService.getEnglish();
+        log.info("获取英语信息:{}", JSONObject.toJSONString(yingYu));
     }
     
     @Test
     public void getZaoAnTest() {
-        TianXingResponse zaoAn = extJobService.getZaoAn();
-        log.info("获取早安信息:{}", zaoAn);
+        TianXingResponse zaoAn = extFunctionService.getZaoAn();
+        log.info("获取早安信息:{}", JSONObject.toJSONString(zaoAn));
     }
     
     @Test
     public void getWanAnTest() {
-        TianXingResponse wanAn = extJobService.getWanAn();
-        log.info("获取晚安信息:{}", wanAn);
+        TianXingResponse wanAn = extFunctionService.getWanAn();
+        log.info("获取晚安信息:{}", JSONObject.toJSONString(wanAn));
     }
     
     @Test
     public void getTenWhyTest() {
-        TianXingResponse tenWhy = extJobService.getTenWhy();
-        log.info("获取十万个为什么信息:{}", tenWhy);
+        TianXingResponse tenWhy = extFunctionService.getTenWhy();
+        log.info("获取十万个为什么信息:{}", JSONObject.toJSONString(tenWhy));
     }
-    
+
     @Test
     public void getZiMiTest() {
-        TianXingResponse ziM = extJobService.getZiMi();
-        log.info("获取字迷信息:{}", ziM);
+        TianXingResponse ziMi = extFunctionService.getZiMi();
+        log.info("获取字迷信息:{}", JSONObject.toJSONString(ziMi));
     }
-    
+
     @Test
     public void getProverbTest() {
-        TianXingResponse proverb = extJobService.getProverb();
-        log.info("获取文化谚语信息:{}", proverb);
+        TianXingResponse proverb = extFunctionService.getProverb();
+        log.info("获取文化谚语信息:{}", JSONObject.toJSONString(proverb));
     }
-    
+
     @Test
-    public void moringTest() {
-        extJobBusiness.morning(extCustomerDo);
+    public void getChengyuTest() {
+        TianXingResponse proverb = extFunctionService.getChengYu();
+        log.info("获取成语信息:{}", JSONObject.toJSONString(proverb));
     }
-    
+
     @Test
-    public void nightTest() {
-        extJobSechduler.night();
+    public void getQiaoMenTest() {
+        TianXingResponse qiaoMen = extFunctionService.getQiaoMen();
+        log.info("获取生活小窍门信息:{}", JSONObject.toJSONString(qiaoMen));
+    }
+
+    @Test
+    public void getMiYuTest() {
+        TianXingResponse miyu = extFunctionService.getMiYu();
+        log.info("获取迷语信息:{}", JSONObject.toJSONString(miyu));
+    }
+
+    @Test
+    public void getQingShiTest() {
+        TianXingResponse qingShi = extFunctionService.getQingShi();
+        log.info("获取情诗信息:{}", JSONObject.toJSONString(qingShi));
+    }
+
+    @Test
+    public void getMingYanTest() {
+        TianXingResponse mingYan = extFunctionService.getMingYan();
+        log.info("获取名言信息:{}", JSONObject.toJSONString(mingYan));
+    }
+
+    @Test
+    public void getSayLoveTest() {
+        TianXingResponse toSayLove = extFunctionService.getSayLove();
+        log.info("获取土味情话信息:{}", JSONObject.toJSONString(toSayLove));
+    }
+
+    @Test
+    public void getHuangLiTest() {
+        TianXingResponse huangLi = extFunctionService.getHuangLi();
+        log.info("获取黄历信息:{}", JSONObject.toJSONString(huangLi));
+    }
+
+    @Test
+    public void getXieHouYuTest() {
+        TianXingResponse xieHouYu = extFunctionService.getXieHouYu();
+        log.info("获取歇后语信息:{}", JSONObject.toJSONString(xieHouYu));
+    }
+
+    @Test
+    public void getRaoKouLingTest() {
+        TianXingResponse raoKouLing = extFunctionService.getRaoKouLing();
+        log.info("获取绕口令信息:{}", JSONObject.toJSONString(raoKouLing));
+    }
+
+    @Test
+    public void jobTest() {
+        extJobInfoBusiness.execJob(ExtJobInfoType.MORNING, EntrustType.AUTO.getCode());
     }
 }

@@ -3,17 +3,12 @@ package top.yueshushu.learn.message.weixin.service;
 import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-
-import java.text.MessageFormat;
-import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Resource;
-
-import lombok.extern.slf4j.Slf4j;
 import top.yueshushu.learn.common.Const;
+import top.yueshushu.learn.domain.UserDo;
+import top.yueshushu.learn.domainservice.UserDomainService;
 import top.yueshushu.learn.message.weixin.model.TextCardMessage;
 import top.yueshushu.learn.message.weixin.model.TextMessage;
 import top.yueshushu.learn.message.weixin.model.WxText;
@@ -21,6 +16,10 @@ import top.yueshushu.learn.message.weixin.model.WxTextCard;
 import top.yueshushu.learn.message.weixin.properties.DefaultWXProperties;
 import top.yueshushu.learn.message.weixin.util.WeChatUtil;
 import top.yueshushu.learn.util.RedisUtil;
+
+import javax.annotation.Resource;
+import java.text.MessageFormat;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Description 微信企业号发送消息
@@ -33,9 +32,22 @@ public class WeChatService {
 	private static String sendMessage_url = "https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token={0}";
 	@Resource
 	private DefaultWXProperties defaultWXProperties;
-    @Resource
-    private RedisUtil redisUtil;
-	
+	@Resource
+	private RedisUtil redisUtil;
+	@Resource
+	private UserDomainService userDomainService;
+
+	/**
+	 * 通过微信企业号向系统管理员发送失败的消息
+	 *
+	 * @param content 发送的内容
+	 * @return 通过微信企业号发送消息
+	 */
+	public String sendSystemUserTextMessage(String content) {
+		UserDo userDo = userDomainService.getById(1);
+		return sendTextMessage(userDo.getWxUserId(), content);
+	}
+
 	/**
 	 * 通过微信企业号发送普通消息
 	 *

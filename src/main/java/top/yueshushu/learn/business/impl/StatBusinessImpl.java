@@ -1,5 +1,6 @@
 package top.yueshushu.learn.business.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
@@ -8,16 +9,22 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import top.yueshushu.learn.business.StatBusiness;
 import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.common.SystemConst;
 import top.yueshushu.learn.entity.Stock;
 import top.yueshushu.learn.entity.StockHistory;
+import top.yueshushu.learn.entity.User;
 import top.yueshushu.learn.enumtype.AmplitudeType;
 import top.yueshushu.learn.enumtype.CharPriceType;
 import top.yueshushu.learn.enumtype.WeekStatType;
+import top.yueshushu.learn.enumtype.message.VelocityTemplateType;
 import top.yueshushu.learn.helper.DateHelper;
+import top.yueshushu.learn.message.email.EmailService;
+import top.yueshushu.learn.message.weixin.service.WeChatService;
+import top.yueshushu.learn.mode.dto.StockTenToEmailDto;
 import top.yueshushu.learn.mode.ro.StatTen10Ro;
 import top.yueshushu.learn.mode.ro.StockSelectedRo;
 import top.yueshushu.learn.mode.ro.StockStatRo;
@@ -34,6 +41,7 @@ import top.yueshushu.learn.response.PageResponse;
 import top.yueshushu.learn.service.StockHistoryService;
 import top.yueshushu.learn.service.StockSelectedService;
 import top.yueshushu.learn.service.StockService;
+import top.yueshushu.learn.service.UserService;
 import top.yueshushu.learn.service.cache.StockCacheService;
 import top.yueshushu.learn.util.BigDecimalUtil;
 
@@ -65,6 +73,12 @@ public class StatBusinessImpl implements StatBusiness {
     @SuppressWarnings("all")
     @Resource(name = Const.ASYNC_SERVICE_EXECUTOR_BEAN_NAME)
     private AsyncTaskExecutor executor;
+    @Resource
+    private UserService userService;
+    @Resource
+    private EmailService emailService;
+    @Resource
+    private WeChatService weChatService;
 
     @Override
     public OutputResult getWeekStat(StockStatRo stockStatRo) {
@@ -208,7 +222,7 @@ public class StatBusinessImpl implements StatBusiness {
     }
 
     @Override
-    public OutputResult getTenTradeData(StatTen10Ro statTen10Ro) {
+    public OutputResult<PageResponse<StockTen10Vo>> getTenTradeData(StatTen10Ro statTen10Ro) {
         // 先查询一下，分页，自选表信息.
         StockSelectedRo stockSelectedRo = new StockSelectedRo();
         stockSelectedRo.setUserId(statTen10Ro.getUserId());
@@ -228,6 +242,65 @@ public class StatBusinessImpl implements StatBusiness {
         ));
     }
 
+    @Override
+    public void ten5ToMail(Integer userId) {
+        //查询一下，当前用户的信息.
+        User user = userService.getById(userId);
+        if (user == null) {
+            return;
+        }
+        if (StringUtils.isEmpty(user.getEmail())) {
+            log.info(">>>用户 {} 未配置邮件，不发送最近10天的交易日信息", userId);
+            return;
+        }
+        // 获取信息
+        StatTen10Ro statTen10Ro = new StatTen10Ro();
+        statTen10Ro.setUserId(userId);
+        statTen10Ro.setPageSize(20);
+        statTen10Ro.setPageNum(1);
+        OutputResult<PageResponse<StockTen10Vo>> tenDataResult = getTenTradeData(statTen10Ro);
+        // 获取数据
+        List<StockTen10Vo> stockTen10List = tenDataResult.getData().getList();
+        List<StockTen10Vo> convertTen10VoList = stockTen10List.stream().map(
+                n -> {
+                    StockTen10Vo last5DaVo = new StockTen10Vo();
+                    List<HistoryTen10Vo> historyTen10VoList = n.getTen10List().subList(5, 10);
+                    historyTen10VoList.forEach(
+                            vo -> {
+                                vo.setAmplitudeProportion(
+                                        vo.getAmplitudeProportion().substring(0, vo.getAmplitudeProportion().length() - 2)
+                                );
+                            }
+                    );
+                    last5DaVo.setCode(n.getCode());
+                    last5DaVo.setName(n.getName().length() > 4 ? n.getName().substring(0, 4) : n.getName());
+                    last5DaVo.setTen10List(historyTen10VoList);
+                    return last5DaVo;
+                }
+        ).collect(Collectors.toList());
+
+        // 定义一个 DTO 对象
+        List<String> currDateList = getTenTradeDay().getData().subList(5, 10);
+        List<String> convertDateList = currDateList.stream().map(
+                n -> n.substring(8)
+        ).collect(Collectors.toList());
+        StockTenToEmailDto stockTenToEmailDto = new StockTenToEmailDto();
+        stockTenToEmailDto.setAccount(user.getAccount());
+        stockTenToEmailDto.setDataList(convertTen10VoList);
+        stockTenToEmailDto.setCurrDateList(convertDateList);
+        stockTenToEmailDto.setLine("<br/>");
+
+        Map<String, Object> modelMap = BeanUtil.beanToMap(stockTenToEmailDto);
+        boolean emailFlag = emailService.sendVelocityMail(
+                new String[]{user.getEmail()}, "自选股票十个交易日内涨跌记录",
+                VelocityTemplateType.TEN10, modelMap
+        );
+        if (!emailFlag) {
+            log.error("发送最近十天的自选股票涨跌记录 给用户{} 失败 ", userId);
+            weChatService.sendSystemUserTextMessage("发送自选股票十个交易日内涨跌记录 给用户" + userId + "失败");
+        }
+    }
+
     /**
      * 将股票信息进行转换，转换成相应的涨跌信息
      *
@@ -235,7 +308,7 @@ public class StatBusinessImpl implements StatBusiness {
      * @return 将股票信息进行转换，转换成相应的涨跌信息
      */
     private List<StockTen10Vo> convertTen10VoBySelectedVo(List<StockSelectedVo> stockSelectedVoList) {
-        List<StockTen10Vo> ten10VoList = new ArrayList<>(stockSelectedVoList.size());
+        List<StockTen10Vo> ten10VoList = Collections.synchronizedList(new ArrayList<>(stockSelectedVoList.size()));
         CountDownLatch countDownLatch = new CountDownLatch(stockSelectedVoList.size());
         // 股票信息展示
         for (StockSelectedVo stockSelectedVo : stockSelectedVoList) {

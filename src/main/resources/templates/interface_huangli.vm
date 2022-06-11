@@ -1,0 +1,16 @@
+${line}
+今日黄历:
+${line}
+日期: ${gregoriandate}
+${line}
+农历日期：${shengxiao}年 ${lubarmonth} ${lunarday}
+${line}
+节气: ${jieqi} 阳历节日: ${festival} 阴历节日: ${lunar_festival}
+${line}
+宜: ${fitness}
+${line}
+忌: ${taboo}
+${line}
+申位: ${shenwei}
+${line}
+胎神: ${taishen}

@@ -10,18 +10,18 @@ import org.springframework.util.Assert;
  */
 
 public enum VelocityTemplateType {
-	TEST("test", "测试邮箱"),
-	TEN10("ten10", "最近10天的交易记录"),
-	;
-	
-	private String code;
-	
-	private String desc;
-	
-	private VelocityTemplateType(String code, String desc) {
-		this.code = code;
-		this.desc = desc;
-	}
+    TEST("test", "测试邮箱"),
+    TEN10("ten5", "自选股票十个交易日内涨跌记录"),
+    ;
+
+    private String code;
+
+    private String desc;
+
+    private VelocityTemplateType(String code, String desc) {
+        this.code = code;
+        this.desc = desc;
+    }
 	
 	/**
 	 * 获取定时任务信息

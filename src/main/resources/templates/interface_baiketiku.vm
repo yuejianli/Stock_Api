@@ -1,5 +1,13 @@
-每日一句>>>
 ${line}
-
+今日问题?
 ${line}
-
+问题: ${title}
+${line}
+选项: A: ${answerA} B:${answerB}
+${line}
+C: ${answerC} D:${answerD}
+${line}
+正确答案: ${answer}
+#if($analytic)
+解析：${analytic}
+#end

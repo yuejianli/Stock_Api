@@ -1,6 +1,7 @@
 package top.yueshushu.learn.message.email.impl;
 
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.app.VelocityEngine;
@@ -9,19 +10,16 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-
-import java.io.StringWriter;
-import java.util.Map;
-import java.util.Properties;
+import top.yueshushu.learn.enumtype.message.VelocityTemplateType;
+import top.yueshushu.learn.message.email.EmailService;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
-
-import lombok.extern.slf4j.Slf4j;
-import top.yueshushu.learn.enumtype.message.VelocityTemplateType;
-import top.yueshushu.learn.message.email.EmailService;
+import java.io.StringWriter;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * 邮件发送信息
@@ -89,6 +87,7 @@ public class EmailServiceImpl implements EmailService {
 	public boolean sendVelocityMail(String[] toArr, String subject, VelocityTemplateType velocityTemplateType, Map<String, Object> dataMap) {
 		try {
 			String velocityMailText = getVelocityMailText(velocityTemplateType, dataMap);
+			log.info(">>>得到信息:{}", velocityMailText);
 			return sendHtmlMail(toArr, subject, velocityMailText);
 		} catch (Exception ex) {
 			log.error(">>>send email type {}  is error,", velocityTemplateType.getCode(), ex);

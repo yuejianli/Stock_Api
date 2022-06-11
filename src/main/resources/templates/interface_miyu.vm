@@ -1,0 +1,7 @@
+${line}
+谜语:
+${line}
+问题: ${quest}
+${line}
+答案：${answer}
+

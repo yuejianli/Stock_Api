@@ -1,0 +1,13 @@
+${line}
+成语问答:
+${line}
+问题: ${question}
+${line}
+参考答案：${answer}
+${line}
+拼音: ${pinyin}
+${line}
+出处: ${source}
+
+
+

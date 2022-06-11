@@ -1,5 +1,9 @@
-每日一句>>>
 ${line}
-
+每日一句：
 ${line}
+原英文内容: ${content}
+${line}
+中文翻译: ${translation}
+${line}
+作者: ${author}
 

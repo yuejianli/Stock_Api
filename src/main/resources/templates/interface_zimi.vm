@@ -1,5 +1,9 @@
-每日一句>>>
 ${line}
-
+每日字迷:
 ${line}
+迷面: ${content}
+${line}
+迷底: ${answer}
+${line}
+原因: ${reason}
 

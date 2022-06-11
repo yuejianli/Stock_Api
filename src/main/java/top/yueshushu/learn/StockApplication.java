@@ -15,7 +15,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * @Version 1.0
  **/
 @SpringBootApplication
-@MapperScan("top.yueshushu.learn.mapper")
+@MapperScan({"top.yueshushu.learn.mapper", "top.yueshushu.learn.extension.mapper"})
 @Slf4j
 //开启缓存
 @EnableCaching

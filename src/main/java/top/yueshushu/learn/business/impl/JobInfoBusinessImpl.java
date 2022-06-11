@@ -1,24 +1,13 @@
 package top.yueshushu.learn.business.impl;
 
-import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-
-import java.text.MessageFormat;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
-import java.util.List;
-
-import javax.annotation.Resource;
-
 import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import top.yueshushu.learn.business.DealBusiness;
 import top.yueshushu.learn.business.JobInfoBusiness;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.entity.JobInfo;
-import top.yueshushu.learn.entity.User;
 import top.yueshushu.learn.enumtype.DataFlagType;
 import top.yueshushu.learn.enumtype.EntrustType;
 import top.yueshushu.learn.enumtype.JobInfoType;
@@ -29,14 +18,17 @@ import top.yueshushu.learn.mode.ro.BuyRo;
 import top.yueshushu.learn.mode.ro.DealRo;
 import top.yueshushu.learn.mode.ro.JobInfoRo;
 import top.yueshushu.learn.response.OutputResult;
-import top.yueshushu.learn.service.HolidayCalendarService;
-import top.yueshushu.learn.service.JobInfoService;
-import top.yueshushu.learn.service.StockCrawlerService;
-import top.yueshushu.learn.service.StockSelectedService;
-import top.yueshushu.learn.service.TradePositionService;
-import top.yueshushu.learn.service.TradeStrategyService;
-import top.yueshushu.learn.service.UserService;
+import top.yueshushu.learn.service.*;
 import top.yueshushu.learn.util.CronExpression;
+
+import javax.annotation.Resource;
+import java.text.MessageFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 用途描述
@@ -68,6 +60,8 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
     private StockCrawlerService stockCrawlerService;
     @Resource
     private WeChatService weChatService;
+    @Resource
+    private StatBusinessImpl statBusiness;
 
 
     @Override
@@ -91,10 +85,11 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
             log.info("当前任务 {} 已经被删除", jobInfoType.getDesc());
             return OutputResult.buildAlert(ResultCode.JOB_ID_NOT_EXIST);
         }
-        //if (!DataFlagType.NORMAL.getCode().equals(jobInfo.getTriggerStatus())) {
-        //    log.info(">>当前任务 {}是禁用状态，不执行", jobInfoType.getDesc());
-        //    return OutputResult.buildAlert(ResultCode.JOB_ID_NOT_EXIST);
-        //}
+        // 禁用状态，不执行。
+        if (!DataFlagType.NORMAL.getCode().equals(jobInfo.getTriggerStatus())) {
+            log.info(">>当前任务 {}是禁用状态，不执行", jobInfoType.getDesc());
+            return OutputResult.buildAlert(ResultCode.JOB_ID_NOT_EXIST);
+        }
         jobInfo.setTriggerLastTime(DateUtil.date().toLocalDateTime());
         try {
             switch (jobInfoType) {
@@ -166,8 +161,24 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
                     }
                     break;
                 }
-                case STOCK_UPDATE:{
+                case STOCK_UPDATE: {
                     stockCrawlerService.updateAllStock();
+                    break;
+                }
+                case STOCK_FIVE_EMAIL: {
+                    List<Integer> userIdList = userService.listUserId();
+                    // 设置类型为虚拟
+                    userIdList
+                            .forEach(
+                                    userId -> {
+                                        statBusiness.ten5ToMail(userId);
+                                        try {
+                                            TimeUnit.SECONDS.sleep(1);
+                                        } catch (InterruptedException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                            );
                     break;
                 }
                 default: {
@@ -181,26 +192,26 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
             jobInfo.setTriggerLastResult(0);
             jobInfo.setTriggerLastErrorMessage(e.getMessage());
             //执行任务失败，会发送消息到当前的用户.
-            User user = userService.getDefaultUser();
             String errorWxMessage = MessageFormat.format("执行任务 {0} 失败，失败原因是:{1}",
                     jobInfoType.getDesc(), e.getMessage());
-			weChatService.sendTextMessage(user.getWxUserId(), errorWxMessage);
-			log.error("执行任务失败{}", e);
+            weChatService.sendSystemUserTextMessage(errorWxMessage);
+            log.error("执行任务失败{}", e);
+        } finally {
+            //设置下次触发的时间
+            jobInfo.setTriggerType(triggerType);
+            jobInfo.setTriggerLastTime(LocalDateTime.now());
+            try {
+                CronExpression cronExpression = new CronExpression(jobInfo.getCron());
+                Date date = cronExpression.getNextValidTimeAfter(new Date());
+                Instant instant = date.toInstant();
+                ZoneId zoneId = ZoneId.systemDefault();
+                LocalDateTime localDateTime = instant.atZone(zoneId).toLocalDateTime();
+                jobInfo.setTriggerNextTime(localDateTime);
+            } catch (Exception e) {
+                log.error("获取下一次触发时间失败", e);
+            }
+            jobInfoService.updateInfoById(jobInfo);
         }
-        //设置下次触发的时间
-        jobInfo.setTriggerType(triggerType);
-        jobInfo.setTriggerLastTime(LocalDateTime.now());
-        try {
-            CronExpression cronExpression = new CronExpression(jobInfo.getCron());
-            Date date = cronExpression.getNextValidTimeAfter(new Date());
-            Instant instant = date.toInstant();
-            ZoneId zoneId = ZoneId.systemDefault();
-            LocalDateTime localDateTime = instant.atZone(zoneId).toLocalDateTime();
-            jobInfo.setTriggerNextTime(localDateTime);
-        } catch (Exception e) {
-            log.error("获取下一次触发时间失败", e);
-        }
-        jobInfoService.updateInfoById(jobInfo);
         if (StringUtils.isEmpty(jobInfo.getTriggerLastErrorMessage())){
             return OutputResult.buildSucc();
         }else{
@@ -217,7 +228,6 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
     public OutputResult handlerById(Integer id) {
         //立即执行
         JobInfo job = jobInfoService.getById(id);
-       OutputResult outputResult= execJob(JobInfoType.getJobInfoType(job.getCode()), EntrustType.HANDLER.getCode());
-        return outputResult;
+        return execJob(JobInfoType.getJobInfoType(job.getCode()), EntrustType.HANDLER.getCode());
     }
 }

@@ -2,7 +2,9 @@ package top.yueshushu.learn.business;
 
 import top.yueshushu.learn.mode.ro.StatTen10Ro;
 import top.yueshushu.learn.mode.ro.StockStatRo;
+import top.yueshushu.learn.mode.vo.ten10stat.StockTen10Vo;
 import top.yueshushu.learn.response.OutputResult;
+import top.yueshushu.learn.response.PageResponse;
 
 import java.util.List;
 
@@ -39,5 +41,12 @@ public interface StatBusiness {
      *
      * @return 获取最近十天的交易日自选表统计信息
      */
-    OutputResult getTenTradeData(StatTen10Ro statTen10Ro);
+    OutputResult<PageResponse<StockTen10Vo>> getTenTradeData(StatTen10Ro statTen10Ro);
+
+    /**
+     * 查询最近十天的交易日自选表统计信息，发送到对应用户的邮箱里面.
+     *
+     * @param userId 用户编号
+     */
+    void ten5ToMail(Integer userId);
 }

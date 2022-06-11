@@ -14,6 +14,7 @@ import java.io.Serializable;
 @ApiModel("股票历史展示信息Vo")
 @Data
 public class HistoryTen10Vo implements Serializable {
+    @ApiModelProperty("交易日期")
     private String currDate;
     @ApiModelProperty("类型 1赚 -1赔 0是平")
     private Integer type;

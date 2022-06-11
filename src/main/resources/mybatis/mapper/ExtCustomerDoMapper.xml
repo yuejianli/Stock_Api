@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.yueshushu.learn.extension.mapper.ExtCustomerDoMapper">
+    <resultMap id="customerMapper" type="top.yueshushu.learn.extension.domain.ExtCustomerDo">
+        <result property="id" column="id"></result>
+        <result property="userAccount" column="user_account"></result>
+        <result property="name" column="name"></result>
+        <result property="wxId" column="wx_id"></result>
+        <result property="sex" column="sex"></result>
+        <result property="birthday" column="birthday"></result>
+        <result property="city" column="city"></result>
+        <result property="flag" column="flag"></result>
+    </resultMap>
+    <select id="listByKeyword" resultMap="customerMapper">
+        select t.id,t.user_account,t.name,t.sex,t.birthday,t.city,t.wx_id,t.flag from ext_customer t
+        <where>
+            <if test="keyword != null and keyword != ''">
+                and (
+                t.user_account like concat('%',concat(#{keyword},'%'))
+                or t.name like concat('%',concat(#{keyword},'%'))
+                )
+            </if>
+            <if test="1 ==1">
+                t.flag =1
+            </if>
+        </where>
+        order by t.id asc
+    </select>
+</mapper>

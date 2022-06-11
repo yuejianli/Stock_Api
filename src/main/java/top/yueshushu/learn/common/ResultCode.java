@@ -157,7 +157,8 @@ public class ResultCode {
             new ResultCode(true, 10016001, "不存在此配置记录信息");
     public static final ResultCode CONFIG_IS_DEFAULT =
             new ResultCode(true, 10016002, "已经是默认配置，不能删除");
-
+    public static final ResultCode CONFIG_SELECTED_MAX =
+            new ResultCode(true, 10016003, "自选股票数量最多10个");
     /**
      * cache 缓存变量配置信息：  100 17 （编排）+ 001 (三位随机)
      */
@@ -175,14 +176,6 @@ public class ResultCode {
             new ResultCode(true, 10018002, "交易规则条件不存在,请刷新后重试");
     public static final ResultCode NO_AUTH =
             new ResultCode(true, 10018003, "没有权限操作");
-
-    /**
-     * 定时任务列表  100 19（编排）+ 001 (三位随机)
-     */
-    public static final ResultCode JOB_ID_NOT_EXIST =
-            new ResultCode(true, 10018001, "任务编号不正确,请刷新后重试");
-    public static final ResultCode JOB_ID_DISABLE =
-            new ResultCode(true, 10018002, "任务编号是禁用状态，不能执行");
     /**
      * 持仓信息 100 19（编排）+ 001 (三位随机)
      */
@@ -227,6 +220,22 @@ public class ResultCode {
     public static final ResultCode STOCK_ASYNC_NO_END_DATE =
             new ResultCode(false, 20010009, "同步历史数据未选择结束日期");
 
+
+    /**
+     * 定时任务列表  100 20（编排）+ 001 (三位随机)
+     */
+    public static final ResultCode JOB_ID_NOT_EXIST =
+            new ResultCode(true, 10020001, "任务编号不正确,请刷新后重试");
+    public static final ResultCode JOB_ID_DISABLE =
+            new ResultCode(true, 10020002, "任务编号是禁用状态，不能执行");
+
+    /**
+     * 扩展信息  100 21（编排）+ 001 (三位随机)
+     */
+    public static final ResultCode EXT_ACCOUNT_EXIST =
+            new ResultCode(true, 10021001, "客户账号已经存在");
+    public static final ResultCode EXT_ID_NOT_EXIST =
+            new ResultCode(true, 10021002, "未查询出客户信息");
 
     private boolean success;
     private int code;
