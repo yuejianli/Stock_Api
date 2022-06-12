@@ -17,7 +17,6 @@ import top.yueshushu.learn.response.PageResponse;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -51,21 +50,5 @@ public class ExtInterfaceServiceImpl implements ExtInterfaceService {
         PageInfo pageInfo = new PageInfo<>(pageResultList);
         return OutputResult.buildSucc(new PageResponse<TradeMethod>(pageGithubResult.getTotal(),
                 pageInfo.getList()));
-    }
-
-    @Override
-    public List<ExtInterface> listAll() {
-        List<ExtInterfaceDo> extInterfaceDoList = extInterfaceDomainService.list();
-        if (CollectionUtils.isEmpty(extInterfaceDoList)) {
-            return Collections.emptyList();
-        }
-
-        List<ExtInterface> pageResultList = new ArrayList<>(extInterfaceDoList.size());
-        extInterfaceDoList.forEach(
-                n -> {
-                    pageResultList.add(extInterfaceAssembler.doToEntity(n));
-                }
-        );
-        return pageResultList;
     }
 }

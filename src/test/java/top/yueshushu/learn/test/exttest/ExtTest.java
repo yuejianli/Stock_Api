@@ -1,5 +1,7 @@
 package top.yueshushu.learn.test.exttest;
 
+import cn.hutool.core.date.ChineseDate;
+import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
@@ -19,6 +21,7 @@ import top.yueshushu.learn.extension.model.dto.tianxing.TianXingResponse;
 import top.yueshushu.learn.extension.service.ExtFunctionService;
 
 import javax.annotation.Resource;
+import java.util.Date;
 
 /**
  * @Description TODO
@@ -189,7 +192,23 @@ public class ExtTest {
     }
 
     @Test
+    public void nongliTest() {
+        //获取农历
+        Date now = DateUtil.date();
+        ChineseDate chineseDate = new ChineseDate(now);
+        // 获取农历月 和农历天
+        String chineseMonth = chineseDate.getChineseMonth();
+        String chineseDay = chineseDate.getChineseDay();
+        log.info(">>>月:{},日:{}", chineseMonth, chineseDay);
+    }
+
+    @Test
     public void jobTest() {
         extJobInfoBusiness.execJob(ExtJobInfoType.MORNING, EntrustType.AUTO.getCode());
+    }
+
+    @Test
+    public void job2Test() {
+        extJobInfoBusiness.execJob(ExtJobInfoType.FASTING, EntrustType.AUTO.getCode());
     }
 }

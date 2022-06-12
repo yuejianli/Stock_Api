@@ -28,14 +28,23 @@ public class ExtJobSechduler {
 	 * 每天早上7点半，发送天气信息
 	 */
 	@Scheduled(cron = "1 30 7 * * ?")
-	public void morning() {
+    public void morning() {
         extJobInfoBusiness.execJob(ExtJobInfoType.MORNING, EntrustType.AUTO.getCode());
     }
-	/**
-	 * 每天晚上10点半，发送信息.
-	 */
-	@Scheduled(cron = "1 20 22 * * ?")
-	public void night() {
+
+    /**
+     * 每天晚上10点半，发送信息.
+     */
+    @Scheduled(cron = "1 20 22 * * ?")
+    public void night() {
         extJobInfoBusiness.execJob(ExtJobInfoType.NIGHT, EntrustType.AUTO.getCode());
+    }
+
+    /**
+     * 每天发送 斋戒日期的处理
+     */
+    @Scheduled(cron = "1 00 8,22 * * ?")
+    public void fasting() {
+        extJobInfoBusiness.execJob(ExtJobInfoType.FASTING, EntrustType.AUTO.getCode());
     }
 }

@@ -12,6 +12,7 @@ import top.yueshushu.learn.enumtype.DataFlagType;
 import top.yueshushu.learn.enumtype.EntrustType;
 import top.yueshushu.learn.enumtype.ExtJobInfoType;
 import top.yueshushu.learn.enumtype.message.ExtInterfaceTemplateType;
+import top.yueshushu.learn.extension.business.ExtFastingBusiness;
 import top.yueshushu.learn.extension.business.ExtJobInfoBusiness;
 import top.yueshushu.learn.extension.domain.ExtInterfaceDo;
 import top.yueshushu.learn.extension.domainservice.ExtInterfaceDomainService;
@@ -62,6 +63,8 @@ public class ExtJobInfoBusinessImpl implements ExtJobInfoBusiness {
     private ExtTemplateTypeService extTemplateTypeService;
     @Resource
     private ExtCustomerService extCustomerService;
+    @Resource
+    private ExtFastingBusiness extFastingBusiness;
 
 
     @Override
@@ -78,6 +81,9 @@ public class ExtJobInfoBusinessImpl implements ExtJobInfoBusiness {
     public OutputResult execJob(ExtJobInfoType jobInfoType, Integer triggerType) {
         if (jobInfoType == null) {
             return OutputResult.buildAlert(ResultCode.NO_AUTH);
+        }
+        if (ExtJobInfoType.FASTING.equals(jobInfoType)) {
+            return execOtherNoInterface(jobInfoType, triggerType);
         }
         //查询任务
         ExtJobInfo jobInfo = extJobInfoService.getByCode(jobInfoType);
@@ -187,6 +193,7 @@ public class ExtJobInfoBusinessImpl implements ExtJobInfoBusiness {
         }
     }
 
+
     /**
      * 将其转换成用户昵称和 对应的接口 code码的形式
      *
@@ -287,6 +294,100 @@ public class ExtJobInfoBusinessImpl implements ExtJobInfoBusiness {
             result.add(tempType);
         }
         return result;
+    }
+
+
+    private OutputResult execOtherNoInterface(ExtJobInfoType jobInfoType, Integer triggerType) {
+        if (jobInfoType == null) {
+            return OutputResult.buildAlert(ResultCode.NO_AUTH);
+        }
+        //查询任务
+        ExtJobInfo jobInfo = extJobInfoService.getByCode(jobInfoType);
+        if (jobInfo == null) {
+            log.info("当前任务 {} 已经被删除", jobInfoType.getDesc());
+            return OutputResult.buildAlert(ResultCode.JOB_ID_NOT_EXIST);
+        }
+        // 禁用状态，不执行。
+        if (!DataFlagType.NORMAL.getCode().equals(jobInfo.getTriggerStatus())) {
+            log.info(">>当前任务 {}是禁用状态，不执行", jobInfoType.getDesc());
+            return OutputResult.buildAlert(ResultCode.JOB_ID_NOT_EXIST);
+        }
+        jobInfo.setTriggerLastTime(DateUtil.date().toLocalDateTime());
+        try {
+            //当前的年
+            //查询一下，当前任务所关联的用户对象列表.
+            List<ExtCustomerJob> extCustomerJobList = extCustomerJobService.listByJobId(jobInfo.getId());
+            if (CollectionUtils.isEmpty(extCustomerJobList)) {
+                log.info(">>>>未查询出关联的用户");
+                return OutputResult.buildSucc();
+            }
+            //获取所有的接口，并进行去重
+            List<Integer> interfaceIdList = extCustomerJobList.stream()
+                    .map(ExtCustomerJob::getExtInterfaceId)
+                    .distinct().collect(Collectors.toList());
+            // 只获取第一个接口即可.
+            Integer jobRelationInterfaceId = interfaceIdList.get(0);
+            String result = "";
+            switch (jobInfoType) {
+                case FASTING: {
+                    result = extFastingBusiness.fastingJob(jobRelationInterfaceId);
+                    break;
+                }
+                default: {
+                    break;
+                }
+
+            }
+            //不为空的话，注意发送消息
+            if (!StringUtils.isEmpty(result)) {
+                List<Integer> extCustomerIdList = extCustomerJobList.stream()
+                        .map(ExtCustomerJob::getExtCustomerId)
+                        .distinct().collect(Collectors.toList());
+                //查询对应的客户信息
+                //1. 先查询出所有的用户
+                List<ExtCustomer> extCustomerDoList = extCustomerService.findAll();
+                //转换成map
+                Map<Integer, ExtCustomer> extCustomerDoMap = extCustomerDoList.stream()
+                        .collect(Collectors.toMap(ExtCustomer::getId, n -> n));
+                for (Integer customerId : extCustomerIdList) {
+                    ExtCustomer extCustomer = extCustomerDoMap.get(customerId);
+                    if (extCustomer != null) {
+                        String content = "你好," + extCustomer.getName() + System.lineSeparator();
+                        weChatService.sendTextMessage(extCustomer.getWxId(), content + result);
+                    }
+                }
+            }
+            jobInfo.setTriggerLastResult(1);
+            jobInfo.setTriggerLastErrorMessage(null);
+        } catch (Exception e) {
+            jobInfo.setTriggerLastResult(0);
+            jobInfo.setTriggerLastErrorMessage(e.getMessage());
+            //执行任务失败，会发送消息到当前的用户.
+            String errorWxMessage = MessageFormat.format("执行任务 {0} 失败，失败原因是:{1}",
+                    jobInfoType.getDesc(), e.getMessage());
+            weChatService.sendSystemUserTextMessage(errorWxMessage);
+            log.error("执行任务失败{}", e);
+        } finally {
+            //设置下次触发的时间
+            jobInfo.setTriggerType(triggerType);
+            jobInfo.setTriggerLastTime(LocalDateTime.now());
+            try {
+                CronExpression cronExpression = new CronExpression(jobInfo.getCron());
+                Date date = cronExpression.getNextValidTimeAfter(new Date());
+                Instant instant = date.toInstant();
+                ZoneId zoneId = ZoneId.systemDefault();
+                LocalDateTime localDateTime = instant.atZone(zoneId).toLocalDateTime();
+                jobInfo.setTriggerNextTime(localDateTime);
+            } catch (Exception e) {
+                log.error("获取下一次触发时间失败", e);
+            }
+            extJobInfoService.updateInfoById(jobInfo);
+        }
+        if (StringUtils.isEmpty(jobInfo.getTriggerLastErrorMessage())) {
+            return OutputResult.buildSucc();
+        } else {
+            return OutputResult.buildFail(jobInfo.getTriggerLastErrorMessage());
+        }
     }
 
     @Override

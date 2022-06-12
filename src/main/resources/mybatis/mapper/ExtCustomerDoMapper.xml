@@ -21,7 +21,7 @@
                 )
             </if>
             <if test="1 ==1">
-                t.flag =1
+                and t.flag =1
             </if>
         </where>
         order by t.id asc

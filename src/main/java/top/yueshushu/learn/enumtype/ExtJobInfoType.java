@@ -10,6 +10,7 @@ import org.springframework.util.Assert;
 public enum ExtJobInfoType {
     MORNING("morning", "早上7点半"),
     NIGHT("night", "晚上10点20"),
+    FASTING("fasting", "每天早上8点和晚上10点可能会发送斋戒信息"),
     ;
 
     private String code;

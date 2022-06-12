@@ -3,8 +3,9 @@ package top.yueshushu.learn.message.email.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
 import org.apache.velocity.app.VelocityEngine;
+import org.apache.velocity.runtime.RuntimeConstants;
+import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -44,7 +45,8 @@ public class EmailServiceImpl implements EmailService {
 	public void initVelocityEngine() {
 		velocityEngine = new VelocityEngine();
 		Properties p = new Properties();
-		p.setProperty(Velocity.FILE_RESOURCE_LOADER_PATH, fileResourceLoaderPath);
+		velocityEngine.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
+		velocityEngine.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
 		velocityEngine.init(p);
 	}
 	

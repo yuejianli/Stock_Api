@@ -6,7 +6,7 @@ import top.yueshushu.learn.extension.entity.ExtInterface;
 import top.yueshushu.learn.extension.model.ro.ExtCustomerJobRo;
 import top.yueshushu.learn.extension.model.vo.ExtCustomerJobVo;
 import top.yueshushu.learn.extension.service.ExtCustomerJobService;
-import top.yueshushu.learn.extension.service.ExtInterfaceService;
+import top.yueshushu.learn.extension.service.ExtJobInterfaceService;
 import top.yueshushu.learn.response.OutputResult;
 
 import javax.annotation.Resource;
@@ -22,14 +22,14 @@ public class ExtCustomerJobBusinessImpl implements ExtCustomerJobBusiness {
     @Resource
     private ExtCustomerJobService extCustomerJobService;
     @Resource
-    private ExtInterfaceService extInterfaceService;
+    private ExtJobInterfaceService extJobInterfaceService;
 
     @Override
     public OutputResult list(ExtCustomerJobRo extCustomerJobRo) {
         OutputResult<ExtCustomerJobVo> outputResult = extCustomerJobService.list(extCustomerJobRo);
         //获取信息
         ExtCustomerJobVo data = outputResult.getData();
-        List<ExtInterface> extInterfaceList = extInterfaceService.listAll();
+        List<ExtInterface> extInterfaceList = extJobInterfaceService.listAllByJobId(extCustomerJobRo.getExtJobId());
         data.setAllInterfaceList(extInterfaceList);
         return OutputResult.buildSucc(data);
     }

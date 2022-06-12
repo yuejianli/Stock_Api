@@ -4,8 +4,9 @@ import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
 import org.apache.velocity.app.VelocityEngine;
+import org.apache.velocity.runtime.RuntimeConstants;
+import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import top.yueshushu.learn.enumtype.message.ExtInterfaceTemplateType;
@@ -46,7 +47,8 @@ public class ExtTemplateTypeServiceImpl implements ExtTemplateTypeService {
     public void initVelocityEngine() {
         velocityEngine = new VelocityEngine();
         Properties p = new Properties();
-        p.setProperty(Velocity.FILE_RESOURCE_LOADER_PATH, fileResourceLoaderPath);
+        velocityEngine.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
+        velocityEngine.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
         velocityEngine.init(p);
     }
 
