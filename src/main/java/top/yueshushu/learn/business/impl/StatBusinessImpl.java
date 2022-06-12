@@ -250,7 +250,7 @@ public class StatBusinessImpl implements StatBusiness {
             return;
         }
         if (StringUtils.isEmpty(user.getEmail())) {
-            log.info(">>>用户 {} 未配置邮件，不发送最近10天的交易日信息", userId);
+            log.info(">>>用户 {} 未配置邮件，不发送最近5天的交易日信息", userId);
             return;
         }
         // 获取信息
@@ -292,12 +292,12 @@ public class StatBusinessImpl implements StatBusiness {
 
         Map<String, Object> modelMap = BeanUtil.beanToMap(stockTenToEmailDto);
         boolean emailFlag = emailService.sendVelocityMail(
-                new String[]{user.getEmail()}, "自选股票十个交易日内涨跌记录",
+                new String[]{user.getEmail()}, "自选股票五个交易日内涨跌记录",
                 VelocityTemplateType.TEN10, modelMap
         );
         if (!emailFlag) {
-            log.error("发送最近十天的自选股票涨跌记录 给用户{} 失败 ", userId);
-            weChatService.sendSystemUserTextMessage("发送自选股票十个交易日内涨跌记录 给用户" + userId + "失败");
+            log.error("发送最近五天的自选股票涨跌记录 给用户{} 失败 ", userId);
+            weChatService.sendSystemUserTextMessage("发送最近五天的自选股票涨跌记录 给用户" + userId + "失败");
         }
     }
 

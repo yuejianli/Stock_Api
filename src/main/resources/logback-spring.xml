@@ -37,7 +37,7 @@
     <!-- 时间滚动输出 level为 DEBUG 日志 -->
     <appender name="TOOL_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <!-- 正在记录的日志文件的路径及文件名 -->
-        <file>${log.path}/log_tool.log</file>
+        <file>${log.path}/log_api.log</file>
         <!--日志文件输出格式-->
         <encoder>
             <pattern>${FILE_LOG_PATTERN}</pattern>

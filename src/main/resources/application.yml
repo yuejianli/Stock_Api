@@ -75,9 +75,23 @@ spring:
         max-wait: 100000
   # 配置发送邮件# 配置发送邮件
   mail:
-    host: smtp.qq.com
+    host: smtp.qq.com # smtp.qq.com 对应的ip
     username: 2048146495@qq.com
     password: pkhpawgntceyejei
+    properties:
+      mail:
+        smpt:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          socketFactory:
+            port: 465
+            class: javax.net.ssl.SSLSocketFactory
+            fallback: false
+    protocol:
+      smtp:
+        port: 465
   velocity:
     FILE_RESOURCE_LOADER_PATH: src/main/resources/templates
 #整合mybatis时使用的。   去掉整合 MyBatis的配置信息
@@ -90,7 +104,7 @@ mybatis-plus:
     # 关闭mybatis一级缓存，防止事务和缓存同时打开引起的查询异常
     local-cache-scope: STATEMENT
     #查看mybatis的SQL, 线上服务器关闭
-    #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    # log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   global-config:
     db-config:
       logic-delete-field: flag   # 逻辑删除的字段

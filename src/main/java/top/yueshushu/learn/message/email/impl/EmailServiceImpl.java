@@ -89,7 +89,7 @@ public class EmailServiceImpl implements EmailService {
 	public boolean sendVelocityMail(String[] toArr, String subject, VelocityTemplateType velocityTemplateType, Map<String, Object> dataMap) {
 		try {
 			String velocityMailText = getVelocityMailText(velocityTemplateType, dataMap);
-			log.info(">>>得到信息:{}", velocityMailText);
+			// log.info(">>>得到信息:{}", velocityMailText);
 			return sendHtmlMail(toArr, subject, velocityMailText);
 		} catch (Exception ex) {
 			log.error(">>>send email type {}  is error,", velocityTemplateType.getCode(), ex);
