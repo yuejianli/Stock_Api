@@ -78,6 +78,8 @@ spring:
     host: smtp.qq.com # smtp.qq.com 对应的ip
     username: 2048146495@qq.com
     password: pkhpawgntceyejei
+    port: 465
+    protocol: smtp
     properties:
       mail:
         smpt:
@@ -89,9 +91,6 @@ spring:
             port: 465
             class: javax.net.ssl.SSLSocketFactory
             fallback: false
-    protocol:
-      smtp:
-        port: 465
   velocity:
     FILE_RESOURCE_LOADER_PATH: src/main/resources/templates
 #整合mybatis时使用的。   去掉整合 MyBatis的配置信息
