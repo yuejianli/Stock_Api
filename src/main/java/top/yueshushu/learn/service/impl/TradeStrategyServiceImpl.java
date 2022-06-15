@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
-import java.text.MessageFormat;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -16,7 +15,6 @@ import top.yueshushu.learn.business.SellBusiness;
 import top.yueshushu.learn.domainservice.StockSelectedDomainService;
 import top.yueshushu.learn.entity.Stock;
 import top.yueshushu.learn.entity.TradeEntrust;
-import top.yueshushu.learn.entity.User;
 import top.yueshushu.learn.enumtype.ConfigCodeType;
 import top.yueshushu.learn.enumtype.EntrustType;
 import top.yueshushu.learn.message.weixin.service.WeChatService;
@@ -99,15 +97,14 @@ public class TradeStrategyServiceImpl implements TradeStrategyService {
                 buyBusiness.buy(mockBuyRo);
                 //立即修改当前买入的价格
                 stockCacheService.setLastBuyCachePrice(code, currentPrice);
-
-                User user = userService.getById(buyRo.getUserId());
-                String message = MessageFormat.format(
-                        "委托买入提醒: 买入股票 {0},股票名称{1},买入{2}份，买入的价格是:{3}",
-                        mockBuyRo.getCode(), mockBuyRo.getName(),
-                        mockBuyRo.getAmount(), mockBuyRo.getPrice()
-                );
-				weChatService.sendTextMessage(user.getWxUserId(),
-						message);
+//
+//                User user = userService.getById(buyRo.getUserId());
+//                String message = MessageFormat.format(
+//                        "委托买入提醒: 买入股票 {0},股票名称{1},买入{2}份，买入的价格是:{3}",
+//                        mockBuyRo.getCode(), mockBuyRo.getName(),
+//                        mockBuyRo.getAmount(), mockBuyRo.getPrice()
+//                );
+//				weChatService.sendTextMessage(user.getWxUserId(), message);
             }
 
             if (BigDecimalUtil.subBigDecimal(currentPrice, lastSellPrice).compareTo(sellSubPrice) > 0) {
@@ -124,14 +121,14 @@ public class TradeStrategyServiceImpl implements TradeStrategyService {
                 stockCacheService.setLastSellCachePrice(code, currentPrice);
                 sellBusiness.sell(sellRo);
 
-                User user = userService.getById(buyRo.getUserId());
-                String message = MessageFormat.format(
-                        "委托卖出提醒: 卖出股票 {0},股票名称{1},卖出{2}份，卖出的价格是:{3}",
-                        sellRo.getCode(), sellRo.getName(),
-                        sellRo.getAmount(), sellRo.getPrice()
-                );
-				weChatService.sendTextMessage(user.getWxUserId(),
-						message);
+//                User user = userService.getById(buyRo.getUserId());
+//                String message = MessageFormat.format(
+//                        "委托卖出提醒: 卖出股票 {0},股票名称{1},卖出{2}份，卖出的价格是:{3}",
+//                        sellRo.getCode(), sellRo.getName(),
+//                        sellRo.getAmount(), sellRo.getPrice()
+//                );
+//				weChatService.sendTextMessage(user.getWxUserId(),
+//						message);
             }
         }
     }

@@ -1,15 +1,29 @@
 package top.yueshushu.learn.business.impl;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.date.DateField;
-import cn.hutool.core.date.DateTime;
-import cn.hutool.core.date.DateUtil;
 import com.github.pagehelper.PageInfo;
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.stream.Collectors;
+
+import javax.annotation.Resource;
+
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.date.DateField;
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
+import lombok.extern.slf4j.Slf4j;
 import top.yueshushu.learn.business.StatBusiness;
 import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.common.ResultCode;
@@ -44,12 +58,6 @@ import top.yueshushu.learn.service.StockService;
 import top.yueshushu.learn.service.UserService;
 import top.yueshushu.learn.service.cache.StockCacheService;
 import top.yueshushu.learn.util.BigDecimalUtil;
-
-import javax.annotation.Resource;
-import java.math.BigDecimal;
-import java.util.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.stream.Collectors;
 
 /**
  * @Description 菜单实现编排层
@@ -250,7 +258,7 @@ public class StatBusinessImpl implements StatBusiness {
             return;
         }
         if (StringUtils.isEmpty(user.getEmail())) {
-            log.info(">>>用户 {} 未配置邮件，不发送最近5天的交易日信息", userId);
+            log.info(">>>用户 {} 未配置邮件，不发送最近5天的交易日信息", user.getAccount());
             return;
         }
         // 获取信息
@@ -296,8 +304,8 @@ public class StatBusinessImpl implements StatBusiness {
                 VelocityTemplateType.TEN10, modelMap
         );
         if (!emailFlag) {
-            log.error("发送最近五天的自选股票涨跌记录 给用户{} 失败 ", userId);
-            weChatService.sendSystemUserTextMessage("发送最近五天的自选股票涨跌记录 给用户" + userId + "失败");
+            log.error("发送最近五天的自选股票涨跌记录 给用户{} 失败 ", user.getAccount());
+            weChatService.sendSystemUserTextMessage("发送最近五天的自选股票涨跌记录 给用户" + user.getAccount() + "失败");
         }
     }
 

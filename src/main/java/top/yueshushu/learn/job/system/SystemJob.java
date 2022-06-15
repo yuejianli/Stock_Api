@@ -1,17 +1,22 @@
 package top.yueshushu.learn.job.system;
 
-import cn.hutool.core.date.DateUtil;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+
+import cn.hutool.core.date.DateUtil;
+import lombok.extern.slf4j.Slf4j;
 import top.yueshushu.learn.business.JobInfoBusiness;
 import top.yueshushu.learn.enumtype.EntrustType;
 import top.yueshushu.learn.enumtype.JobInfoType;
 import top.yueshushu.learn.helper.DateHelper;
-import top.yueshushu.learn.service.*;
-
-import javax.annotation.Resource;
+import top.yueshushu.learn.service.HolidayCalendarService;
+import top.yueshushu.learn.service.StockSelectedService;
+import top.yueshushu.learn.service.TradePositionService;
+import top.yueshushu.learn.service.TradeStrategyService;
+import top.yueshushu.learn.service.UserService;
 
 /**
  * 系统定时任务
@@ -119,9 +124,9 @@ public class SystemJob {
         log.info(">>> {} 时,更新股票信息", DateUtil.now());
         jobInfoBusiness.execJob(JobInfoType.STOCK_UPDATE, EntrustType.AUTO.getCode());
     }
-
+    
     @Scheduled(cron = "1 30 20 ? * 1-7")
-    public void ten10ToEmail() {
+    public void ten5ToEmail() {
         jobInfoBusiness.execJob(JobInfoType.STOCK_FIVE_EMAIL, EntrustType.AUTO.getCode());
     }
 }
