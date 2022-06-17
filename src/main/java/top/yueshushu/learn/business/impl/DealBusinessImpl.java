@@ -250,7 +250,7 @@ public class DealBusinessImpl implements DealBusiness {
             tradePositionDo.setCode(tradeEntrustDo.getCode());
             tradePositionDo.setName(tradeEntrustDo.getName());
             tradePositionDo.setAllAmount(tradeEntrustDo.getEntrustNum());
-            tradePositionDo.setUseAmount(tradeEntrustDo.getEntrustNum());
+        //    tradePositionDo.setUseAmount(tradeEntrustDo.getEntrustNum());
             tradePositionDo.setAvgPrice(
                     BigDecimalUtil.div(
                             tradeEntrustDo.getTotalMoney(),

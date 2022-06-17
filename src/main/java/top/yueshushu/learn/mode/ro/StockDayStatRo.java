@@ -19,7 +19,7 @@ public class StockDayStatRo extends PageRo {
      */
     private String code;
     /**
-    /**
+     * /**
      * 开始日期
      */
     private String startDate;
@@ -28,12 +28,16 @@ public class StockDayStatRo extends PageRo {
      */
     private String endDate;
     /**
+     * 月份
+     */
+    private Integer month;
+    /**
      * 开始的天数字
      */
-    private Integer startDayNum ;
-
+    private Integer startDayNum;
+    
     /**
      * 结束的天数字
      */
-    private Integer endDayNum ;
+    private Integer endDayNum;
 }
