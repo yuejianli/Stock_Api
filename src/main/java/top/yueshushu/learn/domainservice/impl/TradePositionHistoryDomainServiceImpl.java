@@ -1,15 +1,18 @@
 package top.yueshushu.learn.domainservice.impl;
 
-import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import cn.hutool.core.date.DateTime;
+import lombok.extern.slf4j.Slf4j;
 import top.yueshushu.learn.domain.TradePositionHistoryDo;
 import top.yueshushu.learn.domainservice.TradePositionHistoryDomainService;
 import top.yueshushu.learn.mapper.TradePositionHistoryDoMapper;
-
-import javax.annotation.Resource;
-import java.util.List;
 
 /**
  * @Description 持仓历史
@@ -22,11 +25,12 @@ public class TradePositionHistoryDomainServiceImpl extends ServiceImpl<TradePosi
         implements TradePositionHistoryDomainService {
     @Resource
     private TradePositionHistoryDoMapper tradePositionHistoryDoMapper;
-
+    
     @Override
-    public List<TradePositionHistoryDo> listPositionHistoryAndDate(String code, DateTime startDate, DateTime endDate) {
+    public List<TradePositionHistoryDo> listPositionHistoryAndDate(Integer userId, Integer mockTpe, String code, DateTime startDate, DateTime endDate) {
         return tradePositionHistoryDoMapper.listPositionHistoryAndDateDesc(
-                code,startDate,endDate
+                userId, mockTpe,
+                code, startDate, endDate
         );
     }
 

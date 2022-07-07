@@ -1,9 +1,20 @@
 package top.yueshushu.learn.business.impl;
 
-import cn.hutool.core.date.DateUtil;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+
+import java.text.MessageFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import javax.annotation.Resource;
+
+import cn.hutool.core.date.DateUtil;
+import lombok.extern.slf4j.Slf4j;
 import top.yueshushu.learn.business.DealBusiness;
 import top.yueshushu.learn.business.JobInfoBusiness;
 import top.yueshushu.learn.common.ResultCode;
@@ -20,15 +31,6 @@ import top.yueshushu.learn.mode.ro.JobInfoRo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.service.*;
 import top.yueshushu.learn.util.CronExpression;
-
-import javax.annotation.Resource;
-import java.text.MessageFormat;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 用途描述
@@ -62,13 +64,15 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
     private WeChatService weChatService;
     @Resource
     private StatBusinessImpl statBusiness;
-
-
+    @Resource
+    private TradeMoneyService tradeMoneyService;
+    
+    
     @Override
     public OutputResult listJob(JobInfoRo jobInfoRo) {
         return jobInfoService.pageJob(jobInfoRo);
     }
-
+    
     @Override
     public OutputResult changeStatus(Integer id, DataFlagType dataFlagType) {
         return jobInfoService.changeStatus(id, dataFlagType);
@@ -136,6 +140,9 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
                                 tradePositionService.savePositionHistory(
                                         userId, MockType.REAL
                                 );
+                                // 对金额进行处理
+                                tradeMoneyService.saveMoneyHistory(userId, MockType.MOCK);
+                                tradeMoneyService.saveMoneyHistory(userId, MockType.REAL);
                             }
                     );
                     break;

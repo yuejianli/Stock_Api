@@ -1,13 +1,13 @@
 package top.yueshushu.learn.mapper;
 
-import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
 import org.apache.ibatis.annotations.Param;
-import top.yueshushu.learn.domain.StockHistoryDo;
-import top.yueshushu.learn.domain.TradePositionDo;
-import top.yueshushu.learn.domain.TradePositionHistoryDo;
 
 import java.util.List;
+
+import cn.hutool.core.date.DateTime;
+import top.yueshushu.learn.domain.TradePositionHistoryDo;
 
 /**
  * <p>
@@ -18,18 +18,23 @@ import java.util.List;
  * @since 2022-01-03
  */
 public interface TradePositionHistoryDoMapper extends BaseMapper<TradePositionHistoryDo> {
-
+    
     /**
      * 查询股票的我的持仓记录,按照时间降序
      *
+     * @param userId    用户编号
+     * @param mockType  交易类型
      * @param code      股票编码
      * @param startDate 开始日期
      * @param endDate   结束日期
      * @return 查询股票的我的持仓记录
      */
-    List<TradePositionHistoryDo> listPositionHistoryAndDateDesc(@Param("code") String code,
-                                                                @Param("startDate") DateTime startDate,
-                                                                @Param("endDate") DateTime endDate);
+    List<TradePositionHistoryDo> listPositionHistoryAndDateDesc(
+            @Param("userId") Integer userId,
+            @Param("mockType") Integer mockType,
+            @Param("code") String code,
+            @Param("startDate") DateTime startDate,
+            @Param("endDate") DateTime endDate);
 
     /**
      * 删除当天的已经保存的历史记录信息

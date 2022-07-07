@@ -1,9 +1,9 @@
 package top.yueshushu.learn.mode.ro;
 
+import java.io.Serializable;
+
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
-
-import java.io.Serializable;
 
 /**
  * @ClassName:PoistionRo
@@ -15,5 +15,13 @@ import java.io.Serializable;
 @Data
 @ApiModel("我的持仓展示信息")
 public class TradeMoneyRo extends TradeRo implements Serializable {
-
+	
+	/**
+	 * 开始日期
+	 */
+	private String startDate;
+	/**
+	 * 结束日期
+	 */
+	private String endDate;
 }
