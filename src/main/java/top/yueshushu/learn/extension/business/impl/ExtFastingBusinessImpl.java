@@ -1,18 +1,22 @@
 package top.yueshushu.learn.extension.business.impl;
 
-import cn.hutool.core.date.ChineseDate;
-import cn.hutool.core.date.DateUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+
+import javax.annotation.Resource;
+
+import cn.hutool.core.date.ChineseDate;
+import cn.hutool.core.date.DateUtil;
 import top.yueshushu.learn.extension.assembler.ExtFastingAssembler;
 import top.yueshushu.learn.extension.business.ExtFastingBusiness;
 import top.yueshushu.learn.extension.entity.ExtFasting;
 import top.yueshushu.learn.extension.model.vo.ExtFastingVo;
 import top.yueshushu.learn.extension.service.ExtFastingService;
-
-import javax.annotation.Resource;
-import java.util.Arrays;
-import java.util.Date;
 
 /**
  * @Description 接口实现应用
@@ -44,8 +48,16 @@ public class ExtFastingBusinessImpl implements ExtFastingBusiness {
         if (extFastingVo == null) {
             return null;
         }
-        extFastingVo.setFastingReasonList(Arrays.asList(extFastingVo.getFastingReason().split("\\,")));
-        extFastingVo.setDamageList(Arrays.asList(extFastingVo.getDamage().split("\\,")));
+        if (StringUtils.isEmpty(extFastingVo.getFastingReason())) {
+            extFastingVo.setFastingReasonList(Collections.emptyList());
+        } else {
+            extFastingVo.setFastingReasonList(Arrays.asList(extFastingVo.getFastingReason().split("\\,")));
+        }
+        if (StringUtils.isEmpty(extFastingVo.getDamage())) {
+            extFastingVo.setDamageList(Collections.emptyList());
+        } else {
+            extFastingVo.setDamageList(Arrays.asList(extFastingVo.getDamage().split("\\,")));
+        }
         return covertVoToMessage(extFastingVo);
     }
 
