@@ -35,8 +35,27 @@ public class ExtFastingBusinessImpl implements ExtFastingBusiness {
         //根据接口id ,查询相应的信息.
         //能得到信息.
         Date now = DateUtil.date();
-        ChineseDate chineseDate = new ChineseDate(now);
+        
+        String nowMessage = dateConvert(now,0);
+        
+        Date morringDate = DateUtil.offsetDay(now, 1);
+        
+        String tomorrowMessage = dateConvert(morringDate,1);
+        
+        String result = "";
+        String line = System.lineSeparator();
+        if (StringUtils.hasText(nowMessage)) {
+            result = result.concat(nowMessage).concat(line);
+        }
+        if (StringUtils.hasText(tomorrowMessage)) {
+            result = result.concat(tomorrowMessage).concat(line);
+        }
+        return result;
+    }
     
+    
+    private String dateConvert(Date date,int index){
+        ChineseDate chineseDate = new ChineseDate(date);
         // 获取当前的月索引
         int month = chineseDate.getMonth();
         int day = chineseDate.getDay();
@@ -45,37 +64,13 @@ public class ExtFastingBusinessImpl implements ExtFastingBusiness {
         ExtFasting extFasting = extFastingService.getByMonthAndDay(month, day, term);
         //转换成 Vo
         ExtFastingVo extFastingVo = extFastingAssembler.entityToVo(extFasting);
-    
-        String nowDayMessage = null;
+        String message = "";
         if (extFastingVo != null) {
-            nowDayMessage = covertVoToMessage(extFastingVo, now, 0);
+            message = covertVoToMessage(extFastingVo, date, index);
         }
-        Date morring = DateUtil.offsetDay(now, 1);
-        chineseDate = new ChineseDate(morring);
-    
-        // 获取当前的月索引
-        month = chineseDate.getMonth();
-        day = chineseDate.getDay();
-        //是节气
-        term = chineseDate.getTerm();
-        extFasting = extFastingService.getByMonthAndDay(month, day, term);
-        //转换成 Vo
-        extFastingVo = extFastingAssembler.entityToVo(extFasting);
-    
-        String morringDayMessage = null;
-        if (extFastingVo != null) {
-            morringDayMessage = covertVoToMessage(extFastingVo, morring, 1);
-        }
-        String result = "";
-        String line = System.lineSeparator();
-        if (StringUtils.hasText(nowDayMessage)) {
-            result = result.concat(nowDayMessage).concat(line);
-        }
-        if (StringUtils.hasText(morringDayMessage)) {
-            result = result.concat(morringDayMessage).concat(line);
-        }
-        return result;
+        return message;
     }
+    
     
     /**
      * 将对象转换成微信要发送的消息
