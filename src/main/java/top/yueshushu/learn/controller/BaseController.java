@@ -2,24 +2,31 @@ package top.yueshushu.learn.controller;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.StringUtils;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.util.ObjectUtils;
 import top.yueshushu.learn.common.Const;
-import top.yueshushu.learn.domain.UserDo;
 import top.yueshushu.learn.util.RedisUtil;
-import top.yueshushu.learn.util.ThreadLocalUtils;
-
-import javax.servlet.http.HttpServletRequest;
 
 public abstract class BaseController {
     @Autowired
     private RedisUtil redisUtil;
+
     /**
      * 根据请求头获取对应的token 信息
-     * @return
+     *
+     * @return 设置当前的用户信息
      */
-    protected int getUserId() {
-       return ThreadLocalUtils.getUserId();
+    protected Integer getUserId() {
+        Object redisCacheUserId = redisUtil.get(Const.KEY_AUTH_USER_ID);
+
+        if (ObjectUtils.isEmpty(redisCacheUserId)) {
+            redisUtil.set(Const.KEY_AUTH_USER_ID, 1);
+            return 1;
+        }
+        try {
+            return Integer.parseInt(redisCacheUserId.toString());
+        } catch (Exception e) {
+            redisUtil.set(Const.KEY_AUTH_USER_ID, 1);
+            return 1;
+        }
     }
 }

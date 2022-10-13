@@ -6,9 +6,11 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import top.yueshushu.learn.business.UserBusiness;
+import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.mode.ro.UserRo;
 import top.yueshushu.learn.response.OutputResult;
+import top.yueshushu.learn.util.RedisUtil;
 import top.yueshushu.learn.util.SelectConditionUtil;
 
 import javax.annotation.Resource;
@@ -27,6 +29,8 @@ import javax.annotation.Resource;
 public class UserController extends BaseController {
     @Resource
     private UserBusiness userBusiness;
+    @Resource
+    private RedisUtil redisUtil;
 
     @PostMapping("/login")
     @ApiOperation("用户登录信息")
@@ -67,5 +71,12 @@ public class UserController extends BaseController {
     @ApiOperation("配置文件敏感信息解密")
     public OutputResult decrypt(String text) {
         return userBusiness.decrypt(text);
+    }
+
+    @GetMapping("/{userId}")
+    @ApiOperation("配置文件敏感信息解密")
+    public OutputResult setUserId(@PathVariable("userId") Integer userId) {
+        redisUtil.set(Const.KEY_AUTH_USER_ID, userId);
+        return OutputResult.buildSucc("切换用户成功");
     }
 }
