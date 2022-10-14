@@ -1,22 +1,17 @@
 package top.yueshushu.learn.job.system;
 
+import cn.hutool.core.date.DateUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
-
-import cn.hutool.core.date.DateUtil;
-import lombok.extern.slf4j.Slf4j;
 import top.yueshushu.learn.business.JobInfoBusiness;
 import top.yueshushu.learn.enumtype.EntrustType;
 import top.yueshushu.learn.enumtype.JobInfoType;
 import top.yueshushu.learn.helper.DateHelper;
-import top.yueshushu.learn.service.HolidayCalendarService;
-import top.yueshushu.learn.service.StockSelectedService;
-import top.yueshushu.learn.service.TradePositionService;
-import top.yueshushu.learn.service.TradeStrategyService;
-import top.yueshushu.learn.service.UserService;
+import top.yueshushu.learn.service.*;
+
+import javax.annotation.Resource;
 
 /**
  * 系统定时任务
@@ -80,8 +75,8 @@ public class SystemJob {
         log.info(">>> {} 时,更新目前自选表里面的历史表记录信息", DateUtil.now());
         jobInfoBusiness.execJob(JobInfoType.STOCK_HISTORY, EntrustType.AUTO.getCode());
     }
-    
-    @Scheduled(cron = "1/10 * 9,10,11,13,14 ? * 1-5")
+
+    @Scheduled(cron = "1/30 * 9,10,11,13,14 ? * 1-5")
     public void stockPrice() {
         //获取当前的股票信息。取第一个值.
         if (xxlJobTime) {
@@ -104,7 +99,20 @@ public class SystemJob {
         log.info(">>> {} 时,取消掉委托单信息", DateUtil.now());
         jobInfoBusiness.execJob(JobInfoType.TRADE_ING_TO_REVOKE, EntrustType.AUTO.getCode());
     }
-    
+
+    /**
+     * 周一到周五 15 10分时统计汇总今日盈亏数
+     */
+    @Scheduled(cron = "1 2 15 ? * 1-5")
+    public void calcProfit() {
+        if (!dateHelper.isWorkingDay(DateUtil.date())) {
+            log.info("当前时间{}不是交易日，不需要同步", DateUtil.now());
+            return;
+        }
+        log.info(">>> {} 时,汇总今日盈亏数", DateUtil.now());
+        jobInfoBusiness.execJob(JobInfoType.CALL_PROFIT, EntrustType.AUTO.getCode());
+    }
+
     @Scheduled(cron = "1 20 20 ? * 1-5")
     public void tradePositionHistory() {
         if (!dateHelper.isWorkingDay(DateUtil.date())) {

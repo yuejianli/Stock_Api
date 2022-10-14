@@ -80,4 +80,5 @@ public interface TradePositionService {
      * @param id 持仓id编号
      */
     void clearById(Integer id);
+
 }

@@ -93,6 +93,13 @@ public class TradePositionHistoryDo implements Serializable {
     private BigDecimal floatProportion;
 
     /**
+     * 盈亏金额
+     */
+    @TableField("today_money")
+    private BigDecimal todayMoney;
+
+
+    /**
      * 员工编号
      */
     @TableField("user_id")

@@ -1,22 +1,12 @@
 package top.yueshushu.learn.business.impl;
 
-import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-
-import java.text.MessageFormat;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Resource;
-
 import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import top.yueshushu.learn.business.DealBusiness;
 import top.yueshushu.learn.business.JobInfoBusiness;
+import top.yueshushu.learn.business.TradePositionBusiness;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.entity.JobInfo;
 import top.yueshushu.learn.enumtype.DataFlagType;
@@ -31,6 +21,15 @@ import top.yueshushu.learn.mode.ro.JobInfoRo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.service.*;
 import top.yueshushu.learn.util.CronExpression;
+
+import javax.annotation.Resource;
+import java.text.MessageFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 用途描述
@@ -66,13 +65,15 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
     private StatBusinessImpl statBusiness;
     @Resource
     private TradeMoneyService tradeMoneyService;
-    
-    
+    @Resource
+    private TradePositionBusiness tradePositionBusiness;
+
+
     @Override
     public OutputResult listJob(JobInfoRo jobInfoRo) {
         return jobInfoService.pageJob(jobInfoRo);
     }
-    
+
     @Override
     public OutputResult changeStatus(Integer id, DataFlagType dataFlagType) {
         return jobInfoService.changeStatus(id, dataFlagType);
@@ -179,6 +180,22 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
                             .forEach(
                                     userId -> {
                                         statBusiness.ten5ToMail(userId);
+                                        try {
+                                            TimeUnit.SECONDS.sleep(1);
+                                        } catch (InterruptedException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                            );
+                    break;
+                }
+                case CALL_PROFIT: {
+                    List<Integer> userIdList = userService.listUserId();
+                    // 设置类型为虚拟
+                    userIdList
+                            .forEach(
+                                    userId -> {
+                                        tradePositionBusiness.callProfit(userId, MockType.MOCK);
                                         try {
                                             TimeUnit.SECONDS.sleep(1);
                                         } catch (InterruptedException e) {

@@ -11,9 +11,13 @@ import top.yueshushu.learn.business.TradePositionBusiness;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.enumtype.MockType;
 import top.yueshushu.learn.mode.ro.TradePositionRo;
+import top.yueshushu.learn.mode.vo.TradePositionShowVo;
+import top.yueshushu.learn.mode.vo.TradePositionVo;
 import top.yueshushu.learn.response.OutputResult;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * <p>
@@ -38,12 +42,24 @@ public class TradePositionController extends BaseController{
             return OutputResult.buildFail(ResultCode.TRADE_MOCK_TYPE_IS_EMPTY);
         }
         MockType mockType = MockType.getMockType(tradePositionRo.getMockType());
-        if (mockType == null){
+        if (mockType == null) {
             return OutputResult.buildFail(ResultCode.TRADE_MOCK_TYPE_NOT_EXIST);
         }
-        if (MockType.MOCK.equals(mockType)){
-            return tradePositionBusiness.mockList(tradePositionRo);
+        List<TradePositionVo> data;
+        if (MockType.MOCK.equals(mockType)) {
+            data = (List<TradePositionVo>) tradePositionBusiness.mockList(tradePositionRo).getData();
+        } else {
+            data = (List<TradePositionVo>) tradePositionBusiness.realList(tradePositionRo).getData();
         }
-        return tradePositionBusiness.realList(tradePositionRo);
+
+        TradePositionShowVo tradePositionShowVo = new TradePositionShowVo();
+        tradePositionShowVo.setDateList(data);
+
+        BigDecimal todayMoneySum = new BigDecimal(0);
+        for (TradePositionVo tradePositionVo : data) {
+            todayMoneySum = todayMoneySum.add(tradePositionVo.getTodayMoney());
+        }
+        tradePositionShowVo.setTodayMoney(todayMoneySum);
+        return OutputResult.buildSucc(tradePositionShowVo);
     }
 }

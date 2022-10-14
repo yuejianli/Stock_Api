@@ -1,19 +1,10 @@
 package top.yueshushu.learn.service.impl;
 
-import com.alibaba.fastjson.TypeReference;
-
-import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Resource;
-
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import com.alibaba.fastjson.TypeReference;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import top.yueshushu.learn.api.TradeResultVo;
 import top.yueshushu.learn.api.request.GetAssetsRequest;
 import top.yueshushu.learn.api.response.GetAssetsResponse;
@@ -33,6 +24,13 @@ import top.yueshushu.learn.mode.vo.TradeMoneyVo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.service.TradeMoneyService;
 import top.yueshushu.learn.util.TradeUtil;
+
+import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * <p>
@@ -118,7 +116,28 @@ public class TradeMoneyServiceImpl implements TradeMoneyService {
         tradeMoneyHistoryDo.setCurrDate(localDateTime);
         tradeMoneyHistoryDomainService.save(tradeMoneyHistoryDo);
     }
-    
+
+    @Override
+    public void updateToDayMoney(Integer userId, MockType mockType, BigDecimal todayMoneySum) {
+        DateTime now = DateUtil.date();
+        //获取昨天的金额信息,如果没有记录,则 返回 0
+
+        TradeMoneyHistoryDo tradeHistoryLastDo = tradeMoneyHistoryDomainService.getLastRecordProfit(userId, mockType.getCode(), now);
+
+        // 昨天的,与今天的相加,就是今天的亏损信息.
+        TradeMoneyDo tradeMoneyDo = tradeMoneyDomainService.getByUserIdAndMockType(
+                userId, mockType.getCode());
+        if (tradeMoneyDo == null) {
+            return;
+        }
+        // 进行保存
+        tradeMoneyDo.setProfitMoney(todayMoneySum.add(Optional.ofNullable(tradeHistoryLastDo.getProfitMoney()).orElse(BigDecimal.ZERO)));
+        tradeMoneyDo.setTotalMoney(todayMoneySum.add(Optional.ofNullable(tradeHistoryLastDo.getTotalMoney()).orElse(BigDecimal.ZERO)));
+        tradeMoneyDo.setMarketMoney(todayMoneySum.add(Optional.ofNullable(tradeHistoryLastDo.getMarketMoney()).orElse(BigDecimal.ZERO)));
+        // 更新今天的亏损信息
+        tradeMoneyDomainService.updateById(tradeMoneyDo);
+    }
+
     /**
      * 获取真实的持仓金额信息
      *

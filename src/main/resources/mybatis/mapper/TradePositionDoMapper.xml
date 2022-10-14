@@ -13,6 +13,7 @@
         <result column="price" property="price" />
         <result column="all_money" property="allMoney" />
         <result column="float_money" property="floatMoney" />
+        <result column="today_money" property="todayMoney" />
         <result column="float_proportion" property="floatProportion" />
         <result column="user_id" property="userId" />
         <result column="mock_type" property="mockType" />
@@ -20,7 +21,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, code, name, all_amount, use_amount, avg_price, price, all_money, float_money, float_proportion, user_id, mock_type
+        id, code, name, all_amount, use_amount, avg_price, price, all_money, float_money,today_money, float_proportion, user_id, mock_type
     </sql>
     <update id="syncUseAmount">
         update trade_position set use_amount= all_amount

@@ -6,6 +6,8 @@ import top.yueshushu.learn.mode.ro.TradeMoneyRo;
 import top.yueshushu.learn.mode.vo.TradeMoneyVo;
 import top.yueshushu.learn.response.OutputResult;
 
+import java.math.BigDecimal;
+
 /**
  * <p>
  * 资金表 自定义的
@@ -14,7 +16,7 @@ import top.yueshushu.learn.response.OutputResult;
  * @author 两个蝴蝶飞
  * @since 2022-01-03
  */
-public interface TradeMoneyService{
+public interface TradeMoneyService {
 	
 	/**
 	 * 更新用户的资产信息
@@ -42,14 +44,23 @@ public interface TradeMoneyService{
 	 *
 	 * @param tradeMoneyRo 股票持仓对象
 	 * @return 查询真实的股票当前的持仓记录信息
-	 */
-	OutputResult<TradeMoneyVo> realInfo(TradeMoneyRo tradeMoneyRo);
-	
-	/**
-	 * 保存金额的历史记录处理
-	 *
-	 * @param userId 用户编号
-	 * @param mock   类型
-	 */
-	void saveMoneyHistory(Integer userId, MockType mock);
+     */
+    OutputResult<TradeMoneyVo> realInfo(TradeMoneyRo tradeMoneyRo);
+
+    /**
+     * 保存金额的历史记录处理
+     *
+     * @param userId 用户编号
+     * @param mock   类型
+     */
+    void saveMoneyHistory(Integer userId, MockType mock);
+
+    /**
+     * 更新今日的盈亏数
+     *
+     * @param userId        用户编号
+     * @param mockType      类型
+     * @param todayMoneySum 今日的盈亏总数
+     */
+    void updateToDayMoney(Integer userId, MockType mockType, BigDecimal todayMoneySum);
 }

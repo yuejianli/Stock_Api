@@ -27,6 +27,7 @@ public class TradePosition implements Serializable {
     private BigDecimal allMoney;
     private BigDecimal floatMoney;
     private BigDecimal floatProportion;
+    private BigDecimal todayMoney;
     private Integer userId;
     private Integer mockType;
 }

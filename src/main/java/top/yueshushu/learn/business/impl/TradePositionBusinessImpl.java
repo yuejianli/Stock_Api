@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import top.yueshushu.learn.business.TradePositionBusiness;
 import top.yueshushu.learn.common.SystemConst;
+import top.yueshushu.learn.entity.TradePosition;
+import top.yueshushu.learn.enumtype.MockType;
 import top.yueshushu.learn.enumtype.SelectedType;
 import top.yueshushu.learn.enumtype.TradeRealValueType;
 import top.yueshushu.learn.mode.ro.TradePositionRo;
@@ -12,6 +14,7 @@ import top.yueshushu.learn.mode.vo.StockSelectedVo;
 import top.yueshushu.learn.mode.vo.TradePositionVo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.service.StockSelectedService;
+import top.yueshushu.learn.service.TradeMoneyService;
 import top.yueshushu.learn.service.TradePositionService;
 import top.yueshushu.learn.service.cache.StockCacheService;
 import top.yueshushu.learn.service.cache.TradeCacheService;
@@ -40,11 +43,13 @@ public class TradePositionBusinessImpl implements TradePositionBusiness {
     private TradeCacheService tradeCacheService;
     @Resource
     private StockSelectedService stockSelectedService;
+    @Resource
+    private TradeMoneyService tradeMoneyService;
 
     @Override
     public OutputResult mockList(TradePositionRo tradePositionRo) {
-        OutputResult <List<TradePositionVo>> outputResult = tradePositionService.mockList(tradePositionRo);
-        if (!outputResult.getSuccess()){
+        OutputResult<List<TradePositionVo>> outputResult = tradePositionService.mockList(tradePositionRo);
+        if (!outputResult.getSuccess()) {
             return outputResult;
         }
         return parseFillInfo(outputResult.getData(), tradePositionRo);
@@ -57,23 +62,63 @@ public class TradePositionBusinessImpl implements TradePositionBusiness {
         }
         log.info(">>>此次员工{}查询需要同步真实的持仓数据",tradePositionRo.getUserId());
         OutputResult<List<TradePositionVo>> outputResult = tradePositionService.realList(tradePositionRo);
-        if (!outputResult.getSuccess()){
+        if (!outputResult.getSuccess()) {
             return outputResult;
         }
         //获取到最新的持仓信息，更新到相应的数据库中.
         List<TradePositionVo> tradePositionVoList = outputResult.getData();
         // 将数据保存下来
-        tradePositionService.syncRealPositionByUserId(tradePositionRo.getUserId(),tradePositionVoList);
+        tradePositionService.syncRealPositionByUserId(tradePositionRo.getUserId(), tradePositionVoList);
         return parseFillInfo(tradePositionVoList, tradePositionRo);
+    }
+
+    @Override
+    public void callProfit(Integer userId, MockType mockType) {
+
+        if (MockType.REAL.equals(mockType)) {
+            return;
+        }
+
+        // 查询一下信息.
+        TradePositionRo tradePositionRo = new TradePositionRo();
+        tradePositionRo.setUserId(userId);
+        tradePositionRo.setMockType(mockType.getCode());
+        tradePositionRo.setSelectType(SelectedType.POSITION.getCode());
+
+
+        List<TradePositionVo> tradePositionVoList = (List<TradePositionVo>) mockList(tradePositionRo).getData();
+
+        // 更新股票的持仓信息.
+
+        if (CollectionUtils.isEmpty(tradePositionVoList)) {
+            return;
+        }
+
+        // 计算一下,今天的总的亏损金额
+
+        BigDecimal todayMoneySum = new BigDecimal("0");
+        for (TradePositionVo tradePositionVo : tradePositionVoList) {
+            TradePosition tempPosition = tradePositionService.getPositionByCode(userId, mockType.getCode(), tradePositionVo.getCode());
+            //更新这个信息
+            tempPosition.setPrice(tradePositionVo.getPrice());
+            tempPosition.setAllMoney(tradePositionVo.getAllMoney());
+            tempPosition.setFloatMoney(tradePositionVo.getFloatMoney());
+            tempPosition.setFloatProportion(tradePositionVo.getFloatProportion());
+            tempPosition.setTodayMoney(tradePositionVo.getTodayMoney());
+            tradePositionService.updateById(tempPosition);
+            todayMoneySum = todayMoneySum.add(tradePositionVo.getTodayMoney());
+        }
+        tradeMoneyService.updateToDayMoney(userId, mockType, todayMoneySum);
     }
 
     /**
      * 将获取到的持仓股票信息进行填充，返回
+     *
      * @param tradePositionVoList 要解析的数据
      * @param tradePositionRo
      * @return 将获取到的持仓股票信息进行填充，返回
      */
-    private OutputResult parseFillInfo(List<TradePositionVo> tradePositionVoList, TradePositionRo tradePositionRo){
+    private OutputResult parseFillInfo(List<TradePositionVo> tradePositionVoList, TradePositionRo tradePositionRo) {
         //最后的结果处理
         List<TradePositionVo> result = new ArrayList<>();
         if(!CollectionUtils.isEmpty(tradePositionVoList)){
@@ -104,6 +149,15 @@ public class TradePositionBusinessImpl implements TradePositionBusiness {
                                 tradePositionVo.getAllAmount()
                         )
                 );
+                //设置今日盈亏
+                tradePositionVo.setTodayMoney(
+                        StockUtil.floatMoney(
+                                stockCacheService.getYesterdayCloseCachePrice(tradePositionVo.getCode()),
+                                price,
+                                tradePositionVo.getAllAmount()
+                        )
+                );
+
                 tradePositionVo.setSelectType(SelectedType.POSITION.getCode());
             }
             result.addAll(tradePositionVoList);
@@ -152,7 +206,8 @@ public class TradePositionBusinessImpl implements TradePositionBusiness {
         BigDecimal price = stockCacheService.getNowCachePrice(stockSelectedVo.getStockCode());
         tradePositionVo.setPrice(price);
         tradePositionVo.setAllMoney( SystemConst.DEFAULT_EMPTY);
-        tradePositionVo.setFloatMoney( SystemConst.DEFAULT_EMPTY);
+        tradePositionVo.setFloatMoney(SystemConst.DEFAULT_EMPTY);
+        tradePositionVo.setTodayMoney(SystemConst.DEFAULT_EMPTY);
         tradePositionVo.setFloatProportion(SystemConst.DEFAULT_EMPTY);
         tradePositionVo.setMockType(mockType);
         tradePositionVo.setSelectType(SelectedType.SELECTED.getCode());

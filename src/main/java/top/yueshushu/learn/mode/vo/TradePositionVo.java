@@ -1,8 +1,5 @@
 package top.yueshushu.learn.mode.vo;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -38,6 +35,10 @@ public class TradePositionVo implements Serializable {
     private BigDecimal allMoney;
     @ApiModelProperty("浮动盈亏")
     private BigDecimal floatMoney;
+
+    @ApiModelProperty("今天盈亏金额")
+    private BigDecimal todayMoney;
+
     @ApiModelProperty("盈亏比例")
     private BigDecimal floatProportion;
     @ApiModelProperty("类型,1为虚拟 0为正式")

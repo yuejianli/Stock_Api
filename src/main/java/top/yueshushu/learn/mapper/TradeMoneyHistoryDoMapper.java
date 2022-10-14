@@ -1,13 +1,11 @@
 package top.yueshushu.learn.mapper;
 
+import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-
 import org.apache.ibatis.annotations.Param;
+import top.yueshushu.learn.domain.TradeMoneyHistoryDo;
 
 import java.util.List;
-
-import cn.hutool.core.date.DateTime;
-import top.yueshushu.learn.domain.TradeMoneyHistoryDo;
 
 /**
  * <p>
@@ -28,4 +26,13 @@ public interface TradeMoneyHistoryDoMapper extends BaseMapper<TradeMoneyHistoryD
 	 */
 	List<TradeMoneyHistoryDo> listMoneyHistory(@Param("userId") Integer userId, @Param("mockType") Integer mockType,
 											   @Param("startDate") DateTime startDate, @Param("endDate") DateTime endDate);
+
+	/**
+	 * 获取该日前前的最近一条记录信息
+	 *
+	 * @param userId   用户id
+	 * @param mockType 类型
+	 * @param currDate 日期
+	 */
+	TradeMoneyHistoryDo getLastRecord(@Param("userId") Integer userId, @Param("mockType") Integer mockType, @Param("currDate") DateTime currDate);
 }

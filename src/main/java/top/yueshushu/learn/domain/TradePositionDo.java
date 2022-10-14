@@ -1,13 +1,14 @@
 package top.yueshushu.learn.domain;
 
-import java.math.BigDecimal;
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableField;
-import java.io.Serializable;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * <p>
@@ -83,6 +84,12 @@ public class TradePositionDo implements Serializable {
      */
     @TableField("float_proportion")
     private BigDecimal floatProportion;
+
+    /**
+     * 盈亏金额
+     */
+    @TableField("today_money")
+    private BigDecimal todayMoney;
 
     /**
      * 员工编号

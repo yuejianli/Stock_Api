@@ -15,6 +15,7 @@ public enum JobInfoType {
     STOCK_PRICE("stockPrice", "实时获取股票价格"),
     TRADE_ING_TO_REVOKE("tradeIngToRevoke", "自动撤消委托"),
     TRADE_POSITION_HISTORY("tradePositionHistory", "交易持仓信息同步"),
+    CALL_PROFIT("callProfit", "计算每天的盈亏数目"),
     MOCK_DEAL("mockDeal", "虚拟成交"),
     MOCK_ENTRUST("mockEntrust", "虚拟委托"),
     STOCK_UPDATE("stockUpdate", "股票更新"),

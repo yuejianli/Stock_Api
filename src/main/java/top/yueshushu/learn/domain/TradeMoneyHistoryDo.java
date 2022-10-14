@@ -4,13 +4,12 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 /**
  * <p>
@@ -55,19 +54,25 @@ public class TradeMoneyHistoryDo implements Serializable {
      */
     @TableField("market_money")
     private BigDecimal marketMoney;
-    
+
     /**
      * 可取金额
      */
     @TableField("takeout_money")
     private BigDecimal takeoutMoney;
-    
+
+    /**
+     * 盈亏金额
+     */
+    @TableField("profit_money")
+    private BigDecimal profitMoney;
+
     /**
      * 关联用户
      */
     @TableField("user_id")
     private Integer userId;
-    
+
     /**
      * 虚拟类型 1为虚拟 0为真实
      */

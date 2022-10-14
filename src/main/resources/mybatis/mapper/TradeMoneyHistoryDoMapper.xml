@@ -10,6 +10,7 @@
         <result column="use_money" property="useMoney"/>
         <result column="market_money" property="marketMoney"/>
         <result column="takeout_money" property="takeoutMoney"/>
+        <result column="profit_money" property="profitMoney"/>
         <result column="user_id" property="userId"/>
         <result column="mock_type" property="mockType"/>
     </resultMap>
@@ -22,6 +23,7 @@
             use_money,
             market_money,
             takeout_money,
+            profit_money,
             user_id,
             mock_type
     </sql>
@@ -40,4 +42,14 @@
         order by t.curr_date desc
     </select>
 
+    <select id="getLastRecord" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from trade_money_history t
+        where t.user_id=#{userId}
+        and t.mock_type = #{mockType}
+        and date_format(curr_date,'%Y%m%d') &lt; date_format( #{currDate,jdbcType=TIMESTAMP},'%Y%m%d')
+        order by t.curr_date desc
+        limit 1
+    </select>
 </mapper>

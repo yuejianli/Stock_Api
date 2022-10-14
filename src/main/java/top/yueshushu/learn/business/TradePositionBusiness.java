@@ -1,5 +1,6 @@
 package top.yueshushu.learn.business;
 
+import top.yueshushu.learn.enumtype.MockType;
 import top.yueshushu.learn.mode.ro.TradePositionRo;
 import top.yueshushu.learn.response.OutputResult;
 
@@ -18,10 +19,21 @@ public interface TradePositionBusiness {
      * @return 查询虚拟的股票当前的持仓记录信息
      */
     OutputResult mockList(TradePositionRo tradePositionRo);
+
     /**
      * 查询真实的股票当前的持仓记录信息
+     *
      * @param tradePositionRo 股票持仓对象
      * @return 查询真实的股票当前的持仓记录信息
      */
     OutputResult realList(TradePositionRo tradePositionRo);
+
+    /**
+     * 记录用户今日的盈亏数
+     *
+     * @param userId   用户编号
+     * @param mockType 类型
+     */
+    void callProfit(Integer userId, MockType mockType);
+
 }

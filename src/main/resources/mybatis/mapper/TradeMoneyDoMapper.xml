@@ -9,13 +9,14 @@
         <result column="use_money" property="useMoney" />
         <result column="market_money" property="marketMoney" />
         <result column="takeout_money" property="takeoutMoney" />
+        <result column="profit_money" property="profitMoney" />
         <result column="user_id" property="userId" />
         <result column="mock_type" property="mockType" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, total_money, use_money, market_money, takeout_money,user_id, mock_type
+        id, total_money, use_money, market_money, takeout_money,profit_money,user_id, mock_type
     </sql>
 
 </mapper>
