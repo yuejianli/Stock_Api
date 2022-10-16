@@ -1,15 +1,11 @@
 package top.yueshushu.learn.mode.vo;
 
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 /**
  * <p>
@@ -38,5 +34,24 @@ public class StockHistoryVo implements Serializable {
     private BigDecimal tradingValue;
     private BigDecimal closingPrice;
     private BigDecimal highestPrice;
+
+    private Integer outDish;
+    private Integer innerDish;
+    private BigDecimal changingProportion;
+    private BigDecimal than;
+
+    private BigDecimal avgPrice;
+
+    private BigDecimal staticPriceRatio;
+
+
+    private BigDecimal dynamicPriceRatio;
+    private BigDecimal ttmPriceRatio;
+
+    private Integer buyHand;
+
+    private Integer sellHand;
+    private String appointThan;
+
     private Integer flag;
 }
