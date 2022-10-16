@@ -21,10 +21,8 @@ import top.yueshushu.learn.domain.StockSelectedDo;
 import top.yueshushu.learn.domainservice.StockSelectedDomainService;
 import top.yueshushu.learn.entity.StockSelected;
 import top.yueshushu.learn.enumtype.DataFlagType;
-import top.yueshushu.learn.enumtype.SyncStockHistoryType;
 import top.yueshushu.learn.mode.dto.StockPriceCacheDto;
 import top.yueshushu.learn.mode.ro.IdRo;
-import top.yueshushu.learn.mode.ro.StockRo;
 import top.yueshushu.learn.mode.ro.StockSelectedRo;
 import top.yueshushu.learn.mode.vo.StockSelectedVo;
 import top.yueshushu.learn.response.OutputResult;
@@ -32,6 +30,7 @@ import top.yueshushu.learn.response.PageResponse;
 import top.yueshushu.learn.service.StockCrawlerService;
 import top.yueshushu.learn.service.StockHistoryService;
 import top.yueshushu.learn.service.StockSelectedService;
+import top.yueshushu.learn.service.StockService;
 import top.yueshushu.learn.service.cache.StockCacheService;
 
 import javax.annotation.Resource;
@@ -66,6 +65,8 @@ public class StockSelectedServiceImpl implements StockSelectedService {
     private CrawlerStockHistoryService crawlerStockHistoryService;
     @Resource
     private StockHistoryAssembler stockHistoryAssembler;
+    @Resource
+    private StockService stockService;
 
     @SuppressWarnings("all")
     @Resource(name = Const.ASYNC_SERVICE_EXECUTOR_BEAN_NAME)
@@ -289,31 +290,33 @@ public class StockSelectedServiceImpl implements StockSelectedService {
     @Override
     public void syncDayHistory() {
         //查询出所有的自选表里面的股票记录信息
-        List<String> codeList = stockSelectedDomainService.findCodeList(null);
-        for (String code : codeList) {
-            //对股票进行同步
-            StockRo stockRo = new StockRo();
-            stockRo.setType(
-                    SyncStockHistoryType.SELF.getCode()
-            );
-            Date now = DateUtil.date();
-            //获取当天的记录
-            Date beforeDay = DateUtil.beginOfDay(now);
-            stockRo.setStartDate(
-                    DateUtil.format(beforeDay, "yyyy-MM-dd hh:mm:ss")
-            );
-            stockRo.setEndDate(
-                    DateUtil.format(now, "yyyy-MM-dd hh:mm:ss")
-            );
-            stockRo.setCode(code);
-            // 传入 1 ,1 表示股票
-            stockRo.setExchange(1);
-            stockCrawlerService.stockHistoryAsync(
-                    stockRo
-            );
-        }
-    }
+        //List<String> codeList = stockSelectedDomainService.findCodeList(null);
+        //for (String code : codeList) {
+        //    //对股票进行同步
+        //    StockRo stockRo = new StockRo();
+        //    stockRo.setType(
+        //            SyncStockHistoryType.SELF.getCode()
+        //    );
+        //    Date now = DateUtil.date();
+        //    //获取当天的记录
+        //    Date beforeDay = DateUtil.beginOfDay(now);
+        //    stockRo.setStartDate(
+        //            DateUtil.format(beforeDay, "yyyy-MM-dd hh:mm:ss")
+        //    );
+        //    stockRo.setEndDate(
+        //            DateUtil.format(now, "yyyy-MM-dd hh:mm:ss")
+        //    );
+        //    stockRo.setCode(code);
+        //    // 传入 1 ,1 表示股票
+        //    stockRo.setExchange(1);
+        //    stockCrawlerService.stockHistoryAsync(
+        //            stockRo
+        //    );
+        //}
 
+        List<String> codeList = stockSelectedDomainService.findCodeList(null);
+        crawlerStockHistoryService.txMoneyYesStockHistory(codeList, stockService.listFullCode(codeList));
+    }
     @Override
     public void cacheClosePrice() {
         ////查询出所有的自选表里面的股票记录信息
@@ -336,9 +339,11 @@ public class StockSelectedServiceImpl implements StockSelectedService {
             }
         }
         //没有历史的数据。
-        if (!CollectionUtils.isEmpty(noHistoryList)){
+        if (!CollectionUtils.isEmpty(noHistoryList)) {
             //东方财富同步没有的历史记录。
-            crawlerStockHistoryService.easyMoneyYesStockHistory(noHistoryList);
+            // 换成成腾讯相应的接口信息
+            // crawlerStockHistoryService.easyMoneyYesStockHistory(noHistoryList);
+            crawlerStockHistoryService.txMoneyYesStockHistory(noHistoryList, stockService.listFullCode(noHistoryList));
         }
         priceCacheDtoList = stockHistoryService.listClosePrice(codeList);
         //循环设置缓存信息

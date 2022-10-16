@@ -89,14 +89,19 @@ public class StockHistoryDomainServiceImpl extends ServiceImpl<StockHistoryDoMap
 
     @Override
     public List<String> listDate(String code, String startDate, String endDate) {
-       return stockHistoryDoMapper.listDate(
+        return stockHistoryDoMapper.listDate(
                 code,
                 DateUtil.parse(
-                        startDate,"yyyyMMdd"
+                        startDate, "yyyyMMdd"
                 ),
                 DateUtil.parse(
-                        endDate,"yyyyMMdd"
+                        endDate, "yyyyMMdd"
                 )
         );
+    }
+
+    @Override
+    public void deleteHasAsyncData(List<String> codeList, DateTime currentDate) {
+        stockHistoryDoMapper.deleteHasAsyncData(codeList, currentDate);
     }
 }

@@ -2,6 +2,7 @@ package top.yueshushu.learn.crawler.parse;
 
 import cn.hutool.core.date.DateTime;
 import top.yueshushu.learn.crawler.entity.StockHistoryCsvInfo;
+import top.yueshushu.learn.crawler.entity.TxStockHistoryInfo;
 
 import java.io.InputStream;
 import java.util.Collections;
@@ -28,8 +29,21 @@ public interface DailyTradingInfoParse {
      * @param beforeLastWorking 最近的工作日
      * @return 返回记录信息
      */
-    default List<StockHistoryCsvInfo> parseEasyMoneyHistory(String content,List<String> codeList,
-                                                            DateTime beforeLastWorking){
+    default List<StockHistoryCsvInfo> parseEasyMoneyHistory(String content, List<String> codeList,
+                                                            DateTime beforeLastWorking) {
         return Collections.EMPTY_LIST;
+    }
+
+    /**
+     * 腾讯解析最近的工作日的股票记录
+     *
+     * @param content           内容信息
+     * @param codeList          股票编码集合
+     * @param beforeLastWorking 最近的工作日
+     * @return 返回记录信息
+     */
+    default List<TxStockHistoryInfo> parseTxMoneyHistory(String content, List<String> codeList,
+                                                         DateTime beforeLastWorking) {
+        return Collections.emptyList();
     }
 }

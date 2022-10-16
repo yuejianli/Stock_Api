@@ -4,6 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import top.yueshushu.learn.crawler.entity.StockHistoryCsvInfo;
+import top.yueshushu.learn.crawler.entity.TxStockHistoryInfo;
 import top.yueshushu.learn.domain.StockHistoryDo;
 import top.yueshushu.learn.entity.StockHistory;
 import top.yueshushu.learn.mode.vo.StockHistoryVo;
@@ -43,7 +44,12 @@ public interface StockHistoryAssembler {
      * @return 股票历史 stockHistoryCsvInfo 转换成 domain
      */
     @Mappings({
-            @Mapping(target = "currDate",ignore = true),
+            @Mapping(target = "currDate", ignore = true),
     })
     StockHistoryDo csvInfoToDo(StockHistoryCsvInfo stockHistoryCsvInfo);
+
+    @Mappings({
+            @Mapping(target = "currDate", ignore = true),
+    })
+    StockHistoryDo txInfoToDo(TxStockHistoryInfo txStockHistoryInfo);
 }

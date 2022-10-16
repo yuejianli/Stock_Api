@@ -15,12 +15,27 @@
         <result property="amplitudeProportion" column="amplitude_proportion"></result>
         <result property="tradingVolume" column="trading_volume"></result>
         <result property="tradingValue" column="trading_value"></result>
+        <result property="outDish" column="out_dish"></result>
+        <result property="innerDish" column="inner_dish"></result>
+        <result property="changingProportion" column="changing_proportion"></result>
+        <result property="than" column="than"></result>
+        <result property="avgPrice" column="avg_price"></result>
+        <result property="staticPriceRatio" column="static_price_ratio"></result>
+        <result property="dynamicPriceRatio" column="dynamic_price_ratio"></result>
+        <result property="ttmPriceRatio" column="ttm_price_ratio"></result>
+        <result property="buyHand" column="buy_hand"></result>
+        <result property="sellHand" column="sell_hand"></result>
+        <result property="appointThan" column="appoint_than"></result>
         <result property="flag" column="flag"></result>
     </resultMap>
     <sql id="baseSql">
         id,curr_date,code,name,closing_price,highest_price,lowest_price,
         opening_price,yesClosing_price,amplitude,amplitude_proportion,
-        trading_volume,trading_value,flag
+        trading_volume,trading_value,
+        out_dish,inner_dish,changing_proportion,than,
+        avg_price,static_price_ratio,dynamic_price_ratio,
+        ttm_price_ratio,buy_hand,sell_hand,appoint_than,
+        flag
     </sql>
     <select id="getStockHistory" resultMap="stockHistoryMap">
         select <include refid="baseSql"/> from stock_history t
@@ -128,4 +143,15 @@
         and date_format(curr_date,'%Y%m%d') >=date_format( #{currDate,jdbcType=TIMESTAMP},'%Y%m%d')
         order by t.curr_date asc
     </select>
+    <delete id="deleteHasAsyncData">
+
+        delete from stock_history where 1=1
+        <if test="codeList != null and codeList.size() != 0">
+            and code in
+            <foreach collection="codeList" item="code" separator="," open="(" close=")">
+                #{code}
+            </foreach>
+        </if>
+        and date_format(curr_date,'%Y%m%d') =date_format( #{currentDate,jdbcType=TIMESTAMP},'%Y%m%d')
+    </delete>
 </mapper>

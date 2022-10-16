@@ -119,4 +119,12 @@ public interface StockHistoryDoMapper extends BaseMapper<StockHistoryDo> {
      */
     List<String> listDate(@Param("code") String code, @Param("startDate") DateTime startDate,
                           @Param("endDate") DateTime endDate);
+
+    /**
+     * 删除历史记录信息
+     *
+     * @param codeList    股票编码集合
+     * @param currentDate 要删除的日期
+     */
+    void deleteHasAsyncData(@Param("codeList") List<String> codeList, @Param("currentDate") DateTime currentDate);
 }
