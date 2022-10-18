@@ -6,7 +6,6 @@ import top.yueshushu.learn.business.TradeUserBusiness;
 import top.yueshushu.learn.mode.ro.TradeUserRo;
 import top.yueshushu.learn.mode.vo.MenuVo;
 import top.yueshushu.learn.mode.vo.TradeUserVo;
-import top.yueshushu.learn.mode.vo.UserVo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.service.MenuService;
 import top.yueshushu.learn.service.TradeUserService;
@@ -29,6 +28,7 @@ public class TradeUserBusinessImpl implements TradeUserBusiness {
 
     @Override
     public OutputResult login(TradeUserRo tradeUserRo) {
+
         OutputResult outputResult = tradeUserService.login(tradeUserRo);
         if (!outputResult.getSuccess()){
             return outputResult;

@@ -2,8 +2,6 @@ package top.yueshushu.learn.service.impl;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.crypto.digest.MD5;
-import cn.hutool.crypto.symmetric.SymmetricAlgorithm;
-import cn.hutool.crypto.symmetric.SymmetricCrypto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -18,6 +16,7 @@ import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.service.UserService;
 import top.yueshushu.learn.service.cache.UserCacheService;
 import top.yueshushu.learn.util.JwtUtils;
+import top.yueshushu.learn.util.RSAUtil;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
@@ -92,10 +91,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public OutputResult tradePassword(String password) {
-        byte[] key = Const.TRADE_PASSWORD_AES_KEY.getBytes();
-        SymmetricCrypto symmetricCrypto = new SymmetricCrypto(SymmetricAlgorithm.AES, key);
-        //加密
-        return OutputResult.buildSucc(symmetricCrypto.encryptHex(password));
+        if (password.length() != 6) {
+            return OutputResult.buildSucc(password);
+        }
+        String publicKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDHdsyxT66pDG4p73yope7jxA92\nc0AT4qIJ/xtbBcHkFPK77upnsfDTJiVEuQDH+MiMeb+XhCLNKZGp0yaUU6GlxZdp\n+nLW8b7Kmijr3iepaDhcbVTsYBWchaWUXauj9Lrhz58/6AE/NF0aMolxIGpsi+ST\n2hSHPu3GSXMdhPCkWQIDAQAB";
+        return OutputResult.buildSucc(RSAUtil.encodeWithPublicKey(password, publicKey));
     }
 
     @Override

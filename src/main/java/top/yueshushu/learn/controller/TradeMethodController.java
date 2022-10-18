@@ -9,8 +9,11 @@ import top.yueshushu.learn.entity.TradeMethod;
 import top.yueshushu.learn.enumtype.TradeMethodType;
 import top.yueshushu.learn.mode.ro.TradeMethodRo;
 import top.yueshushu.learn.response.OutputResult;
+import top.yueshushu.learn.util.RedisUtil;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
+import java.text.MessageFormat;
 
 /**
  * <p>
@@ -27,23 +30,34 @@ public class TradeMethodController {
 
     @Resource
     private TradeMethodBusiness tradeMethodBusiness;
+    @Resource
+    private RedisUtil redisUtil;
 
     @PostMapping("/list")
     @ApiOperation("查询提供的交易方法")
-    public OutputResult list(@RequestBody TradeMethodRo tradeMethodRo){
+    public OutputResult list(@RequestBody TradeMethodRo tradeMethodRo) {
         return tradeMethodBusiness.list(tradeMethodRo);
     }
 
     @GetMapping("/yzm")
     @ApiOperation("获取验证码")
-    public OutputResult yzm(){
+    public OutputResult yzm(HttpSession httpSession) {
         TradeMethod tradeMethod = tradeMethodBusiness.getMethod(
                 TradeMethodType.yzm
         );
         //获取方法的 url
         String url = tradeMethod.getUrl();
-        return OutputResult.buildSucc(
-               url
-        );
+
+        long nowDateTimestamp = System.currentTimeMillis();
+
+        String randNum = "0.903" + nowDateTimestamp;
+
+        String raNum = "0.483" + nowDateTimestamp;
+
+        String yzmUrl = MessageFormat.format(url, randNum, raNum);
+
+        redisUtil.set(httpSession.getId() + "RAND_NUM", randNum);
+        redisUtil.set(httpSession.getId() + "RA", raNum);
+        return OutputResult.buildSucc(yzmUrl);
     }
 }

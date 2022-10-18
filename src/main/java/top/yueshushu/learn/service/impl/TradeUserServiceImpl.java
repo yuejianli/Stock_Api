@@ -1,7 +1,5 @@
 package top.yueshushu.learn.service.impl;
 
-import cn.hutool.crypto.symmetric.SymmetricAlgorithm;
-import cn.hutool.crypto.symmetric.SymmetricCrypto;
 import com.alibaba.fastjson.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanMap;
@@ -25,6 +23,7 @@ import top.yueshushu.learn.mode.ro.TradeUserRo;
 import top.yueshushu.learn.mode.vo.TradeUserVo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.service.TradeUserService;
+import top.yueshushu.learn.util.RSAUtil;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
@@ -68,9 +67,11 @@ public class TradeUserServiceImpl implements TradeUserService {
 
         //关联的用户
         AuthenticationRequest request = new AuthenticationRequest(tradeUser.getUserId());
-        request.setPassword(passwordEncry(tradeUser.getPassword()));
+        request.setPassword(encodePassword(tradeUser.getPassword()));
         request.setIdentifyCode(tradeUserRo.getIdentifyCode());
         request.setRandNumber(tradeUserRo.getRandNum());
+
+
         //获取登录验证的方法
         TradeMethod tradeMethod = tradeMethodAssembler.doToEntity(
                 tradeMethodDomainService.getMethodByCode(request.getMethod())
@@ -126,15 +127,16 @@ public class TradeUserServiceImpl implements TradeUserService {
 
     /**
      * 密码转换
+     *
      * @param password 数据库密码
      * @return 东方财富加密前的密码
      */
-    private String passwordEncry(String password) {
-        byte[] key = Const.TRADE_PASSWORD_AES_KEY.getBytes();
-        SymmetricCrypto symmetricCrypto = new SymmetricCrypto(SymmetricAlgorithm.AES,key);
-        //加密
-        String originPassword = new String(symmetricCrypto.decrypt(password));
-        return originPassword;
+    private String encodePassword(String password) {
+        if (password.length() != 6) {
+            return password;
+        }
+        String publicKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDHdsyxT66pDG4p73yope7jxA92\nc0AT4qIJ/xtbBcHkFPK77upnsfDTJiVEuQDH+MiMeb+XhCLNKZGp0yaUU6GlxZdp\n+nLW8b7Kmijr3iepaDhcbVTsYBWchaWUXauj9Lrhz58/6AE/NF0aMolxIGpsi+ST\n2hSHPu3GSXMdhPCkWQIDAQAB";
+        return RSAUtil.encodeWithPublicKey(password, publicKey);
     }
 
     /**

@@ -20,6 +20,7 @@ public class AuthenticationRequest extends BaseTradeRequest {
     private String identifyCode;
     private String duration = "1800";
     private String type = "Z";
+    private String authCode;
 
     public AuthenticationRequest(){
         this(1);

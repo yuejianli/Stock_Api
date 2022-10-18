@@ -254,6 +254,25 @@
             <artifactId>spring-boot-starter-velocity</artifactId>
             <version>1.4.7.RELEASE</version>
         </dependency>
+        <!--  百度云OCR文字识别Java-SDK依赖      -->
+        <dependency>
+            <groupId>com.baidu.aip</groupId>
+            <artifactId>java-sdk</artifactId>
+            <version>4.16.11</version>
+        </dependency>
+        <dependency>
+            <groupId>com.tencentcloudapi</groupId>
+            <artifactId>tencentcloud-sdk-java</artifactId>
+            <!-- go to https://search.maven.org/search?q=tencentcloud-sdk-java and get the latest version. -->
+            <!-- 请到https://search.maven.org/search?q=tencentcloud-sdk-java查询所有版本，最新版本如下 -->
+            <version>3.1.322</version>
+        </dependency>
+        <dependency>
+            <groupId>com.tencentcloudapi</groupId>
+            <artifactId>tencentcloud-sdk-java-ocr</artifactId>
+            <version>3.1.322</version>
+        </dependency>
+
     </dependencies>
     <build>
         <!--将该目录下的文件全部打包成类的路径-->
