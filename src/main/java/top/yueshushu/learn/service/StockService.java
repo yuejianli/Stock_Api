@@ -1,10 +1,13 @@
 package top.yueshushu.learn.service;
 
+import top.yueshushu.learn.domain.StockDo;
 import top.yueshushu.learn.entity.Stock;
 import top.yueshushu.learn.mode.info.StockInfo;
 import top.yueshushu.learn.mode.ro.StockRo;
 import top.yueshushu.learn.mode.vo.StockVo;
 import top.yueshushu.learn.response.OutputResult;
+
+import java.util.List;
 
 /**
  * <p>
@@ -38,8 +41,20 @@ public interface StockService {
 
     /**
      * 根据股票的编码，查询股票的信息
+     *
      * @param code 股票的编码
      * @return 根据股票的编码，查询股票的信息
      */
     OutputResult<StockVo> getStockInfo(String code);
+
+    /**
+     * 根据股票编码集合,查询对应的股票信息
+     *
+     * @param codeList 股票编码集合
+     * @return
+     */
+    List<StockDo> listByCodes(List<String> codeList);
+
+    List<String> listFullCode(List<String> codeList);
+
 }

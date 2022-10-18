@@ -157,6 +157,7 @@ default:
                              f4,f5,f6,f12,f14,f15,f16,f17,f18&fs=m:0+t:6,m:0+t:13,m:0+t:80,m:0+t:81+s:2048,m:1+t:2,\
                              m:1+t:23,b:MK0021,\
                              b:MK0022,b:MK0023,b:MK0024%22"
+  tx_money_history_url: http://qt.gtimg.cn?q={0}
 # 微信发送的配置信息
 weixin:
   corpId: ENC(5NynxYfBMsJQellJS1hVS+g7jCOaCqDOhqIftIDeaf0R1xmLBYsrD0nZPgOYa1r413IaYAtFz1+FCJz0Lah8YA==)

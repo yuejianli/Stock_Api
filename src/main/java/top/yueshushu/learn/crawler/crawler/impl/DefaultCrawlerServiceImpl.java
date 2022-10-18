@@ -2,6 +2,7 @@ package top.yueshushu.learn.crawler.crawler.impl;
 
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import org.springframework.web.client.RestTemplate;
 import top.yueshushu.learn.crawler.crawler.CrawlerService;
 import top.yueshushu.learn.crawler.entity.DownloadStockInfo;
 import top.yueshushu.learn.crawler.entity.StockHistoryCsvInfo;
+import top.yueshushu.learn.crawler.entity.TxStockHistoryInfo;
 import top.yueshushu.learn.crawler.parse.DailyTradingInfoParse;
 import top.yueshushu.learn.crawler.parse.StockInfoParser;
 import top.yueshushu.learn.crawler.parse.StockShowInfoParse;
@@ -223,11 +225,30 @@ public class DefaultCrawlerServiceImpl implements CrawlerService {
             String content = HttpUtil.sendGet(httpClient,url);
             //将内容进行转换，解析
             List<StockHistoryCsvInfo> stockHistoryCsvInfoList = dailyTradingInfoParse.parseEasyMoneyHistory(content,
-                    codeList,beforeLastWorking);
+                    codeList, beforeLastWorking);
             return stockHistoryCsvInfoList;
         } catch (Exception e) {
-            log.error("获取股票 {} 最近交易日数据列表出错",codeList,e);
+            log.error("获取股票 {} 最近交易日数据列表出错", codeList, e);
             return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public List<TxStockHistoryInfo> parseTxMoneyYesHistory(List<String> codeList, DateTime beforeLastWorking) {
+        //处理，拼接成信息
+        String qParam = StrUtil.join(",", codeList);
+        String url = MessageFormat.format(defaultProperties.getTxMoneyHistoryUrl(), qParam);
+        log.info(">>>访问地址:" + url);
+        try {
+            //获取内容
+            Map<String, String> header = new HashMap<>();
+            header.put("Referer", "http://qt.gtimg.cn");
+            String content = HttpUtil.sendGet(httpClient, url, header, "gbk");
+            //将内容进行转换，解析
+            return dailyTradingInfoParse.parseTxMoneyHistory(content, codeList, beforeLastWorking);
+        } catch (Exception e) {
+            log.error("获取股票最近历史记录 {} 当前信息 列表出错", qParam, e);
+            return null;
         }
     }
 

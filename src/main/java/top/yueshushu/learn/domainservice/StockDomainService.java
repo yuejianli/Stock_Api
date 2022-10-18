@@ -2,7 +2,6 @@ package top.yueshushu.learn.domainservice;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import top.yueshushu.learn.domain.StockDo;
-import top.yueshushu.learn.domain.UserDo;
 
 import java.util.List;
 
@@ -35,7 +34,16 @@ public interface StockDomainService extends IService<StockDo> {
 
     /**
      * 查询所有的股票列表的编码集合
+     *
      * @return 查询所有的股票列表的编码集合
      */
     List<String> listAllCode();
+
+    /**
+     * 根据股票 code 集合，查询对应的股票信息
+     *
+     * @param codeList 股票编码集合
+     * @return 返回股票对应的集合信息
+     */
+    List<StockDo> listByCodes(List<String> codeList);
 }

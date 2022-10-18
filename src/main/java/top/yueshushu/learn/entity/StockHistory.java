@@ -1,11 +1,6 @@
 package top.yueshushu.learn.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -36,5 +31,22 @@ public class StockHistory implements Serializable {
     private BigDecimal tradingValue;
     private BigDecimal closingPrice;
     private BigDecimal highestPrice;
+    private Integer outDish;
+    private Integer innerDish;
+    private BigDecimal changingProportion;
+    private BigDecimal than;
+
+    private BigDecimal avgPrice;
+
+    private BigDecimal staticPriceRatio;
+
+
+    private BigDecimal dynamicPriceRatio;
+    private BigDecimal ttmPriceRatio;
+
+    private Integer buyHand;
+
+    private Integer sellHand;
+    private String appointThan;
     private Integer flag;
 }

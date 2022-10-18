@@ -1,5 +1,6 @@
 package top.yueshushu.learn.crawler.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.TimeInterval;
@@ -10,6 +11,7 @@ import top.yueshushu.learn.assembler.StockHistoryAssembler;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.crawler.crawler.CrawlerService;
 import top.yueshushu.learn.crawler.entity.StockHistoryCsvInfo;
+import top.yueshushu.learn.crawler.entity.TxStockHistoryInfo;
 import top.yueshushu.learn.crawler.service.CrawlerStockHistoryService;
 import top.yueshushu.learn.domain.StockHistoryDo;
 import top.yueshushu.learn.domainservice.StockHistoryDomainService;
@@ -18,6 +20,8 @@ import top.yueshushu.learn.mode.ro.StockRo;
 import top.yueshushu.learn.response.OutputResult;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -103,32 +107,78 @@ public class CrawlerStockHistoryServiceImpl implements CrawlerStockHistoryServic
 
     @Override
     public OutputResult easyMoneyYesStockHistory(List<String> codeList) {
-       try{
-           Date yesDay = DateUtil.offsetDay(DateUtil.date(),-1);
+       try {
+           Date yesDay = DateUtil.offsetDay(DateUtil.date(), -1);
            DateTime beforeLastWorking = dateHelper.getBeforeLastWorking(yesDay);
 
            //处理读取数据
-           List<StockHistoryCsvInfo> stockHistoryCsvInfoList = crawlerService.parseEasyMoneyYesHistory(codeList,beforeLastWorking);
+           List<StockHistoryCsvInfo> stockHistoryCsvInfoList = crawlerService.parseEasyMoneyYesHistory(codeList, beforeLastWorking);
            // 上一个交易日的数据查询出来了。 进行同步
-           List<StockHistoryDo> stockHistoryDoList=new ArrayList<>();
+           List<StockHistoryDo> stockHistoryDoList = new ArrayList<>();
+
+           ZoneId zoneId = ZoneId.systemDefault();
+           LocalDateTime localDateTime = beforeLastWorking.toInstant().atZone(zoneId).toLocalDateTime();
+
            stockHistoryCsvInfoList.forEach(
-                   n->{
+                   n -> {
                        StockHistoryDo stockHistoryDo = stockHistoryAssembler.csvInfoToDo(
                                n
                        );
                        stockHistoryDo.setCurrDate(
-                               DateUtil.parseDate(
-                                       n.getCurrDate()
-                               ).toLocalDateTime()
+                               localDateTime
                        );
                        stockHistoryDoList.add(stockHistoryDo);
                    }
            );
-           log.info("股票集合{}在东方财富网站同步最近的股票记录,共需要同步有{}条",codeList,stockHistoryCsvInfoList.size());
-           stockHistoryDomainService.saveBatch(stockHistoryDoList,50);
+           log.info("股票集合{}在东方财富网站同步最近的股票记录,共需要同步有{}条", codeList, stockHistoryCsvInfoList.size());
+
+
+           if (!CollectionUtil.isEmpty(stockHistoryDoList)) {
+               // 先删除之前已经同步过的历史数据
+               stockHistoryDomainService.deleteHasAsyncData(codeList, beforeLastWorking);
+           }
+           stockHistoryDomainService.saveBatch(stockHistoryDoList, 50);
            return OutputResult.buildSucc(ResultCode.STOCK_HIS_ASYNC_SUCCESS);
-       }catch (Exception e){
+       } catch (Exception e) {
            return OutputResult.buildFail(e.getMessage());
        }
+    }
+
+    @Override
+    public OutputResult txMoneyYesStockHistory(List<String> codeList, List<String> fullCodeList) {
+        try {
+            Date yesDay = DateUtil.offsetDay(DateUtil.date(), -1);
+            DateTime beforeLastWorking = dateHelper.getBeforeLastWorking(yesDay);
+
+            //处理读取数据
+            List<TxStockHistoryInfo> txStockHistoryInfoList = crawlerService.parseTxMoneyYesHistory(fullCodeList,
+                    beforeLastWorking);
+            // 上一个交易日的数据查询出来了。 进行同步
+            List<StockHistoryDo> stockHistoryDoList = new ArrayList<>();
+
+            ZoneId zoneId = ZoneId.systemDefault();
+            LocalDateTime localDateTime = beforeLastWorking.toInstant().atZone(zoneId).toLocalDateTime();
+
+            txStockHistoryInfoList.forEach(
+                    n -> {
+                        StockHistoryDo stockHistoryDo = stockHistoryAssembler.txInfoToDo(n);
+                        stockHistoryDo.setCurrDate(
+                                localDateTime
+                        );
+                        stockHistoryDoList.add(stockHistoryDo);
+                    }
+            );
+            log.info("股票集合{}在 腾讯网站同步最近的股票记录,共需要同步有{}条", codeList, txStockHistoryInfoList.size());
+
+            if (!CollectionUtil.isEmpty(stockHistoryDoList)) {
+                // 先删除之前已经同步过的历史数据
+                stockHistoryDomainService.deleteHasAsyncData(codeList, beforeLastWorking);
+            }
+
+            stockHistoryDomainService.saveBatch(stockHistoryDoList, 50);
+            return OutputResult.buildSucc(ResultCode.STOCK_HIS_ASYNC_SUCCESS);
+        } catch (Exception e) {
+            return OutputResult.buildFail(e.getMessage());
+        }
     }
 }

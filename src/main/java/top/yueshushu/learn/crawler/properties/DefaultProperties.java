@@ -43,6 +43,9 @@ public class DefaultProperties implements Serializable {
      */
     @Value("${default.easy_money_history_url}")
     private String easyMoneyHistoryUrl;
+
+    @Value("${default.tx_money_history_url}")
+    private String txMoneyHistoryUrl;
     /**
      * 分钟的K线图
      */
