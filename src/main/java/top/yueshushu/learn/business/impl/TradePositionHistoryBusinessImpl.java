@@ -1,12 +1,12 @@
 package top.yueshushu.learn.business.impl;
 
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import top.yueshushu.learn.business.TradePositionHistoryBusiness;
 import top.yueshushu.learn.mode.ro.TradePositionRo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.service.TradePositionHistoryService;
+import top.yueshushu.learn.service.cache.StockCacheService;
 
 import javax.annotation.Resource;
 
@@ -21,10 +21,19 @@ import javax.annotation.Resource;
 public class TradePositionHistoryBusinessImpl implements TradePositionHistoryBusiness {
     @Resource
     private TradePositionHistoryService tradePositionHistoryService;
+    @Resource
+    private StockCacheService stockCacheService;
+
     @Override
     public OutputResult listHistory(TradePositionRo tradePositionRo) {
         return tradePositionHistoryService.pageHistory(
                 tradePositionRo
         );
+    }
+
+    @Override
+    public OutputResult clearPhCache() {
+        stockCacheService.cleanLastTradePositionHistory();
+        return OutputResult.buildSucc();
     }
 }

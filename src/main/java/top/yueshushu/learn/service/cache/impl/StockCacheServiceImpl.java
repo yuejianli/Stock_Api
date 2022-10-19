@@ -3,12 +3,17 @@ package top.yueshushu.learn.service.cache.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+import top.yueshushu.learn.assembler.TradePositionHistoryAssembler;
 import top.yueshushu.learn.common.Const;
+import top.yueshushu.learn.domain.TradePositionHistoryDo;
+import top.yueshushu.learn.domainservice.TradePositionHistoryDomainService;
+import top.yueshushu.learn.entity.TradePositionHistoryCache;
 import top.yueshushu.learn.service.cache.StockCacheService;
 import top.yueshushu.learn.util.RedisUtil;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.Optional;
 
 /**
  * @Description 股票相关的缓存实现 @Author yuejianli @Date 2022/5/20 23:38
@@ -19,6 +24,10 @@ public class StockCacheServiceImpl implements StockCacheService {
     private static final BigDecimal DEFAULT_PRICE = BigDecimal.ZERO;
     @Resource
     private RedisUtil redisUtil;
+    @Resource
+    private TradePositionHistoryDomainService tradePositionHistoryDomainService;
+    @Resource
+    private TradePositionHistoryAssembler tradePositionHistoryAssembler;
 
     @Override
     public void setNowCachePrice(String code, BigDecimal price) {
@@ -95,4 +104,26 @@ public class StockCacheServiceImpl implements StockCacheService {
         }
         return (BigDecimal) o;
     }
+
+    @Override
+    public TradePositionHistoryCache getLastTradePositionByCode(Integer userId, Integer mockType, String code) {
+        String key = Const.POSITION_HISTORY + userId + "_" + mockType + ":" + code;
+        TradePositionHistoryCache positionHistoryDo = redisUtil.get(key);
+        if (!ObjectUtils.isEmpty(positionHistoryDo)) {
+            return positionHistoryDo;
+        }
+        // 查询一下
+        TradePositionHistoryDo lastHistoryDo = tradePositionHistoryDomainService.getLastRecordByCode(userId, mockType, code);
+
+        TradePositionHistoryCache tradePositionHistoryCache = tradePositionHistoryAssembler.doToCache(lastHistoryDo);
+        redisUtil.set(key, Optional.ofNullable(tradePositionHistoryCache).orElse(new TradePositionHistoryCache()));
+
+        return tradePositionHistoryCache;
+    }
+
+    @Override
+    public void cleanLastTradePositionHistory() {
+        redisUtil.deleteByPrefix(Const.POSITION_HISTORY);
+    }
+
 }

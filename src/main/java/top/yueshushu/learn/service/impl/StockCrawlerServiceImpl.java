@@ -1,20 +1,10 @@
 package top.yueshushu.learn.service.impl;
 
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import javax.annotation.Resource;
-
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import top.yueshushu.learn.assembler.StockAssembler;
 import top.yueshushu.learn.assembler.StockUpdateLogAssembler;
 import top.yueshushu.learn.common.Const;
@@ -39,6 +29,14 @@ import top.yueshushu.learn.service.UserService;
 import top.yueshushu.learn.service.cache.StockCacheService;
 import top.yueshushu.learn.util.BigDecimalUtil;
 import top.yueshushu.learn.util.StockUtil;
+
+import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @ClassName:StockCrawlerServiceImpl
@@ -179,14 +177,17 @@ public class StockCrawlerServiceImpl implements StockCrawlerService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateAllStock() {
+        // 先将昨天的最近的记录清理一下。
+        stockCacheService.cleanLastTradePositionHistory();
+
         //1. 查询当前所有的股票信息
         List<StockDo> dbAllStockList = stockDomainService.list();
-        log.info(">>>数据库查询所有的股票记录成功，查询条数为:{}",dbAllStockList.size());
+        log.info(">>>数据库查询所有的股票记录成功，查询条数为:{}", dbAllStockList.size());
         Map<String, StockDo> dbStockCodeMap = dbAllStockList.stream().collect(Collectors.toMap(StockDo::getCode, n -> n));
         //爬虫查询，目前的股票列表记录.
         List<DownloadStockInfo> webStockList = crawlerService.getStockList();
         List<String> webStockCodeList = webStockList.stream().map(DownloadStockInfo::getCode).collect(Collectors.toList());
-        log.info(">>> 查询当前网络系统上，共存在的股票条数为:{}",webStockList.size());
+        log.info(">>> 查询当前网络系统上，共存在的股票条数为:{}", webStockList.size());
 
         List<StockDo> addStockDoList = new ArrayList<>();
         List<StockDo> updateStockDoList = new ArrayList<>();

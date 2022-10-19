@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.common.SystemConst;
-import top.yueshushu.learn.mode.dto.StockPriceCacheDto;
 
 import java.math.BigDecimal;
 import java.util.Optional;

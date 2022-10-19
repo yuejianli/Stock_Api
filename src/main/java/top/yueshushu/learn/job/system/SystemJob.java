@@ -47,7 +47,7 @@ public class SystemJob {
         jobInfoBusiness.execJob(JobInfoType.HOLIDAY, EntrustType.AUTO.getCode());
     }
     
-    @Scheduled(cron = "1 30 20 ? * 1-5")
+    @Scheduled(cron = "1 20 20 ? * 1-5")
     public void positionUseAmount() {
         if (!dateHelper.isWorkingDay(DateUtil.date())) {
             log.info("当前时间{}不是交易日，不需要同步", DateUtil.now());
@@ -113,7 +113,7 @@ public class SystemJob {
         jobInfoBusiness.execJob(JobInfoType.CALL_PROFIT, EntrustType.AUTO.getCode());
     }
 
-    @Scheduled(cron = "1 20 20 ? * 1-5")
+    @Scheduled(cron = "1 40 20 ? * 1-5")
     public void tradePositionHistory() {
         if (!dateHelper.isWorkingDay(DateUtil.date())) {
             log.info("当前时间{}不是交易日，不需要同步", DateUtil.now());

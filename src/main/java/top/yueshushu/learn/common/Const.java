@@ -44,7 +44,7 @@ public class Const {
     public static final String KEY_AUTH_USER_ID = "user_id";
 
     public static final String KEY_AUTH_TOKEN = "auth-token";
-
+    public static final String POSITION_HISTORY = "ph:";
 
 
     private static final String CACHE_KEY_DATA_PREFIX = CACHE_PUBLIC_KEY_PREFIX + "data:";

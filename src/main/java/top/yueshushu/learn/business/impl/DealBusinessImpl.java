@@ -3,20 +3,17 @@ package top.yueshushu.learn.business.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import top.yueshushu.learn.assembler.TradePositionAssembler;
 import top.yueshushu.learn.business.DealBusiness;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.common.SystemConst;
 import top.yueshushu.learn.domain.TradeEntrustDo;
-import top.yueshushu.learn.domain.TradePositionHistoryDo;
 import top.yueshushu.learn.domainservice.TradeEntrustDomainService;
 import top.yueshushu.learn.domainservice.TradePositionDomainService;
 import top.yueshushu.learn.domainservice.TradePositionHistoryDomainService;
-import top.yueshushu.learn.entity.TradeEntrust;
-import top.yueshushu.learn.entity.TradeMoney;
-import top.yueshushu.learn.entity.TradePosition;
-import top.yueshushu.learn.entity.User;
+import top.yueshushu.learn.entity.*;
 import top.yueshushu.learn.enumtype.DealType;
 import top.yueshushu.learn.enumtype.EntrustStatusType;
 import top.yueshushu.learn.message.weixin.service.WeChatService;
@@ -65,6 +62,7 @@ public class DealBusinessImpl implements DealBusiness {
     private TradePositionHistoryDomainService tradePositionHistoryDomainService;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public OutputResult deal(DealRo dealRo) {
         log.info("用户{},试图成交委托单{}", dealRo.getUserId(), dealRo.getId());
         //查询单号信息
@@ -193,11 +191,11 @@ public class DealBusinessImpl implements DealBusiness {
             );
 
             // 查询某个股票最近一天的亏损情况。
-            TradePositionHistoryDo tradePositionHistoryDo = tradePositionHistoryDomainService.getLastRecordByCode(
+            TradePositionHistoryCache tradePositionHistoryCache = stockCacheService.getLastTradePositionByCode(
                     tradePosition.getUserId(), tradePosition.getMockType(), tradePosition.getCode());
             //设置浮动盈亏 昨天亏+ 今日亏。
             tradePosition.setFloatMoney(
-                    BigDecimalUtil.addBigDecimal(tradePositionHistoryDo.getFloatMoney(), tradePosition.getTodayMoney())
+                    BigDecimalUtil.addBigDecimal(tradePositionHistoryCache.getFloatMoney(), tradePosition.getTodayMoney())
             );
             tradePosition.setFloatProportion(BigDecimal.valueOf(-100));
         }else{

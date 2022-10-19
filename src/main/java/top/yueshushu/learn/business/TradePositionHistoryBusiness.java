@@ -14,8 +14,17 @@ import top.yueshushu.learn.response.OutputResult;
 public interface TradePositionHistoryBusiness {
     /**
      * 查询持仓记录历史表
+     *
      * @param tradePositionRo 持仓记录对象
      * @return 查询持仓记录历史表
      */
     OutputResult listHistory(TradePositionRo tradePositionRo);
+
+    /**
+     * 清理缓存信息
+     *
+     * @return
+     */
+    OutputResult clearPhCache();
+
 }

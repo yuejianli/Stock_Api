@@ -196,11 +196,6 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
                             .forEach(
                                     userId -> {
                                         tradePositionBusiness.callProfit(userId, MockType.MOCK);
-                                        try {
-                                            TimeUnit.SECONDS.sleep(1);
-                                        } catch (InterruptedException e) {
-                                            e.printStackTrace();
-                                        }
                                     }
                             );
                     break;

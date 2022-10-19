@@ -31,6 +31,6 @@
     </delete>
 
     <delete id="deleteUseAmoutIsNull">
-        delete from trade_position where use_amount is null or use_amount = 0
+        delete from trade_position where all_amount is null or all_amount = 0
     </delete>
 </mapper>

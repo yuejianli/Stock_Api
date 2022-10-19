@@ -1,5 +1,7 @@
 package top.yueshushu.learn.service.cache;
 
+import top.yueshushu.learn.entity.TradePositionHistoryCache;
+
 import java.math.BigDecimal;
 
 /**
@@ -99,4 +101,17 @@ public interface StockCacheService {
      * @param code 股票代码
      */
     BigDecimal getLastSellCachePrice(String code);
+
+    /**
+     * @param userId   用户编号
+     * @param mockType 类型
+     * @param code     股票代码
+     * @return 返回最近的历史记录
+     */
+    TradePositionHistoryCache getLastTradePositionByCode(Integer userId, Integer mockType, String code);
+
+    /**
+     * 清理缓存信息
+     */
+    void cleanLastTradePositionHistory();
 }

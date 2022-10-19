@@ -2,6 +2,7 @@ package top.yueshushu.learn.business.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import top.yueshushu.learn.assembler.TradePositionAssembler;
 import top.yueshushu.learn.business.RevokeBusiness;
 import top.yueshushu.learn.common.ResultCode;
@@ -42,6 +43,7 @@ public class RevokeBusinessImpl implements RevokeBusiness {
     private TradeEntrustDomainService tradeEntrustDomainService;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public OutputResult revoke(RevokeRo revokeRo) {
         //查询单号信息
         TradeEntrustDo tradeEntrustDo = tradeEntrustDomainService.getById(revokeRo.getId());

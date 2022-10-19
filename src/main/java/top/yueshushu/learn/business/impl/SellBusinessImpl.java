@@ -3,6 +3,7 @@ package top.yueshushu.learn.business.impl;
 import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import top.yueshushu.learn.business.SellBusiness;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.common.SystemConst;
@@ -42,7 +43,9 @@ public class SellBusinessImpl implements SellBusiness {
     private StockService stockService;
     @Resource
     private TradeEntrustDomainService tradeEntrustDomainService;
+
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public OutputResult sell(SellRo sellRo) {
         log.info(">>>试图卖出股票 {},股票信息是:{}", sellRo.getCode(), sellRo);
         Stock stock = stockService.selectByCode(sellRo.getCode());

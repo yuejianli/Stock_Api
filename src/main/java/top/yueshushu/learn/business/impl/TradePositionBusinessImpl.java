@@ -6,6 +6,7 @@ import org.springframework.util.CollectionUtils;
 import top.yueshushu.learn.business.TradePositionBusiness;
 import top.yueshushu.learn.common.SystemConst;
 import top.yueshushu.learn.entity.TradePosition;
+import top.yueshushu.learn.entity.TradePositionHistoryCache;
 import top.yueshushu.learn.enumtype.MockType;
 import top.yueshushu.learn.enumtype.SelectedType;
 import top.yueshushu.learn.enumtype.TradeRealValueType;
@@ -18,6 +19,8 @@ import top.yueshushu.learn.service.TradeMoneyService;
 import top.yueshushu.learn.service.TradePositionService;
 import top.yueshushu.learn.service.cache.StockCacheService;
 import top.yueshushu.learn.service.cache.TradeCacheService;
+import top.yueshushu.learn.util.BigDecimalUtil;
+import top.yueshushu.learn.util.StockRedisUtil;
 import top.yueshushu.learn.util.StockUtil;
 
 import javax.annotation.Resource;
@@ -45,6 +48,8 @@ public class TradePositionBusinessImpl implements TradePositionBusiness {
     private StockSelectedService stockSelectedService;
     @Resource
     private TradeMoneyService tradeMoneyService;
+    @Resource
+    private StockRedisUtil stockRedisUtil;
 
     @Override
     public OutputResult mockList(TradePositionRo tradePositionRo) {
@@ -156,14 +161,27 @@ public class TradePositionBusinessImpl implements TradePositionBusiness {
                                 tradePositionVo.getAllAmount()
                         )
                 );
+
+                // 查询一下，该股票昨天的盈亏数据信息。
+                TradePositionHistoryCache tradePositionHistoryCache =
+                        stockCacheService.getLastTradePositionByCode(tradePositionRo.getUserId(),
+                                tradePositionRo.getMockType(),
+                                tradePositionVo.getCode());
+
                 //设置今日盈亏
-                tradePositionVo.setTodayMoney(
-                        StockUtil.floatMoney(
-                                stockCacheService.getYesterdayCloseCachePrice(tradePositionVo.getCode()),
-                                price,
-                                tradePositionVo.getAllAmount()
-                        )
-                );
+                if (null == tradePositionHistoryCache) {
+                    tradePositionVo.setTodayMoney(
+                            tradePositionVo.getFloatMoney()
+                    );
+                } else {
+                    tradePositionVo.setTodayMoney(
+                            BigDecimalUtil.subBigDecimal(
+                                    tradePositionVo.getFloatMoney(),
+                                    tradePositionHistoryCache.getFloatMoney()
+                            )
+                    );
+                }
+
             }
             result.addAll(tradePositionVoList);
         }
