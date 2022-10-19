@@ -266,12 +266,6 @@
             <artifactId>spring-boot-starter-velocity</artifactId>
             <version>1.4.7.RELEASE</version>
         </dependency>
-        <!--  百度云OCR文字识别Java-SDK依赖      -->
-        <dependency>
-            <groupId>com.baidu.aip</groupId>
-            <artifactId>java-sdk</artifactId>
-            <version>4.16.11</version>
-        </dependency>
         <dependency>
             <groupId>com.tencentcloudapi</groupId>
             <artifactId>tencentcloud-sdk-java</artifactId>
