@@ -49,4 +49,22 @@
         </if>
         order by t.curr_date desc ,t.code asc
     </select>
+
+    <select id="getLastRecordByCode" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from trade_position_history t
+        where 1=1
+        <if test="userId != null">
+            and user_id = #{userId}
+        </if>
+        <if test="mockType != null">
+            and mock_type = #{mockType}
+        </if>
+        <if test="code != null and code != ''">
+            and t.code=#{code}
+        </if>
+        order by t.curr_date desc
+        limit 1
+    </select>
 </mapper>

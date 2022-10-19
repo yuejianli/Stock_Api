@@ -9,8 +9,10 @@ import top.yueshushu.learn.business.DealBusiness;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.common.SystemConst;
 import top.yueshushu.learn.domain.TradeEntrustDo;
+import top.yueshushu.learn.domain.TradePositionHistoryDo;
 import top.yueshushu.learn.domainservice.TradeEntrustDomainService;
 import top.yueshushu.learn.domainservice.TradePositionDomainService;
+import top.yueshushu.learn.domainservice.TradePositionHistoryDomainService;
 import top.yueshushu.learn.entity.TradeEntrust;
 import top.yueshushu.learn.entity.TradeMoney;
 import top.yueshushu.learn.entity.TradePosition;
@@ -59,6 +61,8 @@ public class DealBusinessImpl implements DealBusiness {
     private WeChatService weChatService;
     @Resource
     private UserService userService;
+    @Resource
+    private TradePositionHistoryDomainService tradePositionHistoryDomainService;
 
     @Override
     public OutputResult deal(DealRo dealRo) {
@@ -168,11 +172,34 @@ public class DealBusinessImpl implements DealBusiness {
         }
 
         //查询一下可用数量
-        if(tradePosition.getAllAmount().equals(tradeEntrustDo.getEntrustNum())){
+        if(tradePosition.getAllAmount().equals(tradeEntrustDo.getEntrustNum())) {
             //说明全卖完了
             log.info("股票{}进行清仓成交", tradePosition.getName());
-            //需要删除
-            tradePositionService.clearById(tradePosition.getId());
+            //不应该删除，需要设置 平均价格为 0, 总数量为0 。
+            //全部卖出时
+            tradePosition.setAllAmount(0);
+            tradePosition.setAvgPrice(BigDecimal.valueOf(0));
+            tradePosition.setPrice(tradeEntrustDo.getEntrustPrice());
+            //设置总的市值
+            tradePosition.setAllMoney(BigDecimal.valueOf(0));
+
+            //设置今日盈亏
+            tradePosition.setTodayMoney(
+                    StockUtil.floatMoney(
+                            stockCacheService.getYesterdayCloseCachePrice(tradePosition.getCode()),
+                            tradeEntrustDo.getEntrustPrice(),
+                            tradeEntrustDo.getEntrustNum()
+                    )
+            );
+
+            // 查询某个股票最近一天的亏损情况。
+            TradePositionHistoryDo tradePositionHistoryDo = tradePositionHistoryDomainService.getLastRecordByCode(
+                    tradePosition.getUserId(), tradePosition.getMockType(), tradePosition.getCode());
+            //设置浮动盈亏 昨天亏+ 今日亏。
+            tradePosition.setFloatMoney(
+                    BigDecimalUtil.addBigDecimal(tradePositionHistoryDo.getFloatMoney(), tradePosition.getTodayMoney())
+            );
+            tradePosition.setFloatProportion(BigDecimal.valueOf(-100));
         }else{
             //修改成本价
             tradePosition.setAvgPrice(

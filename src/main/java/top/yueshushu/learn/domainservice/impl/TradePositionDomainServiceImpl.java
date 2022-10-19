@@ -33,7 +33,10 @@ public class TradePositionDomainServiceImpl extends ServiceImpl<TradePositionDoM
     }
     @Override
     public void syncUseAmountByXxlJob() {
-         tradePositionDoMapper.syncUseAmount();;
+        // 删除可用数量为 0 的数据。
+        tradePositionDoMapper.deleteUseAmoutIsNull();
+        tradePositionDoMapper.syncUseAmount();
+        ;
     }
 
     @Override

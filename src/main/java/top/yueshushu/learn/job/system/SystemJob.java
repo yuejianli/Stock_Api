@@ -76,7 +76,7 @@ public class SystemJob {
         jobInfoBusiness.execJob(JobInfoType.STOCK_HISTORY, EntrustType.AUTO.getCode());
     }
 
-    @Scheduled(cron = "1/30 * 9,10,11,13,14 ? * 1-5")
+    @Scheduled(cron = "1/10 * 9,10,11,13,14 ? * 1-5")
     public void stockPrice() {
         //获取当前的股票信息。取第一个值.
         if (xxlJobTime) {

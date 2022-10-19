@@ -25,4 +25,9 @@ public interface TradePositionDoMapper extends BaseMapper<TradePositionDo> {
      * @param mockType 交易类型
      */
     void deleteByUserIdAndMockType(@Param("userId") Integer userId, @Param("mockType") Integer mockType);
+
+    /**
+     * 删除可用数量为 0 的记录信息
+     */
+    void deleteUseAmoutIsNull();
 }

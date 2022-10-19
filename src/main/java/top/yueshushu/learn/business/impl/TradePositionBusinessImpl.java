@@ -89,7 +89,6 @@ public class TradePositionBusinessImpl implements TradePositionBusiness {
         List<TradePositionVo> tradePositionVoList = (List<TradePositionVo>) mockList(tradePositionRo).getData();
 
         // 更新股票的持仓信息.
-
         if (CollectionUtils.isEmpty(tradePositionVoList)) {
             return;
         }
@@ -105,8 +104,12 @@ public class TradePositionBusinessImpl implements TradePositionBusiness {
             tempPosition.setFloatMoney(tradePositionVo.getFloatMoney());
             tempPosition.setFloatProportion(tradePositionVo.getFloatProportion());
             tempPosition.setTodayMoney(tradePositionVo.getTodayMoney());
-            tradePositionService.updateById(tempPosition);
             todayMoneySum = todayMoneySum.add(tradePositionVo.getTodayMoney());
+
+            // 进行一下更新，否则的话，不进行更新。
+            if (tempPosition.getAllAmount() > 0) {
+                tradePositionService.updateById(tempPosition);
+            }
         }
         tradeMoneyService.updateToDayMoney(userId, mockType, todayMoneySum);
     }
@@ -123,10 +126,14 @@ public class TradePositionBusinessImpl implements TradePositionBusiness {
         List<TradePositionVo> result = new ArrayList<>();
         if(!CollectionUtils.isEmpty(tradePositionVoList)){
             //进行获取，补全相关的信息
-            for(TradePositionVo tradePositionVo:tradePositionVoList){
+            for(TradePositionVo tradePositionVo:tradePositionVoList) {
                 //进行补充数据
                 BigDecimal price = stockCacheService.getNowCachePrice(tradePositionVo.getCode());
                 tradePositionVo.setPrice(price);
+                tradePositionVo.setSelectType(SelectedType.POSITION.getCode());
+                if (tradePositionVo.getAllAmount() == 0) {
+                    continue;
+                }
                 //设置总的市值
                 tradePositionVo.setAllMoney(
                         StockUtil.allMoney(
@@ -157,8 +164,6 @@ public class TradePositionBusinessImpl implements TradePositionBusiness {
                                 tradePositionVo.getAllAmount()
                         )
                 );
-
-                tradePositionVo.setSelectType(SelectedType.POSITION.getCode());
             }
             result.addAll(tradePositionVoList);
         }

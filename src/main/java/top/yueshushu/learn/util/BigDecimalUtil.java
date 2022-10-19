@@ -171,12 +171,29 @@ public class BigDecimalUtil {
 
     /**
      * 将 BigDecimal 转换成 double
+     *
      * @param bigDecimal 值1
      * @return
      */
-    public static double toDouble (BigDecimal bigDecimal) {
+    public static double toDouble(BigDecimal bigDecimal) {
         Assert.notNull(bigDecimal, "格式化的源 bigDecimal 不能为空");
         return bigDecimal.setScale(4, BigDecimal.ROUND_HALF_UP)
                 .doubleValue();
+    }
+
+    /**
+     * 将 BigDecimal 转换成 double
+     *
+     * @param bigDecimal 值1
+     * @return
+     */
+    public static boolean isZero(BigDecimal bigDecimal) {
+        if (bigDecimal == null) {
+            return true;
+        }
+        if (bigDecimal.compareTo(BigDecimal.valueOf(1)) < 1) {
+            return true;
+        }
+        return false;
     }
 }

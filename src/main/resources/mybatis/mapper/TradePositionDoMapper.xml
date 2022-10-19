@@ -30,4 +30,7 @@
         delete from trade_position where user_id =#{userId} and mock_type =#{mockType}
     </delete>
 
+    <delete id="deleteUseAmoutIsNull">
+        delete from trade_position where use_amount is null or use_amount = 0
+    </delete>
 </mapper>

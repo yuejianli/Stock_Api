@@ -1,13 +1,11 @@
 package top.yueshushu.learn.mapper;
 
+import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-
 import org.apache.ibatis.annotations.Param;
+import top.yueshushu.learn.domain.TradePositionHistoryDo;
 
 import java.util.List;
-
-import cn.hutool.core.date.DateTime;
-import top.yueshushu.learn.domain.TradePositionHistoryDo;
 
 /**
  * <p>
@@ -45,4 +43,15 @@ public interface TradePositionHistoryDoMapper extends BaseMapper<TradePositionHi
      */
     void deleteByUserIdAndMockTypeAndDate(@Param("userId") Integer userId, @Param("mockType") Integer mockType,
                                           @Param("currDate") DateTime currDate);
+
+    /**
+     * 查询股票最后一次的持仓信息
+     *
+     * @param userId   用户编号
+     * @param mockType 交易类型
+     * @param code     股票编码
+     */
+    TradePositionHistoryDo getLastRecordByCode(@Param("userId") Integer userId, @Param("mockType") Integer mockType, @Param("code") String code);
+
+
 }
