@@ -3,8 +3,13 @@ package top.yueshushu.learn.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import top.yueshushu.learn.business.TradeMethodBusiness;
+import top.yueshushu.learn.crawler.util.HttpUtil;
 import top.yueshushu.learn.entity.TradeMethod;
 import top.yueshushu.learn.enumtype.TradeMethodType;
 import top.yueshushu.learn.mode.ro.TradeMethodRo;
@@ -13,6 +18,8 @@ import top.yueshushu.learn.util.RedisUtil;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.MessageFormat;
 
 /**
@@ -32,6 +39,9 @@ public class TradeMethodController {
     private TradeMethodBusiness tradeMethodBusiness;
     @Resource
     private RedisUtil redisUtil;
+    @Resource
+    private CloseableHttpClient httpClient;
+
 
     @PostMapping("/list")
     @ApiOperation("查询提供的交易方法")
@@ -58,6 +68,16 @@ public class TradeMethodController {
 
         redisUtil.set(httpSession.getId() + "RAND_NUM", randNum);
         redisUtil.set(httpSession.getId() + "RA", raNum);
-        return OutputResult.buildSucc(yzmUrl);
+
+        // 对网址进行处理,返回一个 base64 的数据信息。
+
+        try (CloseableHttpResponse response = HttpUtil.sendGetResponse(httpClient, yzmUrl)) {
+            InputStream in = response.getEntity().getContent();
+            byte[] buf = FileCopyUtils.copyToByteArray(in);
+            String base64 = Base64.encodeBase64String(buf);
+            return OutputResult.buildSucc(base64);
+        } catch (IOException e) {
+            return OutputResult.buildFail();
+        }
     }
 }

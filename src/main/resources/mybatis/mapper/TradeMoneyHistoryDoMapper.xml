@@ -52,4 +52,11 @@
         order by t.curr_date desc
         limit 1
     </select>
+
+    <delete id="deleteByUserIdAndMockTypeAndDate">
+       delete from trade_money_history
+        where user_id=#{userId}
+        and mock_type = #{mockType}
+        and date_format(curr_date,'%Y%m%d') = date_format( #{currDate,jdbcType=TIMESTAMP},'%Y%m%d')
+    </delete>
 </mapper>

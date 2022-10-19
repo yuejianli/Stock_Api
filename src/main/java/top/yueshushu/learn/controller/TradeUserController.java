@@ -40,9 +40,6 @@ public class TradeUserController extends BaseController {
     public OutputResult login(@RequestBody TradeUserRo tradeUserRo, HttpSession httpSession) {
 
         // 对数据进行 check
-        if (!StringUtils.hasText(tradeUserRo.getPassword())) {
-            return OutputResult.buildAlert(ResultCode.TRADE_PASSWORD_IS_EMPTY);
-        }
         if (!StringUtils.hasText(tradeUserRo.getIdentifyCode())) {
             return OutputResult.buildAlert(ResultCode.TRADE_IDENTIFY_CODE_IS_EMPTY);
         }

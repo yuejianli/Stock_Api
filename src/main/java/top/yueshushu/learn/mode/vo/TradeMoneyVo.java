@@ -1,9 +1,5 @@
 package top.yueshushu.learn.mode.vo;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -31,6 +27,8 @@ public class TradeMoneyVo implements Serializable {
     private BigDecimal marketMoney;
     @ApiModelProperty("可取金额")
     private BigDecimal takeoutMoney;
+    @ApiModelProperty("亏损金额")
+    private BigDecimal profitMoney;
     @ApiModelProperty(" 虚拟类型 1为虚拟 0为真实")
     private Integer mockType;
 

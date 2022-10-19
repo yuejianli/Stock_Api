@@ -1,10 +1,10 @@
 package top.yueshushu.learn.entity;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-
-import lombok.Data;
 
 /**
  * <p>
@@ -29,6 +29,7 @@ public class TradeMoneyHistory implements Serializable {
 	
 	private BigDecimal marketMoney;
 	private BigDecimal takeoutMoney;
+	private BigDecimal profitMoney;
 	private Integer userId;
 	private Integer mockType;
 	

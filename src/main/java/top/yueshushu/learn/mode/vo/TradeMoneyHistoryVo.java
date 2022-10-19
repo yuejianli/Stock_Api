@@ -1,14 +1,13 @@
 package top.yueshushu.learn.mode.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
 
 /**
  * @ClassName:TradeMoneyVo
@@ -35,7 +34,9 @@ public class TradeMoneyHistoryVo implements Serializable {
     private BigDecimal marketMoney;
     @ApiModelProperty("可取金额")
     private BigDecimal takeoutMoney;
+    @ApiModelProperty("可取金额")
+    private BigDecimal profitMoney;
     @ApiModelProperty(" 虚拟类型 1为虚拟 0为真实")
     private Integer mockType;
-    
+
 }

@@ -26,6 +26,7 @@ public class TradeMoney implements Serializable {
 
     private BigDecimal marketMoney;
     private BigDecimal takeoutMoney;
+    private BigDecimal profitMoney;
     private Integer userId;
     private Integer mockType;
 

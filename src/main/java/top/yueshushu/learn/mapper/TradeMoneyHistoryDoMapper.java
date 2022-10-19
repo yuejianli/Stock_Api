@@ -25,14 +25,23 @@ public interface TradeMoneyHistoryDoMapper extends BaseMapper<TradeMoneyHistoryD
 	 * @param endDate   结束日期
 	 */
 	List<TradeMoneyHistoryDo> listMoneyHistory(@Param("userId") Integer userId, @Param("mockType") Integer mockType,
-											   @Param("startDate") DateTime startDate, @Param("endDate") DateTime endDate);
+                                               @Param("startDate") DateTime startDate, @Param("endDate") DateTime endDate);
 
-	/**
-	 * 获取该日前前的最近一条记录信息
-	 *
-	 * @param userId   用户id
-	 * @param mockType 类型
-	 * @param currDate 日期
-	 */
-	TradeMoneyHistoryDo getLastRecord(@Param("userId") Integer userId, @Param("mockType") Integer mockType, @Param("currDate") DateTime currDate);
+    /**
+     * 获取该日前前的最近一条记录信息
+     *
+     * @param userId   用户id
+     * @param mockType 类型
+     * @param currDate 日期
+     */
+    TradeMoneyHistoryDo getLastRecord(@Param("userId") Integer userId, @Param("mockType") Integer mockType, @Param("currDate") DateTime currDate);
+
+    /**
+     * 删除金额历史信息
+     *
+     * @param userId   用户编号
+     * @param mockType 类型
+     * @param currDate 日期
+     */
+    void deleteByUserIdAndMockTypeAndDate(@Param("userId") Integer userId, @Param("mockType") Integer mockType, @Param("currDate") DateTime currDate);
 }

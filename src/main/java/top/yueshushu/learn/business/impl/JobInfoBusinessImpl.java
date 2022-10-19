@@ -92,7 +92,7 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
         }
         // 禁用状态，不执行。
         if (!DataFlagType.NORMAL.getCode().equals(jobInfo.getTriggerStatus())) {
-            log.info(">>当前任务 {}是禁用状态，不执行", jobInfoType.getDesc());
+            // log.info(">>当前任务 {}是禁用状态，不执行", jobInfoType.getDesc());
             return OutputResult.buildAlert(ResultCode.JOB_ID_NOT_EXIST);
         }
         jobInfo.setTriggerLastTime(DateUtil.date().toLocalDateTime());

@@ -30,11 +30,7 @@ public class TradeMoneyHistoryDomainServiceImpl extends ServiceImpl<TradeMoneyHi
 
     @Override
     public void deleteByUserIdAndMockTypeAndDate(Integer userId, Integer mockType, DateTime currDate) {
-        this.lambdaUpdate()
-                .eq(TradeMoneyHistoryDo::getUserId, userId)
-                .eq(TradeMoneyHistoryDo::getCurrDate, currDate)
-                .eq(TradeMoneyHistoryDo::getMockType, mockType)
-                .remove();
+         tradeMoneyHistoryDoMapper.deleteByUserIdAndMockTypeAndDate(userId, mockType, currDate);
     }
 
     @Override
