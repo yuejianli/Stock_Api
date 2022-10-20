@@ -47,7 +47,7 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
     private UserDoMapper userDoMapper;
     @Autowired
     private JwtUtils jwtUtils;
-    @Value("${login.noLoginUrl:www.yueshushu.top/Stock/login.html}")
+    @Value("${login.noLoginUrl:/Stock/login.html}")
     private String noLoginUrl;
 
     @Override

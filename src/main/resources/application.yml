@@ -124,7 +124,7 @@ jwt:
   ttl: "3600000"
 # 跳转到某个页面
 login:
-  noLoginUrl: http://www.yueshushu.top/Stock/login.html
+  noLoginUrl: /Stock/login.html
 #配置 swagger
 swagger:
   show: true
@@ -175,3 +175,13 @@ jasypt:
 tianxing:
   key1: bdea38f89ed9d2f98f626225ffe453f4
   key2: 682b53e4b8e13c01a94200c5815c49e4
+ocr:
+  service: txOcrService
+  path: /usr/app/orc/
+  third:
+    aliyun:
+      appcode:
+    chaojiying:
+      user:
+      pass:
+      softid: 000000
