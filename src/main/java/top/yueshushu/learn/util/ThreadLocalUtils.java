@@ -1,5 +1,6 @@
 package top.yueshushu.learn.util;
-import top.yueshushu.learn.domain.UserDo;
+import top.yueshushu.learn.common.Const;
+import top.yueshushu.learn.entity.User;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,9 +40,9 @@ public class ThreadLocalUtils {
     /**
      * 获取当前用户
      */
-    public static UserDo getUser() {
+    public static User getUser() {
         Map<String, Object> map = THREAD_LOCAL.get();
-        return (UserDo) map.get("user");
+        return (User) map.get("user");
     }
 
     public static void release() {
@@ -54,14 +55,10 @@ public class ThreadLocalUtils {
 
     /**
      * 如果当前用户没有登录，则默认为1
-     * todo 需要处理，改成必须登录才可以使用的。
-     * @return
      *
      */
     public static Integer getUserId() {
         Integer userId = get("userId");
-        return Optional.ofNullable(
-                userId
-        ).orElse(1);
+        return Optional.ofNullable(userId).orElse(Const.DEFAULT_USER_ID);
     }
 }

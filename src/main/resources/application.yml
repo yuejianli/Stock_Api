@@ -124,7 +124,7 @@ jwt:
   ttl: "3600000"
 # 跳转到某个页面
 login:
-  noLoginUrl: /Stock/login.html
+  noLoginUrl: https://www.yueshushu.top/Stock/login.html
 #配置 swagger
 swagger:
   show: true

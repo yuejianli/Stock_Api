@@ -1,7 +1,12 @@
 package top.yueshushu.learn.controller;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * @ClassName:PageController
@@ -12,12 +17,31 @@ import org.springframework.web.bind.annotation.RequestMapping;
  **/
 @Controller
 public class PageController {
+
+    @Value("${login.noLoginUrl}")
+    private String noLoginUrl;
+
     /**
      * 跳转到首页
+     *
      * @return
      */
     @RequestMapping("/")
-    public String index(){
+    public String index() {
         return "page";
+    }
+
+    /**
+     * 跳转到首页
+     *
+     * @return
+     */
+    @RequestMapping("/redirect")
+    public void redirect(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        try {
+            httpServletResponse.sendRedirect(noLoginUrl);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

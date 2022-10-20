@@ -29,7 +29,7 @@ public class Const {
     public static final String X_REAL_IP = "x-real-ip";
     public static final int TOKEN_EXPIRE_TIME = 7 * 24 * 3600;
 
-    public static final int YZM_TIME = 60;
+    public static final int YZM_TIME = 30;
     //采用的是 md5 加密
     public static final String FOR_ALL_TIME_TOKEN = "b91f1d0a2849df8430e13bd12f80287a";
 

@@ -4,6 +4,7 @@ package top.yueshushu.learn.interceptor;
  * @author yuejianli
  * @Date: 2022-05-20
  */
+
 import cn.hutool.crypto.digest.DigestUtil;
 import com.alibaba.fastjson.JSONObject;
 import io.jsonwebtoken.Claims;
@@ -12,15 +13,15 @@ import io.jsonwebtoken.MalformedJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 import top.yueshushu.learn.annotation.AuthToken;
+import top.yueshushu.learn.assembler.UserAssembler;
 import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.common.ResultCode;
-import top.yueshushu.learn.domain.UserDo;
+import top.yueshushu.learn.entity.User;
 import top.yueshushu.learn.mapper.UserDoMapper;
 import top.yueshushu.learn.util.JwtUtils;
 import top.yueshushu.learn.util.RedisUtil;
@@ -29,7 +30,6 @@ import top.yueshushu.learn.util.ThreadLocalUtils;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
 
@@ -45,10 +45,10 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
     private RedisUtil redisUtil;
     @Resource
     private UserDoMapper userDoMapper;
+    @Resource
+    private UserAssembler userAssembler;
     @Autowired
     private JwtUtils jwtUtils;
-    @Value("${login.noLoginUrl:/Stock/login.html}")
-    private String noLoginUrl;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
@@ -63,15 +63,15 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
 
             String token = request.getHeader(httpHeaderName);
             String ip = request.getHeader(Const.X_REAL_IP);
-            UserDo currentUserDo = null;
+            User loginUser = null;
             if (StringUtils.isNotBlank(token)) {
                 // 是永久生效的token
                 if (Const.FOR_ALL_TIME_TOKEN.equalsIgnoreCase(DigestUtil.md5Hex(token))) {
-                    currentUserDo = userDoMapper.selectById(Const.DEFAULT_USER_ID);
+                    loginUser = userAssembler.doToEntity(userDoMapper.selectById(Const.DEFAULT_USER_ID));
                     isForAllTimeUser = true;
                 } else {
-                    currentUserDo = redisUtil.get(token);
-                    if (currentUserDo == null) {
+                    loginUser = redisUtil.get(token);
+                    if (loginUser == null) {
                         Claims claims;
                         try {
                             claims = jwtUtils.parseJwt(token);
@@ -90,27 +90,27 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
                     }
                 }
             }
-            if (StringUtils.isBlank(token) || currentUserDo == null) {
+            if (StringUtils.isBlank(token) || loginUser == null) {
                 isFalse(request, response);
                 return false;
             }
-            String userDoAccount = currentUserDo.getAccount();
+            String userDoAccount = loginUser.getAccount();
             ThreadLocalUtils.put("userDoAccount", userDoAccount);
             ThreadLocalUtils.put("ip", ip == null ? request.getRemoteAddr() : ip);
-            ThreadLocalUtils.put("user", currentUserDo);
+            ThreadLocalUtils.put("user", loginUser);
             ThreadLocalUtils.put("token", token);
 
             if (isForAllTimeUser) {
                 return true;
             }
 
-            long tokeBirthTime = Long.parseLong(redisUtil.get(token + userDoAccount));
+            long tokeBirthTime = redisUtil.get(token + "_" + userDoAccount);
             long diff = System.currentTimeMillis() - tokeBirthTime;
 
             if (diff < Const.TOKEN_EXPIRE_TIME * 1000) {
                 long newBirthTime = System.currentTimeMillis();
-                redisUtil.set(token + userDoAccount, Long.toString(newBirthTime), Const.TOKEN_EXPIRE_TIME);
-                redisUtil.set(token, currentUserDo, Const.TOKEN_EXPIRE_TIME);
+                redisUtil.set(token + "_" + userDoAccount, newBirthTime, Const.TOKEN_EXPIRE_TIME);
+                redisUtil.set(token, loginUser, Const.TOKEN_EXPIRE_TIME);
                 request.setAttribute(REQUEST_CURRENT_KEY, userDoAccount);
                 return true;
             } else {
@@ -132,55 +132,49 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
     }
 
     private void isFalse(HttpServletRequest httpServletRequest, HttpServletResponse response) {
+        JSONObject jsonObject = new JSONObject();
+        PrintWriter out = null;
         try {
-            response.sendRedirect(noLoginUrl);
-        } catch (IOException e1) {
-            JSONObject jsonObject = new JSONObject();
-            PrintWriter out = null;
-            try {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                response.setCharacterEncoding("utf-8");
-                jsonObject.put("code", ResultCode.LOGIN_EXPIRE.getCode());
-                jsonObject.put("message", ResultCode.LOGIN_EXPIRE.getMessage());
-                //添加其余的两个属性  success和 data
-                jsonObject.put("data", "");
-                jsonObject.put("success", false);
-                out = response.getWriter();
-                out.println(jsonObject);
-            } catch (Exception e) {
-                log.error("发生异常{}", e);
-            } finally {
-                if (out != null) {
-                    out.flush();
-                    out.close();
-                }
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.setCharacterEncoding("utf-8");
+            jsonObject.put("code", ResultCode.LOGIN_EXPIRE.getCode());
+            jsonObject.put("message", ResultCode.LOGIN_EXPIRE.getMessage());
+            //添加其余的两个属性  success和 data
+            jsonObject.put("data", "");
+            jsonObject.put("success", false);
+            out = response.getWriter();
+            out.println(jsonObject);
+        } catch (Exception e) {
+            log.error("发生异常{}", e);
+        } finally {
+            if (out != null) {
+                out.flush();
+                out.close();
             }
         }
     }
-
     private void isUnValid(HttpServletRequest httpServletRequest, HttpServletResponse response) {
-        isFalse(httpServletRequest, response);
-//        JSONObject jsonObject = new JSONObject();
-//        PrintWriter out = null;
-//        try {
-//            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-//            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-//            response.setCharacterEncoding("utf-8");
-//            jsonObject.put("code", ResultCode.ACCOUNT_IS_OFFLINE.getCode());
-//            jsonObject.put("message", ResultCode.ACCOUNT_IS_OFFLINE.getMessage());
-//            //添加其余的两个属性  success和 data, 解决 PDA端无法翻译 退出的问题。 @zk_yjl
-//            jsonObject.put("data","");
-//            jsonObject.put("success",false);
-//            out = response.getWriter();
-//            out.println(jsonObject);
-//        } catch (Exception e) {
-//            log.error("发生异常", e);
-//        } finally {
-//            if (out != null) {
-//                out.flush();
-//                out.close();
-//            }
-//        }
+        JSONObject jsonObject = new JSONObject();
+        PrintWriter out = null;
+        try {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.setCharacterEncoding("utf-8");
+            jsonObject.put("code", ResultCode.ACCOUNT_IS_OFFLINE.getCode());
+            jsonObject.put("message", ResultCode.ACCOUNT_IS_OFFLINE.getMessage());
+            //添加其余的两个属性  success和 data, 解决 PDA端无法翻译 退出的问题。 @zk_yjl
+            jsonObject.put("data", "");
+            jsonObject.put("success", false);
+            out = response.getWriter();
+            out.println(jsonObject);
+        } catch (Exception e) {
+            log.error("发生异常", e);
+        } finally {
+            if (out != null) {
+                out.flush();
+                out.close();
+            }
+        }
     }
 }
