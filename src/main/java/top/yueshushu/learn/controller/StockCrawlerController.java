@@ -6,11 +6,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import top.yueshushu.learn.annotation.AuthToken;
 import top.yueshushu.learn.business.StockCrawlerBusiness;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.mode.info.StockShowInfo;
-import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.mode.ro.StockRo;
+import top.yueshushu.learn.response.OutputResult;
 
 import javax.annotation.Resource;
 
@@ -53,6 +54,7 @@ public class StockCrawlerController {
     }
     @ApiOperation("股票列表同步")
     @PostMapping("/stockAsync")
+    @AuthToken
     public OutputResult<String> stockAsync(@RequestBody StockRo stockRo) {
         return stockCrawlerBusiness.stockAsync(stockRo);
     }
@@ -61,6 +63,7 @@ public class StockCrawlerController {
      */
     @ApiOperation("同步股票的历史记录")
     @PostMapping("/stockHistoryAsync")
+    @AuthToken
     public OutputResult<String> stockHistoryAsync(@RequestBody StockRo stockRo) {
         if (!StringUtils.hasText(stockRo.getCode())){
             return OutputResult.buildAlert(

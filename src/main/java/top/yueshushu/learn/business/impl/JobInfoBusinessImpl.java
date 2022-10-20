@@ -2,18 +2,19 @@ package top.yueshushu.learn.business.impl;
 
 import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import top.yueshushu.learn.business.DealBusiness;
 import top.yueshushu.learn.business.JobInfoBusiness;
 import top.yueshushu.learn.business.TradePositionBusiness;
+import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.entity.JobInfo;
 import top.yueshushu.learn.enumtype.DataFlagType;
 import top.yueshushu.learn.enumtype.EntrustType;
 import top.yueshushu.learn.enumtype.JobInfoType;
 import top.yueshushu.learn.enumtype.MockType;
-import top.yueshushu.learn.helper.DateHelper;
 import top.yueshushu.learn.message.weixin.service.WeChatService;
 import top.yueshushu.learn.mode.ro.BuyRo;
 import top.yueshushu.learn.mode.ro.DealRo;
@@ -48,8 +49,6 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
     @Resource
     private TradePositionService tradePositionService;
     @Resource
-    private DateHelper dateHelper;
-    @Resource
     private StockSelectedService stockSelectedService;
     @Resource
     private UserService userService;
@@ -67,6 +66,10 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
     private TradeMoneyService tradeMoneyService;
     @Resource
     private TradePositionBusiness tradePositionBusiness;
+
+    @SuppressWarnings("all")
+    @Resource(name = Const.ASYNC_SERVICE_EXECUTOR_BEAN_NAME)
+    private AsyncTaskExecutor executor;
 
 
     @Override
@@ -247,6 +250,12 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
     public OutputResult handlerById(Integer id) {
         //立即执行
         JobInfo job = jobInfoService.getById(id);
-        return execJob(JobInfoType.getJobInfoType(job.getCode()), EntrustType.HANDLER.getCode());
+
+        executor.submit(
+                () -> {
+                    execJob(JobInfoType.getJobInfoType(job.getCode()), EntrustType.HANDLER.getCode());
+                }
+        );
+        return OutputResult.buildSucc();
     }
 }

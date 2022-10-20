@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import top.yueshushu.learn.annotation.AuthToken;
 import top.yueshushu.learn.business.ConfigBusiness;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.mode.ro.ConfigRo;
@@ -38,6 +39,7 @@ public class ConfigController extends BaseController {
 
     @PostMapping("/update")
     @ApiOperation("修改配置参数")
+    @AuthToken
     public OutputResult update(@RequestBody ConfigRo configRo) {
         configRo.setUserId(getUserId());
         if (configRo.getId() == null){
@@ -50,6 +52,7 @@ public class ConfigController extends BaseController {
 
     @PostMapping("/reset")
     @ApiOperation("自定义配置信息重置")
+    @AuthToken
     public OutputResult reset(@RequestBody ConfigRo configRo) {
         configRo.setUserId(getUserId());
         if (configRo.getId() == null){

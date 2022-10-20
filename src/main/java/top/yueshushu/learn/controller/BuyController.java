@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import top.yueshushu.learn.annotation.AuthToken;
 import top.yueshushu.learn.business.BuyBusiness;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.mode.ro.BuyRo;
@@ -31,6 +32,7 @@ public class BuyController extends BaseController {
     private BuyBusiness buyBusiness;
     @PostMapping("/buy")
     @ApiOperation("买入股票信息")
+    @AuthToken
     public OutputResult buy(@RequestBody BuyRo buyRo){
         buyRo.setUserId(getUserId());
         if(!StringUtils.hasText(buyRo.getCode())){

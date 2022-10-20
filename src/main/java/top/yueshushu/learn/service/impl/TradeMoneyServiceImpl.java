@@ -23,6 +23,7 @@ import top.yueshushu.learn.mode.ro.TradeMoneyRo;
 import top.yueshushu.learn.mode.vo.TradeMoneyVo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.service.TradeMoneyService;
+import top.yueshushu.learn.service.cache.StockCacheService;
 import top.yueshushu.learn.util.TradeUtil;
 
 import javax.annotation.Resource;
@@ -57,14 +58,15 @@ public class TradeMoneyServiceImpl implements TradeMoneyService {
     private TradeMoneyHistoryAssembler tradeMoneyHistoryAssembler;
     @Resource
     private TradeMoneyHistoryDomainService tradeMoneyHistoryDomainService;
-    
-    
+    @Resource
+    private StockCacheService stockCacheService;
+
     @Override
     public void updateMoney(TradeMoney tradeMoney) {
         //进行修改
         tradeMoneyDomainService.updateById(tradeMoneyAssembler.entityToDo(tradeMoney));
     }
-    
+
     @Override
     public TradeMoney getByUserIdAndMockType(Integer userId, Integer mockType) {
 
@@ -122,7 +124,7 @@ public class TradeMoneyServiceImpl implements TradeMoneyService {
         DateTime now = DateUtil.date();
         //获取昨天的金额信息,如果没有记录,则 返回 0
 
-        TradeMoneyHistoryDo tradeHistoryLastDo = tradeMoneyHistoryDomainService.getLastRecordProfit(userId, mockType.getCode(), now);
+        TradeMoneyHistoryDo tradeHistoryLastDo = Optional.ofNullable(tradeMoneyHistoryDomainService.getLastRecordProfit(userId, mockType.getCode(), now)).orElse(new TradeMoneyHistoryDo());
 
         // 昨天的,与今天的相加,就是今天的亏损信息.
         TradeMoneyDo tradeMoneyDo = tradeMoneyDomainService.getByUserIdAndMockType(

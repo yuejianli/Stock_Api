@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import top.yueshushu.learn.annotation.AuthToken;
 import top.yueshushu.learn.business.StockSelectedBusiness;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.mode.ro.IdRo;
@@ -34,6 +35,7 @@ public class StockSelectedController extends BaseController{
 
     @PostMapping("/list")
     @ApiOperation("查询自选表信息")
+    @AuthToken
     public OutputResult list(@RequestBody StockSelectedRo stockSelectedRo){
         stockSelectedRo.setUserId(getUserId());
         return stockSelectedBusiness.listSelected(stockSelectedRo);
@@ -41,6 +43,7 @@ public class StockSelectedController extends BaseController{
 
     @PostMapping("/yesHistory")
     @ApiOperation("查询当前自选表里面的记录信息")
+    @AuthToken
     public OutputResult yesHistory(@RequestBody StockSelectedRo stockSelectedRo){
         stockSelectedRo.setUserId(getUserId());
         return stockSelectedBusiness.yesHistory(stockSelectedRo);
@@ -48,6 +51,7 @@ public class StockSelectedController extends BaseController{
 
     @PostMapping("/add")
     @ApiOperation("添加到自选表")
+    @AuthToken
     public OutputResult add(@RequestBody StockSelectedRo stockSelectedRo){
         if (!StringUtils.hasText(stockSelectedRo.getStockCode())){
             return OutputResult.buildAlert(ResultCode.STOCK_CODE_IS_EMPTY);
@@ -57,6 +61,7 @@ public class StockSelectedController extends BaseController{
     }
     @PostMapping("/delete")
     @ApiOperation("单个移出自选表")
+    @AuthToken
     public OutputResult delete(@RequestBody IdRo idRo){
         if (idRo.getId() == null){
             return OutputResult.buildAlert(ResultCode.ID_IS_EMPTY);
@@ -65,6 +70,7 @@ public class StockSelectedController extends BaseController{
     }
     @PostMapping("/deleteByCode")
     @ApiOperation("根据股票code进行移除,股票页面使用")
+    @AuthToken
     public OutputResult deleteByCode(@RequestBody StockSelectedRo stockSelectedRo){
         stockSelectedRo.setUserId(getUserId());
         if (!StringUtils.hasText(stockSelectedRo.getStockCode())){
@@ -77,6 +83,7 @@ public class StockSelectedController extends BaseController{
 
     @PostMapping("/editNotes")
     @ApiOperation("根据自选记录，编辑笔记")
+    @AuthToken
     public OutputResult editNotes(@RequestBody StockSelectedRo stockSelectedRo){
         stockSelectedRo.setUserId(getUserId());
         if (stockSelectedRo.getId() == null){

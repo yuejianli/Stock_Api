@@ -27,6 +27,7 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -177,7 +178,7 @@ public class TradePositionBusinessImpl implements TradePositionBusiness {
                     tradePositionVo.setTodayMoney(
                             BigDecimalUtil.subBigDecimal(
                                     tradePositionVo.getFloatMoney(),
-                                    tradePositionHistoryCache.getFloatMoney()
+                                    Optional.ofNullable(tradePositionHistoryCache.getFloatMoney()).orElse(BigDecimal.ZERO)
                             )
                     );
                 }

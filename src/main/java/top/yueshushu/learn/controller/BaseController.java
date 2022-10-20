@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ObjectUtils;
 import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.util.RedisUtil;
+import top.yueshushu.learn.util.ThreadLocalUtils;
 
 public abstract class BaseController {
     @Autowired
@@ -16,6 +17,11 @@ public abstract class BaseController {
      * @return 设置当前的用户信息
      */
     protected Integer getUserId() {
+
+        Integer userId = ThreadLocalUtils.getUserId();
+        if (userId != null) {
+            return userId;
+        }
         Object redisCacheUserId = redisUtil.get(Const.KEY_AUTH_USER_ID);
 
         if (ObjectUtils.isEmpty(redisCacheUserId)) {

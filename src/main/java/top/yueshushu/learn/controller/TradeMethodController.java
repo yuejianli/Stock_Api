@@ -8,7 +8,9 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
+import top.yueshushu.learn.annotation.AuthToken;
 import top.yueshushu.learn.business.TradeMethodBusiness;
+import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.crawler.util.HttpUtil;
 import top.yueshushu.learn.entity.TradeMethod;
 import top.yueshushu.learn.enumtype.TradeMethodType;
@@ -45,6 +47,7 @@ public class TradeMethodController {
 
     @PostMapping("/list")
     @ApiOperation("查询提供的交易方法")
+    @AuthToken
     public OutputResult list(@RequestBody TradeMethodRo tradeMethodRo) {
         return tradeMethodBusiness.list(tradeMethodRo);
     }
@@ -66,8 +69,8 @@ public class TradeMethodController {
 
         String yzmUrl = MessageFormat.format(url, randNum, raNum);
 
-        redisUtil.set(httpSession.getId() + "RAND_NUM", randNum);
-        redisUtil.set(httpSession.getId() + "RA", raNum);
+        redisUtil.set(httpSession.getId() + "RAND_NUM", randNum, Const.YZM_TIME);
+        redisUtil.set(httpSession.getId() + "RA", raNum, Const.YZM_TIME);
 
         // 对网址进行处理,返回一个 base64 的数据信息。
 

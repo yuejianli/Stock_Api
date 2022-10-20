@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import top.yueshushu.learn.annotation.AuthToken;
 import top.yueshushu.learn.business.HolidayCalendarBusiness;
 import top.yueshushu.learn.mode.ro.HolidayRo;
 import top.yueshushu.learn.response.OutputResult;
@@ -36,6 +37,7 @@ public class HolidayCalendarController {
 
     @PostMapping("/sync")
     @ApiOperation("同步假期")
+    @AuthToken
     public OutputResult sync(@RequestBody HolidayRo holidayRo) {
         return holidayCalendarBusiness.syncYear(holidayRo.getYear());
     }

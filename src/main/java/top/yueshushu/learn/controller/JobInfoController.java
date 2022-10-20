@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import top.yueshushu.learn.annotation.AuthToken;
 import top.yueshushu.learn.business.JobInfoBusiness;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.enumtype.DataFlagType;
@@ -38,6 +39,7 @@ public class JobInfoController extends BaseController {
 
     @PostMapping("/disable")
     @ApiOperation("禁用")
+    @AuthToken
     public OutputResult disable(@RequestBody JobInfoRo jobInfoRo) {
         if (jobInfoRo.getId() == null) {
             return OutputResult.buildAlert(ResultCode.ID_IS_EMPTY);
@@ -47,6 +49,7 @@ public class JobInfoController extends BaseController {
 
     @PostMapping("/enable")
     @ApiOperation("启用")
+    @AuthToken
     public OutputResult enable(@RequestBody JobInfoRo jobInfoRo) {
         if (jobInfoRo.getId() == null) {
             return OutputResult.buildAlert(ResultCode.ID_IS_EMPTY);
@@ -56,6 +59,7 @@ public class JobInfoController extends BaseController {
 
     @PostMapping("/delete")
     @ApiOperation("删除定时任务")
+    @AuthToken
     public OutputResult delete(@RequestBody JobInfoRo jobInfoRo) {
         if (jobInfoRo.getId() == null) {
             return OutputResult.buildAlert(ResultCode.ID_IS_EMPTY);
@@ -65,6 +69,7 @@ public class JobInfoController extends BaseController {
 
     @PostMapping("/handler")
     @ApiOperation("手动执行定时任务")
+    @AuthToken
     public OutputResult handler(@RequestBody JobInfoRo jobInfoRo) {
         if (jobInfoRo.getId() == null) {
             return OutputResult.buildAlert(ResultCode.ID_IS_EMPTY);

@@ -49,7 +49,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class StockCrawlerServiceImpl implements StockCrawlerService {
     @Resource
-    private StockCacheService  stockCacheService;
+    private StockCacheService stockCacheService;
     @Resource
     private CrawlerStockBusiness crawlerStockBusiness;
     @Resource
@@ -88,78 +88,81 @@ public class StockCrawlerServiceImpl implements StockCrawlerService {
     @Override
     public OutputResult stockHistoryAsync(StockRo stockRo) {
         //处理日期信息
-        OutputResult handlerResult=handlerDate(stockRo);
-        if(null!=handlerResult){
+        OutputResult handlerResult = handlerDate(stockRo);
+        if (null != handlerResult) {
             return handlerResult;
         }
         return crawlerStockHistoryBusiness.stockHistoryAsync(stockRo);
     }
+
     /**
      * 历史交易信息同步时，处理日期.
+     *
      * @param stockRo
      */
     private OutputResult handlerDate(StockRo stockRo) {
         SyncStockHistoryType syncRangeType = SyncStockHistoryType.getSyncRangeType(stockRo.getType());
-        if(syncRangeType==null){
+        if (syncRangeType == null) {
             return OutputResult.buildAlert("不支持的同步交易范围");
         }
         String Date_formatter = Const.STOCK_DATE_FORMAT;
-        Date now=DateUtil.date();
-        String startDate=DateUtil.format(
-                now,Date_formatter
+        Date now = DateUtil.date();
+        String startDate = DateUtil.format(
+                now, Date_formatter
         );
-        String endDate=DateUtil.format(
-                now,Date_formatter
-        );;
-        switch (syncRangeType){
-            case SELF:{
-                startDate= DateUtil.format(
+        String endDate = DateUtil.format(
+                now, Date_formatter
+        );
+        ;
+        switch (syncRangeType) {
+            case SELF: {
+                startDate = DateUtil.format(
                         DateUtil.parse(
                                 stockRo.getStartDate(),
                                 Const.DATE_FORMAT
                         )
-                        ,Date_formatter);
-                endDate= DateUtil.format(
+                        , Date_formatter);
+                endDate = DateUtil.format(
                         DateUtil.parse(
                                 stockRo.getEndDate(),
                                 Const.DATE_FORMAT
                         )
-                        ,Date_formatter);
+                        , Date_formatter);
                 break;
             }
-            case WEEK:{
+            case WEEK: {
                 DateTime dateTime = DateUtil.offsetWeek(now, -1);
-                startDate=DateUtil.format(dateTime,Date_formatter);
+                startDate = DateUtil.format(dateTime, Date_formatter);
                 break;
             }
-            case MONTH:{
+            case MONTH: {
                 DateTime dateTime = DateUtil.offsetMonth(now, -1);
-                startDate=DateUtil.format(dateTime,Date_formatter);
+                startDate = DateUtil.format(dateTime, Date_formatter);
                 break;
             }
-            case YEAR:{
-                DateTime dateTime = DateUtil.offsetMonth(now, -1*12);
-                startDate=DateUtil.format(dateTime,Date_formatter);
+            case YEAR: {
+                DateTime dateTime = DateUtil.offsetMonth(now, -1 * 12);
+                startDate = DateUtil.format(dateTime, Date_formatter);
                 break;
             }
-            case THREE_YEAR:{
-                DateTime dateTime = DateUtil.offsetMonth(now, -1*12*3);
-                startDate=DateUtil.format(dateTime,Date_formatter);
+            case THREE_YEAR: {
+                DateTime dateTime = DateUtil.offsetMonth(now, -1 * 12 * 3);
+                startDate = DateUtil.format(dateTime, Date_formatter);
                 break;
             }
-            case FIVE_YEAR:{
-                DateTime dateTime = DateUtil.offsetMonth(now, -1*12*5);
-                startDate=DateUtil.format(dateTime,Date_formatter);
+            case FIVE_YEAR: {
+                DateTime dateTime = DateUtil.offsetMonth(now, -1 * 12 * 5);
+                startDate = DateUtil.format(dateTime, Date_formatter);
                 break;
             }
-            case TEN_YEAR:{
-                DateTime dateTime = DateUtil.offsetMonth(now, -1*12*10);
-                startDate=DateUtil.format(dateTime,Date_formatter);
+            case TEN_YEAR: {
+                DateTime dateTime = DateUtil.offsetMonth(now, -1 * 12 * 10);
+                startDate = DateUtil.format(dateTime, Date_formatter);
                 break;
             }
-            case ALL:{
+            case ALL: {
                 // 1984年11月18日 中国第一个股票交易
-                startDate="19841118";
+                startDate = "19841118";
                 break;
             }
         }
@@ -196,9 +199,9 @@ public class StockCrawlerServiceImpl implements StockCrawlerService {
         List<StockUpdateLogDo> stockUpdateLogDoList = new ArrayList<>();
         // 股票更新历史记录
         Date now = DateUtil.date();
-        for (DownloadStockInfo downloadStockInfo :webStockList){
+        for (DownloadStockInfo downloadStockInfo : webStockList) {
             //如果不存在的话，为新增.
-            if (!dbStockCodeMap.containsKey(downloadStockInfo.getCode())){
+            if (!dbStockCodeMap.containsKey(downloadStockInfo.getCode())) {
                 //不包含，说明为新增.
                 StockDo addStockDo = stockAssembler.downInfoToDO(downloadStockInfo);
                 addStockDo.setCreateTime(now);
@@ -214,26 +217,26 @@ public class StockCrawlerServiceImpl implements StockCrawlerService {
                 String newStockMessage = "打新股提醒:股票 " + downloadStockInfo.getCode() + "今天上市了";
                 userList.forEach(
                         n -> {
-							weChatService.sendTextMessage(n.getWxUserId(), newStockMessage);
+                            weChatService.sendTextMessage(n.getWxUserId(), newStockMessage);
                         }
                 );
-            }else{
+            } else {
                 //如果编码相同，看名称是否相同.
                 StockDo updateStockDo = dbStockCodeMap.get(downloadStockInfo.getCode());
                 //名称还一样，说明没有变。
-                if (updateStockDo.getName().equals(downloadStockInfo.getName())){
+                if (updateStockDo.getName().equals(downloadStockInfo.getName())) {
                     continue;
                 }
                 String oldName = updateStockDo.getName();
                 //更新名称.
                 updateStockDo.setName(downloadStockInfo.getName());
 
-                log.info(">>>>>更新股票:{}",updateStockDo);
+                log.info(">>>>>更新股票:{}", updateStockDo);
                 updateStockDoList.add(updateStockDo);
 
                 StockUpdateLogDo stockUpdateLogDo = stockUpdateLogAssembler.stockEntityToDo(updateStockDo);
                 stockUpdateLogDo.setUpdateTime(now);
-                stockUpdateLogDo.setName(oldName+"--->"+downloadStockInfo.getName());
+                stockUpdateLogDo.setName(oldName + "--->" + downloadStockInfo.getName());
                 //id为空，避免使用的是股票编码的id
                 stockUpdateLogDo.setId(null);
                 stockUpdateLogDo.setUpdateType(StockUpdateType.CHANGE.getCode());
@@ -242,11 +245,11 @@ public class StockCrawlerServiceImpl implements StockCrawlerService {
         }
         // 处理删除的
         dbStockCodeMap.entrySet().forEach(
-                n->{
+                n -> {
                     StockDo dbStockDo = n.getValue();
-                    if (!webStockCodeList.contains(dbStockDo.getCode())){
+                    if (!webStockCodeList.contains(dbStockDo.getCode())) {
                         //不包含，如果被删除了
-                        log.info(">>>>>删除股票:{}",dbStockDo);
+                        log.info(">>>>>删除股票:{}", dbStockDo);
                         deleteStockIdList.add(dbStockDo.getId());
 
                         //处理日志记录
@@ -259,7 +262,6 @@ public class StockCrawlerServiceImpl implements StockCrawlerService {
                     }
                 }
         );
-
         //接下来，进行插入和修改相关操作.
         stockDomainService.removeByIds(deleteStockIdList);
         stockDomainService.updateBatchById(updateStockDoList);
@@ -267,38 +269,41 @@ public class StockCrawlerServiceImpl implements StockCrawlerService {
 
         //对日志处理
         stockUpdateLogDomainService.saveBatch(stockUpdateLogDoList);
+
+        log.info(">>>> 更新股票记录成功");
     }
 
     /**
      * 生成虚拟的股票信息  P(t) = P(t-1) + random(0,1)*1 - 0.5
+     *
      * @param code 股票编码
      * @return 返回生成的虚拟的股票价格
      */
     private void generateMockPriceData(String code) {
         //获取当前的价格
         BigDecimal nowCachePrice = stockCacheService.getNowCachePrice(code);
-        BigDecimal randPrice = BigDecimalUtil.toBigDecimal(Math.random()*1-0.5);
-        BigDecimal newPrice = BigDecimalUtil.addBigDecimal(nowCachePrice,randPrice);
+        BigDecimal randPrice = BigDecimalUtil.toBigDecimal(Math.random() * 1 - 0.5);
+        BigDecimal newPrice = BigDecimalUtil.addBigDecimal(nowCachePrice, randPrice);
         stockCacheService.setNowCachePrice(
-                code,newPrice
-         );
+                code, newPrice
+        );
     }
 
-    private void generateRealPriceData(String code){
-         StockRo stockRo = new StockRo();
-         //获取当前的股票
-         String fullCode = StockUtil.getFullCode(code);
-         stockRo.setCode(fullCode);
-         //获取当前的价格
-        OutputResult outputResult= crawlerStockBusiness.getStockPrice(fullCode);
-         //获取信息
+    private void generateRealPriceData(String code) {
+        StockRo stockRo = new StockRo();
+        //获取当前的股票
+        String fullCode = StockUtil.getFullCode(code);
+        stockRo.setCode(fullCode);
+        //获取当前的价格
+        OutputResult outputResult = crawlerStockBusiness.getStockPrice(fullCode);
+        //获取信息
         String priceReturn = (String) (outputResult.getData());
         //将这个信息进行转换，转换成对应的 BigDecimal
-         BigDecimal price = BigDecimalUtil.toBigDecimal(priceReturn);
+        BigDecimal price = BigDecimalUtil.toBigDecimal(priceReturn);
 
-         stockCacheService.setNowCachePrice(
-                 code,price
-         );
+        stockCacheService.setNowCachePrice(
+                code, price
+        );
 
     }
 }

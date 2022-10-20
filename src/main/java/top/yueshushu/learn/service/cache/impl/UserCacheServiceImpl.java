@@ -39,11 +39,13 @@ public class UserCacheServiceImpl implements UserCacheService{
         // 进行存储新的token 信息
         redisUtil.set(
                 user.getToken(),
-                user
+                user,
+                Const.TOKEN_EXPIRE_TIME
         );
         redisUtil.set(
-                user.getToken()+"_"+user.getAccount(),
-                System.currentTimeMillis()
+                user.getToken() + "_" + user.getAccount(),
+                System.currentTimeMillis(),
+                Const.TOKEN_EXPIRE_TIME
         );
     }
 }

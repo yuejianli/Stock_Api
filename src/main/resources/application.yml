@@ -122,6 +122,9 @@ pagehelper:
 jwt:
   key: "saaa-ihrm"
   ttl: "3600000"
+# 跳转到某个页面
+login:
+  noLoginUrl: http://www.yueshushu.top/Stock/login.html
 #配置 swagger
 swagger:
   show: true

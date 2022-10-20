@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import top.yueshushu.learn.annotation.AuthToken;
 import top.yueshushu.learn.business.TradeUserBusiness;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.mode.ro.TradeUserRo;
@@ -37,6 +38,7 @@ public class TradeUserController extends BaseController {
 
     @PostMapping("/login")
     @ApiOperation("交易用户的登录")
+    @AuthToken
     public OutputResult login(@RequestBody TradeUserRo tradeUserRo, HttpSession httpSession) {
 
         // 对数据进行 check

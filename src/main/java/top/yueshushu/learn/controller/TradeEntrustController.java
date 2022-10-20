@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import top.yueshushu.learn.annotation.AuthToken;
 import top.yueshushu.learn.business.TradeEntrustBusiness;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.enumtype.MockType;
@@ -32,6 +33,7 @@ public class TradeEntrustController extends BaseController {
 
     @PostMapping("/list")
     @ApiOperation("查询今日委托信息")
+    @AuthToken
     public OutputResult list(@RequestBody TradeEntrustRo tradeEntrustRo){
         tradeEntrustRo.setUserId(getUserId());
         if (tradeEntrustRo.getMockType()==null){
@@ -50,6 +52,7 @@ public class TradeEntrustController extends BaseController {
 
     @PostMapping("/history")
     @ApiOperation("查询历史委托信息")
+    @AuthToken
     public OutputResult history(@RequestBody TradeEntrustRo tradeEntrustRo){
         tradeEntrustRo.setUserId(getUserId());
         if (tradeEntrustRo.getMockType()==null){

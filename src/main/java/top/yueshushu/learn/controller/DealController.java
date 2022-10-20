@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import top.yueshushu.learn.annotation.AuthToken;
 import top.yueshushu.learn.business.DealBusiness;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.mode.ro.DealRo;
@@ -30,6 +31,7 @@ public class DealController extends BaseController {
     private DealBusiness dealBusiness;
     @PostMapping("/deal")
     @ApiOperation("成交委托信息")
+    @AuthToken
     public OutputResult deal(@RequestBody DealRo dealRo){
         dealRo.setUserId(getUserId());
         if (null == dealRo.getId()){

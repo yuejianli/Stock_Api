@@ -28,6 +28,7 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @Description 委托单
@@ -195,7 +196,7 @@ public class DealBusinessImpl implements DealBusiness {
                     tradePosition.getUserId(), tradePosition.getMockType(), tradePosition.getCode());
             //设置浮动盈亏 昨天亏+ 今日亏。
             tradePosition.setFloatMoney(
-                    BigDecimalUtil.addBigDecimal(tradePositionHistoryCache.getFloatMoney(), tradePosition.getTodayMoney())
+                    BigDecimalUtil.addBigDecimal(Optional.ofNullable(tradePositionHistoryCache.getFloatMoney()).orElse(BigDecimal.ZERO), tradePosition.getTodayMoney())
             );
             tradePosition.setFloatProportion(BigDecimal.valueOf(-100));
         }else{

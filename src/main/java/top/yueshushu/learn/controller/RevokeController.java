@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import top.yueshushu.learn.annotation.AuthToken;
 import top.yueshushu.learn.business.RevokeBusiness;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.mode.ro.RevokeRo;
@@ -30,6 +31,7 @@ public class RevokeController extends BaseController {
     private RevokeBusiness revokeBusiness;
     @PostMapping("/revoke")
     @ApiOperation("撤销委托信息")
+    @AuthToken
     public OutputResult revoke(@RequestBody RevokeRo revokeRo){
         revokeRo.setUserId(getUserId());
         if (null == revokeRo.getId()){

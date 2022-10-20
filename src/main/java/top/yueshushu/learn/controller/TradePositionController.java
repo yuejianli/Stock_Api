@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import top.yueshushu.learn.annotation.AuthToken;
 import top.yueshushu.learn.business.TradePositionBusiness;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.enumtype.MockType;
@@ -36,6 +37,7 @@ public class TradePositionController extends BaseController{
 
     @PostMapping("/list")
     @ApiOperation("查询当前我的持仓")
+    @AuthToken
     public OutputResult list(@RequestBody TradePositionRo tradePositionRo){
         tradePositionRo.setUserId(getUserId());
         if (tradePositionRo.getMockType()==null){

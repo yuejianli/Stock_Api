@@ -5,6 +5,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import top.yueshushu.learn.annotation.AuthToken;
 import top.yueshushu.learn.business.UserBusiness;
 import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.common.ResultCode;
@@ -51,30 +52,35 @@ public class UserController extends BaseController {
 
     @GetMapping("/convertPassWord")
     @ApiOperation("转换登录用户的密码")
+    @AuthToken
     public OutputResult convertPassWord(String password) {
         return userBusiness.convertPassWord(password);
     }
 
     @GetMapping("/tradePassword")
     @ApiOperation("转换交易用户的密码")
+    @AuthToken
     public OutputResult tradePassword(String password) {
         return userBusiness.tradePassword(password);
     }
 
     @GetMapping("/encrypt")
     @ApiOperation("配置文件敏感信息加密")
+    @AuthToken
     public OutputResult encrypt(String text) {
         return userBusiness.encrypt(text);
     }
 
     @GetMapping("/decrypt")
     @ApiOperation("配置文件敏感信息解密")
+    @AuthToken
     public OutputResult decrypt(String text) {
         return userBusiness.decrypt(text);
     }
 
     @GetMapping("/{userId}")
-    @ApiOperation("配置文件敏感信息解密")
+    @ApiOperation("切换用户信息")
+    @AuthToken
     public OutputResult setUserId(@PathVariable("userId") Integer userId) {
         redisUtil.set(Const.KEY_AUTH_USER_ID, userId);
         return OutputResult.buildSucc("切换用户成功");

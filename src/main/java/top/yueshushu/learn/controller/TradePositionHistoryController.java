@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import top.yueshushu.learn.annotation.AuthToken;
 import top.yueshushu.learn.business.TradePositionHistoryBusiness;
 import top.yueshushu.learn.mode.ro.TradePositionRo;
 import top.yueshushu.learn.response.OutputResult;
@@ -30,6 +31,7 @@ public class TradePositionHistoryController extends BaseController {
 
     @ApiOperation("查询持仓历史记录信息")
     @PostMapping("/history")
+    @AuthToken
     public OutputResult history(@RequestBody TradePositionRo tradePositionRo) {
         tradePositionRo.setUserId(getUserId());
         return tradePositionHistoryBusiness.listHistory(tradePositionRo);
@@ -37,6 +39,7 @@ public class TradePositionHistoryController extends BaseController {
 
     @ApiOperation("清理最近的持仓历史缓存信息")
     @PostMapping("/clearPhCache")
+    @AuthToken
     public OutputResult clearPhCache() {
         return tradePositionHistoryBusiness.clearPhCache();
     }
