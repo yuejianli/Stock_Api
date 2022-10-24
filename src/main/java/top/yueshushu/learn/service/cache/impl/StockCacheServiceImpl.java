@@ -114,7 +114,6 @@ public class StockCacheServiceImpl implements StockCacheService {
         }
         // 查询一下
         TradePositionHistoryDo lastHistoryDo = tradePositionHistoryDomainService.getLastRecordByCode(userId, mockType, code);
-
         TradePositionHistoryCache tradePositionHistoryCache = tradePositionHistoryAssembler.doToCache(lastHistoryDo);
         redisUtil.set(key, Optional.ofNullable(tradePositionHistoryCache).orElse(new TradePositionHistoryCache()));
 

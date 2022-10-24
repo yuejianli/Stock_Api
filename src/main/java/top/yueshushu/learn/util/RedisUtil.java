@@ -42,7 +42,7 @@ public class RedisUtil {
      */
     public void deleteByPrefix(String key) {
         Set<String> keys = redisTemplate.keys(key + "*");
-        if (!!CollectionUtils.isEmpty(keys)) {
+        if (!CollectionUtils.isEmpty(keys)) {
             redisTemplate.delete(keys);
         }
     }

@@ -3,6 +3,7 @@ package top.yueshushu.learn.business.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 import top.yueshushu.learn.business.TradePositionBusiness;
 import top.yueshushu.learn.common.SystemConst;
 import top.yueshushu.learn.entity.TradePosition;
@@ -27,7 +28,6 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -170,7 +170,7 @@ public class TradePositionBusinessImpl implements TradePositionBusiness {
                                 tradePositionVo.getCode());
 
                 //设置今日盈亏
-                if (null == tradePositionHistoryCache) {
+                if (null == tradePositionHistoryCache || ObjectUtils.isEmpty(tradePositionHistoryCache.getFloatMoney())) {
                     tradePositionVo.setTodayMoney(
                             tradePositionVo.getFloatMoney()
                     );
@@ -178,7 +178,7 @@ public class TradePositionBusinessImpl implements TradePositionBusiness {
                     tradePositionVo.setTodayMoney(
                             BigDecimalUtil.subBigDecimal(
                                     tradePositionVo.getFloatMoney(),
-                                    Optional.ofNullable(tradePositionHistoryCache.getFloatMoney()).orElse(BigDecimal.ZERO)
+                                    tradePositionHistoryCache.getFloatMoney()
                             )
                     );
                 }

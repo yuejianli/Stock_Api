@@ -99,6 +99,7 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
             ThreadLocalUtils.put("ip", ip == null ? request.getRemoteAddr() : ip);
             ThreadLocalUtils.put("user", loginUser);
             ThreadLocalUtils.put("token", token);
+            ThreadLocalUtils.put("userId", loginUser.getId());
 
             if (isForAllTimeUser) {
                 return true;

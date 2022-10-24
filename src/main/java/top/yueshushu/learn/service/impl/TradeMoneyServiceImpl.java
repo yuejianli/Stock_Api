@@ -133,9 +133,9 @@ public class TradeMoneyServiceImpl implements TradeMoneyService {
             return;
         }
         // 进行保存
-        tradeMoneyDo.setProfitMoney(todayMoneySum.add(Optional.ofNullable(tradeHistoryLastDo.getProfitMoney()).orElse(BigDecimal.ZERO)));
-        tradeMoneyDo.setTotalMoney(todayMoneySum.add(Optional.ofNullable(tradeHistoryLastDo.getTotalMoney()).orElse(BigDecimal.ZERO)));
-        tradeMoneyDo.setMarketMoney(todayMoneySum.add(Optional.ofNullable(tradeHistoryLastDo.getMarketMoney()).orElse(BigDecimal.ZERO)));
+        tradeMoneyDo.setProfitMoney(todayMoneySum.add(Optional.ofNullable(tradeHistoryLastDo.getProfitMoney()).orElse(tradeMoneyDo.getProfitMoney())));
+        tradeMoneyDo.setTotalMoney(todayMoneySum.add(Optional.ofNullable(tradeHistoryLastDo.getTotalMoney()).orElse(tradeMoneyDo.getTotalMoney())));
+        tradeMoneyDo.setMarketMoney(todayMoneySum.add(Optional.ofNullable(tradeHistoryLastDo.getMarketMoney()).orElse(tradeMoneyDo.getMarketMoney())));
         // 更新今天的亏损信息
         tradeMoneyDomainService.updateById(tradeMoneyDo);
     }
