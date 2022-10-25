@@ -228,7 +228,8 @@ public class ResultCode {
             new ResultCode(true, 10020001, "任务编号不正确,请刷新后重试");
     public static final ResultCode JOB_ID_DISABLE =
             new ResultCode(true, 10020002, "任务编号是禁用状态，不能执行");
-
+    public static final ResultCode CRON_NO_VALID =
+            new ResultCode(true, 10020003, "Cron 表达式不正确");
     /**
      * 扩展信息  100 21（编排）+ 001 (三位随机)
      */

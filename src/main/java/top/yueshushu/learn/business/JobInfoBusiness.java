@@ -55,4 +55,12 @@ public interface JobInfoBusiness {
      * @param id 任务编号id
      */
     OutputResult handlerById(Integer id);
+
+    /**
+     * 新的 cron 表达式
+     *
+     * @param id   任务编号id
+     * @param cron 新的cron 表达式
+     */
+    OutputResult changeCron(Integer id, String cron);
 }

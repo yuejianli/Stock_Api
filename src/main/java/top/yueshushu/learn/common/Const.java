@@ -41,7 +41,6 @@ public class Const {
     public static final String STOCK_DATE_FORMAT = "yyyyMMdd";
 
 
-
     public static final String ASYNC_SERVICE_EXECUTOR_BEAN_NAME = "asyncServiceExecutor";
     public static final String HOLIDAY_CALENDAR_CACHE = "holiday_calendar";
 
@@ -49,6 +48,8 @@ public class Const {
 
     public static final String KEY_AUTH_TOKEN = "auth-token";
     public static final String POSITION_HISTORY = "ph:";
+    public static final String DATE_WORKING = "work:";
+    public static final String JOB_INFO = "jobInfo:";
 
 
     private static final String CACHE_KEY_DATA_PREFIX = CACHE_PUBLIC_KEY_PREFIX + "data:";

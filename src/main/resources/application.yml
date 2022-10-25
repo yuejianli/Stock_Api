@@ -18,7 +18,7 @@ SWAGGER_USERNAME: admin
 SWAGGER_PASSWORD: ENC(oNEYdaPhQJloQiYdM2lecPtjcIVgJW6Jj08nzIYy6IpMtvM0v6mgqOdJ3XQDlCuX)
 
 # 是否开启xxl_job的相应时间验证
-xxlJobTime: true
+xxlJobTime: false
 
 server:
   port: 8088

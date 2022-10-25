@@ -15,4 +15,11 @@ public interface JobInfoDomainService extends IService<JobInfoDo> {
      * @param code 任务编码
      */
     JobInfoDo getByCode(String code);
+
+    /**
+     * 判断任务是否是启用状态
+     *
+     * @param jobInfoDo 任务对象
+     */
+    boolean isValid(JobInfoDo jobInfoDo);
 }

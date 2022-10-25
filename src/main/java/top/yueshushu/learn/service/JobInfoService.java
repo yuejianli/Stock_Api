@@ -1,5 +1,6 @@
 package top.yueshushu.learn.service;
 
+import top.yueshushu.learn.domain.JobInfoDo;
 import top.yueshushu.learn.entity.JobInfo;
 import top.yueshushu.learn.enumtype.DataFlagType;
 import top.yueshushu.learn.enumtype.JobInfoType;
@@ -33,7 +34,7 @@ public interface JobInfoService {
      * @date 2022/6/2 13:54
      * @author yuejianli
      */
-    OutputResult changeStatus(Integer id, DataFlagType dataFlagType);
+    OutputResult<JobInfoDo> changeStatus(Integer id, DataFlagType dataFlagType);
 
     /**
      * 根据编码，获取相应的任务信息

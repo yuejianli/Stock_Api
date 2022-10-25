@@ -1,13 +1,19 @@
 package top.yueshushu.learn.service.cache.impl;
 
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import top.yueshushu.learn.assembler.TradePositionHistoryAssembler;
 import top.yueshushu.learn.common.Const;
+import top.yueshushu.learn.domain.JobInfoDo;
 import top.yueshushu.learn.domain.TradePositionHistoryDo;
+import top.yueshushu.learn.domainservice.JobInfoDomainService;
 import top.yueshushu.learn.domainservice.TradePositionHistoryDomainService;
 import top.yueshushu.learn.entity.TradePositionHistoryCache;
+import top.yueshushu.learn.helper.DateHelper;
 import top.yueshushu.learn.service.cache.StockCacheService;
 import top.yueshushu.learn.util.RedisUtil;
 
@@ -28,6 +34,10 @@ public class StockCacheServiceImpl implements StockCacheService {
     private TradePositionHistoryDomainService tradePositionHistoryDomainService;
     @Resource
     private TradePositionHistoryAssembler tradePositionHistoryAssembler;
+    @Resource
+    private DateHelper dateHelper;
+    @Resource
+    private JobInfoDomainService jobInfoDomainService;
 
     @Override
     public void setNowCachePrice(String code, BigDecimal price) {
@@ -125,4 +135,43 @@ public class StockCacheServiceImpl implements StockCacheService {
         redisUtil.deleteByPrefix(Const.POSITION_HISTORY);
     }
 
+    @Override
+    public boolean isWorkingDay(DateTime currDate) {
+        String currDateStr = DateUtil.format(currDate, DatePattern.NORM_DATE_PATTERN);
+
+        String workingKey = Const.DATE_WORKING + currDateStr;
+
+        boolean isWorking = redisUtil.get(workingKey);
+        if (!ObjectUtils.isEmpty(isWorking)) {
+            return isWorking;
+        }
+        // 为空的话，进行计算。
+        boolean workingDay = dateHelper.isWorkingDay(currDate);
+        // 8 个小时 清空一次 即可。
+        redisUtil.set(workingKey, isWorking, 8 * 3600);
+        return workingDay;
+    }
+
+    @Override
+    public String getJobInfoCronCacheByCode(String code) {
+        String jobInfoKey = Const.JOB_INFO + code;
+
+        String jobCronCache = redisUtil.get(jobInfoKey);
+        if (!ObjectUtils.isEmpty(jobCronCache)) {
+            return jobCronCache;
+        }
+        // 为空的话，进行计算。
+        JobInfoDo jobInfoDo = jobInfoDomainService.getByCode(code);
+        String cronResult = " ";
+        if (jobInfoDomainService.isValid(jobInfoDo)) {
+            cronResult = jobInfoDo.getCron();
+        }
+        redisUtil.set(jobInfoKey, cronResult);
+        return cronResult;
+    }
+
+    @Override
+    public void clearJobInfoCronCacheByCode(String code) {
+        redisUtil.delByKey(Const.JOB_INFO + code);
+    }
 }

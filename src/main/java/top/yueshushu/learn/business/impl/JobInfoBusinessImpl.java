@@ -10,6 +10,7 @@ import top.yueshushu.learn.business.JobInfoBusiness;
 import top.yueshushu.learn.business.TradePositionBusiness;
 import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.common.ResultCode;
+import top.yueshushu.learn.domain.JobInfoDo;
 import top.yueshushu.learn.entity.JobInfo;
 import top.yueshushu.learn.enumtype.DataFlagType;
 import top.yueshushu.learn.enumtype.EntrustType;
@@ -21,6 +22,7 @@ import top.yueshushu.learn.mode.ro.DealRo;
 import top.yueshushu.learn.mode.ro.JobInfoRo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.service.*;
+import top.yueshushu.learn.service.cache.StockCacheService;
 import top.yueshushu.learn.util.CronExpression;
 
 import javax.annotation.Resource;
@@ -66,6 +68,8 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
     private TradeMoneyService tradeMoneyService;
     @Resource
     private TradePositionBusiness tradePositionBusiness;
+    @Resource
+    private StockCacheService stockCacheService;
 
     @SuppressWarnings("all")
     @Resource(name = Const.ASYNC_SERVICE_EXECUTOR_BEAN_NAME)
@@ -79,25 +83,23 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
 
     @Override
     public OutputResult changeStatus(Integer id, DataFlagType dataFlagType) {
-        return jobInfoService.changeStatus(id, dataFlagType);
+        JobInfoDo jobInfoDo = jobInfoService.changeStatus(id, dataFlagType).getData();
+        if (null == jobInfoDo) {
+            return OutputResult.buildAlert(ResultCode.JOB_ID_NOT_EXIST);
+        }
+        stockCacheService.clearJobInfoCronCacheByCode(jobInfoDo.getCode());
+
+        return OutputResult.buildSucc();
     }
 
     @Override
     public OutputResult execJob(JobInfoType jobInfoType, Integer triggerType) {
-        if (jobInfoType == null) {
-            return OutputResult.buildAlert(ResultCode.NO_AUTH);
+        String cron = stockCacheService.getJobInfoCronCacheByCode(jobInfoType.getCode());
+        if (!StringUtils.hasText(cron)) {
+            return OutputResult.buildAlert(ResultCode.JOB_ID_NOT_EXIST);
         }
         //查询任务
         JobInfo jobInfo = jobInfoService.getByCode(jobInfoType);
-        if (jobInfo == null) {
-            log.info("当前任务 {} 已经被删除", jobInfoType.getDesc());
-            return OutputResult.buildAlert(ResultCode.JOB_ID_NOT_EXIST);
-        }
-        // 禁用状态，不执行。
-        if (!DataFlagType.NORMAL.getCode().equals(jobInfo.getTriggerStatus())) {
-            // log.info(">>当前任务 {}是禁用状态，不执行", jobInfoType.getDesc());
-            return OutputResult.buildAlert(ResultCode.JOB_ID_NOT_EXIST);
-        }
         jobInfo.setTriggerLastTime(DateUtil.date().toLocalDateTime());
         try {
             switch (jobInfoType) {
@@ -243,7 +245,14 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
 
     @Override
     public OutputResult deleteById(Integer id) {
-        return jobInfoService.deleteById(id);
+        //立即执行
+        JobInfo job = jobInfoService.getById(id);
+        if (null == job) {
+            return OutputResult.buildAlert(ResultCode.JOB_ID_NOT_EXIST);
+        }
+        jobInfoService.deleteById(id);
+        stockCacheService.clearJobInfoCronCacheByCode(job.getCode());
+        return OutputResult.buildSucc();
     }
 
     @Override
@@ -256,6 +265,24 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
                     execJob(JobInfoType.getJobInfoType(job.getCode()), EntrustType.HANDLER.getCode());
                 }
         );
+        return OutputResult.buildSucc();
+    }
+
+    @Override
+    public OutputResult changeCron(Integer id, String cron) {
+
+        JobInfo job = jobInfoService.getById(id);
+        if (null == job) {
+            return OutputResult.buildAlert(ResultCode.JOB_ID_NOT_EXIST);
+        }
+        // 更新 cron 信息
+        JobInfo jobInfo = new JobInfo();
+        jobInfo.setId(id);
+        jobInfo.setCron(cron);
+        jobInfoService.updateInfoById(jobInfo);
+
+        // 清理缓存信息
+        stockCacheService.clearJobInfoCronCacheByCode(job.getCode());
         return OutputResult.buildSucc();
     }
 }

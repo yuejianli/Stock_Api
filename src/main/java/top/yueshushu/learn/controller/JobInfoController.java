@@ -3,6 +3,7 @@ package top.yueshushu.learn.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,6 +14,7 @@ import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.enumtype.DataFlagType;
 import top.yueshushu.learn.mode.ro.JobInfoRo;
 import top.yueshushu.learn.response.OutputResult;
+import top.yueshushu.learn.util.CronExpression;
 
 import javax.annotation.Resource;
 
@@ -75,5 +77,19 @@ public class JobInfoController extends BaseController {
             return OutputResult.buildAlert(ResultCode.ID_IS_EMPTY);
         }
         return jobInfoBusiness.handlerById(jobInfoRo.getId());
+    }
+
+    @PostMapping("/changeCron")
+    @ApiOperation("修改cron 表达式")
+    @AuthToken
+    public OutputResult changeCron(@RequestBody JobInfoRo jobInfoRo) {
+        if (jobInfoRo.getId() == null || StringUtils.isEmpty(jobInfoRo.getCron())) {
+            return OutputResult.buildAlert(ResultCode.ID_IS_EMPTY);
+        }
+        boolean validExpression = CronExpression.isValidExpression(jobInfoRo.getCron());
+        if (!validExpression) {
+            return OutputResult.buildAlert(ResultCode.CRON_NO_VALID);
+        }
+        return jobInfoBusiness.changeCron(jobInfoRo.getId(), jobInfoRo.getCron());
     }
 }

@@ -17,4 +17,5 @@ import java.io.Serializable;
 public class JobInfoRo extends PageRo implements Serializable {
     private Integer id;
     private Integer triggerStatus;
+    private String cron;
 }

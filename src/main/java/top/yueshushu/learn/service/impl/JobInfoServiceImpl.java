@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import top.yueshushu.learn.assembler.JobInfoAssembler;
-import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.domain.JobInfoDo;
 import top.yueshushu.learn.domainservice.JobInfoDomainService;
 import top.yueshushu.learn.entity.JobInfo;
@@ -58,16 +57,16 @@ public class JobInfoServiceImpl implements JobInfoService {
     }
 
     @Override
-    public OutputResult changeStatus(Integer id, DataFlagType dataFlagType) {
+    public OutputResult<JobInfoDo> changeStatus(Integer id, DataFlagType dataFlagType) {
         JobInfoDo jobInfoDo = jobInfoDomainService.getById(id);
         if (jobInfoDo == null) {
-            return OutputResult.buildAlert(ResultCode.JOB_ID_NOT_EXIST);
+            return OutputResult.buildSucc();
         }
         jobInfoDo.setUpdateTime(DateUtil.date().toLocalDateTime());
         jobInfoDo.setTriggerStatus(dataFlagType.getCode());
         //进行更新
         jobInfoDomainService.updateById(jobInfoDo);
-        return OutputResult.buildSucc();
+        return OutputResult.buildSucc(jobInfoDo);
     }
 
     @Override

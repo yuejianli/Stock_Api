@@ -1,5 +1,6 @@
 package top.yueshushu.learn.service.cache;
 
+import cn.hutool.core.date.DateTime;
 import top.yueshushu.learn.entity.TradePositionHistoryCache;
 
 import java.math.BigDecimal;
@@ -114,4 +115,25 @@ public interface StockCacheService {
      * 清理缓存信息
      */
     void cleanLastTradePositionHistory();
+
+    /**
+     * 当前日期是否是工作日，直接对缓存进行处理。
+     *
+     * @param currDate 当前日期
+     */
+    boolean isWorkingDay(DateTime currDate);
+
+    /**
+     * 根据任务编码，获取对应的 cron.
+     * 如果任务被禁用，则 cron 为 null
+     *
+     * @param code 任务编码
+     */
+    String getJobInfoCronCacheByCode(String code);
+
+
+    /**
+     * 删除 jobInfo 的缓存信息
+     */
+    void clearJobInfoCronCacheByCode(String code);
 }

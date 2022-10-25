@@ -3,6 +3,7 @@ package top.yueshushu.learn.domainservice.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import top.yueshushu.learn.domain.JobInfoDo;
 import top.yueshushu.learn.domainservice.JobInfoDomainService;
 import top.yueshushu.learn.mapper.JobInfoDoMapper;
@@ -26,5 +27,13 @@ public class JobInfoDomainServiceImpl extends ServiceImpl<JobInfoDoMapper, JobIn
         return this.lambdaQuery()
                 .eq(JobInfoDo::getCode, code)
                 .one();
+    }
+
+    @Override
+    public boolean isValid(JobInfoDo jobInfoDo) {
+        if (null == jobInfoDo || jobInfoDo.getTriggerStatus() == 0 || StringUtils.isEmpty(jobInfoDo.getCron())) {
+            return false;
+        }
+        return true;
     }
 }
