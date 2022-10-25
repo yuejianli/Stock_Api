@@ -28,7 +28,7 @@
     <sql id="Base_Column_List">
         id, code, name, entrust_date, deal_type, entrust_num, entrust_price, entrust_status, entrust_code,
         use_money,takeout_money,entrust_money,
-        hand_money
+        hand_money,
         total_money,user_id,
         entrust_type,mock_type, flag
     </sql>
@@ -67,4 +67,14 @@
         order by entrust_date desc
     </select>
 
+    <select id="getTotalHandMoney" resultType="java.math.BigDecimal">
+        select sum(hand_money) from trade_entrust
+        where user_id=#{tradeEntrustQueryDto.userId}
+        and mock_type =#{tradeEntrustQueryDto.mockType}
+        and date_format(entrust_date,'%Y%m%d') =date_format(
+        #{tradeEntrustQueryDto.entrustDate,jdbcType=TIMESTAMP},'%Y%m%d')
+        <if test="tradeEntrustQueryDto.entrustStatus != null">
+            and entrust_status =#{tradeEntrustQueryDto.entrustStatus}
+        </if>
+    </select>
 </mapper>

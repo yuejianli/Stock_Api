@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Param;
 import top.yueshushu.learn.domain.TradeEntrustDo;
 import top.yueshushu.learn.mode.dto.TradeEntrustQueryDto;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -32,4 +33,10 @@ public interface TradeEntrustDoMapper extends BaseMapper<TradeEntrustDo> {
      * 查询当前用户股票类型下的历史委托信息
      */
     List<TradeEntrustDo> listHistoryByQuery(@Param("tradeEntrustQueryDto") TradeEntrustQueryDto tradeEntrustQueryDto);
+
+    /**
+     * @param tradeEntrustQueryDto 查询对象
+     */
+    BigDecimal getTotalHandMoney(@Param("tradeEntrustQueryDto") TradeEntrustQueryDto tradeEntrustQueryDto);
+
 }

@@ -9,7 +9,9 @@ import top.yueshushu.learn.mapper.TradeEntrustDoMapper;
 import top.yueshushu.learn.mode.dto.TradeEntrustQueryDto;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @Description 委托操作
@@ -29,11 +31,16 @@ public class TradeEntrustDomainServiceImpl extends ServiceImpl<TradeEntrustDoMap
 
     @Override
     public void deleteToDayByQuery(TradeEntrustQueryDto tradeEntrustQueryDto) {
-         tradeEntrustDoMapper.deleteToDayByQuery(tradeEntrustQueryDto);
+        tradeEntrustDoMapper.deleteToDayByQuery(tradeEntrustQueryDto);
     }
 
     @Override
     public List<TradeEntrustDo> listHistoryByQuery(TradeEntrustQueryDto tradeEntrustQueryDto) {
         return tradeEntrustDoMapper.listHistoryByQuery(tradeEntrustQueryDto);
+    }
+
+    @Override
+    public BigDecimal getTotalHandMoney(TradeEntrustQueryDto tradeEntrustQueryDto) {
+        return Optional.ofNullable(tradeEntrustDoMapper.getTotalHandMoney(tradeEntrustQueryDto)).orElse(BigDecimal.ZERO);
     }
 }

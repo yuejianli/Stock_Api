@@ -1,16 +1,20 @@
 package top.yueshushu.learn.business.impl;
 
+import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import top.yueshushu.learn.business.TradePositionBusiness;
 import top.yueshushu.learn.common.SystemConst;
+import top.yueshushu.learn.domainservice.TradeEntrustDomainService;
 import top.yueshushu.learn.entity.TradePosition;
 import top.yueshushu.learn.entity.TradePositionHistoryCache;
+import top.yueshushu.learn.enumtype.EntrustStatusType;
 import top.yueshushu.learn.enumtype.MockType;
 import top.yueshushu.learn.enumtype.SelectedType;
 import top.yueshushu.learn.enumtype.TradeRealValueType;
+import top.yueshushu.learn.mode.dto.TradeEntrustQueryDto;
 import top.yueshushu.learn.mode.ro.TradePositionRo;
 import top.yueshushu.learn.mode.vo.StockSelectedVo;
 import top.yueshushu.learn.mode.vo.TradePositionVo;
@@ -51,6 +55,8 @@ public class TradePositionBusinessImpl implements TradePositionBusiness {
     private TradeMoneyService tradeMoneyService;
     @Resource
     private StockRedisUtil stockRedisUtil;
+    @Resource
+    private TradeEntrustDomainService tradeEntrustDomainService;
 
     @Override
     public OutputResult mockList(TradePositionRo tradePositionRo) {
@@ -169,16 +175,28 @@ public class TradePositionBusinessImpl implements TradePositionBusiness {
                                 tradePositionRo.getMockType(),
                                 tradePositionVo.getCode());
 
+                // 查询该股票今日的手续费，如果没有，则返回 0.
+
+                TradeEntrustQueryDto tradeEntrustQueryDto = new TradeEntrustQueryDto();
+                tradeEntrustQueryDto.setUserId(tradePositionRo.getUserId());
+                tradeEntrustQueryDto.setMockType(tradePositionRo.getMockType());
+                tradeEntrustQueryDto.setCode(tradePositionVo.getCode());
+                tradeEntrustQueryDto.setEntrustDate(DateUtil.date());
+                tradeEntrustQueryDto.setEntrustStatus(EntrustStatusType.SUCCESS.getCode());
+                BigDecimal todayHandMoney = tradeEntrustDomainService.getTotalHandMoney(tradeEntrustQueryDto);
                 //设置今日盈亏
                 if (null == tradePositionHistoryCache || ObjectUtils.isEmpty(tradePositionHistoryCache.getFloatMoney())) {
                     tradePositionVo.setTodayMoney(
-                            tradePositionVo.getFloatMoney()
+                            BigDecimalUtil.subBigDecimal(tradePositionVo.getFloatMoney(), todayHandMoney)
                     );
                 } else {
                     tradePositionVo.setTodayMoney(
                             BigDecimalUtil.subBigDecimal(
-                                    tradePositionVo.getFloatMoney(),
-                                    tradePositionHistoryCache.getFloatMoney()
+                                    BigDecimalUtil.subBigDecimal(
+                                            tradePositionVo.getFloatMoney(),
+                                            tradePositionHistoryCache.getFloatMoney()
+                                    ),
+                                    todayHandMoney
                             )
                     );
                 }

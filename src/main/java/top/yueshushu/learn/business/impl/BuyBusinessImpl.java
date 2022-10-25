@@ -86,7 +86,7 @@ public class BuyBusinessImpl implements BuyBusiness {
         BigDecimal takeoutMoney = tradeMoney.getTakeoutMoney();
         //获取之间的差值。
         BigDecimal subMoney = BigDecimalUtil.subBigDecimal(useMoney, takeoutMoney);
-        BigDecimal useMoneyChange;;
+        BigDecimal useMoneyChange;
         BigDecimal takeoutMoneyChange = SystemConst.DEFAULT_EMPTY;
         tradeMoney.setUseMoney(
                 BigDecimalUtil.subBigDecimal(

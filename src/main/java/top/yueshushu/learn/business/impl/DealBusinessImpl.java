@@ -1,10 +1,12 @@
 package top.yueshushu.learn.business.impl;
 
+import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 import top.yueshushu.learn.assembler.TradePositionAssembler;
 import top.yueshushu.learn.business.DealBusiness;
 import top.yueshushu.learn.common.ResultCode;
@@ -17,6 +19,7 @@ import top.yueshushu.learn.entity.*;
 import top.yueshushu.learn.enumtype.DealType;
 import top.yueshushu.learn.enumtype.EntrustStatusType;
 import top.yueshushu.learn.message.weixin.service.WeChatService;
+import top.yueshushu.learn.mode.dto.TradeEntrustQueryDto;
 import top.yueshushu.learn.mode.ro.DealRo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.service.*;
@@ -175,37 +178,55 @@ public class DealBusinessImpl implements DealBusiness {
             //说明全卖完了
             log.info("股票{}进行清仓成交", tradePosition.getName());
             //不应该删除，需要设置 平均价格为 0, 总数量为0 。
+            // 查询某个股票最近一天的亏损情况。
+            TradePositionHistoryCache tradePositionHistoryCache = stockCacheService.getLastTradePositionByCode(
+                    tradePosition.getUserId(), tradePosition.getMockType(), tradePosition.getCode());
+
+            // 查询该股票今日的手续费，如果没有，则返回 0.
+
+            TradeEntrustQueryDto tradeEntrustQueryDto = new TradeEntrustQueryDto();
+            tradeEntrustQueryDto.setUserId(tradeEntrustDo.getUserId());
+            tradeEntrustQueryDto.setMockType(tradeEntrustDo.getMockType());
+            tradeEntrustQueryDto.setCode(tradeEntrustDo.getCode());
+            tradeEntrustQueryDto.setEntrustDate(DateUtil.date());
+            tradeEntrustQueryDto.setEntrustStatus(EntrustStatusType.SUCCESS.getCode());
+            BigDecimal todayHandMoney = tradeEntrustDomainService.getTotalHandMoney(tradeEntrustQueryDto);
+            //设置今日盈亏
+            if (null == tradePositionHistoryCache || ObjectUtils.isEmpty(tradePositionHistoryCache.getFloatMoney())) {
+                tradePosition.setTodayMoney(
+                        BigDecimalUtil.subBigDecimal(
+                                Optional.ofNullable(tradePosition.getFloatMoney()).orElse(BigDecimal.ZERO),
+                                todayHandMoney)
+                );
+            } else {
+                tradePosition.setTodayMoney(
+                        BigDecimalUtil.subBigDecimal(
+                                BigDecimalUtil.subBigDecimal(
+                                        Optional.ofNullable(tradePosition.getFloatMoney()).orElse(BigDecimal.ZERO),
+                                        tradePositionHistoryCache.getFloatMoney()
+                                ),
+                                todayHandMoney
+                        )
+                );
+            }
+            //设置浮动盈亏 昨天亏+ 今日亏。
+            tradePosition.setFloatMoney(
+                    BigDecimalUtil.addBigDecimal(Optional.ofNullable(tradePositionHistoryCache.getFloatMoney()).orElse(BigDecimal.ZERO), tradePosition.getTodayMoney())
+            );
+            tradePosition.setFloatProportion(BigDecimal.valueOf(-100));
             //全部卖出时
             tradePosition.setAllAmount(0);
             tradePosition.setAvgPrice(BigDecimal.valueOf(0));
             tradePosition.setPrice(tradeEntrustDo.getEntrustPrice());
             //设置总的市值
             tradePosition.setAllMoney(BigDecimal.valueOf(0));
-
-            //设置今日盈亏
-            tradePosition.setTodayMoney(
-                    StockUtil.floatMoney(
-                            stockCacheService.getYesterdayCloseCachePrice(tradePosition.getCode()),
-                            tradeEntrustDo.getEntrustPrice(),
-                            tradeEntrustDo.getEntrustNum()
-                    )
-            );
-
-            // 查询某个股票最近一天的亏损情况。
-            TradePositionHistoryCache tradePositionHistoryCache = stockCacheService.getLastTradePositionByCode(
-                    tradePosition.getUserId(), tradePosition.getMockType(), tradePosition.getCode());
-            //设置浮动盈亏 昨天亏+ 今日亏。
-            tradePosition.setFloatMoney(
-                    BigDecimalUtil.addBigDecimal(Optional.ofNullable(tradePositionHistoryCache.getFloatMoney()).orElse(BigDecimal.ZERO), tradePosition.getTodayMoney())
-            );
-            tradePosition.setFloatProportion(BigDecimal.valueOf(-100));
         }else{
             //修改成本价
             tradePosition.setAvgPrice(
                     StockUtil.calcSellAvgPrice(
                             tradePosition.getAllAmount(),
                             tradePosition.getAvgPrice(),
-                            tradeEntrustDo.getTotalMoney(),
+                            tradeEntrustDo.getEntrustMoney(),
                             tradeEntrustDo.getEntrustNum()
                     )
             );
@@ -245,6 +266,12 @@ public class DealBusinessImpl implements DealBusiness {
                         tradeEntrustDo.getHandMoney()
                 )
         );
+//        tradeMoneyDo.setProfitMoney(
+//                BigDecimalUtil.subBigDecimal(
+//                        tradeMoneyDo.getProfitMoney(),
+//                        tradeEntrustDo.getHandMoney()
+//                )
+//        );
         tradeMoneyService.updateMoney(tradeMoneyDo);
         //添加一条记录到成交表里面
         tradeDealService.addDealRecord(tradeEntrustDo);
@@ -273,7 +300,7 @@ public class DealBusinessImpl implements DealBusiness {
             tradePositionDo.setUseAmount(0);
             tradePositionDo.setAvgPrice(
                     BigDecimalUtil.div(
-                            tradeEntrustDo.getTotalMoney(),
+                            tradeEntrustDo.getEntrustMoney(),
                             new BigDecimal(
                                     tradeEntrustDo.getEntrustNum()
                             )
@@ -288,7 +315,7 @@ public class DealBusinessImpl implements DealBusiness {
                     StockUtil.calcBuyAvgPrice(
                             tradePositionDo.getAllAmount(),
                             tradePositionDo.getAvgPrice(),
-                            tradeEntrustDo.getTotalMoney(),
+                            tradeEntrustDo.getEntrustMoney(),
                             tradeEntrustDo.getEntrustNum()
                     )
             );
@@ -326,6 +353,12 @@ public class DealBusinessImpl implements DealBusiness {
                         tradeEntrustDo.getHandMoney()
                 )
         );
+//        tradeMoneyDo.setProfitMoney(
+//                BigDecimalUtil.subBigDecimal(
+//                        tradeMoneyDo.getProfitMoney(),
+//                        tradeEntrustDo.getHandMoney()
+//                )
+//        );
         tradeMoneyService.updateMoney(tradeMoneyDo);
         log.info("用户{},成交买入委托单{},金额信息更新成功", tradeEntrustDo.getUserId(), tradeEntrustDo.getId());
         //添加一条记录到成交表里面

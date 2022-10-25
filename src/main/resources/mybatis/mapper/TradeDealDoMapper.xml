@@ -65,5 +65,4 @@
         </if>
         order by deal_date desc
     </select>
-
 </mapper>

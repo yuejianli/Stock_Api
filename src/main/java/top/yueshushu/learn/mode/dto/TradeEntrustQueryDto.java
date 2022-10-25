@@ -14,6 +14,7 @@ public class TradeEntrustQueryDto {
     private Integer mockType;
     private DateTime entrustDate;
     private Integer entrustStatus;
+    private String code;
     /**
      * 开始委托时间
      */
