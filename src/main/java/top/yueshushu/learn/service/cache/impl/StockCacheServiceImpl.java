@@ -166,7 +166,7 @@ public class StockCacheServiceImpl implements StockCacheService {
         if (jobInfoDomainService.isValid(jobInfoDo)) {
             cronResult = jobInfoDo.getCron();
         }
-        redisUtil.set(jobInfoKey, cronResult);
+        redisUtil.set(jobInfoKey, cronResult, 3600);
         return cronResult;
     }
 

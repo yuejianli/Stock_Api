@@ -1,6 +1,5 @@
 package top.yueshushu.learn.job;
 
-import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.Trigger;
@@ -51,8 +50,7 @@ public class JobInfoConfig implements SchedulingConfigurer {
                                 return null;
                             }
                             CronTrigger cronTrigger = new CronTrigger(cron);
-                            // 延迟1分钟执行
-                            return DateUtil.offsetMinute(cronTrigger.nextExecutionTime(triggerContext), 1);
+                            return cronTrigger.nextExecutionTime(triggerContext);
                         }
                     }
             );
