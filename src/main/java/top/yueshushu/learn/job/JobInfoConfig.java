@@ -1,5 +1,6 @@
 package top.yueshushu.learn.job;
 
+import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.Trigger;
@@ -10,7 +11,6 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.util.StringUtils;
 import top.yueshushu.learn.business.JobInfoBusiness;
-import top.yueshushu.learn.domainservice.JobInfoDomainService;
 import top.yueshushu.learn.enumtype.EntrustType;
 import top.yueshushu.learn.enumtype.JobInfoType;
 import top.yueshushu.learn.service.cache.StockCacheService;
@@ -28,9 +28,6 @@ import java.util.Date;
 @EnableScheduling
 @Slf4j
 public class JobInfoConfig implements SchedulingConfigurer {
-    @Resource
-    private JobInfoDomainService jobInfoDomainService;
-
     @Resource
     private JobInfoBusiness jobInfoBusiness;
 
@@ -54,7 +51,8 @@ public class JobInfoConfig implements SchedulingConfigurer {
                                 return null;
                             }
                             CronTrigger cronTrigger = new CronTrigger(cron);
-                            return cronTrigger.nextExecutionTime(triggerContext);
+                            // 延迟1分钟执行
+                            return DateUtil.offsetMinute(cronTrigger.nextExecutionTime(triggerContext), 1);
                         }
                     }
             );
