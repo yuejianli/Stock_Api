@@ -22,6 +22,9 @@ xxlJobTime: false
 
 server:
   port: 8088
+  undertow:
+    buffer-size: 1024
+    direct-buffers: true
   servlet:
     context-path: /StockApi
   #设置头的大小
