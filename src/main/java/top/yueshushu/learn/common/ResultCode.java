@@ -45,10 +45,12 @@ public class ResultCode {
             new ResultCode(false, 10010005, "必须同意协议");
     public static final ResultCode ACCOUNT_NOT_EXIST =
             new ResultCode(false, 10010006, "用户名或者账号不正确");
-    public static final ResultCode PASSWORD_INCORRECT  =
+    public static final ResultCode PASSWORD_INCORRECT =
             new ResultCode(false, 10010006, "用户名或者账号不正确");
-    public static final ResultCode EASY_MONEY_LOGIN_ERROR  =
+    public static final ResultCode EASY_MONEY_LOGIN_ERROR =
             new ResultCode(false, 10010007, "东方财富登录失败");
+    public static final ResultCode USER_EXISTS =
+            new ResultCode(false, 10010008, "用户已存在");
 
     /**
      * 交易用户层提示信息：  100 11 （编排）+ 001 (三位随机)

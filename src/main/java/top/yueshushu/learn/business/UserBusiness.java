@@ -1,6 +1,8 @@
 package top.yueshushu.learn.business;
 
+import top.yueshushu.learn.entity.User;
 import top.yueshushu.learn.mode.ro.UserRo;
+import top.yueshushu.learn.mode.vo.AddUserRequestVo;
 import top.yueshushu.learn.response.OutputResult;
 
 /**
@@ -46,4 +48,12 @@ public interface UserBusiness {
      * @return 将配置文件中的敏感信息解密
      */
     OutputResult decrypt(String text);
+
+    /**
+     * 新增用户信息
+     *
+     * @param addUserRequestVo 新增用户信息
+     * @param currentUser      当前用户
+     */
+    OutputResult addUser(AddUserRequestVo addUserRequestVo, User currentUser);
 }

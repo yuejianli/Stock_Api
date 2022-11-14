@@ -123,7 +123,6 @@ public class TradeMoneyServiceImpl implements TradeMoneyService {
     public void updateToDayMoney(Integer userId, MockType mockType, BigDecimal todayMoneySum) {
         DateTime now = DateUtil.date();
         //获取昨天的金额信息,如果没有记录,则 返回 0
-
         TradeMoneyHistoryDo tradeHistoryLastDo = Optional.ofNullable(tradeMoneyHistoryDomainService.getLastRecordProfit(userId, mockType.getCode(), now)).orElse(new TradeMoneyHistoryDo());
 
         // 昨天的,与今天的相加,就是今天的亏损信息.
@@ -138,6 +137,33 @@ public class TradeMoneyServiceImpl implements TradeMoneyService {
         tradeMoneyDo.setMarketMoney(todayMoneySum.add(Optional.ofNullable(tradeHistoryLastDo.getMarketMoney()).orElse(tradeMoneyDo.getMarketMoney())));
         // 更新今天的亏损信息
         tradeMoneyDomainService.updateById(tradeMoneyDo);
+    }
+
+    @Override
+    public void operateMoney(TradeMoney tradeMoney) {
+        // 补充今日的金额信息
+
+        // 先查询一下，是否存在.
+
+        TradeMoneyDo tradeMoneyDo = tradeMoneyDomainService.getByUserIdAndMockType(tradeMoney.getUserId(), tradeMoney.getMockType());
+        if (null == tradeMoneyDo) {
+            // 进行插入
+            tradeMoneyDo = new TradeMoneyDo();
+            tradeMoneyDo.setTotalMoney(tradeMoney.getTotalMoney());
+            tradeMoneyDo.setUseMoney(tradeMoney.getTotalMoney());
+            tradeMoneyDo.setMarketMoney(new BigDecimal(0));
+            tradeMoneyDo.setTakeoutMoney(tradeMoney.getTotalMoney());
+            tradeMoneyDo.setProfitMoney(new BigDecimal(0));
+            tradeMoneyDo.setUserId(tradeMoney.getUserId());
+            tradeMoneyDo.setMockType(tradeMoney.getMockType());
+            tradeMoneyDomainService.save(tradeMoneyDo);
+        } else {
+            // 存在的话，进行更新。
+            TradeMoneyDo editTradeMoneyDo = tradeMoneyAssembler.entityToDo(tradeMoney);
+            editTradeMoneyDo.setId(tradeMoneyDo.getId());
+            // 进行更新
+            tradeMoneyDomainService.updateById(editTradeMoneyDo);
+        }
     }
 
     /**

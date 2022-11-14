@@ -80,4 +80,11 @@ public interface UserService  {
      * @return 查询需要通知的用户列表
      */
     List<User> listNotice();
+
+    /**
+     * 添加用户操作
+     *
+     * @param addUserRequestVo 用户信息
+     */
+    User operateUser(User user);
 }

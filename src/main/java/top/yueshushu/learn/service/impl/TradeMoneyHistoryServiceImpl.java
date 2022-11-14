@@ -1,19 +1,12 @@
 package top.yueshushu.learn.service.impl;
 
+import cn.hutool.core.date.DateUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.Resource;
-
-import cn.hutool.core.date.DateUtil;
-import lombok.extern.slf4j.Slf4j;
 import top.yueshushu.learn.assembler.TradeMoneyHistoryAssembler;
 import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.domain.TradeMoneyHistoryDo;
@@ -23,6 +16,11 @@ import top.yueshushu.learn.mode.vo.TradeMoneyHistoryVo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.response.PageResponse;
 import top.yueshushu.learn.service.TradeMoneyHistoryService;
+import top.yueshushu.learn.service.TradeMoneyService;
+
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>
@@ -39,11 +37,13 @@ public class TradeMoneyHistoryServiceImpl implements TradeMoneyHistoryService {
     private TradeMoneyHistoryDomainService tradeMoneyHistoryDomainService;
     @Resource
     private TradeMoneyHistoryAssembler tradeMoneyHistoryAssembler;
-    
+    @Resource
+    private TradeMoneyService tradeMoneyService;
+
     @Override
     public OutputResult pageHistory(TradeMoneyRo tradeMoneyRo) {
         Page<Object> pageGithubResult = PageHelper.startPage(tradeMoneyRo.getPageNum(), tradeMoneyRo.getPageSize());
-        
+
         List<TradeMoneyHistoryDo> tradeMoneyHistoryDoList = tradeMoneyHistoryDomainService.listMoneyHistory(tradeMoneyRo.getUserId(), tradeMoneyRo.getMockType()
                 , DateUtil.parse(
                         tradeMoneyRo.getStartDate(), Const.SIMPLE_DATE_FORMAT

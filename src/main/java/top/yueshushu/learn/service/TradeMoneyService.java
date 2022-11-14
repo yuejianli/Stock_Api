@@ -53,14 +53,16 @@ public interface TradeMoneyService {
      * @param userId 用户编号
      * @param mock   类型
      */
-    void saveMoneyHistory(Integer userId, MockType mock);
+	void saveMoneyHistory(Integer userId, MockType mock);
 
-    /**
-     * 更新今日的盈亏数
-     *
-     * @param userId        用户编号
-     * @param mockType      类型
-     * @param todayMoneySum 今日的盈亏总数
-     */
-    void updateToDayMoney(Integer userId, MockType mockType, BigDecimal todayMoneySum);
+	/**
+	 * 更新今日的盈亏数
+	 *
+	 * @param userId        用户编号
+	 * @param mockType      类型
+	 * @param todayMoneySum 今日的盈亏总数
+	 */
+	void updateToDayMoney(Integer userId, MockType mockType, BigDecimal todayMoneySum);
+
+	void operateMoney(TradeMoney tradeMoney);
 }

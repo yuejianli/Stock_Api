@@ -10,9 +10,11 @@ import top.yueshushu.learn.business.UserBusiness;
 import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.mode.ro.UserRo;
+import top.yueshushu.learn.mode.vo.AddUserRequestVo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.util.RedisUtil;
 import top.yueshushu.learn.util.SelectConditionUtil;
+import top.yueshushu.learn.util.ThreadLocalUtils;
 
 import javax.annotation.Resource;
 
@@ -85,4 +87,12 @@ public class UserController extends BaseController {
         redisUtil.set(Const.KEY_AUTH_USER_ID, userId);
         return OutputResult.buildSucc("切换用户成功");
     }
+
+    @PostMapping("/addUser")
+    @ApiOperation("添加用户信息")
+    @AuthToken
+    public OutputResult addUser(@RequestBody AddUserRequestVo addUserRequestVo) {
+        return userBusiness.addUser(addUserRequestVo, ThreadLocalUtils.getUser());
+    }
+
 }

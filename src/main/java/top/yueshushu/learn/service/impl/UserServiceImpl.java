@@ -11,6 +11,7 @@ import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.domain.UserDo;
 import top.yueshushu.learn.domainservice.UserDomainService;
 import top.yueshushu.learn.entity.User;
+import top.yueshushu.learn.enumtype.DataFlagType;
 import top.yueshushu.learn.mode.ro.UserRo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.service.UserService;
@@ -35,6 +36,7 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class UserServiceImpl implements UserService {
+    public static final String DEFAULT_PASSWORD = "123456";
     @Resource
     private UserDomainService userDomainService;
     @Resource
@@ -94,7 +96,7 @@ public class UserServiceImpl implements UserService {
         if (password.length() != 6) {
             return OutputResult.buildSucc(password);
         }
-        String publicKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDHdsyxT66pDG4p73yope7jxA92\nc0AT4qIJ/xtbBcHkFPK77upnsfDTJiVEuQDH+MiMeb+XhCLNKZGp0yaUU6GlxZdp\n+nLW8b7Kmijr3iepaDhcbVTsYBWchaWUXauj9Lrhz58/6AE/NF0aMolxIGpsi+ST\n2hSHPu3GSXMdhPCkWQIDAQAB";
+        String publicKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDHdsyxT66pDG4p73yope7jxA92c0AT4qIJ/xtbBcHkFPK77upnsfDTJiVEuQDH+MiMeb+XhCLNKZGp0yaUU6GlxZdp+nLW8b7Kmijr3iepaDhcbVTsYBWchaWUXauj9Lrhz58/6AE/NF0aMolxIGpsi+ST2hSHPu3GSXMdhPCkWQIDAQAB";
         return OutputResult.buildSucc(RSAUtil.encodeWithPublicKey(password, publicKey));
     }
 
@@ -104,6 +106,37 @@ public class UserServiceImpl implements UserService {
         return userDoList.stream().map(
                 n -> userAssembler.doToEntity(n)
         ).collect(Collectors.toList());
+    }
+
+    @Override
+    public User operateUser(User user) {
+        // 先查询一下，是否存在.
+        UserDo userDo = userDomainService.getByAccount(user.getAccount());
+        if (null == userDo) {
+            userDo = userAssembler.entityToDo(user);
+            userDo.setPassword(generateDefaultPassword());
+            userDo.setCreateTime(DateUtil.date());
+            userDo.setUpdateTime(DateUtil.date());
+            userDo.setStatus(DataFlagType.NORMAL.getCode());
+            userDo.setFlag(DataFlagType.NORMAL.getCode());
+            // 添加用户
+            userDomainService.save(userDo);
+        } else {
+            // 存在的话，进行更新。
+            UserDo editUserDo = userAssembler.entityToDo(user);
+            editUserDo.setId(userDo.getId());
+            // 进行更新
+            userDomainService.updateById(editUserDo);
+        }
+        return getUserByAccount(user.getAccount());
+
+    }
+
+    /**
+     * 生成默认的密码
+     */
+    private String generateDefaultPassword() {
+        return (String) convertPassWord(DEFAULT_PASSWORD).getData();
     }
 
     @Override

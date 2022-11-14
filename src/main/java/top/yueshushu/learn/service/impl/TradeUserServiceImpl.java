@@ -14,10 +14,12 @@ import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.config.TradeClient;
 import top.yueshushu.learn.domain.TradeMethodDo;
+import top.yueshushu.learn.domain.TradeUserDo;
 import top.yueshushu.learn.domainservice.TradeMethodDomainService;
 import top.yueshushu.learn.domainservice.TradeUserDomainService;
 import top.yueshushu.learn.entity.TradeMethod;
 import top.yueshushu.learn.entity.TradeUser;
+import top.yueshushu.learn.enumtype.DataFlagType;
 import top.yueshushu.learn.enumtype.TradeMethodType;
 import top.yueshushu.learn.mode.ro.TradeUserRo;
 import top.yueshushu.learn.mode.vo.TradeUserVo;
@@ -26,6 +28,7 @@ import top.yueshushu.learn.service.TradeUserService;
 import top.yueshushu.learn.util.RSAUtil;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -120,9 +123,37 @@ public class TradeUserServiceImpl implements TradeUserService {
                         tradeUser
                 )
         );
-        log.info("系统用户{}更新cookie和validateKey成功",tradeUser.getUserId());
+        log.info("系统用户{}更新cookie和validateKey成功", tradeUser.getUserId());
         tradeUserVo.setUserId(tradeUserRo.getId());
         return OutputResult.buildSucc(tradeUserVo);
+    }
+
+    @Override
+    public void operateTradeUser(TradeUser tradeUser, Integer userId) {
+        // 先查询一下，是否存在.
+
+        TradeUserDo tradeUserDo = tradeUserDomainService.getByUserId(userId);
+
+        if (null == tradeUserDo) {
+            // 进行插入
+            tradeUserDo = new TradeUserDo();
+            tradeUserDo.setAccount("证券交易系统账号");
+            tradeUserDo.setPassword("证券交易系统密码,已加密");
+            tradeUserDo.setUserId(userId);
+            tradeUserDo.setCreateTime(LocalDateTime.now());
+            tradeUserDo.setUpdateTime(LocalDateTime.now());
+            tradeUserDo.setFlag(DataFlagType.NORMAL.getCode());
+            // 进行保存
+            tradeUserDomainService.save(tradeUserDo);
+        } else {
+            // 存在的话，进行更新。
+
+            TradeUserDo editTradeUserDo = tradeUserAssembler.entityToDo(tradeUser);
+            editTradeUserDo.setId(tradeUserDo.getId());
+            // 进行更新
+            tradeUserDomainService.updateById(editTradeUserDo);
+        }
+
     }
 
     /**
@@ -135,7 +166,7 @@ public class TradeUserServiceImpl implements TradeUserService {
         if (password.length() != 6) {
             return password;
         }
-        String publicKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDHdsyxT66pDG4p73yope7jxA92\nc0AT4qIJ/xtbBcHkFPK77upnsfDTJiVEuQDH+MiMeb+XhCLNKZGp0yaUU6GlxZdp\n+nLW8b7Kmijr3iepaDhcbVTsYBWchaWUXauj9Lrhz58/6AE/NF0aMolxIGpsi+ST\n2hSHPu3GSXMdhPCkWQIDAQAB";
+        String publicKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDHdsyxT66pDG4p73yope7jxA92c0AT4qIJ/xtbBcHkFPK77upnsfDTJiVEuQDH+MiMeb+XhCLNKZGp0yaUU6GlxZdp+nLW8b7Kmijr3iepaDhcbVTsYBWchaWUXauj9Lrhz58/6AE/NF0aMolxIGpsi+ST2hSHPu3GSXMdhPCkWQIDAQAB";
         return RSAUtil.encodeWithPublicKey(password, publicKey);
     }
 
