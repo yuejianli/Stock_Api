@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import top.yueshushu.learn.util.ThreadLocalUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -69,6 +70,8 @@ public class LogAspect {
         String method = Optional.ofNullable(attributes).map(attr -> attr.getRequest().getMethod()).orElse(null);
         StringBuilder logInfo = new StringBuilder();
         logInfo.append("request method: ").append(invokeMethodFullPath).append("; ");
+        logInfo.append("request ip: ").append(ThreadLocalUtils.<String>get("ip")).append("; ");
+        logInfo.append("username: ").append(ThreadLocalUtils.<String>get("userName")).append("; ");
         logInfo.append("request type: ").append(method).append("; ");
         logInfo.append("request param: ").append(requestParams).append("; ");
 

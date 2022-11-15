@@ -97,6 +97,7 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
             String userDoAccount = loginUser.getAccount();
             ThreadLocalUtils.put("userDoAccount", userDoAccount);
             ThreadLocalUtils.put("ip", ip == null ? request.getRemoteAddr() : ip);
+            ThreadLocalUtils.put("userName", loginUser.getAccount());
             ThreadLocalUtils.put("user", loginUser);
             ThreadLocalUtils.put("token", token);
             ThreadLocalUtils.put("userId", loginUser.getId());
