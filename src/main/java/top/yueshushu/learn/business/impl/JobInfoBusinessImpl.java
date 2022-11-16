@@ -29,6 +29,7 @@ import javax.annotation.Resource;
 import java.text.MessageFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
@@ -75,6 +76,8 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
     @Resource(name = Const.ASYNC_SERVICE_EXECUTOR_BEAN_NAME)
     private AsyncTaskExecutor executor;
 
+    private LocalTime STOCK_PRICE_START_TIME = LocalTime.parse("14:59:00");
+    private LocalTime STOCK_PRICE_END_TIME = LocalTime.parse("15:01:00");
 
     @Override
     public OutputResult listJob(JobInfoRo jobInfoRo) {
@@ -122,6 +125,10 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
                     break;
                 }
                 case STOCK_PRICE: {
+                    if (isEndStockPriceTime()) {
+                        // 进行休眠70 s, 使 查询股票的价格时间 在3点之后。
+                        TimeUnit.SECONDS.sleep(70);
+                    }
                     stockSelectedService.updateSelectedCodePrice(null);
                     break;
                 }
@@ -284,5 +291,18 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
         // 清理缓存信息
         stockCacheService.clearJobInfoCronCacheByCode(job.getCode());
         return OutputResult.buildSucc();
+    }
+
+    /**
+     * 是否是股票最后的特殊时间，
+     * 即 14:59 到  15:01 期间
+     */
+    private boolean isEndStockPriceTime() {
+        // 进行延迟， 如果时间在 14:59 之后，则睡眠 1分钟。
+        LocalTime now = LocalTime.now();
+        if (now.isAfter(STOCK_PRICE_START_TIME) && now.isBefore(STOCK_PRICE_END_TIME)) {
+            return true;
+        }
+        return false;
     }
 }
