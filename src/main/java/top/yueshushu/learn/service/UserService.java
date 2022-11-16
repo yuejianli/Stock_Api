@@ -64,7 +64,16 @@ public interface UserService  {
      *
      * @return 返回所有的用户id集合
      */
-    List<Integer> listUserId();
+    List<Integer> listUserIds();
+
+
+    /**
+     * 查询所有的正在使用的用户id信息
+     *
+     * @return 返回所有的用户id集合
+     */
+    List<Integer> listUseUserIds();
+
 
     /**
      * 转换交易用户的密码
@@ -84,7 +93,7 @@ public interface UserService  {
     /**
      * 添加用户操作
      *
-     * @param addUserRequestVo 用户信息
+     * @param user 用户信息
      */
     User operateUser(User user);
 }

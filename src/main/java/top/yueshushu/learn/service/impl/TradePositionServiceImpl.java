@@ -26,11 +26,10 @@ import top.yueshushu.learn.service.TradePositionService;
 import top.yueshushu.learn.util.TradeUtil;
 
 import javax.annotation.Resource;
+import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.time.ZoneId;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -82,20 +81,22 @@ public class TradePositionServiceImpl implements TradePositionService {
     }
 
     @Override
-    public void savePositionHistory(Integer userId, MockType mock) {
+    public void savePositionHistory(Integer userId, MockType mock, Date currentDate) {
         //1. 将今天的记录删除掉
-        DateTime now = DateUtil.date();
+        DateTime handlerDate = DateUtil.date(currentDate);
         tradePositionHistoryDomainService.deleteByUserIdAndMockTypeAndDate(
-                userId,mock.getCode(),now
+                userId, mock.getCode(), handlerDate
         );
         //查看当前的持仓信息
         List<TradePositionDo> tradePositionDoList = tradePositionDomainService.listByUserIdAndMockTypeAndCode(
                 userId, mock.getCode(), null);
         // 进行保存
-        if (CollectionUtils.isEmpty(tradePositionDoList)){
-            return ;
+        if (CollectionUtils.isEmpty(tradePositionDoList)) {
+            return;
         }
-        LocalDateTime localDateTime = LocalDateTime.now();
+        Instant instant = currentDate.toInstant();
+        ZoneId zoneId = ZoneId.systemDefault();
+        LocalDateTime localDateTime = instant.atZone(zoneId).toLocalDateTime();
         List<TradePositionHistoryDo> tradePositionHistoryDoList = tradePositionDoList.stream().map(
                 n -> {
                     TradePositionHistoryDo tradePositionHistoryDo =
@@ -158,11 +159,29 @@ public class TradePositionServiceImpl implements TradePositionService {
 
     @Override
     public void clearById(Integer id) {
-         tradePositionDomainService.removeById(id);
+        tradePositionDomainService.removeById(id);
+    }
+
+    @Override
+    public void operatePosition(TradePosition tradePosition) {
+        // 先查询一下，是否存在.
+        TradePosition showTradePosition = getPositionByCode(tradePosition.getUserId(), tradePosition.getMockType(), tradePosition.getCode());
+        if (null == showTradePosition) {
+            // 进行插入
+            TradePositionDo addTradePositionDo = tradePositionAssembler.entityToDo(tradePosition);
+            tradePositionDomainService.save(addTradePositionDo);
+        } else {
+            // 存在的话，进行更新。
+            TradePositionDo editTradePositionDo = tradePositionAssembler.entityToDo(tradePosition);
+            editTradePositionDo.setId(showTradePosition.getId());
+            // 进行更新
+            tradePositionDomainService.updateById(editTradePositionDo);
+        }
     }
 
     /**
      * 获取真实的股票持仓响应的信息
+     *
      * @param userId 用户编号
      * @return 获取真实的股票持仓响应的信息
      */

@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import top.yueshushu.learn.domain.UserDo;
 import top.yueshushu.learn.domainservice.UserDomainService;
+import top.yueshushu.learn.enumtype.DataFlagType;
 import top.yueshushu.learn.mapper.UserDoMapper;
-import top.yueshushu.learn.service.UserService;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -32,7 +32,7 @@ public class UserDomainServiceImpl extends ServiceImpl<UserDoMapper, UserDo>
                         UserDo::getAccount,
                         account
                 ).list();
-        if (CollectionUtils.isEmpty(userList)){
+        if (CollectionUtils.isEmpty(userList)) {
             return null;
         }
         return userList.get(0);
@@ -46,8 +46,18 @@ public class UserDomainServiceImpl extends ServiceImpl<UserDoMapper, UserDo>
     }
 
     @Override
-    public List<Integer> listUserId() {
+    public List<Integer> listUserIds() {
         return this.lambdaQuery()
+                .list()
+                .stream().map(
+                        UserDo::getId
+                ).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Integer> listUseUserIds() {
+        return this.lambdaQuery()
+                .eq(UserDo::getStatus, DataFlagType.NORMAL.getCode())
                 .list()
                 .stream().map(
                         UserDo::getId

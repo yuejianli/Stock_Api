@@ -7,6 +7,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
+
+import java.util.TimeZone;
+
 /**
  * @ClassName:StockApplication
  * @Description 股票小工具
@@ -23,6 +26,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 public class StockApplication {
     public static void main(String[] args) {
-        SpringApplication.run(StockApplication.class,args);
+        // 设置为 +8 时区
+        TimeZone china = TimeZone.getTimeZone("GMT+:08:00");
+        TimeZone.setDefault(china);
+        SpringApplication.run(StockApplication.class, args);
     }
 }

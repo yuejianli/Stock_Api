@@ -7,6 +7,7 @@ import top.yueshushu.learn.mode.vo.TradeMoneyVo;
 import top.yueshushu.learn.response.OutputResult;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * <p>
@@ -50,10 +51,11 @@ public interface TradeMoneyService {
     /**
      * 保存金额的历史记录处理
      *
-     * @param userId 用户编号
-     * @param mock   类型
+     * @param userId      用户编号
+     * @param mock        类型
+     * @param currentDate 日期信息
      */
-	void saveMoneyHistory(Integer userId, MockType mock);
+    void saveMoneyHistory(Integer userId, MockType mock, Date currentDate);
 
 	/**
 	 * 更新今日的盈亏数

@@ -148,12 +148,16 @@ public class UserServiceImpl implements UserService {
             log.info("账号 {} 不存在", userRo.getAccount());
             return OutputResult.buildAlert(ResultCode.ACCOUNT_NOT_EXIST);
         }
+        if (DataFlagType.DELETE.getCode().equals(user.getStatus())) {
+            log.info("账号 {} 已经被禁用了", userRo.getAccount());
+            return OutputResult.buildAlert(ResultCode.USER_DISABLE);
+        }
         //进行密码验证
         MD5 md5 = MD5.create();
         md5.setSalt(Const.SALT.getBytes());
         String entryPs = md5.digestHex16(userRo.getPassword().getBytes());
-        if(!entryPs.equals(user.getPassword())){
-            log.info("账号 {} 所填写的密码与数据库的密码不一致",userRo.getAccount());
+        if (!entryPs.equals(user.getPassword())) {
+            log.info("账号 {} 所填写的密码与数据库的密码不一致", userRo.getAccount());
             return OutputResult.buildAlert(ResultCode.PASSWORD_INCORRECT);
         }
         return OutputResult.buildSucc();
@@ -177,7 +181,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<Integer> listUserId() {
-        return userDomainService.listUserId();
+    public List<Integer> listUserIds() {
+        return userDomainService.listUserIds();
+    }
+
+    @Override
+    public List<Integer> listUseUserIds() {
+        return userDomainService.listUseUserIds();
     }
 }

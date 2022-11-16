@@ -8,6 +8,7 @@ import top.yueshushu.learn.mode.vo.StockVo;
 import top.yueshushu.learn.response.OutputResult;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -57,4 +58,10 @@ public interface StockService {
 
     List<String> listFullCode(List<String> codeList);
 
+    /**
+     * 根据股票编码集合，获取对应的 name 转换关系
+     *
+     * @param stockCodeList 股票编码集合
+     */
+    Map<String, String> mapNameByCodeList(List<String> stockCodeList);
 }

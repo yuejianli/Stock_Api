@@ -6,6 +6,7 @@ import top.yueshushu.learn.mode.ro.TradePositionRo;
 import top.yueshushu.learn.mode.vo.TradePositionVo;
 import top.yueshushu.learn.response.OutputResult;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -37,10 +38,12 @@ public interface TradePositionService {
 
     /**
      * 保存持仓记录的历史信息
-     * @param userId 用户编号
-     * @param mock 类型
+     *
+     * @param userId      用户编号
+     * @param mock        类型
+     * @param currentDate 要改变的日期
      */
-    void savePositionHistory(Integer userId, MockType mock);
+    void savePositionHistory(Integer userId, MockType mock, Date currentDate);
 
     /**
      * 查询虚拟的股票持仓记录
@@ -71,14 +74,22 @@ public interface TradePositionService {
 
     /**
      * 更新持仓数量
+     *
      * @param tradePosition 持仓数量对象
      */
     void updateById(TradePosition tradePosition);
 
     /**
      * 清仓
+     *
      * @param id 持仓id编号
      */
     void clearById(Integer id);
 
+    /**
+     * 更新持仓信息
+     *
+     * @param tradePosition 更新持仓信息
+     */
+    void operatePosition(TradePosition tradePosition);
 }

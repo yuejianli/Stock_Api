@@ -28,7 +28,10 @@ import top.yueshushu.learn.util.TradeUtil;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -97,13 +100,13 @@ public class TradeMoneyServiceImpl implements TradeMoneyService {
         tradeMoneyVo.setMockType(MockType.REAL.getCode());
         return OutputResult.buildSucc(tradeMoneyVo);
     }
-    
+
     @Override
-    public void saveMoneyHistory(Integer userId, MockType mock) {
+    public void saveMoneyHistory(Integer userId, MockType mock, Date currentDate) {
         //1. 将今天的记录删除掉
-        DateTime now = DateUtil.date();
+        DateTime handlerDate = DateUtil.date(currentDate);
         tradeMoneyHistoryDomainService.deleteByUserIdAndMockTypeAndDate(
-                userId, mock.getCode(), now
+                userId, mock.getCode(), handlerDate
         );
         //查看当前的持仓信息
         TradeMoneyDo tradeMoneyDo = tradeMoneyDomainService.getByUserIdAndMockType(
@@ -112,7 +115,10 @@ public class TradeMoneyServiceImpl implements TradeMoneyService {
         if (tradeMoneyDo == null) {
             return;
         }
-        LocalDateTime localDateTime = LocalDateTime.now();
+
+        Instant instant = currentDate.toInstant();
+        ZoneId zoneId = ZoneId.systemDefault();
+        LocalDateTime localDateTime = instant.atZone(zoneId).toLocalDateTime();
         TradeMoneyHistoryDo tradeMoneyHistoryDo =
                 tradeMoneyHistoryAssembler.doToHis(tradeMoneyDo);
         tradeMoneyHistoryDo.setCurrDate(localDateTime);
@@ -141,10 +147,7 @@ public class TradeMoneyServiceImpl implements TradeMoneyService {
 
     @Override
     public void operateMoney(TradeMoney tradeMoney) {
-        // 补充今日的金额信息
-
         // 先查询一下，是否存在.
-
         TradeMoneyDo tradeMoneyDo = tradeMoneyDomainService.getByUserIdAndMockType(tradeMoney.getUserId(), tradeMoney.getMockType());
         if (null == tradeMoneyDo) {
             // 进行插入

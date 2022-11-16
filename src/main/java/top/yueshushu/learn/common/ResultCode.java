@@ -52,6 +52,9 @@ public class ResultCode {
     public static final ResultCode USER_EXISTS =
             new ResultCode(false, 10010008, "用户已存在");
 
+    public static final ResultCode USER_DISABLE =
+            new ResultCode(false, 10010009, "用户已经被禁用");
+
     /**
      * 交易用户层提示信息：  100 11 （编排）+ 001 (三位随机)
      */

@@ -18,7 +18,7 @@ import javax.annotation.Resource;
 import java.util.Date;
 
 /**
- * 用途描述
+ * 定时任务处理
  *
  * @author yuejianli
  * @date 2022-10-24

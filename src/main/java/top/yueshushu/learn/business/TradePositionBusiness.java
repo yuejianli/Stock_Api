@@ -1,7 +1,9 @@
 package top.yueshushu.learn.business;
 
+import top.yueshushu.learn.entity.User;
 import top.yueshushu.learn.enumtype.MockType;
 import top.yueshushu.learn.mode.ro.TradePositionRo;
+import top.yueshushu.learn.mode.vo.AddPositionVo;
 import top.yueshushu.learn.response.OutputResult;
 
 /**
@@ -36,4 +38,11 @@ public interface TradePositionBusiness {
      */
     void callProfit(Integer userId, MockType mockType);
 
+    /**
+     * 要处理的今日持仓信息
+     *
+     * @param addPositionVo 要添加的持仓信息
+     * @param user          当前用户
+     */
+    OutputResult addPosition(AddPositionVo addPositionVo, User user);
 }

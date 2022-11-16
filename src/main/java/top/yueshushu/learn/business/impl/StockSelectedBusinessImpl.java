@@ -3,18 +3,14 @@ package top.yueshushu.learn.business.impl;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import top.yueshushu.learn.business.StockSelectedBusiness;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.entity.Stock;
-import top.yueshushu.learn.enumtype.SyncStockHistoryType;
 import top.yueshushu.learn.helper.DateHelper;
-import top.yueshushu.learn.mode.dto.StockPriceCacheDto;
 import top.yueshushu.learn.mode.ro.IdRo;
-import top.yueshushu.learn.mode.ro.StockRo;
 import top.yueshushu.learn.mode.ro.StockSelectedRo;
 import top.yueshushu.learn.mode.vo.StockHistoryVo;
 import top.yueshushu.learn.response.OutputResult;
@@ -24,7 +20,6 @@ import top.yueshushu.learn.service.cache.StockCacheService;
 import top.yueshushu.learn.util.PageUtil;
 
 import javax.annotation.Resource;
-import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -81,37 +76,12 @@ public class StockSelectedBusinessImpl implements StockSelectedBusiness {
         stockSelectedService.add(
                 stockSelectedRo, stock.getName()
         );
-        syncCodeInfo(stockSelectedRo.getStockCode());
+        stockSelectedService.syncCodeInfo(stockSelectedRo.getStockCode());
         // 处理缓存信息
         return OutputResult.buildSucc(
                 ResultCode.SUCCESS
         );
     }
-
-    /**
-     * 添加股票到自选后，同步股票的信息记录
-     * @param stockCode 股票编码
-     */
-    @Async
-    public void syncCodeInfo(String stockCode) {
-        // 同步股票的历史交易记录。 同步最近一个月的.
-        StockRo stockRo = new StockRo();
-        stockRo.setCode(stockCode);
-        stockRo.setType(SyncStockHistoryType.MONTH.getCode());
-        stockCrawlerService.stockHistoryAsync(stockRo);
-        // 设置当前的价格信息
-        stockCrawlerService.updateCodePrice(stockCode);
-        BigDecimal nowCachePrice1 = stockCacheService.getNowCachePrice(stockCode);
-        // 获取价格信息, 获取该股票昨天的价格
-        List<StockPriceCacheDto> priceCacheDtoList = stockHistoryService.listClosePrice(Collections.singletonList(stockCode));
-        if (!CollectionUtils.isEmpty(priceCacheDtoList)) {
-            StockPriceCacheDto stockPriceCacheDto = priceCacheDtoList.get(0);
-            stockCacheService.setLastBuyCachePrice(stockCode, stockPriceCacheDto.getPrice());
-            stockCacheService.setLastSellCachePrice(stockCode, stockPriceCacheDto.getPrice());
-            stockCacheService.setYesterdayCloseCachePrice(stockCode, stockPriceCacheDto.getPrice());
-        }
-    }
-
     @Override
     public OutputResult delete(IdRo idRo, int userId) {
         // 删除相关的记录

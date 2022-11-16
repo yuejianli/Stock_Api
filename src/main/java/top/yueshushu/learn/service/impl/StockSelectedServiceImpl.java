@@ -12,17 +12,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-import top.yueshushu.learn.assembler.StockHistoryAssembler;
 import top.yueshushu.learn.assembler.StockSelectedAssembler;
 import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.crawler.service.CrawlerStockHistoryService;
 import top.yueshushu.learn.domain.StockSelectedDo;
 import top.yueshushu.learn.domainservice.StockSelectedDomainService;
+import top.yueshushu.learn.entity.Stock;
 import top.yueshushu.learn.entity.StockSelected;
 import top.yueshushu.learn.enumtype.DataFlagType;
+import top.yueshushu.learn.enumtype.SyncStockHistoryType;
 import top.yueshushu.learn.mode.dto.StockPriceCacheDto;
 import top.yueshushu.learn.mode.ro.IdRo;
+import top.yueshushu.learn.mode.ro.StockRo;
 import top.yueshushu.learn.mode.ro.StockSelectedRo;
 import top.yueshushu.learn.mode.vo.StockSelectedVo;
 import top.yueshushu.learn.response.OutputResult;
@@ -63,8 +65,6 @@ public class StockSelectedServiceImpl implements StockSelectedService {
     private StockCrawlerService stockCrawlerService;
     @Resource
     private CrawlerStockHistoryService crawlerStockHistoryService;
-    @Resource
-    private StockHistoryAssembler stockHistoryAssembler;
     @Resource
     private StockService stockService;
 
@@ -276,14 +276,78 @@ public class StockSelectedServiceImpl implements StockSelectedService {
     }
 
     @Override
+    public List<String> batchSelected(int addUserId, List<String> stockCodeList) {
+        // 查询一下 当前用户目前拥有的自选股票编码集合
+
+        List<String> haveSelectedCodeList = stockSelectedDomainService.findCodeList(addUserId);
+        // 进行移除
+        stockCodeList.removeAll(haveSelectedCodeList);
+        if (CollectionUtils.isEmpty(stockCodeList)) {
+            log.info(">>>> 用户 {} 已经自选了所有的股票 {}", addUserId, haveSelectedCodeList);
+        }
+        log.info(">>>> 用户 {} 未自选了股票集合 {}", addUserId, stockCodeList);
+        // 进行批量添加股票信息
+
+        List<String> resultCodeList = new ArrayList<>();
+
+        if (!CollectionUtils.isEmpty(haveSelectedCodeList)) {
+            resultCodeList.addAll(haveSelectedCodeList);
+        }
+
+
+        for (String code : stockCodeList) {
+            // 根据股票的编码，获取相应的股票记录信息
+            Stock stock = stockService.selectByCode(code);
+            if (null == stock) {
+                continue;
+            }
+            StockSelectedRo stockSelectedRo = new StockSelectedRo();
+            stockSelectedRo.setStockCode(code);
+            stockSelectedRo.setUserId(addUserId);
+
+            add(stockSelectedRo, stock.getName());
+
+            resultCodeList.add(code);
+            executor.submit(() -> {
+                syncCodeInfo(code);
+            });
+        }
+        return resultCodeList;
+    }
+
+    /**
+     * 添加股票到自选后，同步股票的信息记录
+     *
+     * @param stockCode 股票编码
+     */
+    @Override
+    public void syncCodeInfo(String stockCode) {
+        // 同步股票的历史交易记录。 同步最近一个月的.
+        StockRo stockRo = new StockRo();
+        stockRo.setCode(stockCode);
+        stockRo.setType(SyncStockHistoryType.MONTH.getCode());
+        stockCrawlerService.stockHistoryAsync(stockRo);
+        // 设置当前的价格信息
+        stockCrawlerService.updateCodePrice(stockCode);
+        // 获取价格信息, 获取该股票昨天的价格
+        List<StockPriceCacheDto> priceCacheDtoList = stockHistoryService.listClosePrice(Collections.singletonList(stockCode));
+        if (!CollectionUtils.isEmpty(priceCacheDtoList)) {
+            StockPriceCacheDto stockPriceCacheDto = priceCacheDtoList.get(0);
+            stockCacheService.setLastBuyCachePrice(stockCode, stockPriceCacheDto.getPrice());
+            stockCacheService.setLastSellCachePrice(stockCode, stockPriceCacheDto.getPrice());
+            stockCacheService.setYesterdayCloseCachePrice(stockCode, stockPriceCacheDto.getPrice());
+        }
+    }
+
+    @Override
     public OutputResult deleteByCode(StockSelectedRo stockSelectedRo) {
-       StockSelected stockSelected = stockSelectedAssembler.doToEntity(
-               stockSelectedDomainService.getByUserIdAndCodeAndStatus(
-                       stockSelectedRo.getUserId(),
-                       stockSelectedRo.getStockCode(),
-                       null
-               )
-       );
+        StockSelected stockSelected = stockSelectedAssembler.doToEntity(
+                stockSelectedDomainService.getByUserIdAndCodeAndStatus(
+                        stockSelectedRo.getUserId(),
+                        stockSelectedRo.getStockCode(),
+                        null
+                )
+        );
        return deleteByInfo(stockSelected,stockSelected.getUserId());
     }
 

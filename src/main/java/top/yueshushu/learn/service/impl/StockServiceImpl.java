@@ -19,7 +19,9 @@ import top.yueshushu.learn.service.StockService;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -104,11 +106,17 @@ public class StockServiceImpl implements StockService {
     @Override
     public List<String> listFullCode(List<String> codeList) {
         // 查询出这些股票对应的 full_code 信息，然后用 腾讯的接口去同步相应的数据。
-
         List<StockDo> stockDoList = listByCodes(codeList);
-
-
         // 取出对应的 full Code
         return stockDoList.stream().map(StockDo::getFullCode).collect(Collectors.toList());
+    }
+
+    @Override
+    public Map<String, String> mapNameByCodeList(List<String> stockCodeList) {
+        List<StockDo> stockDoList = listByCodes(stockCodeList);
+        if (CollectionUtils.isEmpty(stockDoList)) {
+            return Collections.emptyMap();
+        }
+        return stockDoList.stream().collect(Collectors.toMap(StockDo::getCode, StockDo::getName));
     }
 }

@@ -16,6 +16,7 @@ import top.yueshushu.learn.enumtype.DataFlagType;
 import top.yueshushu.learn.enumtype.EntrustType;
 import top.yueshushu.learn.enumtype.JobInfoType;
 import top.yueshushu.learn.enumtype.MockType;
+import top.yueshushu.learn.helper.DateHelper;
 import top.yueshushu.learn.message.weixin.service.WeChatService;
 import top.yueshushu.learn.mode.ro.BuyRo;
 import top.yueshushu.learn.mode.ro.DealRo;
@@ -24,6 +25,7 @@ import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.service.*;
 import top.yueshushu.learn.service.cache.StockCacheService;
 import top.yueshushu.learn.util.CronExpression;
+import top.yueshushu.learn.util.MyDateUtil;
 
 import javax.annotation.Resource;
 import java.text.MessageFormat;
@@ -71,6 +73,8 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
     private TradePositionBusiness tradePositionBusiness;
     @Resource
     private StockCacheService stockCacheService;
+    @Resource
+    private DateHelper dateHelper;
 
     @SuppressWarnings("all")
     @Resource(name = Const.ASYNC_SERVICE_EXECUTOR_BEAN_NAME)
@@ -101,6 +105,12 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
         if (!StringUtils.hasText(cron)) {
             return OutputResult.buildAlert(ResultCode.JOB_ID_NOT_EXIST);
         }
+        //是获取股票实时价格的任务，并且是自动运行。 非时间，不执行。
+        if (JobInfoType.STOCK_PRICE.equals(jobInfoType) && EntrustType.AUTO.getCode().equals(triggerType)) {
+            if (!MyDateUtil.between930And15() || !dateHelper.isWorkingDay(DateUtil.date())) {
+                return OutputResult.buildSucc();
+            }
+        }
         //查询任务
         JobInfo jobInfo = jobInfoService.getByCode(jobInfoType);
         jobInfo.setTriggerLastTime(DateUtil.date().toLocalDateTime());
@@ -127,13 +137,13 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
                 case STOCK_PRICE: {
                     if (isEndStockPriceTime()) {
                         // 进行休眠70 s, 使 查询股票的价格时间 在3点之后。
-                        TimeUnit.SECONDS.sleep(70);
+                        TimeUnit.SECONDS.sleep(30);
                     }
                     stockSelectedService.updateSelectedCodePrice(null);
                     break;
                 }
                 case TRADE_ING_TO_REVOKE: {
-                    List<Integer> userIdList = userService.listUserId();
+                    List<Integer> userIdList = userService.listUserIds();
                     // 设置类型为虚拟
                     userIdList
                             .parallelStream()
@@ -143,19 +153,19 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
                     break;
                 }
                 case TRADE_POSITION_HISTORY: {
-                    List<Integer> userIdList = userService.listUserId();
+                    List<Integer> userIdList = userService.listUserIds();
                     //设置类型为虚拟
                     userIdList.parallelStream().forEach(
                             userId -> {
                                 tradePositionService.savePositionHistory(
-                                        userId, MockType.MOCK
+                                        userId, MockType.MOCK, DateUtil.date()
                                 );
                                 tradePositionService.savePositionHistory(
-                                        userId, MockType.REAL
+                                        userId, MockType.REAL, DateUtil.date()
                                 );
                                 // 对金额进行处理
-                                tradeMoneyService.saveMoneyHistory(userId, MockType.MOCK);
-                                tradeMoneyService.saveMoneyHistory(userId, MockType.REAL);
+                                tradeMoneyService.saveMoneyHistory(userId, MockType.MOCK, DateUtil.date());
+                                tradeMoneyService.saveMoneyHistory(userId, MockType.REAL, DateUtil.date());
                             }
                     );
                     break;
@@ -186,7 +196,7 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
                     break;
                 }
                 case STOCK_FIVE_EMAIL: {
-                    List<Integer> userIdList = userService.listUserId();
+                    List<Integer> userIdList = userService.listUserIds();
                     // 设置类型为虚拟
                     userIdList
                             .forEach(
@@ -202,7 +212,7 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
                     break;
                 }
                 case CALL_PROFIT: {
-                    List<Integer> userIdList = userService.listUserId();
+                    List<Integer> userIdList = userService.listUserIds();
                     // 设置类型为虚拟
                     userIdList
                             .forEach(

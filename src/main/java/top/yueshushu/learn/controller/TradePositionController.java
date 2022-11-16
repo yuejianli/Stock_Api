@@ -12,9 +12,11 @@ import top.yueshushu.learn.business.TradePositionBusiness;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.enumtype.MockType;
 import top.yueshushu.learn.mode.ro.TradePositionRo;
+import top.yueshushu.learn.mode.vo.AddPositionVo;
 import top.yueshushu.learn.mode.vo.TradePositionShowVo;
 import top.yueshushu.learn.mode.vo.TradePositionVo;
 import top.yueshushu.learn.response.OutputResult;
+import top.yueshushu.learn.util.ThreadLocalUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -63,5 +65,12 @@ public class TradePositionController extends BaseController{
         }
         tradePositionShowVo.setTodayMoney(todayMoneySum);
         return OutputResult.buildSucc(tradePositionShowVo);
+    }
+
+    @PostMapping("/addPosition")
+    @ApiOperation("保存当前的持仓信息")
+    @AuthToken
+    public OutputResult addPosition(@RequestBody AddPositionVo addPositionVo) {
+        return tradePositionBusiness.addPosition(addPositionVo, ThreadLocalUtils.getUser());
     }
 }

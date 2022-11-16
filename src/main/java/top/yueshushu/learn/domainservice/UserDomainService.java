@@ -20,13 +20,20 @@ public interface UserDomainService extends IService<UserDo> {
 
     /**
      * 更新用户信息
+     *
      * @param userDo 传递过来的用户对象
      */
     void updateUser(UserDo userDo);
 
     /**
      * 查询所有的用户id 集合
+     *
      * @return 查询所有的用户id 集合
      */
-    List<Integer> listUserId();
+    List<Integer> listUserIds();
+
+    /**
+     * 查询正在使用的用户列表信息
+     */
+    List<Integer> listUseUserIds();
 }

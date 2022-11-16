@@ -1,5 +1,6 @@
 package top.yueshushu.learn.business.impl;
 
+import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import top.yueshushu.learn.assembler.UserAssembler;
@@ -114,7 +115,7 @@ public class UserBusinessImpl implements UserBusiness {
         tradeMoneyService.operateMoney(tradeMoney);
 
         // 保存历史金额
-        tradeMoneyService.saveMoneyHistory(addUser.getId(), MockType.MOCK);
+        tradeMoneyService.saveMoneyHistory(addUser.getId(), MockType.MOCK, DateUtil.date());
 
         return OutputResult.buildSucc();
 

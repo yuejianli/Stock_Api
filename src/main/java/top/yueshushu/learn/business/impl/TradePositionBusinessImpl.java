@@ -2,36 +2,47 @@ package top.yueshushu.learn.business.impl;
 
 import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import top.yueshushu.learn.business.TradePositionBusiness;
+import top.yueshushu.learn.common.Const;
+import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.common.SystemConst;
+import top.yueshushu.learn.domain.UserDo;
 import top.yueshushu.learn.domainservice.TradeEntrustDomainService;
+import top.yueshushu.learn.domainservice.UserDomainService;
+import top.yueshushu.learn.entity.TradeMoney;
 import top.yueshushu.learn.entity.TradePosition;
 import top.yueshushu.learn.entity.TradePositionHistoryCache;
+import top.yueshushu.learn.entity.User;
 import top.yueshushu.learn.enumtype.EntrustStatusType;
 import top.yueshushu.learn.enumtype.MockType;
 import top.yueshushu.learn.enumtype.SelectedType;
 import top.yueshushu.learn.enumtype.TradeRealValueType;
+import top.yueshushu.learn.helper.DateHelper;
 import top.yueshushu.learn.mode.dto.TradeEntrustQueryDto;
 import top.yueshushu.learn.mode.ro.TradePositionRo;
+import top.yueshushu.learn.mode.vo.AddPositionVo;
 import top.yueshushu.learn.mode.vo.StockSelectedVo;
 import top.yueshushu.learn.mode.vo.TradePositionVo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.service.StockSelectedService;
+import top.yueshushu.learn.service.StockService;
 import top.yueshushu.learn.service.TradeMoneyService;
 import top.yueshushu.learn.service.TradePositionService;
 import top.yueshushu.learn.service.cache.StockCacheService;
 import top.yueshushu.learn.service.cache.TradeCacheService;
 import top.yueshushu.learn.util.BigDecimalUtil;
-import top.yueshushu.learn.util.StockRedisUtil;
 import top.yueshushu.learn.util.StockUtil;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -54,9 +65,17 @@ public class TradePositionBusinessImpl implements TradePositionBusiness {
     @Resource
     private TradeMoneyService tradeMoneyService;
     @Resource
-    private StockRedisUtil stockRedisUtil;
+    private UserDomainService userDomainService;
     @Resource
     private TradeEntrustDomainService tradeEntrustDomainService;
+    @Resource
+    private DateHelper dateHelper;
+    @Resource
+    private StockService stockService;
+
+    @SuppressWarnings("all")
+    @Resource(name = Const.ASYNC_SERVICE_EXECUTOR_BEAN_NAME)
+    private AsyncTaskExecutor executor;
 
     @Override
     public OutputResult mockList(TradePositionRo tradePositionRo) {
@@ -124,6 +143,70 @@ public class TradePositionBusinessImpl implements TradePositionBusiness {
             }
         }
         tradeMoneyService.updateToDayMoney(userId, mockType, todayMoneySum);
+    }
+
+    @Override
+    public OutputResult addPosition(AddPositionVo addPositionVo, User currentUser) {
+        // 添加用户前验证。
+        if (currentUser.getId() != 1) {
+            return OutputResult.buildFail(ResultCode.NO_AUTH);
+        }
+        List<TradePosition> positionList = addPositionVo.getPositionList();
+        if (CollectionUtils.isEmpty(positionList)) {
+            return OutputResult.buildFail(ResultCode.TRADE_NO_MONEY);
+        }
+        // 先查询一下用户账号信息，使用账号进行处理。
+        String account = addPositionVo.getAccount();
+
+        UserDo addUser = userDomainService.getByAccount(account);
+        if (null == addUser) {
+            return OutputResult.buildFail(ResultCode.ACCOUNT_NOT_EXIST);
+        }
+        int addUserId = addUser.getId();
+
+        //处理股票自选信息.
+
+        List<String> stockCodeList = positionList.stream().map(TradePosition::getCode).collect(Collectors.toList());
+        executor.submit(() -> {
+            stockSelectedService.batchSelected(addUserId, stockCodeList);
+        });
+
+        MockType mockType = MockType.MOCK;
+        // 对金额等信息进行处理。  处理昨天的。
+        // 默认是当天的。
+        Date currentDate = DateUtil.date();
+
+        if (addPositionVo.getType() == 0) {
+            currentDate = dateHelper.getBeforeLastWorking(currentDate);
+        }
+
+        // 对 TradeMoney 进行处理。
+
+        TradeMoney tradeMoney = addPositionVo.getMoneyInfo();
+        tradeMoney.setId(null);
+        tradeMoney.setMockType(mockType.getCode());
+        tradeMoney.setUserId(addUserId);
+        tradeMoneyService.operateMoney(tradeMoney);
+
+        // 保存历史数据
+        tradeMoneyService.saveMoneyHistory(addUserId, mockType, currentDate);
+        // 对持仓进行处理。
+
+        Map<String, String> codeNameMap = stockService.mapNameByCodeList(stockCodeList);
+
+        for (TradePosition tradePosition : positionList) {
+            tradePosition.setId(null);
+            // 根据股票的编码，获取相应的股票记录信息
+            tradePosition.setName(codeNameMap.getOrDefault(tradePosition.getCode(), ""));
+            tradePosition.setUserId(addUserId);
+            tradePosition.setMockType(mockType.getCode());
+
+            // 进行保存。
+            tradePositionService.operatePosition(tradePosition);
+        }
+        tradePositionService.savePositionHistory(addUserId, mockType, currentDate);
+
+        return OutputResult.buildSucc();
     }
 
     /**

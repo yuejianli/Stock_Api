@@ -96,12 +96,28 @@ public interface StockSelectedService {
      * 更新自选表里面的股票代码的价格
      * @param code 股票编码
      */
-    void updateSelectedCodePrice( String code);
+    void updateSelectedCodePrice(String code);
 
     /**
      * 编辑笔记
+     *
      * @param stockSelectedRo 笔记对象
      * @return 编辑笔记
      */
     OutputResult editNotes(StockSelectedRo stockSelectedRo);
+
+    /**
+     * 批量保存自选股票信息
+     *
+     * @param addUserId     要添加的用户id
+     * @param stockCodeList 股票编码集合
+     */
+    List<String> batchSelected(int addUserId, List<String> stockCodeList);
+
+    /**
+     * 同步股票编码
+     *
+     * @param stockCode 股票编码
+     */
+    void syncCodeInfo(String stockCode);
 }
