@@ -188,3 +188,22 @@ ocr:
       user:
       pass:
       softid: 000000
+# 配置 actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+      jmx:
+        exposure:
+          include: '*'
+  endpoint:
+    shutdown:
+      enabled: true
+    health:
+      show-details: always
+    beans:
+      cache:
+        time-to-live: 100s
+  server:
+    port: 8099
