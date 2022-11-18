@@ -3,6 +3,7 @@ package top.yueshushu.learn.util;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -19,15 +20,22 @@ public class MyDateUtil {
     static List<String> holiday;
     static List<String> extraWorkDay;
 
+    private static LocalTime MORNING_START_TIME = LocalTime.parse("09:20:00");
+    private static LocalTime MORNING_END_TIME = LocalTime.parse("11:30:05");
+
+    private static LocalTime AFTERNOON_START_TIME = LocalTime.parse("13:00:00");
+    private static LocalTime AFTERNOON_END_TIME = LocalTime.parse("15:00:05");
+
     /**
      * 当前时间是否在下午3点之后
+     *
      * @return
      */
-    public static boolean after15Hour(){
-        Date now= DateUtil.date();
+    public static boolean after15Hour() {
+        Date now = DateUtil.date();
         //组装一个下午3点的时间
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY,15);
+        calendar.set(Calendar.HOUR_OF_DAY, 15);
         calendar.set(Calendar.MINUTE,0);
         calendar.set(Calendar.SECOND,0);
         Date hour15 = calendar.getTime();
@@ -44,22 +52,49 @@ public class MyDateUtil {
         Date now= DateUtil.date();
         //组装一个下午3点的时间
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY,9);
-        calendar.set(Calendar.MINUTE,30);
-        calendar.set(Calendar.SECOND,0);
+        calendar.set(Calendar.HOUR_OF_DAY, 9);
+        calendar.set(Calendar.MINUTE, 30);
+        calendar.set(Calendar.SECOND, 0);
         Date hour930 = calendar.getTime();
-        if(now.before(hour930)){
+        if (now.before(hour930)) {
+            return true;
+        }
+        return false;
+    }
+
+
+    /**
+     * 是否是 9点 20到 11:30 的时间
+     */
+    public static boolean isMorning() {
+        // 进行延迟， 如果时间在 14:59 之后，则睡眠 1分钟。
+        LocalTime now = LocalTime.now();
+        if (now.isAfter(MORNING_START_TIME) && now.isBefore(MORNING_END_TIME)) {
             return true;
         }
         return false;
     }
 
     /**
+     * 是否是 13 点 到 15:00 的时间
+     */
+    public static boolean isAfternoon() {
+        // 进行延迟， 如果时间在 14:59 之后，则睡眠 1分钟。
+        LocalTime now = LocalTime.now();
+        if (now.isAfter(AFTERNOON_START_TIME) && now.isBefore(AFTERNOON_END_TIME)) {
+            return true;
+        }
+        return false;
+    }
+
+
+    /**
      * 当前时间是否 9点半到 15点之间
+     *
      * @return
      */
-    public static boolean between930And15(){
-       return !before930()&&!after15Hour();
+    public static boolean isWorkingTime() {
+        return isMorning() || isAfternoon();
     }
 
     public static void main(String[] args) {

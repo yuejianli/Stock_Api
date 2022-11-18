@@ -141,7 +141,7 @@ public class DefaultStockShowInfoParse implements StockShowInfoParse {
             }
         }
         /*如果当前时间在下午三点之后*/
-        if (!MyDateUtil.between930And15()) {
+        if (!MyDateUtil.isWorkingTime()) {
             result.setClosingPrice(result.getNowPrice());
         }
         result.setAmplitude(BigDecimalUtil.subBigDecimal(

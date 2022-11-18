@@ -202,13 +202,12 @@ javamelody:
     # 记录http请求
     log: true
     # 从监视中排除图像，css，字体和js网址
-    url-exclude-pattern: (/webjars/.*|/css/.*|/images/.*|/fonts/.*|/js/.*)
+    url-exclude-pattern: (/static/.*|/webjars/.*|/css/.*|/images/.*|/fonts/.*|/js/.*)
     # 汇总http请求中的数字
     #http-transform-pattern: \d+
     # 添加基本身份验证
-    # authorized-users: admin:{SHA-256}6ca13d52ca70c883e0f0bb101e425a89e8624de51db2d2392593af6a84118090
-    authorized-users: admin:abc123
+    authorized-users: admin:{SHA-256}6ca13d52ca70c883e0f0bb101e425a89e8624de51db2d2392593af6a84118090
     # 更改默认存储目录：
-    #storage-directory: /tmp/javamelody
+    storage-directory: /usr/app/javamelody
     # 更改默认的“ / monitoring”路径：
-    #monitoring-path: /admin/performance
+    monitoring-path: /monitoring

@@ -107,7 +107,7 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
         }
         //是获取股票实时价格的任务，并且是自动运行。 非时间，不执行。
         if (JobInfoType.STOCK_PRICE.equals(jobInfoType) && EntrustType.AUTO.getCode().equals(triggerType)) {
-            if (!MyDateUtil.between930And15() || !dateHelper.isWorkingDay(DateUtil.date())) {
+            if (!MyDateUtil.isWorkingTime() || !dateHelper.isWorkingDay(DateUtil.date())) {
                 return OutputResult.buildSucc();
             }
         }
@@ -136,7 +136,7 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
                 }
                 case STOCK_PRICE: {
                     if (isEndStockPriceTime()) {
-                        // 进行休眠70 s, 使 查询股票的价格时间 在3点之后。
+                        // 进行休眠30 s, 使 查询股票的价格时间 在3点之后。
                         TimeUnit.SECONDS.sleep(30);
                     }
                     stockSelectedService.updateSelectedCodePrice(null);
