@@ -2,7 +2,6 @@ package top.yueshushu.learn.business.impl;
 
 import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
-import net.bull.javamelody.MonitoredWithSpring;
 import org.springframework.stereotype.Service;
 import top.yueshushu.learn.assembler.UserAssembler;
 import top.yueshushu.learn.business.UserBusiness;
@@ -31,7 +30,7 @@ import java.util.List;
  **/
 @Service
 @Slf4j
-@MonitoredWithSpring
+
 public class UserBusinessImpl implements UserBusiness {
     @Resource
     private UserService userService;

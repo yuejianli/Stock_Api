@@ -55,13 +55,6 @@ spring:
     initialSize: 100
     maxActive: 100
     minIdle: 100
-    # 配置监控统计拦截的filters，去掉后监控界面sql将无法统计，'wall'用于防火墙
-    # filters: stat, wall, log4j   # wall暂不启用，如果启用，需要设置multiStatementAllow为true
-    filters: stat
-    # 通过connectProperties属性来打开mergeSql功能，慢SQL记录
-    connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=2000
-    druid:
-      aop-patterns: top.yueshushu.learn.mapper.*,top.yueshushu.learn.service.impl.*
   # 配置Redis的使用
   redis:
     database: ${REDIS_DATABASE}
@@ -188,26 +181,3 @@ ocr:
       user:
       pass:
       softid: 000000
-# javamelody 监控
-javamelody:
-  # 启用JavaMelody自动配置（可选，默认值：true）
-  enabled: true
-  # 要从监视中排除的数据源名称（可选，以逗号分隔）
-  #  excluded-datasources: secretSource,topSecretSource
-  # 启用对Spring服务和控制器的监视（可选，默认值：true）
-  spring-monitoring-enabled: true
-  # JavaMelody的初始化参数（可选）
-  # See: https://github.com/javamelody/javamelody/wiki/UserGuide#6-optional-parameters
-  init-parameters:
-    # 记录http请求
-    log: true
-    # 从监视中排除图像，css，字体和js网址
-    url-exclude-pattern: (/static/.*|/webjars/.*|/css/.*|/images/.*|/fonts/.*|/js/.*)
-    # 汇总http请求中的数字
-    #http-transform-pattern: \d+
-    # 添加基本身份验证
-    authorized-users: admin:{SHA-256}6ca13d52ca70c883e0f0bb101e425a89e8624de51db2d2392593af6a84118090
-    # 更改默认存储目录：
-    storage-directory: /usr/app/javamelody
-    # 更改默认的“ / monitoring”路径：
-    monitoring-path: /monitoring

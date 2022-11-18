@@ -34,24 +34,17 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-            <!--            &lt;!&ndash; 排除Tomcat依赖 &ndash;&gt;-->
-            <!--            <exclusions>-->
-            <!--                <exclusion>-->
-            <!--                    <groupId>org.springframework.boot</groupId>-->
-            <!--                    <artifactId>spring-boot-starter-tomcat</artifactId>-->
-            <!--                </exclusion>-->
-            <!--            </exclusions>-->
+            <!-- 排除Tomcat依赖 -->
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-tomcat</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
-        <!-- 添加 Undertow依赖 -->
-        <!--        <dependency>-->
-        <!--            <groupId>org.springframework.boot</groupId>-->
-        <!--            <artifactId>spring-boot-starter-undertow</artifactId>-->
-        <!--        </dependency>-->
-        <!--添加 javamelody监控-->
         <dependency>
-            <groupId>net.bull.javamelody</groupId>
-            <artifactId>javamelody-spring-boot-starter</artifactId>
-            <version>1.91.0</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-undertow</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

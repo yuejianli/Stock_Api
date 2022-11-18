@@ -1,7 +1,6 @@
 package top.yueshushu.learn.business.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import net.bull.javamelody.MonitoredWithSpring;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import top.yueshushu.learn.business.RevokeBusiness;
@@ -28,7 +27,7 @@ import javax.annotation.Resource;
  **/
 @Slf4j
 @Service
-@MonitoredWithSpring
+
 public class RevokeBusinessImpl implements RevokeBusiness {
 
     @Resource

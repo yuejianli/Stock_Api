@@ -2,7 +2,6 @@ package top.yueshushu.learn.business.impl;
 
 import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
-import net.bull.javamelody.MonitoredWithSpring;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,7 +40,7 @@ import java.util.Optional;
  **/
 @Slf4j(topic = "deal")
 @Service
-@MonitoredWithSpring
+
 public class DealBusinessImpl implements DealBusiness {
 
     @Resource

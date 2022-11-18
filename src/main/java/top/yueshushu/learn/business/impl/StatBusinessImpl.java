@@ -6,7 +6,6 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
-import net.bull.javamelody.MonitoredWithSpring;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -59,7 +58,7 @@ import java.util.stream.Collectors;
  **/
 @Service
 @Slf4j
-@MonitoredWithSpring
+
 public class StatBusinessImpl implements StatBusiness {
     public static final int TEN_10 = 10;
     @Resource

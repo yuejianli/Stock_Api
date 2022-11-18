@@ -1,7 +1,6 @@
 package top.yueshushu.learn.business.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import net.bull.javamelody.MonitoredWithSpring;
 import org.springframework.stereotype.Service;
 import top.yueshushu.learn.business.MoneyBusiness;
 import top.yueshushu.learn.common.ResultCode;
@@ -22,7 +21,7 @@ import javax.annotation.Resource;
  **/
 @Slf4j
 @Service
-@MonitoredWithSpring
+
 public class MoneyBusinessImpl implements MoneyBusiness {
     @Resource
     private StockService stockService;

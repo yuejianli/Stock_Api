@@ -1,6 +1,6 @@
 package top.yueshushu.learn.business.impl;
 
-import net.bull.javamelody.MonitoredWithSpring;
+
 import org.springframework.stereotype.Service;
 import top.yueshushu.learn.business.StockCrawlerBusiness;
 import top.yueshushu.learn.mode.info.StockShowInfo;
@@ -16,7 +16,7 @@ import javax.annotation.Resource;
  * @Date 2021/11/12 23:07
  **/
 @Service
-@MonitoredWithSpring
+
 public class StockCrawlerBusinessImpl implements StockCrawlerBusiness {
     @Resource
     private StockCrawlerService stockCrawlerService;

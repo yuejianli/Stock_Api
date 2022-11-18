@@ -1,7 +1,6 @@
 package top.yueshushu.learn.business.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import net.bull.javamelody.MonitoredWithSpring;
 import org.springframework.stereotype.Service;
 import top.yueshushu.learn.assembler.TradeMoneyAssembler;
 import top.yueshushu.learn.business.TradeMoneyBusiness;
@@ -23,7 +22,7 @@ import javax.annotation.Resource;
  */
 @Service
 @Slf4j
-@MonitoredWithSpring
+
 public class TradeMoneyBusinessImpl implements TradeMoneyBusiness {
     @Resource
     private TradeMoneyService tradeMoneyService;

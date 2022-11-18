@@ -1,7 +1,6 @@
 package top.yueshushu.learn.business.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import net.bull.javamelody.MonitoredWithSpring;
 import org.springframework.stereotype.Service;
 import top.yueshushu.learn.business.TradeEntrustBusiness;
 import top.yueshushu.learn.enumtype.TradeRealValueType;
@@ -22,7 +21,7 @@ import java.util.List;
  */
 @Service
 @Slf4j
-@MonitoredWithSpring
+
 public class TradeEntrustBusinessImpl implements TradeEntrustBusiness {
     @Resource
     private TradeEntrustService tradeEntrustService;
