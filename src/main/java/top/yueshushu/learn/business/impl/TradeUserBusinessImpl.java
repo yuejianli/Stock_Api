@@ -1,6 +1,7 @@
 package top.yueshushu.learn.business.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import net.bull.javamelody.MonitoredWithSpring;
 import org.springframework.stereotype.Service;
 import top.yueshushu.learn.business.TradeUserBusiness;
 import top.yueshushu.learn.mode.ro.TradeUserRo;
@@ -20,6 +21,7 @@ import java.util.List;
  **/
 @Service
 @Slf4j
+@MonitoredWithSpring
 public class TradeUserBusinessImpl implements TradeUserBusiness {
     @Resource
     private TradeUserService tradeUserService;

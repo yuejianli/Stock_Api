@@ -2,6 +2,7 @@ package top.yueshushu.learn.business.impl;
 
 import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
+import net.bull.javamelody.MonitoredWithSpring;
 import org.springframework.stereotype.Service;
 import top.yueshushu.learn.assembler.UserAssembler;
 import top.yueshushu.learn.business.UserBusiness;
@@ -14,7 +15,10 @@ import top.yueshushu.learn.mode.vo.AddUserRequestVo;
 import top.yueshushu.learn.mode.vo.MenuVo;
 import top.yueshushu.learn.mode.vo.UserVo;
 import top.yueshushu.learn.response.OutputResult;
-import top.yueshushu.learn.service.*;
+import top.yueshushu.learn.service.MenuService;
+import top.yueshushu.learn.service.TradeMoneyService;
+import top.yueshushu.learn.service.TradeUserService;
+import top.yueshushu.learn.service.UserService;
 import top.yueshushu.learn.util.JasypUtil;
 
 import javax.annotation.Resource;
@@ -27,6 +31,7 @@ import java.util.List;
  **/
 @Service
 @Slf4j
+@MonitoredWithSpring
 public class UserBusinessImpl implements UserBusiness {
     @Resource
     private UserService userService;
@@ -35,8 +40,6 @@ public class UserBusinessImpl implements UserBusiness {
     @Resource
     private TradeMoneyService tradeMoneyService;
 
-    @Resource
-    private TradeMoneyHistoryService tradeMoneyHistoryService;
     @Resource
     private MenuService menuService;
     @Resource

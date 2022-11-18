@@ -2,6 +2,7 @@ package top.yueshushu.learn.business.impl;
 
 import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
+import net.bull.javamelody.MonitoredWithSpring;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import top.yueshushu.learn.business.SellBusiness;
@@ -34,6 +35,7 @@ import javax.annotation.Resource;
  */
 @Service
 @Slf4j(topic = "sell")
+@MonitoredWithSpring
 public class SellBusinessImpl implements SellBusiness {
     @Resource
     private TradePositionService tradePositionService;

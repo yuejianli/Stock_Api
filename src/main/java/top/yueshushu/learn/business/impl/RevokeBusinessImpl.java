@@ -1,9 +1,9 @@
 package top.yueshushu.learn.business.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import net.bull.javamelody.MonitoredWithSpring;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import top.yueshushu.learn.assembler.TradePositionAssembler;
 import top.yueshushu.learn.business.RevokeBusiness;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.domain.TradeEntrustDo;
@@ -15,7 +15,6 @@ import top.yueshushu.learn.enumtype.EntrustStatusType;
 import top.yueshushu.learn.enumtype.EntrustType;
 import top.yueshushu.learn.mode.ro.RevokeRo;
 import top.yueshushu.learn.response.OutputResult;
-import top.yueshushu.learn.service.TradeEntrustService;
 import top.yueshushu.learn.service.TradeMoneyService;
 import top.yueshushu.learn.service.TradePositionService;
 import top.yueshushu.learn.util.BigDecimalUtil;
@@ -29,16 +28,13 @@ import javax.annotation.Resource;
  **/
 @Slf4j
 @Service
+@MonitoredWithSpring
 public class RevokeBusinessImpl implements RevokeBusiness {
 
     @Resource
     private TradeMoneyService tradeMoneyService;
     @Resource
-    private TradeEntrustService tradeEntrustService;
-    @Resource
     private TradePositionService tradePositionService;
-    @Resource
-    private TradePositionAssembler tradePositionAssembler;
     @Resource
     private TradeEntrustDomainService tradeEntrustDomainService;
 

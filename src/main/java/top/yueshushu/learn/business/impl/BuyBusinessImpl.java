@@ -2,6 +2,7 @@ package top.yueshushu.learn.business.impl;
 
 import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
+import net.bull.javamelody.MonitoredWithSpring;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import top.yueshushu.learn.business.BuyBusiness;
@@ -35,6 +36,7 @@ import java.math.BigDecimal;
  **/
 @Slf4j(topic = "buy")
 @Service
+@MonitoredWithSpring
 public class BuyBusinessImpl implements BuyBusiness {
 
     @Resource

@@ -1,29 +1,16 @@
 package top.yueshushu.learn.business.impl;
 
-import com.github.pagehelper.PageInfo;
-
-import org.springframework.core.task.AsyncTaskExecutor;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.stream.Collectors;
-
-import javax.annotation.Resource;
-
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
+import net.bull.javamelody.MonitoredWithSpring;
+import org.springframework.core.task.AsyncTaskExecutor;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import top.yueshushu.learn.business.StatBusiness;
 import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.common.ResultCode;
@@ -59,6 +46,12 @@ import top.yueshushu.learn.service.UserService;
 import top.yueshushu.learn.service.cache.StockCacheService;
 import top.yueshushu.learn.util.BigDecimalUtil;
 
+import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.stream.Collectors;
+
 /**
  * @Description 菜单实现编排层
  * @Author yuejianli
@@ -66,6 +59,7 @@ import top.yueshushu.learn.util.BigDecimalUtil;
  **/
 @Service
 @Slf4j
+@MonitoredWithSpring
 public class StatBusinessImpl implements StatBusiness {
     public static final int TEN_10 = 10;
     @Resource
