@@ -81,7 +81,7 @@ public class StockHistoryServiceImpl  implements StockHistoryService {
     @Override
     public List<StockPriceCacheDto> listClosePrice(List<String> codeList) {
         //查询距离当前最近的一个工作日
-        Date lastWorkingDate = dateHelper.getBeforeLastWorking(DateUtil.date());
+        Date lastWorkingDate = dateHelper.getBeforeLastWorking(DateUtil.offsetDay(DateUtil.date(), -1));
         return stockHistoryDomainService.listYesterdayClosePrice(codeList,lastWorkingDate);
     }
 

@@ -178,7 +178,7 @@ public class TradePositionBusinessImpl implements TradePositionBusiness {
         Date currentDate = DateUtil.date();
 
         if (addPositionVo.getType() == 0) {
-            currentDate = dateHelper.getBeforeLastWorking(currentDate);
+            currentDate = dateHelper.getBeforeLastWorking(DateUtil.offsetDay(currentDate, -1));
         }
 
         // 对 TradeMoney 进行处理。

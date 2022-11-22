@@ -14,7 +14,6 @@ import top.yueshushu.learn.helper.DateHelper;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -35,9 +34,7 @@ public class DailyTradingInfoParseTest {
     @Test
     public void parseTxMoneyHistoryTest() {
         List<String> codeList = Arrays.asList("sz002812", "sz002415");
-
-        Date yesDay = DateUtil.offsetDay(DateUtil.date(), -1);
-        DateTime beforeLastWorking = dateHelper.getBeforeLastWorking(yesDay);
+        DateTime beforeLastWorking = dateHelper.getBeforeLastWorking(DateUtil.offsetDay(DateUtil.date(), -1));
 
         //内容处理
 

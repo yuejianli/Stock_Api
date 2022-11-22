@@ -108,8 +108,7 @@ public class CrawlerStockHistoryServiceImpl implements CrawlerStockHistoryServic
     @Override
     public OutputResult easyMoneyYesStockHistory(List<String> codeList) {
        try {
-           Date yesDay = DateUtil.offsetDay(DateUtil.date(), -1);
-           DateTime beforeLastWorking = dateHelper.getBeforeLastWorking(yesDay);
+           DateTime beforeLastWorking = dateHelper.getBeforeLastWorking(DateUtil.offsetDay(DateUtil.date(), -1));
 
            //处理读取数据
            List<StockHistoryCsvInfo> stockHistoryCsvInfoList = crawlerService.parseEasyMoneyYesHistory(codeList, beforeLastWorking);

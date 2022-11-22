@@ -108,12 +108,14 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
         //是获取股票实时价格的任务，并且是自动运行。 非时间，不执行。
         if (JobInfoType.STOCK_PRICE.equals(jobInfoType) && EntrustType.AUTO.getCode().equals(triggerType)) {
             if (!MyDateUtil.isWorkingTime() || !dateHelper.isWorkingDay(DateUtil.date())) {
+                log.info(">>> 执行任务 {} 被拒绝", jobInfoType.getDesc());
                 return OutputResult.buildSucc();
             }
         }
         //是获取股票实时价格的任务，并且是自动运行。 非时间，不执行。
         if (JobInfoType.STOCK_HISTORY.equals(jobInfoType)) {
             if (!MyDateUtil.after15Hour()) {
+                log.info(">>> 执行任务 {} 被拒绝", jobInfoType.getDesc());
                 return OutputResult.buildFail(ResultCode.JOB_AFTER_3);
             }
         }
