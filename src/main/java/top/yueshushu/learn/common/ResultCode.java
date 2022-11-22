@@ -235,6 +235,8 @@ public class ResultCode {
             new ResultCode(true, 10020002, "任务编号是禁用状态，不能执行");
     public static final ResultCode CRON_NO_VALID =
             new ResultCode(true, 10020003, "Cron 表达式不正确");
+    public static final ResultCode JOB_AFTER_3 =
+            new ResultCode(true, 10020004, "必须要在下午3点之后执行");
     /**
      * 扩展信息  100 21（编排）+ 001 (三位随机)
      */

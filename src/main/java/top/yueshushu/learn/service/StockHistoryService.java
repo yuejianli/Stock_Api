@@ -8,6 +8,7 @@ import top.yueshushu.learn.mode.ro.StockRo;
 import top.yueshushu.learn.mode.vo.StockHistoryVo;
 import top.yueshushu.learn.response.OutputResult;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -72,8 +73,14 @@ public interface StockHistoryService{
 
     /**
      * 查询股票天范围内的历史记录信息
+     *
      * @param stockDayStatRo 天范围股票对象
      * @return 查询股票天范围内的历史记录信息
      */
     OutputResult pageDayRange(StockDayStatRo stockDayStatRo);
+
+    /**
+     * 获取目前最大的历史记录信息
+     */
+    Date getMaxCurrentDate();
 }

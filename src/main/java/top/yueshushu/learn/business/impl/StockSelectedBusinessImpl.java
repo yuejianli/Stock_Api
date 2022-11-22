@@ -1,7 +1,6 @@
 package top.yueshushu.learn.business.impl;
 
 import cn.hutool.core.date.DateTime;
-import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -125,22 +124,22 @@ public class StockSelectedBusinessImpl implements StockSelectedBusiness {
                 stockSelectedRo.getPageSize()
         );
         //如果这个时候为空的话，进行处理
-        if (CollectionUtils.isEmpty(stockList)){
+        if (CollectionUtils.isEmpty(stockList)) {
             return OutputResult.buildSucc(
                     new PageResponse((long) stockList.size(),
                             Collections.emptyList())
             );
         }
         //查询最近的一天，非周末，非节假日
-        Date yestaryDay = DateUtil.yesterday();
-        DateTime beforeLastWorking = dateHelper.getBeforeLastWorking(yestaryDay);
+        Date maxHistoryDay = stockHistoryService.getMaxCurrentDate();
+        DateTime beforeLastWorking = dateHelper.getBeforeLastWorking(maxHistoryDay);
 
         List<StockHistoryVo> stockHistoryVoList = new ArrayList<>(list.size());
-        for (String code: list){
+        for (String code : list) {
             StockHistoryVo stockHistoryVo = stockHistoryService.getVoByCodeAndCurrDate(
                     code, beforeLastWorking
             );
-            if (null == stockHistoryVo){
+            if (null == stockHistoryVo) {
                 stockHistoryVo = new StockHistoryVo();
                 stockHistoryVo.setCode(
                         code

@@ -36,4 +36,13 @@ public interface CrawlerStockHistoryService {
      */
     OutputResult txMoneyYesStockHistory(List<String> codeList, List<String> fullCodeList);
 
+
+    /**
+     * 股票历史记录同步
+     *
+     * @param codeList 股票代码对象
+     * @return 股票历史记录同步 今日交易日的信息
+     */
+    OutputResult txMoneyTodayStockHistory(List<String> codeList, List<String> fullCodeList);
+
 }

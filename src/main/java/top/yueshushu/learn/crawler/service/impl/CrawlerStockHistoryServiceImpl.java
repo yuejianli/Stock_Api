@@ -146,9 +146,13 @@ public class CrawlerStockHistoryServiceImpl implements CrawlerStockHistoryServic
 
     @Override
     public OutputResult txMoneyYesStockHistory(List<String> codeList, List<String> fullCodeList) {
+        Date yesDay = DateUtil.offsetDay(DateUtil.date(), -1);
+        return txMoneyStockHistoryAsync(codeList, fullCodeList, yesDay);
+    }
+
+    private OutputResult<Object> txMoneyStockHistoryAsync(List<String> codeList, List<String> fullCodeList, Date dateTime) {
         try {
-            Date yesDay = DateUtil.offsetDay(DateUtil.date(), -1);
-            DateTime beforeLastWorking = dateHelper.getBeforeLastWorking(yesDay);
+            DateTime beforeLastWorking = dateHelper.getBeforeLastWorking(dateTime);
 
             //处理读取数据
             List<TxStockHistoryInfo> txStockHistoryInfoList = crawlerService.parseTxMoneyYesHistory(fullCodeList,
@@ -180,5 +184,10 @@ public class CrawlerStockHistoryServiceImpl implements CrawlerStockHistoryServic
         } catch (Exception e) {
             return OutputResult.buildFail(e.getMessage());
         }
+    }
+
+    @Override
+    public OutputResult txMoneyTodayStockHistory(List<String> codeList, List<String> fullCodeList) {
+        return txMoneyStockHistoryAsync(codeList, fullCodeList, DateUtil.date());
     }
 }

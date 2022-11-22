@@ -56,4 +56,11 @@ public interface UserBusiness {
      * @param currentUser      当前用户
      */
     OutputResult addUser(AddUserRequestVo addUserRequestVo, User currentUser);
+
+    /**
+     * 是否是超级用户  id=1 为超级用户
+     *
+     * @param user 当前用户
+     */
+    boolean isSuperUser(User user);
 }

@@ -379,7 +379,8 @@ public class StockSelectedServiceImpl implements StockSelectedService {
         //}
 
         List<String> codeList = stockSelectedDomainService.findCodeList(null);
-        crawlerStockHistoryService.txMoneyYesStockHistory(codeList, stockService.listFullCode(codeList));
+        // 15点之前
+        crawlerStockHistoryService.txMoneyTodayStockHistory(codeList, stockService.listFullCode(codeList));
     }
     @Override
     public void cacheClosePrice() {
@@ -407,6 +408,7 @@ public class StockSelectedServiceImpl implements StockSelectedService {
             //东方财富同步没有的历史记录。
             // 换成成腾讯相应的接口信息
             // crawlerStockHistoryService.easyMoneyYesStockHistory(noHistoryList);
+            // 早上执行的，同步的是昨天的。
             crawlerStockHistoryService.txMoneyYesStockHistory(noHistoryList, stockService.listFullCode(noHistoryList));
         }
         priceCacheDtoList = stockHistoryService.listClosePrice(codeList);

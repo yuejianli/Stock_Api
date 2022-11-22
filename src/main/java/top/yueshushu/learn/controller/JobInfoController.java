@@ -10,11 +10,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import top.yueshushu.learn.annotation.AuthToken;
 import top.yueshushu.learn.business.JobInfoBusiness;
+import top.yueshushu.learn.business.UserBusiness;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.enumtype.DataFlagType;
 import top.yueshushu.learn.mode.ro.JobInfoRo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.util.CronExpression;
+import top.yueshushu.learn.util.ThreadLocalUtils;
 
 import javax.annotation.Resource;
 
@@ -32,6 +34,8 @@ import javax.annotation.Resource;
 public class JobInfoController extends BaseController {
     @Resource
     private JobInfoBusiness jobInfoBusiness;
+    @Resource
+    private UserBusiness userBusiness;
 
     @PostMapping("/list")
     @ApiOperation("查询任务信息")
@@ -46,6 +50,9 @@ public class JobInfoController extends BaseController {
         if (jobInfoRo.getId() == null) {
             return OutputResult.buildAlert(ResultCode.ID_IS_EMPTY);
         }
+        if (!userBusiness.isSuperUser(ThreadLocalUtils.getUser())) {
+            return OutputResult.buildFail(ResultCode.NO_AUTH);
+        }
         return jobInfoBusiness.changeStatus(jobInfoRo.getId(), DataFlagType.DELETE);
     }
 
@@ -55,6 +62,9 @@ public class JobInfoController extends BaseController {
     public OutputResult enable(@RequestBody JobInfoRo jobInfoRo) {
         if (jobInfoRo.getId() == null) {
             return OutputResult.buildAlert(ResultCode.ID_IS_EMPTY);
+        }
+        if (!userBusiness.isSuperUser(ThreadLocalUtils.getUser())) {
+            return OutputResult.buildFail(ResultCode.NO_AUTH);
         }
         return jobInfoBusiness.changeStatus(jobInfoRo.getId(), DataFlagType.NORMAL);
     }
@@ -66,6 +76,9 @@ public class JobInfoController extends BaseController {
         if (jobInfoRo.getId() == null) {
             return OutputResult.buildAlert(ResultCode.ID_IS_EMPTY);
         }
+        if (!userBusiness.isSuperUser(ThreadLocalUtils.getUser())) {
+            return OutputResult.buildFail(ResultCode.NO_AUTH);
+        }
         return jobInfoBusiness.deleteById(jobInfoRo.getId());
     }
 
@@ -75,6 +88,9 @@ public class JobInfoController extends BaseController {
     public OutputResult handler(@RequestBody JobInfoRo jobInfoRo) {
         if (jobInfoRo.getId() == null) {
             return OutputResult.buildAlert(ResultCode.ID_IS_EMPTY);
+        }
+        if (!userBusiness.isSuperUser(ThreadLocalUtils.getUser())) {
+            return OutputResult.buildFail(ResultCode.NO_AUTH);
         }
         return jobInfoBusiness.handlerById(jobInfoRo.getId());
     }
@@ -89,6 +105,9 @@ public class JobInfoController extends BaseController {
         boolean validExpression = CronExpression.isValidExpression(jobInfoRo.getCron());
         if (!validExpression) {
             return OutputResult.buildAlert(ResultCode.CRON_NO_VALID);
+        }
+        if (!userBusiness.isSuperUser(ThreadLocalUtils.getUser())) {
+            return OutputResult.buildFail(ResultCode.NO_AUTH);
         }
         return jobInfoBusiness.changeCron(jobInfoRo.getId(), jobInfoRo.getCron());
     }

@@ -1,21 +1,12 @@
 package top.yueshushu.learn.service.impl;
 
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-
-import javax.annotation.Resource;
-
-import cn.hutool.core.date.DateTime;
-import cn.hutool.core.date.DateUtil;
 import top.yueshushu.learn.assembler.StockHistoryAssembler;
 import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.domain.StockHistoryDo;
@@ -30,6 +21,12 @@ import top.yueshushu.learn.mode.vo.StockHistoryVo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.response.PageResponse;
 import top.yueshushu.learn.service.StockHistoryService;
+
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 /**
  * <p>
@@ -201,9 +198,14 @@ public class StockHistoryServiceImpl  implements StockHistoryService {
                 }
         );
 
-        PageInfo pageInfo=new PageInfo<>(pageResultList);
+        PageInfo pageInfo = new PageInfo<>(pageResultList);
         return OutputResult.buildSucc(new PageResponse<>(
-                pageGithubResult.getTotal(),pageInfo.getList()
+                pageGithubResult.getTotal(), pageInfo.getList()
         ));
+    }
+
+    @Override
+    public Date getMaxCurrentDate() {
+        return stockHistoryDomainService.getMaxCurrentDate();
     }
 }

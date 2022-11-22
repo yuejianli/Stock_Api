@@ -127,4 +127,9 @@ public interface StockHistoryDoMapper extends BaseMapper<StockHistoryDo> {
      * @param currentDate 要删除的日期
      */
     void deleteHasAsyncData(@Param("codeList") List<String> codeList, @Param("currentDate") DateTime currentDate);
+
+    /**
+     * 获取最大的日期信息
+     */
+    Date getMaxCurrentDate();
 }

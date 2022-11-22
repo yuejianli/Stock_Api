@@ -111,6 +111,12 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
                 return OutputResult.buildSucc();
             }
         }
+        //是获取股票实时价格的任务，并且是自动运行。 非时间，不执行。
+        if (JobInfoType.STOCK_HISTORY.equals(jobInfoType)) {
+            if (!MyDateUtil.after15Hour()) {
+                return OutputResult.buildFail(ResultCode.JOB_AFTER_3);
+            }
+        }
         //查询任务
         JobInfo jobInfo = jobInfoService.getByCode(jobInfoType);
         jobInfo.setTriggerLastTime(DateUtil.date().toLocalDateTime());
@@ -277,6 +283,12 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
         //立即执行
         JobInfo job = jobInfoService.getById(id);
 
+        //是获取股票实时价格的任务，并且是自动运行。 非时间，不执行。
+        if (JobInfoType.STOCK_HISTORY.equals(JobInfoType.getJobInfoType(job.getCode()))) {
+            if (!MyDateUtil.after15Hour()) {
+                return OutputResult.buildFail(ResultCode.JOB_AFTER_3);
+            }
+        }
         executor.submit(
                 () -> {
                     execJob(JobInfoType.getJobInfoType(job.getCode()), EntrustType.HANDLER.getCode());

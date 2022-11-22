@@ -96,4 +96,9 @@ public interface StockHistoryDomainService extends IService<StockHistoryDo> {
      * @param currentDate 日期
      */
     void deleteHasAsyncData(List<String> codeList, DateTime currentDate);
+
+    /**
+     * 获取最大的日期信息
+     */
+    Date getMaxCurrentDate();
 }

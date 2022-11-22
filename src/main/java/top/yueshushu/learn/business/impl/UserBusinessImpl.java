@@ -89,8 +89,7 @@ public class UserBusinessImpl implements UserBusiness {
 
     @Override
     public OutputResult addUser(AddUserRequestVo addUserRequestVo, User currentUser) {
-        // 添加用户前验证。
-        if (currentUser.getId() != 1) {
+        if (!isSuperUser(currentUser)) {
             return OutputResult.buildFail(ResultCode.NO_AUTH);
         }
         // 用户账号不能相同
@@ -121,5 +120,14 @@ public class UserBusinessImpl implements UserBusiness {
 
         return OutputResult.buildSucc();
 
+    }
+
+    @Override
+    public boolean isSuperUser(User user) {
+        if (user == null) {
+            return false;
+        }
+        // 添加用户前验证。
+        return 1 == user.getId();
     }
 }

@@ -104,4 +104,9 @@ public class StockHistoryDomainServiceImpl extends ServiceImpl<StockHistoryDoMap
     public void deleteHasAsyncData(List<String> codeList, DateTime currentDate) {
         stockHistoryDoMapper.deleteHasAsyncData(codeList, currentDate);
     }
+
+    @Override
+    public Date getMaxCurrentDate() {
+        return stockHistoryDoMapper.getMaxCurrentDate();
+    }
 }

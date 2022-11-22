@@ -154,4 +154,8 @@
         </if>
         and date_format(curr_date,'%Y%m%d') =date_format( #{currentDate,jdbcType=TIMESTAMP},'%Y%m%d')
     </delete>
+
+    <select id="getMaxCurrentDate" resultType="java.util.Date">
+        select t.curr_date from stock_history t order by t.curr_date desc limit 1
+    </select>
 </mapper>
