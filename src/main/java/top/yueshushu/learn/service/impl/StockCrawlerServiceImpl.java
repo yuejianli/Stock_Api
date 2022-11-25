@@ -214,7 +214,7 @@ public class StockCrawlerServiceImpl implements StockCrawlerService {
                 stockUpdateLogDo.setUpdateType(StockUpdateType.NEW.getCode());
                 stockUpdateLogDoList.add(stockUpdateLogDo);
                 List<User> userList = userService.listNotice();
-                String newStockMessage = "打新股提醒:股票 " + downloadStockInfo.getCode() + "今天上市了";
+                String newStockMessage = "打新股提醒:股票 " + downloadStockInfo.getCode() + ",股票名称:" + downloadStockInfo.getName() + "今天上市了";
                 userList.forEach(
                         n -> {
                             weChatService.sendTextMessage(n.getWxUserId(), newStockMessage);

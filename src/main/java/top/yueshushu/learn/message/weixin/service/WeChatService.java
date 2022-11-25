@@ -56,6 +56,11 @@ public class WeChatService {
 	 * @return 通过微信企业号发送消息
 	 */
 	public String sendTextMessage(String wxUserId, String content) {
+
+		if (!StringUtils.hasText(wxUserId)) {
+			return "";
+		}
+
 		// 1. 获取 token
 		String accessToken = getWeiXinToken();
 		// 2 构建普通文本对象
@@ -88,6 +93,10 @@ public class WeChatService {
 	 * @return 通过微信企业号发送消息
 	 */
 	public String sendTextCardMessage(String wxUserId, String title, String content) {
+
+		if (!StringUtils.hasText(wxUserId)) {
+			return "";
+		}
 		// 1.获取access_token:根据企业id和应用密钥获取access_token,并拼接请求url
 		String accessToken = getWeiXinToken();
 		// 2.获取发送对象，并转成json
