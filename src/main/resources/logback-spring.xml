@@ -9,7 +9,7 @@
 
     <contextName>logback</contextName>
     <!-- name的值是变量的名称，value的值时变量定义的值。通过定义的值会被插入到logger上下文中。定义变量后，可以使“${}”来使用变量。 -->
-    <property name="log.path" value="/usr/app/apiLog" />
+    <property name="log.path" value="/usr/app/logs"/>
 
     <!-- 彩色日志 -->
     <!-- 彩色日志依赖的渲染类 -->
@@ -19,7 +19,8 @@
     <!-- 彩色日志格式 -->
     <property name="CONSOLE_LOG_PATTERN" value="${CONSOLE_LOG_PATTERN:-%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} [%X{traceId}] %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}[%line]){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}"/>
     <!-- 输入到文件里面的日志格式 -->
-    <property name="FILE_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%X{traceId}] [%thread] %-5level %logger{50}[%line] - %msg%n" />
+    <property name="FILE_LOG_PATTERN"
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%X{traceId}] [%thread] %-5level [%X{X-B3-TraceId:-},%X{X-B3-SpanId:-}] %logger{50}[%line] - %msg%n"/>
 
     <!--输出到控制台-->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
@@ -35,9 +36,9 @@
     </appender>
 
     <!-- 时间滚动输出 level为 DEBUG 日志 -->
-    <appender name="TOOL_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <appender name="ZK_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <!-- 正在记录的日志文件的路径及文件名 -->
-        <file>${log.path}/log_api.log</file>
+        <file>${log.path}/log_stock.log</file>
         <!--日志文件输出格式-->
         <encoder>
             <pattern>${FILE_LOG_PATTERN}</pattern>
@@ -46,12 +47,12 @@
         <!-- 日志记录器的滚动策略，按日期，按大小记录 -->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- 日志归档 -->
-            <fileNamePattern>${log.path}/debug/log-zk-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>${log.path}/debug/log-stock-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <maxFileSize>300MB</maxFileSize>
+                <maxFileSize>100MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
             <!--日志文件保留天数-->
-            <maxHistory>7</maxHistory>
+            <maxHistory>15</maxHistory>
         </rollingPolicy>
     </appender>
 
@@ -60,38 +61,11 @@
         <!-- 不丢失日志.默认的,如果队列的80%已满,则会丢弃TRACT、DEBUG、INFO级别的日志 -->
         <discardingThreshold >0</discardingThreshold>
         <!-- 更改默认的队列的深度,该值会影响性能.默认值为256 -->
-        <queueSize>512</queueSize>
+        <queueSize>256</queueSize>
         <!-- 异步日志提取调用者数据标识 true/false -->
         <includeCallerData>true</includeCallerData>
         <!-- 添加附加的appender,最多只能添加一个 -->
-        <appender-ref ref ="TOOL_FILE"/>
-    </appender>
-
-    <!-- 时间滚动输出 level为 INFO 日志 -->
-    <appender name="INFO_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <!-- 正在记录的日志文件的路径及文件名 -->
-        <file>${log.path}/log_info.log</file>
-        <!--日志文件输出格式-->
-        <encoder>
-            <pattern>${FILE_LOG_PATTERN}</pattern>
-            <charset>UTF-8</charset>
-        </encoder>
-        <!-- 日志记录器的滚动策略，按日期，按大小记录 -->
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <!-- 每天日志归档路径以及格式 -->
-            <fileNamePattern>${log.path}/info/log-info-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
-            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <maxFileSize>300MB</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
-            <!--日志文件保留天数-->
-            <maxHistory>7</maxHistory>
-        </rollingPolicy>
-        <!-- 此日志文件只记录info级别的 -->
-        <filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <level>info</level>
-            <onMatch>ACCEPT</onMatch>
-            <onMismatch>DENY</onMismatch>
-        </filter>
+        <appender-ref ref="ZK_FILE"/>
     </appender>
 
     <!-- 时间滚动输出 level为 WARN 日志 -->
@@ -110,7 +84,7 @@
                 <maxFileSize>100MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
             <!--日志文件保留天数-->
-            <maxHistory>12</maxHistory>
+            <maxHistory>20</maxHistory>
         </rollingPolicy>
         <!-- 此日志文件只记录warn级别的 -->
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
@@ -137,7 +111,7 @@
                 <maxFileSize>100MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
             <!--日志文件保留天数-->
-            <maxHistory>15</maxHistory>
+            <maxHistory>20</maxHistory>
         </rollingPolicy>
         <!-- 此日志文件只记录ERROR级别的 -->
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
@@ -176,46 +150,32 @@
     <!--开发环境:打印控制台-->
 
     <logger name="top.yueshushu.learn" level="DEBUG" additivity="false">
-<!--         <appender-ref ref="ASYNC_ZK_FILE" />-->
+        <appender-ref ref="ASYNC_ZK_FILE"/>
 
-           <appender-ref ref="CONSOLE" />
-           <appender-ref ref="INFO_FILE" />
+        <!--                <appender-ref ref="CONSOLE" />-->
 
         <appender-ref ref="WARN_FILE" />
         <appender-ref ref="ERROR_FILE" />
-
     </logger>
     <!-- 不打印mapper的debug信息 -->
     <logger name="top.yueshushu.learn.mapper" level="INFO" additivity="false">
 
-        <appender-ref ref="ASYNC_ZK_FILE" />
-        <!--
-        <appender-ref ref="CONSOLE" />
-        <appender-ref ref="INFO_FILE" />
-        -->
-        <appender-ref ref="WARN_FILE" />
-        <appender-ref ref="ERROR_FILE" />
+        <appender-ref ref="ASYNC_ZK_FILE"/>
+
+        <!--        <appender-ref ref="CONSOLE"/>-->
+
+        <appender-ref ref="WARN_FILE"/>
+        <appender-ref ref="ERROR_FILE"/>
     </logger>
 
-   <root level="INFO">
-        <appender-ref ref="ASYNC_ZK_FILE" />
-       <!--
-               <appender-ref ref="CONSOLE" />
-               <appender-ref ref="INFO_FILE" />
-               -->
-        <appender-ref ref="WARN_FILE" />
-        <appender-ref ref="ERROR_FILE" />
+    <root level="INFO">
+        <appender-ref ref="ASYNC_ZK_FILE"/>
+
+        <!--        <appender-ref ref="CONSOLE"/>-->
+
+        <appender-ref ref="WARN_FILE"/>
+        <appender-ref ref="ERROR_FILE"/>
     </root>
 
-    <!--生产环境:输出到文件-->
-    <springProfile name="DEBUG">
-    <root level="info">
-        <appender-ref ref="CONSOLE" />
-        <appender-ref ref="DEBUG_FILE" />
-        <appender-ref ref="INFO_FILE" />
-        <appender-ref ref="ERROR_FILE" />
-        <appender-ref ref="WARN_FILE" />
-    </root>
-    </springProfile>
 
 </configuration>
