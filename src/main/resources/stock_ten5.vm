@@ -31,12 +31,12 @@
     </style>
 </head>
 <body>
-<h3>亲爱的 ${account} 投资者:</h3>
+<h3>亲爱的 <span style="color:red;">${name} </span> 投资者:</h3>
     ${line}
 愿你明天心想事成，股票都是红
 <br/>
     ${line}
-您自选股票五个交易日内涨跌记录如下:
+您自选股票十个交易日内涨跌记录如下:
     ${line}
 <div>
     ${line}
@@ -57,20 +57,19 @@
                         #foreach($ten10Vo in ${stockInfo.ten10List})
                             <td>
                                 #if(${ten10Vo.type} ==1)
-                                    <span style="color:red;">赚</span>
+                                    <span style="color:red;">↑ </span>
                                     ${line}
                                     ${ten10Vo.amplitudeProportion}
                                 #elseif(${ten10Vo.type} ==-1)
-                                    <span style="color:green;">赔</span>
+                                    <span style="color:green;">↓ </span>
                                     ${line}
                                     ${ten10Vo.amplitudeProportion}
                                 #elseif(${ten10Vo.type} ==0)
-                                    <span style="color:#999999;">平</span>
+                                    <span style="color:#999999;">↑ </span>
                                     ${line}
                                     ${ten10Vo.amplitudeProportion}
                                 #else
-                                    <span style="color:pink;">未同步</span>
-
+                                    <span style="color:pink;"> </span>
                                     ${line}
                                     0.00
                                 #end

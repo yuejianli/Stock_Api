@@ -251,13 +251,13 @@ public class StatBusinessImpl implements StatBusiness {
             return;
         }
         if (StringUtils.isEmpty(user.getEmail())) {
-            log.info(">>>用户 {} 未配置邮件，不发送最近5天的交易日信息", user.getAccount());
+            log.info(">>>用户 {} 未配置邮件，不发送最近10 天的交易日信息", user.getAccount());
             return;
         }
         // 获取信息
         StatTen10Ro statTen10Ro = new StatTen10Ro();
         statTen10Ro.setUserId(userId);
-        statTen10Ro.setPageSize(20);
+        statTen10Ro.setPageSize(30);
         statTen10Ro.setPageNum(1);
         OutputResult<PageResponse<StockTen10Vo>> tenDataResult = getTenTradeData(statTen10Ro);
         // 获取数据
@@ -265,7 +265,7 @@ public class StatBusinessImpl implements StatBusiness {
         List<StockTen10Vo> convertTen10VoList = stockTen10List.stream().map(
                 n -> {
                     StockTen10Vo last5DaVo = new StockTen10Vo();
-                    List<HistoryTen10Vo> historyTen10VoList = n.getTen10List().subList(5, 10);
+                    List<HistoryTen10Vo> historyTen10VoList = n.getTen10List();
                     historyTen10VoList.forEach(
                             vo -> {
                                 vo.setAmplitudeProportion(
@@ -281,24 +281,25 @@ public class StatBusinessImpl implements StatBusiness {
         ).collect(Collectors.toList());
 
         // 定义一个 DTO 对象
-        List<String> currDateList = getTenTradeDay().getData().subList(5, 10);
+        List<String> currDateList = getTenTradeDay().getData();
         List<String> convertDateList = currDateList.stream().map(
                 n -> n.substring(8)
         ).collect(Collectors.toList());
         StockTenToEmailDto stockTenToEmailDto = new StockTenToEmailDto();
         stockTenToEmailDto.setAccount(user.getAccount());
+        stockTenToEmailDto.setName(user.getName());
         stockTenToEmailDto.setDataList(convertTen10VoList);
         stockTenToEmailDto.setCurrDateList(convertDateList);
         stockTenToEmailDto.setLine("<br/>");
 
         Map<String, Object> modelMap = BeanUtil.beanToMap(stockTenToEmailDto);
         boolean emailFlag = emailService.sendVelocityMail(
-                new String[]{user.getEmail()}, "自选股票五个交易日内涨跌记录",
+                new String[]{user.getEmail()}, "自选股票十个交易日内涨跌记录",
                 VelocityTemplateType.TEN10, modelMap
         );
         if (!emailFlag) {
-            log.error("发送最近五天的自选股票涨跌记录 给用户{} 失败 ", user.getAccount());
-            weChatService.sendSystemUserTextMessage("发送最近五天的自选股票涨跌记录 给用户" + user.getAccount() + "失败");
+            log.error("发送最近十天的自选股票涨跌记录 给用户{} 失败 ", user.getName());
+            weChatService.sendSystemUserTextMessage("发送最近十天的自选股票涨跌记录 给用户" + user.getName() + "失败");
         }
     }
 

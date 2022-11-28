@@ -18,6 +18,10 @@ public class StockTenToEmailDto implements Serializable {
      */
     private String account;
     /**
+     * 名称
+     */
+    private String name;
+    /**
      * 日期信息
      */
     private List<String> currDateList;
