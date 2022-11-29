@@ -120,4 +120,11 @@ public interface StockSelectedService {
      * @param stockCode 股票编码
      */
     void syncCodeInfo(String stockCode);
+
+    /**
+     * 查询所有的自选股票信息
+     *
+     * @param userId 用户编号
+     */
+    List<String> findCodeList(Integer userId);
 }

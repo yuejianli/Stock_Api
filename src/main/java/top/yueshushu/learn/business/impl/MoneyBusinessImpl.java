@@ -10,7 +10,7 @@ import top.yueshushu.learn.mode.vo.CalcMoneyVo;
 import top.yueshushu.learn.mode.vo.MoneyVo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.service.MoneyService;
-import top.yueshushu.learn.service.StockService;
+import top.yueshushu.learn.service.cache.StockCacheService;
 
 import javax.annotation.Resource;
 
@@ -24,7 +24,7 @@ import javax.annotation.Resource;
 
 public class MoneyBusinessImpl implements MoneyBusiness {
     @Resource
-    private StockService stockService;
+    private StockCacheService stockCacheService;
     @Resource
     private MoneyService moneyService;
 
@@ -102,7 +102,7 @@ public class MoneyBusinessImpl implements MoneyBusiness {
      * @return 验证股票的编码是否正确，如果正确，返回股票的对象
      */
     private OutputResult validateStock(String code) {
-        Stock stock = stockService.selectByCode(code);
+        Stock stock = stockCacheService.selectByCode(code);
         if (null == stock) {
             return OutputResult.buildAlert(
                     ResultCode.STOCK_CODE_NO_EXIST

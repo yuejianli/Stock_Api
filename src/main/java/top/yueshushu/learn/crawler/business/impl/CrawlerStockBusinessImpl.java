@@ -3,11 +3,13 @@ package top.yueshushu.learn.crawler.business.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import top.yueshushu.learn.crawler.business.CrawlerStockBusiness;
+import top.yueshushu.learn.crawler.entity.StockBigDealInfo;
 import top.yueshushu.learn.crawler.service.CrawlerStockService;
-import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.mode.ro.StockRo;
+import top.yueshushu.learn.response.OutputResult;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @Description 菜单实现编排层
@@ -45,5 +47,10 @@ public class CrawlerStockBusinessImpl implements CrawlerStockBusiness {
         return crawlerStockService.getCrawlerPrice(
                 fullCode
         );
+    }
+
+    @Override
+    public OutputResult<List<StockBigDealInfo>> getBigDealList(String fullCode, Integer minVolume, String day) {
+        return crawlerStockService.getBigDealList(fullCode, minVolume, day);
     }
 }

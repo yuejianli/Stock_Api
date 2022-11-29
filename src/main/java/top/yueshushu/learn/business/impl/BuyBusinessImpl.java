@@ -19,9 +19,8 @@ import top.yueshushu.learn.mode.ro.BuyRo;
 import top.yueshushu.learn.mode.vo.ConfigVo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.service.ConfigService;
-import top.yueshushu.learn.service.StockService;
-import top.yueshushu.learn.service.TradeEntrustService;
 import top.yueshushu.learn.service.TradeMoneyService;
+import top.yueshushu.learn.service.cache.StockCacheService;
 import top.yueshushu.learn.util.BigDecimalUtil;
 import top.yueshushu.learn.util.StockUtil;
 
@@ -38,21 +37,19 @@ import java.math.BigDecimal;
 public class BuyBusinessImpl implements BuyBusiness {
 
     @Resource
-    private TradeEntrustService tradeEntrustService;
-    @Resource
     private TradeMoneyService tradeMoneyService;
     @Resource
     private ConfigService configService;
     @Resource
     private TradeEntrustDomainService tradeEntrustDomainService;
     @Resource
-    private StockService stockService;
+    private StockCacheService stockCacheService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public OutputResult buy(BuyRo buyRo) {
         log.info(">>>试图买入股票 {},股票信息是:{}", buyRo.getCode(), buyRo);
-        Stock stock = stockService.selectByCode(buyRo.getCode());
+        Stock stock = stockCacheService.selectByCode(buyRo.getCode());
         if (stock ==null){
             return OutputResult.buildAlert(ResultCode.STOCK_CODE_NO_EXIST);
         }

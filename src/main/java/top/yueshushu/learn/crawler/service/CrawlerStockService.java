@@ -1,7 +1,10 @@
 package top.yueshushu.learn.crawler.service;
 
-import top.yueshushu.learn.response.OutputResult;
+import top.yueshushu.learn.crawler.entity.StockBigDealInfo;
 import top.yueshushu.learn.mode.ro.StockRo;
+import top.yueshushu.learn.response.OutputResult;
+
+import java.util.List;
 
 /**
  * @InterfaceName StockBaseService
@@ -35,8 +38,18 @@ public interface CrawlerStockService {
 
     /**
      * 获取股票的当前价格
+     *
      * @param fullCode 股票的编码
      * @return 获取股票的当前价格
      */
     OutputResult getCrawlerPrice(String fullCode);
+
+    /**
+     * 获取大宗交易信息
+     *
+     * @param fullCode  股票全编码
+     * @param minVolume 最低量
+     * @param day
+     */
+    OutputResult<List<StockBigDealInfo>> getBigDealList(String fullCode, Integer minVolume, String day);
 }

@@ -5,6 +5,7 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import top.yueshushu.learn.assembler.TradePositionHistoryAssembler;
 import top.yueshushu.learn.common.Const;
@@ -12,13 +13,19 @@ import top.yueshushu.learn.domain.JobInfoDo;
 import top.yueshushu.learn.domain.TradePositionHistoryDo;
 import top.yueshushu.learn.domainservice.JobInfoDomainService;
 import top.yueshushu.learn.domainservice.TradePositionHistoryDomainService;
+import top.yueshushu.learn.entity.Stock;
 import top.yueshushu.learn.entity.TradePositionHistoryCache;
 import top.yueshushu.learn.helper.DateHelper;
+import top.yueshushu.learn.mode.dto.StockPriceCacheDto;
+import top.yueshushu.learn.service.StockHistoryService;
+import top.yueshushu.learn.service.StockService;
 import top.yueshushu.learn.service.cache.StockCacheService;
 import top.yueshushu.learn.util.RedisUtil;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -38,6 +45,10 @@ public class StockCacheServiceImpl implements StockCacheService {
     private DateHelper dateHelper;
     @Resource
     private JobInfoDomainService jobInfoDomainService;
+    @Resource
+    private StockService stockService;
+    @Resource
+    private StockHistoryService stockHistoryService;
 
     @Override
     public void setNowCachePrice(String code, BigDecimal price) {
@@ -71,15 +82,30 @@ public class StockCacheServiceImpl implements StockCacheService {
     @Override
     public BigDecimal getYesterdayCloseCachePrice(String code) {
         Object o = redisUtil.get(Const.STOCK_YES_PRICE + code);
-        if (ObjectUtils.isEmpty(o)) {
+        if (!ObjectUtils.isEmpty(o)) {
+            return (BigDecimal) o;
+        }
+        List<StockPriceCacheDto> stockPriceCacheDtos = stockHistoryService.listClosePrice(Collections.singletonList(code));
+
+        if (CollectionUtils.isEmpty(stockPriceCacheDtos)) {
             return DEFAULT_PRICE;
         }
-        return (BigDecimal) o;
+
+        BigDecimal yesPrice = stockPriceCacheDtos.get(0).getPrice();
+        setYesterdayCloseCachePrice(code, yesPrice);
+
+        return yesPrice;
+    }
+
+    @Override
+    public void clearYesPrice() {
+        // 清空所有的
+        redisUtil.deleteByPrefix(Const.STOCK_YES_PRICE);
     }
 
     @Override
     public void setLastBuyCachePrice(String code, BigDecimal price) {
-        redisUtil.set(Const.STOCK_BUY_PRICE + code, price);
+        redisUtil.set(Const.STOCK_BUY_PRICE + code, price, Const.STOCK_PRICE_EXPIRE_TIME);
     }
 
     @Override
@@ -98,7 +124,7 @@ public class StockCacheServiceImpl implements StockCacheService {
 
     @Override
     public void setLastSellCachePrice(String code, BigDecimal price) {
-        redisUtil.set(Const.STOCK_SELL_PRICE + code, price);
+        redisUtil.set(Const.STOCK_SELL_PRICE + code, price, Const.STOCK_PRICE_EXPIRE_TIME);
     }
 
     @Override
@@ -125,7 +151,7 @@ public class StockCacheServiceImpl implements StockCacheService {
         // 查询一下
         TradePositionHistoryDo lastHistoryDo = tradePositionHistoryDomainService.getLastRecordByCode(userId, mockType, code);
         TradePositionHistoryCache tradePositionHistoryCache = tradePositionHistoryAssembler.doToCache(lastHistoryDo);
-        redisUtil.set(key, Optional.ofNullable(tradePositionHistoryCache).orElse(new TradePositionHistoryCache()));
+        redisUtil.set(key, Optional.ofNullable(tradePositionHistoryCache).orElse(new TradePositionHistoryCache()), Const.STOCK_PRICE_EXPIRE_TIME);
 
         return tradePositionHistoryCache;
     }
@@ -148,7 +174,7 @@ public class StockCacheServiceImpl implements StockCacheService {
         // 为空的话，进行计算。
         boolean workingDay = dateHelper.isWorkingDay(currDate);
         // 8 个小时 清空一次 即可。
-        redisUtil.set(workingKey, isWorking, 8 * 3600);
+        redisUtil.set(workingKey, isWorking, 24 * 3600);
         return workingDay;
     }
 
@@ -166,12 +192,31 @@ public class StockCacheServiceImpl implements StockCacheService {
         if (jobInfoDomainService.isValid(jobInfoDo)) {
             cronResult = jobInfoDo.getCron();
         }
-        redisUtil.set(jobInfoKey, cronResult, 3600);
+        redisUtil.set(jobInfoKey, cronResult, Const.JOB_CRON_EXPIRE_TIME);
         return cronResult;
     }
 
     @Override
     public void clearJobInfoCronCacheByCode(String code) {
         redisUtil.delByKey(Const.JOB_INFO + code);
+    }
+
+    @Override
+    public Stock selectByCode(String code) {
+        Object stockInfo = redisUtil.hGet(Const.CACHE_STOCK_INFO, code);
+        if (null != stockInfo) {
+            return (Stock) stockInfo;
+        }
+        // 查询一个数据库
+        Stock stock = stockService.selectByCode(code);
+        // 往里面放置
+        redisUtil.hPut(Const.CACHE_STOCK_INFO, code, stock);
+        return stock;
+    }
+
+    @Override
+    public void clearStockInfo() {
+        // 清除缓存， 是一个 map 形式。
+        redisUtil.delByKey(Const.CACHE_STOCK_INFO);
     }
 }

@@ -9,6 +9,7 @@ import top.yueshushu.learn.assembler.StockAssembler;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.crawler.crawler.CrawlerService;
 import top.yueshushu.learn.crawler.entity.DownloadStockInfo;
+import top.yueshushu.learn.crawler.entity.StockBigDealInfo;
 import top.yueshushu.learn.crawler.service.CrawlerStockService;
 import top.yueshushu.learn.domain.StockDo;
 import top.yueshushu.learn.domainservice.StockDomainService;
@@ -143,7 +144,7 @@ public class CrawlerStockServiceImpl implements CrawlerStockService {
                         Collectors.toList()
                 ));
         stockDomainService.saveBatch(stockList,1000);
-        log.info("同步信息到数据库共用时 {}",timer.intervalMs());
+        log.info("同步信息到数据库共用时 {}", timer.intervalMs());
         return OutputResult.buildSucc(ResultCode.STOCK_ASYNC_SUCCESS);
     }
 
@@ -151,6 +152,13 @@ public class CrawlerStockServiceImpl implements CrawlerStockService {
     public OutputResult getCrawlerPrice(String fullCode) {
         return OutputResult.buildSucc(
                 crawlerService.sinaGetPrice(fullCode)
+        );
+    }
+
+    @Override
+    public OutputResult<List<StockBigDealInfo>> getBigDealList(String fullCode, Integer minVolume, String day) {
+        return OutputResult.buildSucc(
+                crawlerService.parseBigDealByCode(fullCode, minVolume, day)
         );
     }
 }

@@ -1,14 +1,8 @@
 package top.yueshushu.learn.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-
-import java.math.BigDecimal;
-import java.util.List;
-
-import javax.annotation.Resource;
-
-import lombok.extern.slf4j.Slf4j;
 import top.yueshushu.learn.business.BuyBusiness;
 import top.yueshushu.learn.business.RevokeBusiness;
 import top.yueshushu.learn.business.SellBusiness;
@@ -17,18 +11,19 @@ import top.yueshushu.learn.entity.Stock;
 import top.yueshushu.learn.entity.TradeEntrust;
 import top.yueshushu.learn.enumtype.ConfigCodeType;
 import top.yueshushu.learn.enumtype.EntrustType;
-import top.yueshushu.learn.message.weixin.service.WeChatService;
 import top.yueshushu.learn.mode.ro.BuyRo;
 import top.yueshushu.learn.mode.ro.RevokeRo;
 import top.yueshushu.learn.mode.ro.SellRo;
 import top.yueshushu.learn.mode.vo.ConfigVo;
 import top.yueshushu.learn.service.ConfigService;
-import top.yueshushu.learn.service.StockService;
 import top.yueshushu.learn.service.TradeEntrustService;
 import top.yueshushu.learn.service.TradeStrategyService;
-import top.yueshushu.learn.service.UserService;
 import top.yueshushu.learn.service.cache.StockCacheService;
 import top.yueshushu.learn.util.BigDecimalUtil;
+
+import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @ClassName:TradeStrategyServiceImpl
@@ -52,15 +47,9 @@ public class TradeStrategyServiceImpl implements TradeStrategyService {
     @Resource
     private ConfigService configService;
     @Resource
-    private StockService stockService;
-    @Resource
     private TradeEntrustService tradeEntrustService;
     @Resource
     private RevokeBusiness revokeBusiness;
-    @Resource
-    private UserService userService;
-    @Resource
-    private WeChatService weChatService;
 
     @Override
     public void mockEntrustXxlJob(BuyRo buyRo) {
@@ -81,7 +70,7 @@ public class TradeStrategyServiceImpl implements TradeStrategyService {
             //获取今天的价格
             BigDecimal currentPrice = stockCacheService.getNowCachePrice(code);
             //查询当前股票的名称
-            Stock stock = stockService.selectByCode(code);
+            Stock stock = stockCacheService.selectByCode(code);
             //+ 相差 2元，就    110  2    --->  108 106  2
             if (BigDecimalUtil.subBigDecimal(lastBuyPrice, currentPrice).compareTo(buySubPrice) > 0) {
                 //可以买入

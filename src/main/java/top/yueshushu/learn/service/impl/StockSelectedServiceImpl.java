@@ -58,6 +58,11 @@ public class StockSelectedServiceImpl implements StockSelectedService {
     private StockSelectedDomainService stockSelectedDomainService;
     @Resource
     private StockCacheService stockCacheService;
+
+    @Resource
+    private StockService stockService;
+
+
     @Resource
     private StockHistoryService stockHistoryService;
 
@@ -65,8 +70,6 @@ public class StockSelectedServiceImpl implements StockSelectedService {
     private StockCrawlerService stockCrawlerService;
     @Resource
     private CrawlerStockHistoryService crawlerStockHistoryService;
-    @Resource
-    private StockService stockService;
 
     @SuppressWarnings("all")
     @Resource(name = Const.ASYNC_SERVICE_EXECUTOR_BEAN_NAME)
@@ -297,7 +300,7 @@ public class StockSelectedServiceImpl implements StockSelectedService {
 
         for (String code : stockCodeList) {
             // 根据股票的编码，获取相应的股票记录信息
-            Stock stock = stockService.selectByCode(code);
+            Stock stock = stockCacheService.selectByCode(code);
             if (null == stock) {
                 continue;
             }
@@ -337,6 +340,11 @@ public class StockSelectedServiceImpl implements StockSelectedService {
             stockCacheService.setLastSellCachePrice(stockCode, stockPriceCacheDto.getPrice());
             stockCacheService.setYesterdayCloseCachePrice(stockCode, stockPriceCacheDto.getPrice());
         }
+    }
+
+    @Override
+    public List<String> findCodeList(Integer userId) {
+        return stockSelectedDomainService.findCodeList(userId);
     }
 
     @Override
@@ -385,9 +393,11 @@ public class StockSelectedServiceImpl implements StockSelectedService {
     @Override
     public void cacheClosePrice() {
         ////查询出所有的自选表里面的股票记录信息
+        stockCacheService.clearYesPrice();
+
         List<String> codeList = stockSelectedDomainService.findCodeList(null);
-        if (CollectionUtil.isEmpty(codeList)){
-            return ;
+        if (CollectionUtil.isEmpty(codeList)) {
+            return;
         }
         //获取相关的信息，根据历史记录查询。
         List<StockPriceCacheDto> priceCacheDtoList = stockHistoryService.listClosePrice(codeList);

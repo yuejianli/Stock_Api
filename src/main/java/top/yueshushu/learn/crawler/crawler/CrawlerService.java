@@ -2,6 +2,7 @@ package top.yueshushu.learn.crawler.crawler;
 
 import cn.hutool.core.date.DateTime;
 import top.yueshushu.learn.crawler.entity.DownloadStockInfo;
+import top.yueshushu.learn.crawler.entity.StockBigDealInfo;
 import top.yueshushu.learn.crawler.entity.StockHistoryCsvInfo;
 import top.yueshushu.learn.crawler.entity.TxStockHistoryInfo;
 import top.yueshushu.learn.mode.info.StockShowInfo;
@@ -19,7 +20,7 @@ public interface CrawlerService {
      * 获取股票的全量列表信息
      * @return 获取股票的全量列表信息
      */
-     default List<DownloadStockInfo> getStockList() {
+    default List<DownloadStockInfo> getStockList() {
         return Collections.EMPTY_LIST;
     }
 
@@ -30,9 +31,9 @@ public interface CrawlerService {
      * @param endDate 结束日期
      * @return 获取该股票这期间内的历史数据
      */
-     default List<StockHistoryCsvInfo> parseStockHistoryList(String code,
-                                                             String startDate,
-                                                             String endDate) {
+    default List<StockHistoryCsvInfo> parseStockHistoryList(String code,
+                                                            String startDate,
+                                                            String endDate) {
         return Collections.EMPTY_LIST;
     }
 
@@ -41,7 +42,7 @@ public interface CrawlerService {
      * @param code 股票编码
      * @return 获取该股票展示的数据
      */
-     default StockShowInfo getNowInfo(String code) {
+    default StockShowInfo getNowInfo(String code) {
         return new StockShowInfo();
     }
 
@@ -50,25 +51,28 @@ public interface CrawlerService {
      * @param code 股票编码
      * @return 获取股票分钟的K线
      */
-     default String getMinUrl(String code) {
+    default String getMinUrl(String code) {
         return "";
     }
+
     /**
      * 获取股票 天的K线
      * @param code 股票编码
      * @return 获取股票 天 的K线
      */
-     default String getDayUrl(String code) {
+    default String getDayUrl(String code) {
         return "";
     }
+
     /**
      * 获取股票 周的K线
      * @param code 股票编码
      * @return 获取股票 周 的K线
      */
-     default String getWeekUrl(String code) {
+    default String getWeekUrl(String code) {
         return "";
     }
+
     /**
      * 获取股票 月 的K线
      * @param code 股票编码
@@ -99,7 +103,19 @@ public interface CrawlerService {
      *
      * @param codeList          股票编码集合
      * @param beforeLastWorking 最近的一个工作日
-     * @return 东方财富，同步股票交易信息
+     * @return 腾讯接口, 解析历史数据。
      */
     List<TxStockHistoryInfo> parseTxMoneyYesHistory(List<String> codeList, DateTime beforeLastWorking);
+
+
+    /**
+     * 新浪财富,获取大单数据
+     *
+     * @param fullCode  股票编码
+     * @param minVolume 最小的数量(股数)
+     * @param day       日期, 形式是  2022-11-23
+     * @return 新浪财富, 获取大单数据
+     */
+    List<StockBigDealInfo> parseBigDealByCode(String fullCode, Integer minVolume, String day);
+
 }

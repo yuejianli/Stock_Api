@@ -8,6 +8,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import top.yueshushu.learn.crawler.crawler.CrawlerService;
+import top.yueshushu.learn.crawler.entity.StockBigDealInfo;
 import top.yueshushu.learn.crawler.entity.TxStockHistoryInfo;
 import top.yueshushu.learn.crawler.parse.DailyTradingInfoParse;
 import top.yueshushu.learn.helper.DateHelper;
@@ -30,6 +32,8 @@ public class DailyTradingInfoParseTest {
     private DailyTradingInfoParse dailyTradingInfoParse;
     @Resource
     private DateHelper dateHelper;
+    @Resource
+    private CrawlerService crawlerService;
 
     @Test
     public void parseTxMoneyHistoryTest() {
@@ -57,5 +61,11 @@ public class DailyTradingInfoParseTest {
 
     }
 
+    @Test
+    public void parseTxMoneyYesHistoryTest() {
+        List<StockBigDealInfo> result = crawlerService.parseBigDealByCode("sz001322", 400000, "2022-11-29");
+
+        log.info(">>> 获取信息: {}", result);
+    }
 
 }

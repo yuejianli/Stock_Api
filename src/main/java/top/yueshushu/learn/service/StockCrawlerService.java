@@ -1,8 +1,12 @@
 package top.yueshushu.learn.service;
 
+import top.yueshushu.learn.domain.StockBigDealDo;
 import top.yueshushu.learn.mode.info.StockShowInfo;
 import top.yueshushu.learn.mode.ro.StockRo;
 import top.yueshushu.learn.response.OutputResult;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * @ClassName:StockService
@@ -44,6 +48,7 @@ public interface StockCrawlerService {
 
     /**
      * 更新股票的当前价格，放置到 redis 缓存里面。
+     *
      * @param code
      */
     void updateCodePrice(String code);
@@ -52,4 +57,13 @@ public interface StockCrawlerService {
      * 更新所有的股票信息
      */
     void updateAllStock();
+
+    /**
+     * 获取大宗交易信息
+     *
+     * @param fullCode  股票全编码
+     * @param minVolume 最低量
+     * @return
+     */
+    OutputResult<List<StockBigDealDo>> handleBigDeal(String fullCode, Integer minVolume, Date currentDate);
 }

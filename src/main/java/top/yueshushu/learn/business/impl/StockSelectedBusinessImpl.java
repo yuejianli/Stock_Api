@@ -14,7 +14,9 @@ import top.yueshushu.learn.mode.ro.StockSelectedRo;
 import top.yueshushu.learn.mode.vo.StockHistoryVo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.response.PageResponse;
-import top.yueshushu.learn.service.*;
+import top.yueshushu.learn.service.ConfigService;
+import top.yueshushu.learn.service.StockHistoryService;
+import top.yueshushu.learn.service.StockSelectedService;
 import top.yueshushu.learn.service.cache.StockCacheService;
 import top.yueshushu.learn.util.PageUtil;
 
@@ -34,13 +36,9 @@ public class StockSelectedBusinessImpl implements StockSelectedBusiness {
     @Resource
     private ConfigService configService;
     @Resource
-    private StockService stockService;
-    @Resource
     private StockHistoryService stockHistoryService;
     @Resource
     private DateHelper dateHelper;
-    @Resource
-    private StockCrawlerService stockCrawlerService;
     @Resource
     private StockCacheService stockCacheService;
 
@@ -59,7 +57,7 @@ public class StockSelectedBusinessImpl implements StockSelectedBusiness {
                 stockSelectedRo.getUserId()
         );
         // 根据股票的编码，获取相应的股票记录信息
-        Stock stock = stockService.selectByCode(stockSelectedRo.getStockCode());
+        Stock stock = stockCacheService.selectByCode(stockSelectedRo.getStockCode());
         if (null == stock) {
             return OutputResult.buildAlert(
                     ResultCode.STOCK_CODE_NO_EXIST

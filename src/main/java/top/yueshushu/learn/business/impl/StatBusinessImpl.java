@@ -40,7 +40,6 @@ import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.response.PageResponse;
 import top.yueshushu.learn.service.StockHistoryService;
 import top.yueshushu.learn.service.StockSelectedService;
-import top.yueshushu.learn.service.StockService;
 import top.yueshushu.learn.service.UserService;
 import top.yueshushu.learn.service.cache.StockCacheService;
 import top.yueshushu.learn.util.BigDecimalUtil;
@@ -64,13 +63,11 @@ public class StatBusinessImpl implements StatBusiness {
     @Resource
     private StockHistoryService stockHistoryService;
     @Resource
-    private StockService stockService;
+    private StockCacheService stockCacheService;
     @Resource
     private DateHelper dateHelper;
     @Resource
     private StockSelectedService stockSelectedService;
-    @Resource
-    private StockCacheService stockCacheService;
     @SuppressWarnings("all")
     @Resource(name = Const.ASYNC_SERVICE_EXECUTOR_BEAN_NAME)
     private AsyncTaskExecutor executor;
@@ -83,7 +80,7 @@ public class StatBusinessImpl implements StatBusiness {
 
     @Override
     public OutputResult getWeekStat(StockStatRo stockStatRo) {
-        Stock stock = stockService.selectByCode(stockStatRo.getCode());
+        Stock stock = stockCacheService.selectByCode(stockStatRo.getCode());
         if (stock == null) {
             return OutputResult.buildAlert(
                     ResultCode.STOCK_CODE_NO_EXIST
@@ -154,7 +151,7 @@ public class StatBusinessImpl implements StatBusiness {
 
     @Override
     public OutputResult getCharStat(StockStatRo stockStatRo) {
-        Stock stock = stockService.selectByCode(stockStatRo.getCode());
+        Stock stock = stockCacheService.selectByCode(stockStatRo.getCode());
         if (stock == null){
             return OutputResult.buildAlert(
                     ResultCode.STOCK_CODE_NO_EXIST

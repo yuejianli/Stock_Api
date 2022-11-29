@@ -1,6 +1,7 @@
 package top.yueshushu.learn.service.cache;
 
 import cn.hutool.core.date.DateTime;
+import top.yueshushu.learn.entity.Stock;
 import top.yueshushu.learn.entity.TradePositionHistoryCache;
 
 import java.math.BigDecimal;
@@ -58,6 +59,11 @@ public interface StockCacheService {
      * @param code 股票代码
      */
     BigDecimal getYesterdayCloseCachePrice(String code);
+
+    /**
+     * 清空所有的昨日价格
+     */
+    void clearYesPrice();
 
     /**
      * 设置缓存中股票的最近一次买入的价格  第二天为重置成昨晚的收盘价
@@ -136,4 +142,16 @@ public interface StockCacheService {
      * 删除 jobInfo 的缓存信息
      */
     void clearJobInfoCronCacheByCode(String code);
+
+
+    /**
+     * 根据股票的编码，获取股票的信息
+     */
+    Stock selectByCode(String code);
+
+    /**
+     * 清除股票的集合信息
+     */
+    void clearStockInfo();
+
 }

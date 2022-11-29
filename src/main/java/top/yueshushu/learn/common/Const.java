@@ -21,13 +21,15 @@ public class Const {
     public static final String CACHE_PRIVATE_KEY_PREFIX = "stock:private:";
     public static final String CACHE_WE_CHAT = "stock:wechat";
 
-    public static final String STOCK_PRICE = CACHE_PUBLIC_KEY_PREFIX;
+    public static final String STOCK_PRICE = CACHE_PUBLIC_KEY_PREFIX + "now:";
     public static final String STOCK_YES_PRICE = CACHE_PUBLIC_KEY_PREFIX + "yes:";
     public static final String STOCK_BUY_PRICE = CACHE_PUBLIC_KEY_PREFIX + "buy:";
     public static final String STOCK_SELL_PRICE = CACHE_PUBLIC_KEY_PREFIX + "sell:";
 
     public static final String X_REAL_IP = "x-real-ip";
     public static final int TOKEN_EXPIRE_TIME = 7 * 24 * 3600;
+    public static final int STOCK_PRICE_EXPIRE_TIME = 3 * 24 * 3600;
+    public static final int JOB_CRON_EXPIRE_TIME = 7 * 24 * 3600;
 
     public static final int YZM_TIME = 30;
     //采用的是 md5 加密
@@ -53,7 +55,7 @@ public class Const {
 
 
     private static final String CACHE_KEY_DATA_PREFIX = CACHE_PUBLIC_KEY_PREFIX + "data:";
-    public static final String CACHE_KEY_DATA_STOCK = Const.CACHE_KEY_DATA_PREFIX + "stock";
+    public static final String CACHE_STOCK_INFO = Const.CACHE_PUBLIC_KEY_PREFIX + "info";
 
     private static final String CACHE_KEY_CONFIG_PREFIX = CACHE_PUBLIC_KEY_PREFIX + "config:";
     public static final String CACHE_KEY_CONFIG_ROBOT = Const.CACHE_KEY_CONFIG_PREFIX + "robot";

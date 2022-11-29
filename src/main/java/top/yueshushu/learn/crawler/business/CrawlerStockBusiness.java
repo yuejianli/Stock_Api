@@ -1,7 +1,10 @@
 package top.yueshushu.learn.crawler.business;
 
+import top.yueshushu.learn.crawler.entity.StockBigDealInfo;
 import top.yueshushu.learn.mode.ro.StockRo;
 import top.yueshushu.learn.response.OutputResult;
+
+import java.util.List;
 
 /**
  * @Description stock 股票 的编排层处理
@@ -40,4 +43,13 @@ public interface CrawlerStockBusiness {
      * @return 获取股票的价格
      */
     OutputResult getStockPrice(String fullCode);
+
+    /**
+     * 获取大宗交易信息
+     *
+     * @param fullCode  股票全编码
+     * @param minVolume 最低量
+     * @param day
+     */
+    OutputResult<List<StockBigDealInfo>> getBigDealList(String fullCode, Integer minVolume, String day);
 }

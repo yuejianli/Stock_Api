@@ -1,9 +1,11 @@
 package top.yueshushu.learn.business.impl;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.ArrayUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import top.yueshushu.learn.business.DealBusiness;
 import top.yueshushu.learn.business.JobInfoBusiness;
@@ -33,9 +35,11 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * 用途描述
@@ -75,6 +79,8 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
     private StockCacheService stockCacheService;
     @Resource
     private DateHelper dateHelper;
+    @Resource
+    private StockBigDealService stockBigDealService;
 
     @SuppressWarnings("all")
     @Resource(name = Const.ASYNC_SERVICE_EXECUTOR_BEAN_NAME)
@@ -111,7 +117,7 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
                 return OutputResult.buildSucc();
             }
         }
-        //是获取股票实时价格的任务，并且是自动运行。 非时间，不执行。
+        //股票历史
         if (JobInfoType.STOCK_HISTORY.equals(jobInfoType)) {
             if (!MyDateUtil.after15Hour()) {
               //  log.info(">>> 执行任务 {} 被拒绝", jobInfoType.getDesc());
@@ -122,6 +128,7 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
         JobInfo jobInfo = jobInfoService.getByCode(jobInfoType);
         jobInfo.setTriggerLastTime(DateUtil.date().toLocalDateTime());
         try {
+            String param = jobInfo.getParam();
             switch (jobInfoType) {
                 case HOLIDAY: {
                     //当前的年
@@ -178,8 +185,8 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
                     break;
                 }
                 case MOCK_DEAL: {
-                    String userIdList = jobInfo.getParam();
-                    for (String userId : userIdList.split(",")) {
+                    String userIdList = param;
+                    for (String userId : userIdList.split("\\,")) {
                         DealRo dealRo = new DealRo();
                         dealRo.setMockType(MockType.MOCK.getCode());
                         dealRo.setUserId(Integer.parseInt(userId));
@@ -189,8 +196,8 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
                     break;
                 }
                 case MOCK_ENTRUST: {
-                    String userIdList = jobInfo.getParam();
-                    for (String userId : userIdList.split(",")) {
+                    String userIdList = param;
+                    for (String userId : userIdList.split("\\,")) {
                         BuyRo buyRo = new BuyRo();
                         buyRo.setMockType(MockType.MOCK.getCode());
                         buyRo.setUserId(Integer.parseInt(userId));
@@ -227,6 +234,28 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
                                         tradePositionBusiness.callProfit(userId, MockType.MOCK);
                                     }
                             );
+                    break;
+                }
+                case BIG_DEAL: {
+
+                    String[] splitUserIdArr = param.split("\\,");
+
+                    if (ArrayUtil.isEmpty(splitUserIdArr)) {
+                        splitUserIdArr = new String[]{Const.DEFAULT_USER_ID + ""};
+                    }
+                    List<String> codeList = new ArrayList<>();
+
+                    for (String userId : splitUserIdArr) {
+                        List<String> tempCodeList = stockSelectedService.findCodeList(Integer.parseInt(userId));
+                        if (!CollectionUtils.isEmpty(tempCodeList)) {
+                            codeList.addAll(tempCodeList);
+                        }
+                    }
+                    //去重
+                    codeList = codeList.stream().distinct().collect(Collectors.toList());
+
+                    stockBigDealService.syncBigDeal(codeList);
+
                     break;
                 }
                 default: {

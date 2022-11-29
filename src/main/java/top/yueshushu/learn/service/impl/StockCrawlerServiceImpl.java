@@ -1,10 +1,12 @@
 package top.yueshushu.learn.service.impl;
 
+import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import top.yueshushu.learn.assembler.StockAssembler;
 import top.yueshushu.learn.assembler.StockUpdateLogAssembler;
 import top.yueshushu.learn.common.Const;
@@ -12,11 +14,14 @@ import top.yueshushu.learn.crawler.business.CrawlerStockBusiness;
 import top.yueshushu.learn.crawler.business.CrawlerStockHistoryBusiness;
 import top.yueshushu.learn.crawler.crawler.CrawlerService;
 import top.yueshushu.learn.crawler.entity.DownloadStockInfo;
+import top.yueshushu.learn.crawler.entity.StockBigDealInfo;
+import top.yueshushu.learn.domain.StockBigDealDo;
 import top.yueshushu.learn.domain.StockDo;
 import top.yueshushu.learn.domain.StockUpdateLogDo;
 import top.yueshushu.learn.domainservice.StockDomainService;
 import top.yueshushu.learn.domainservice.StockUpdateLogDomainService;
 import top.yueshushu.learn.entity.User;
+import top.yueshushu.learn.enumtype.BigDealKindType;
 import top.yueshushu.learn.enumtype.DataFlagType;
 import top.yueshushu.learn.enumtype.StockUpdateType;
 import top.yueshushu.learn.enumtype.SyncStockHistoryType;
@@ -32,10 +37,7 @@ import top.yueshushu.learn.util.StockUtil;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -270,7 +272,47 @@ public class StockCrawlerServiceImpl implements StockCrawlerService {
         //对日志处理
         stockUpdateLogDomainService.saveBatch(stockUpdateLogDoList);
 
+        // 清除缓存信息
+        stockCacheService.clearStockInfo();
         log.info(">>>> 更新股票记录成功");
+    }
+
+    @Override
+    public OutputResult<List<StockBigDealDo>> handleBigDeal(String fullCode, Integer minVolume, Date currentDate) {
+        if (null == currentDate) {
+            currentDate = DateUtil.date();
+        }
+        // 进行查询
+        List<StockBigDealInfo> stockBigDealInfos = crawlerService.parseBigDealByCode(fullCode, minVolume, DateUtil.format(currentDate, DatePattern.NORM_DATE_PATTERN));
+
+        if (CollectionUtils.isEmpty(stockBigDealInfos)) {
+            return OutputResult.buildSucc(Collections.emptyList());
+        }
+
+        List<StockBigDealDo> result = new ArrayList<>(stockBigDealInfos.size());
+        Date finalCurrentDate = currentDate;
+
+        Map<String, Integer> kindMap = new HashMap<>();
+        kindMap.put("D", BigDealKindType.D.getCode());
+        kindMap.put("U", BigDealKindType.U.getCode());
+        kindMap.put("E", BigDealKindType.E.getCode());
+        stockBigDealInfos.forEach(
+                n -> {
+                    StockBigDealDo tempDo = new StockBigDealDo();
+                    // 处理放置
+                    tempDo.setFullCode(n.getSymbol());
+                    tempDo.setName(n.getName());
+                    tempDo.setCurrDate(finalCurrentDate);
+                    tempDo.setTickTime(n.getTicktime());
+                    tempDo.setPrice(BigDecimalUtil.toBigDecimal(n.getPrice()));
+                    tempDo.setPrevPrice(BigDecimalUtil.toBigDecimal(n.getPrev_price()));
+                    tempDo.setTradingVolume(BigDecimalUtil.toBigDecimal(n.getVolume()));
+                    tempDo.setTradingValue(BigDecimalUtil.toBigDecimal(tempDo.getPrice(), tempDo.getTradingVolume()));
+                    tempDo.setKind(kindMap.get(n.getKind()));
+                    result.add(tempDo);
+                }
+        );
+        return OutputResult.buildSucc(result);
     }
 
     /**

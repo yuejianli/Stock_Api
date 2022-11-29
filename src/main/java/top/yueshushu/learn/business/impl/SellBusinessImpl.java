@@ -19,8 +19,8 @@ import top.yueshushu.learn.mode.ro.SellRo;
 import top.yueshushu.learn.mode.vo.ConfigVo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.service.ConfigService;
-import top.yueshushu.learn.service.StockService;
 import top.yueshushu.learn.service.TradePositionService;
+import top.yueshushu.learn.service.cache.StockCacheService;
 import top.yueshushu.learn.util.BigDecimalUtil;
 import top.yueshushu.learn.util.StockUtil;
 
@@ -41,7 +41,7 @@ public class SellBusinessImpl implements SellBusiness {
     @Resource
     private ConfigService configService;
     @Resource
-    private StockService stockService;
+    private StockCacheService stockCacheService;
     @Resource
     private TradeEntrustDomainService tradeEntrustDomainService;
 
@@ -49,7 +49,7 @@ public class SellBusinessImpl implements SellBusiness {
     @Transactional(rollbackFor = Exception.class)
     public OutputResult sell(SellRo sellRo) {
         log.info(">>>试图卖出股票 {},股票信息是:{}", sellRo.getCode(), sellRo);
-        Stock stock = stockService.selectByCode(sellRo.getCode());
+        Stock stock = stockCacheService.selectByCode(sellRo.getCode());
         if (stock ==null){
             return OutputResult.buildAlert(ResultCode.STOCK_CODE_NO_EXIST);
         }

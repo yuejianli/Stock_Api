@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.yueshushu.learn.mapper.StockBigDealDoMapper">
+    <resultMap id="stockHistoryMap" type="top.yueshushu.learn.domain.StockBigDealDo">
+        <id property="id" column="id"></id>
+        <result property="currDate" column="curr_date"></result>
+        <result property="fullCode" column="full_code"></result>
+        <result property="name" column="name"></result>
+        <result property="tickTime" column="tick_time"></result>
+        <result property="price" column="price"></result>
+        <result property="prevPrice" column="prev_price"></result>
+        <result property="tradingVolume" column="trading_volume"></result>
+        <result property="tradingValue" column="trading_value"></result>
+        <result property="kind" column="kind"></result>
+    </resultMap>
+    <sql id="baseSql">
+        id,full_code,name,tick_time,price,prev_price,trading_volume,trading_value,kind
+    </sql>
+
+    <delete id="deleteHasAsyncData">
+        delete from stock_big_deal where 1=1
+        and full_code =#{fullCode}
+        and date_format(curr_date,'%Y%m%d') =date_format( #{currentDate,jdbcType=TIMESTAMP},'%Y%m%d')
+    </delete>
+</mapper>

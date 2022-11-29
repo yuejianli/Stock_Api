@@ -4,12 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import top.yueshushu.learn.business.StockHistoryBusiness;
 import top.yueshushu.learn.common.ResultCode;
-import top.yueshushu.learn.domainservice.StockDomainService;
 import top.yueshushu.learn.mode.ro.StockDayStatRo;
 import top.yueshushu.learn.mode.ro.StockRo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.service.StockHistoryService;
-import top.yueshushu.learn.service.StockService;
+import top.yueshushu.learn.service.cache.StockCacheService;
 
 import javax.annotation.Resource;
 
@@ -24,11 +23,11 @@ public class StockHistoryBusinessImpl implements StockHistoryBusiness {
     @Resource
     private StockHistoryService stockHistoryService;
     @Resource
-    private StockService stockService;
+    private StockCacheService stockCacheService;
 
     @Override
     public OutputResult listHistory(StockRo stockRo) {
-        if (stockService.selectByCode(stockRo.getCode()) == null){
+        if (stockCacheService.selectByCode(stockRo.getCode()) == null) {
             return OutputResult.buildAlert(
                     ResultCode.STOCK_CODE_NO_EXIST
             );
@@ -38,7 +37,7 @@ public class StockHistoryBusinessImpl implements StockHistoryBusiness {
 
     @Override
     public OutputResult listDayRange(StockDayStatRo stockDayStatRo) {
-        if (stockService.selectByCode(stockDayStatRo.getCode()) == null){
+        if (stockCacheService.selectByCode(stockDayStatRo.getCode()) == null) {
             return OutputResult.buildAlert(
                     ResultCode.STOCK_CODE_NO_EXIST
             );

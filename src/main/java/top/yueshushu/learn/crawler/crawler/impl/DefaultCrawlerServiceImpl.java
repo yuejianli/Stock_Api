@@ -3,14 +3,18 @@ package top.yueshushu.learn.crawler.crawler.impl;
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import top.yueshushu.learn.crawler.crawler.CrawlerService;
 import top.yueshushu.learn.crawler.entity.DownloadStockInfo;
+import top.yueshushu.learn.crawler.entity.StockBigDealInfo;
 import top.yueshushu.learn.crawler.entity.StockHistoryCsvInfo;
 import top.yueshushu.learn.crawler.entity.TxStockHistoryInfo;
 import top.yueshushu.learn.crawler.parse.DailyTradingInfoParse;
@@ -19,15 +23,14 @@ import top.yueshushu.learn.crawler.parse.StockShowInfoParse;
 import top.yueshushu.learn.crawler.properties.DefaultProperties;
 import top.yueshushu.learn.crawler.util.HttpUtil;
 import top.yueshushu.learn.crawler.util.ImageUtil;
+import top.yueshushu.learn.crawler.util.QueryParamUtil;
 import top.yueshushu.learn.mode.info.StockShowInfo;
 
 import javax.annotation.Resource;
 import java.io.ByteArrayInputStream;
 import java.text.MessageFormat;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Description 东方财富的相关实现
@@ -252,4 +255,84 @@ public class DefaultCrawlerServiceImpl implements CrawlerService {
         }
     }
 
+
+    /**
+     * [
+     * {
+     * "symbol": "sz001322",
+     * "name": "箭牌家居",
+     * "ticktime": "09:25:00",
+     * "price": "15.020",
+     * "volume": "619700",
+     * "prev_price": "0.000",
+     * "kind": "D"
+     * },
+     * {
+     * "symbol": "sz001322",
+     * "name": "箭牌家居",
+     * "ticktime": "09:30:00",
+     * "price": "15.000",
+     * "volume": "241200",
+     * "prev_price": "15.020",
+     * "kind": "D"
+     * }
+     * ]
+     */
+    @Override
+    public List<StockBigDealInfo> parseBigDealByCode(String fullCode, Integer minVolume, String day) {
+        //处理，拼接成信息
+        // 定义一个 Map 参数信息
+        Map<String, String> paramMap = new HashMap<>();
+        paramMap.put("symbol", fullCode);
+        paramMap.put("num", "100");
+        paramMap.put("sort", "ticktime");
+        paramMap.put("asc", "1");
+        paramMap.put("volume", minVolume + "");
+        paramMap.put("amount", "0");
+        paramMap.put("type", "0");
+        paramMap.put("day", day);
+        // 处理url 进行访问
+        String url = "https://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_Bill.GetBillList";
+
+        //获取内容
+        Map<String, String> header = new HashMap<>();
+        header.put("Referer", "https://vip.stock.finance.sina.com.cn/quotes_service/view/vMS_tradedetail.php?symbol=" + fullCode);
+        header.put("Host", "vip.stock.finance.sina.com.cn");
+
+        boolean stopGetBigDeal;
+
+        List<StockBigDealInfo> result = new ArrayList<>();
+        try {
+            int page = 1;
+            do {
+                paramMap.put("page", String.valueOf(page));
+
+                String queryUrl = QueryParamUtil.getUrlWithQueryString(url, paramMap);
+                log.info(">>>访问地址: {}", queryUrl);
+                String content = HttpUtil.sendGet(httpClient, queryUrl, header, "gbk");
+                // 表示没有数据了
+                stopGetBigDeal = StringUtils.isEmpty(content) || content.length() < 20;
+
+                if (!stopGetBigDeal) {
+
+                    JSONArray arrays = JSON.parseArray(content);
+                    List<StockBigDealInfo> allList = new ArrayList<>();
+                    for (int i = 0; i < arrays.size(); i++) {
+                        //用toJavaObject toJavaObject
+                        StockBigDealInfo u = JSON.toJavaObject(arrays.getJSONObject(i), StockBigDealInfo.class);
+                        allList.add(u);
+                    }
+                    result.addAll(allList);
+                }
+                page = page + 1;
+                // 休眠 3s钟，避免被检测到。
+                TimeUnit.SECONDS.sleep(3);
+            } while (!stopGetBigDeal);
+            //将内容进行转换，解析
+            return result;
+        } catch (Exception e) {
+            log.error("获取股票当前的大交易信息失败", e);
+            return null;
+        }
+    }
 }

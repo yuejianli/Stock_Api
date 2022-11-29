@@ -20,6 +20,7 @@ public enum JobInfoType {
     MOCK_ENTRUST("mockEntrust", "虚拟委托"),
     STOCK_UPDATE("stockUpdate", "股票更新"),
     STOCK_FIVE_EMAIL("stockFiveEmail", "最近五天记录发送到邮箱"),
+    BIG_DEAL("bigDeal", "大宗交易信息同步"),
     ;
 
     private String code;
