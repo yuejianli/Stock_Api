@@ -3,7 +3,9 @@ package top.yueshushu.learn.business.impl;
 import org.springframework.stereotype.Service;
 import top.yueshushu.learn.business.StockUpdateLogBusiness;
 import top.yueshushu.learn.mode.ro.StockUpdateLogRo;
+import top.yueshushu.learn.mode.vo.StockUpdateLogVo;
 import top.yueshushu.learn.response.OutputResult;
+import top.yueshushu.learn.response.PageResponse;
 import top.yueshushu.learn.service.StockUpdateLogService;
 
 import javax.annotation.Resource;
@@ -19,7 +21,7 @@ public class StockUpdateLogBusinessImpl implements StockUpdateLogBusiness {
     private StockUpdateLogService stockUpdateLogService;
 
     @Override
-    public OutputResult list(StockUpdateLogRo stockUpdateLogRo) {
+    public OutputResult<PageResponse<StockUpdateLogVo>> list(StockUpdateLogRo stockUpdateLogRo) {
         return stockUpdateLogService.pageLastMonth(stockUpdateLogRo);
     }
 }
