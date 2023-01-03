@@ -277,6 +277,9 @@ public class DefaultDailyTradingInfoParse implements DailyTradingInfoParse {
     private String calcAppointThan(Integer buyHand, Integer sellHand) {
         Integer subNum = buyHand - sellHand;
         Integer sumNum = buyHand + sellHand;
+        if (sumNum == 0 || subNum == 0) {
+            return "0";
+        }
         return BigDecimalUtil.divPattern(
                 new BigDecimal(subNum), new BigDecimal(sumNum)
         );

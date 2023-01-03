@@ -435,9 +435,9 @@ public class StockSelectedServiceImpl implements StockSelectedService {
             } else {
                 yesClosePrice = stockCacheService.getNowCachePrice(code);
             }
-            stockCacheService.setYesterdayCloseCachePrice(priceCacheDto.getCode(), yesClosePrice);
-            stockCacheService.setLastBuyCachePrice(priceCacheDto.getCode(), yesClosePrice);
-            stockCacheService.setLastSellCachePrice(priceCacheDto.getCode(), yesClosePrice);
+            stockCacheService.setYesterdayCloseCachePrice(code, yesClosePrice);
+            stockCacheService.setLastBuyCachePrice(code, yesClosePrice);
+            stockCacheService.setLastSellCachePrice(code, yesClosePrice);
         }
     }
 
