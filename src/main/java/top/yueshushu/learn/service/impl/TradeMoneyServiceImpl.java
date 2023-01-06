@@ -8,7 +8,8 @@ import org.springframework.stereotype.Service;
 import top.yueshushu.learn.api.TradeResultVo;
 import top.yueshushu.learn.api.request.GetAssetsRequest;
 import top.yueshushu.learn.api.response.GetAssetsResponse;
-import top.yueshushu.learn.api.responseparse.DefaultResponseParser;
+import top.yueshushu.learn.api.responseparse.DataObjResponseParser;
+import top.yueshushu.learn.api.responseparse.ResponseParser;
 import top.yueshushu.learn.assembler.TradeMoneyAssembler;
 import top.yueshushu.learn.assembler.TradeMoneyHistoryAssembler;
 import top.yueshushu.learn.common.ResultCode;
@@ -50,7 +51,7 @@ public class TradeMoneyServiceImpl implements TradeMoneyService {
     @Resource
     private TradeMoneyDomainService tradeMoneyDomainService;
     @Resource
-    private DefaultResponseParser defaultResponseParser;
+    private DataObjResponseParser dataObjResponseParser;
     @Resource
     private TradeUtil tradeUtil;
     @Resource
@@ -94,7 +95,7 @@ public class TradeMoneyServiceImpl implements TradeMoneyService {
         List<GetAssetsResponse> data = tradeResultVo.getData();
         GetAssetsResponse response = data.get(0);
         tradeMoneyVo.setUseMoney(new BigDecimal(response.getKyzj()));
-        tradeMoneyVo.setMarketMoney(new BigDecimal(response.getDjzj()));
+        tradeMoneyVo.setMarketMoney(new BigDecimal(response.getZxsz()));
         tradeMoneyVo.setTotalMoney(new BigDecimal(response.getZzc()));
         tradeMoneyVo.setTakeoutMoney(new BigDecimal(response.getKqzj()));
         tradeMoneyVo.setMockType(MockType.REAL.getCode());
@@ -177,15 +178,17 @@ public class TradeMoneyServiceImpl implements TradeMoneyService {
      */
     private TradeResultVo<GetAssetsResponse> getAssetsResponse(Integer userId) {
         GetAssetsRequest request = new GetAssetsRequest(userId);
+        ResponseParser responseParse = tradeUtil.getResponseParser(request);
+
         String url = tradeUtil.getUrl(request);
+        log.debug("trade {} url: {}", request.getMethod(), url);
         Map<String, String> header = tradeUtil.getHeader(request);
-        Map<String, Object> params;
-        params = tradeUtil.getParams(request);
+
+        Map<String, Object> params = tradeUtil.getParams(request);
         log.debug("trade {} request: {}", request.getMethod(), params);
         String content = tradeClient.send(url, params, header);
         log.debug("trade {} response: {}", request.getMethod(), content);
-        TradeResultVo<GetAssetsResponse> result= defaultResponseParser.parse(content,
-                new TypeReference<GetAssetsResponse>(){});
-        return result;
+        return responseParse.parse(content, new TypeReference<GetAssetsResponse>() {
+        });
     }
 }

@@ -4,9 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import org.springframework.stereotype.Service;
 import top.yueshushu.learn.api.TradeResultVo;
+import top.yueshushu.learn.api.request.BaseTradeRequest;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 /**
  * @ClassName:DefaultResponseParser
@@ -15,8 +15,8 @@ import java.util.Collections;
  * @Date 2022/1/2 21:51
  * @Version 1.0
  **/
-@Service("v3ReponseParser")
-public class V3ResponseParser implements ResponseParser {
+@Service("objResponseParser")
+public class ObjResponseParser implements ResponseParser {
     @Override
     public <T> TradeResultVo<T> parse(String content, TypeReference<T> responseType) {
         T t = JSON.parseObject(content, responseType);
@@ -31,6 +31,11 @@ public class V3ResponseParser implements ResponseParser {
 
     @Override
     public String name() {
-        return "v3ReponseParser";
+        return "objResponseParser";
+    }
+
+    @Override
+    public int version() {
+        return BaseTradeRequest.VERSION_OBJ;
     }
 }

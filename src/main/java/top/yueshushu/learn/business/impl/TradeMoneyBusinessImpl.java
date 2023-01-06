@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import top.yueshushu.learn.assembler.TradeMoneyAssembler;
 import top.yueshushu.learn.business.TradeMoneyBusiness;
 import top.yueshushu.learn.entity.TradeMoney;
-import top.yueshushu.learn.enumtype.TradeRealValueType;
 import top.yueshushu.learn.mode.ro.TradeMoneyRo;
 import top.yueshushu.learn.mode.vo.TradeMoneyVo;
 import top.yueshushu.learn.response.OutputResult;
@@ -40,12 +39,12 @@ public class TradeMoneyBusinessImpl implements TradeMoneyBusiness {
 
     @Override
     public OutputResult realInfo(TradeMoneyRo tradeMoneyRo) {
-        if (!tradeCacheService.needSyncReal(TradeRealValueType.TRADE_MONEY, tradeMoneyRo.getUserId())) {
-             return mockInfo(tradeMoneyRo);
-        }
-        log.info(">>>此次员工{}查询需要同步真实的持仓数据",tradeMoneyRo.getUserId());
+//        if (!tradeCacheService.needSyncReal(TradeRealValueType.TRADE_MONEY, tradeMoneyRo.getUserId())) {
+//             return mockInfo(tradeMoneyRo);
+//        }
+        log.info(">>>此次员工{}查询需要同步真实的持仓数据", tradeMoneyRo.getUserId());
         OutputResult<TradeMoneyVo> tradeMoneyVoOutputResult = tradeMoneyService.realInfo(tradeMoneyRo);
-        if (!tradeMoneyVoOutputResult.getSuccess()){
+        if (!tradeMoneyVoOutputResult.getSuccess()) {
             return tradeMoneyVoOutputResult;
         }
         //获取数据

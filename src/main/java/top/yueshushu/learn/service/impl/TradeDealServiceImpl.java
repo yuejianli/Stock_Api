@@ -15,7 +15,7 @@ import top.yueshushu.learn.api.request.GetDealDataRequest;
 import top.yueshushu.learn.api.request.GetHisDealDataRequest;
 import top.yueshushu.learn.api.response.GetDealDataResponse;
 import top.yueshushu.learn.api.response.GetHisDealDataResponse;
-import top.yueshushu.learn.api.responseparse.DefaultResponseParser;
+import top.yueshushu.learn.api.responseparse.DataObjResponseParser;
 import top.yueshushu.learn.assembler.TradeDealAssembler;
 import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.common.ResultCode;
@@ -57,7 +57,7 @@ public class TradeDealServiceImpl implements TradeDealService {
     @Resource
     private TradeDealAssembler tradeDealAssembler;
     @Resource
-    private DefaultResponseParser defaultResponseParser;
+    private DataObjResponseParser dataObjResponseParser;
     @Resource
     private TradeUtil tradeUtil;
     @Resource
@@ -130,8 +130,9 @@ public class TradeDealServiceImpl implements TradeDealService {
         log.debug("trade {} request: {}", request.getMethod(), params);
         String content = tradeClient.send(url, params, header);
         log.debug("trade {} response: {}", request.getMethod(), content);
-        TradeResultVo<GetDealDataResponse> result= defaultResponseParser.parse(content,
-                new TypeReference<GetDealDataResponse>(){});
+        TradeResultVo<GetDealDataResponse> result = dataObjResponseParser.parse(content,
+                new TypeReference<GetDealDataResponse>() {
+                });
         return result;
     }
     @Override
@@ -224,8 +225,9 @@ public class TradeDealServiceImpl implements TradeDealService {
         log.debug("trade {} request: {}", request.getMethod(), params);
         String content = tradeClient.send(url, params, header);
         log.debug("trade {} response: {}", request.getMethod(), content);
-        TradeResultVo<GetHisDealDataResponse> result= defaultResponseParser.parse(content,
-                new TypeReference<GetHisDealDataResponse>(){});
+        TradeResultVo<GetHisDealDataResponse> result = dataObjResponseParser.parse(content,
+                new TypeReference<GetHisDealDataResponse>() {
+                });
         return result;
     }
 

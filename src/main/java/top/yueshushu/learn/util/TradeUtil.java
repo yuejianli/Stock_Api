@@ -1,17 +1,16 @@
 package top.yueshushu.learn.util;
 
 import org.apache.commons.beanutils.BeanMap;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+import top.yueshushu.learn.api.request.AuthenticationRequest;
 import top.yueshushu.learn.api.request.BaseTradeRequest;
+import top.yueshushu.learn.api.responseparse.*;
 import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.domain.TradeMethodDo;
 import top.yueshushu.learn.domain.TradeUserDo;
 import top.yueshushu.learn.domainservice.TradeMethodDomainService;
 import top.yueshushu.learn.domainservice.TradeUserDomainService;
-import top.yueshushu.learn.service.TradeMethodService;
-import top.yueshushu.learn.service.TradeUserService;
 
 import javax.annotation.Resource;
 import java.text.MessageFormat;
@@ -44,18 +43,14 @@ public class TradeUtil {
         return MessageFormat.format(url, tradeUserDo.getValidateKey());
     }
 
-    /**
-     * 获取请求的信息
-     * @param request
-     * @return
-     */
     public Map<String, String> getHeader(BaseTradeRequest request) {
         TradeUserDo tradeUserDo = tradeUserDomainService.getByUserId(request.getUserId());
-        Assert.notNull(tradeUserDo,"登录用户"+request.getUserId()+"对应的交易用户不能为空");
         HashMap<String, String> header = new HashMap<>();
-        String cookie= tradeUserDo.getCookie();
-        Assert.notNull(cookie,"交易用户"+request.getUserId()+"没有cookie,未登录");
-        header.put("cookie",cookie);
+        if (!(request instanceof AuthenticationRequest)) {
+            header.put("cookie", tradeUserDo.getCookie());
+        }
+        header.put("gw_reqtimestamp", System.currentTimeMillis() + "");
+        header.put("X-Requested-With", "XMLHttpRequest");
         return header;
     }
 
@@ -70,5 +65,35 @@ public class TradeUtil {
         beanMap.entrySet().stream().filter(entry -> !Const.IgnoreList.contains(entry.getKey()))
                 .forEach(entry -> params.put(String.valueOf(entry.getKey()), entry.getValue()));
         return params;
+    }
+
+
+    @Resource(name = "dataObjResponseParser")
+    private DataObjResponseParser dataObjResponseParser;
+
+    @Resource(name = "msgResponseParser")
+    private MsgResponseParser msgResponseParser;
+
+    @Resource(name = "objResponseParser")
+    private ObjResponseParser objResponseParser;
+
+    @Resource(name = "dataListResponseParser")
+    private DataListResponseParser dataListResponseParser;
+
+    public ResponseParser getResponseParser(BaseTradeRequest request) {
+        if (request.responseVersion() == dataObjResponseParser.version()) {
+            return dataObjResponseParser;
+        }
+        if (request.responseVersion() == msgResponseParser.version()) {
+            return msgResponseParser;
+        }
+        if (request.responseVersion() == objResponseParser.version()) {
+            return objResponseParser;
+        }
+        if (request.responseVersion() == dataListResponseParser.version()) {
+            return dataListResponseParser;
+        }
+        // 设置一个默认的
+        return dataObjResponseParser;
     }
 }

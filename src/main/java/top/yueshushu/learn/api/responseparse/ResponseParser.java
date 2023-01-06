@@ -22,7 +22,10 @@ public interface ResponseParser {
 
     /**
      * 解析器的名称
+     *
      * @return
      */
     String name();
+
+    int version();
 }

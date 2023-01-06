@@ -6,7 +6,7 @@ import lombok.Data;
  * 获取资产的响应
  */
 @Data
-public class GetAssetsResponse {
+public class GetAssetsResponse extends BaseTradeResponse {
 
     /**
      * 总资产
@@ -24,4 +24,9 @@ public class GetAssetsResponse {
      * 冻结资金
      */
     private String Djzj;
+    /**
+     * 市值金额
+     */
+    private String Zxsz;
+
 }

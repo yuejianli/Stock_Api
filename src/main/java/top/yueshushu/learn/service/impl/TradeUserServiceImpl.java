@@ -1,16 +1,18 @@
 package top.yueshushu.learn.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanMap;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import top.yueshushu.learn.api.TradeResultVo;
 import top.yueshushu.learn.api.request.AuthenticationRequest;
+import top.yueshushu.learn.api.request.BaseTradeRequest;
 import top.yueshushu.learn.api.response.AuthenticationResponse;
-import top.yueshushu.learn.api.responseparse.DefaultResponseParser;
+import top.yueshushu.learn.api.responseparse.DataListResponseParser;
 import top.yueshushu.learn.assembler.TradeMethodAssembler;
 import top.yueshushu.learn.assembler.TradeUserAssembler;
-import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.config.TradeClient;
 import top.yueshushu.learn.domain.TradeMethodDo;
@@ -56,7 +58,10 @@ public class TradeUserServiceImpl implements TradeUserService {
     @Resource
     private TradeClient tradeClient;
     @Resource
-    private DefaultResponseParser defaultResponseParser;
+    private DataListResponseParser dataListResponseParser;
+
+    //    @Value(value = "${emSecSecurityServerUrl}")
+    private String emSecSecurityServerUrl;
 
     @Override
     public OutputResult login(TradeUserRo tradeUserRo) {
@@ -64,7 +69,7 @@ public class TradeUserServiceImpl implements TradeUserService {
         TradeUser tradeUser = tradeUserAssembler.doToEntity(
                 tradeUserDomainService.getByUserId(tradeUserRo.getId())
         );
-        if(null== tradeUser){
+        if (null == tradeUser) {
             return OutputResult.buildFail(ResultCode.TRADE_USER_NO_RELATION);
         }
 
@@ -73,7 +78,12 @@ public class TradeUserServiceImpl implements TradeUserService {
         request.setPassword(encodePassword(tradeUser.getPassword()));
         request.setIdentifyCode(tradeUserRo.getIdentifyCode());
         request.setRandNumber(tradeUserRo.getRandNum());
-
+        setRequestSecInfo(request);
+        Map<String, String> header = getHeader(request);
+        if (!StringUtils.hasLength(request.getSecInfo())) {
+            log.info("authentication use mac User-Agent");
+            header.put("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/536.66");
+        }
 
         //获取登录验证的方法
         TradeMethod tradeMethod = tradeMethodAssembler.doToEntity(
@@ -82,17 +92,18 @@ public class TradeUserServiceImpl implements TradeUserService {
         Map<String, Object> params = getParams(request);
         params.put("userId", tradeUser.getAccount());
         TradeResultVo<AuthenticationResponse> resultVo = null;
-        log.info("系统用户{}登录时成功构建了登录请求信息",tradeUser.getUserId());
+        log.info("系统用户{}登录时成功构建了登录请求信息", tradeUser.getUserId());
         try {
             tradeClient.openSession();
-            String content = tradeClient.sendNewInstance(tradeMethod.getUrl(), params);
-            resultVo = defaultResponseParser.parse(content, new TypeReference<AuthenticationResponse>() {});
+            String content = tradeClient.sendNewInstance(tradeMethod.getUrl(), params, header);
+            resultVo = dataListResponseParser.parse(content, new TypeReference<AuthenticationResponse>() {
+            });
             if (resultVo.getSuccess()) {
-                log.info("系统用户{}登录请求成功",tradeUser.getUserId());
+                log.info("系统用户{}登录请求成功", tradeUser.getUserId());
                 TradeMethodDo authCheckTradeMethodDo =
                         tradeMethodDomainService.getMethodByCode(TradeMethodType.AuthenticationCheckRequest.getCode());
 
-                String content2 = tradeClient.sendNewInstance(authCheckTradeMethodDo.getUrl(), new HashMap<>(2));
+                String content2 = tradeClient.sendNewInstance(authCheckTradeMethodDo.getUrl(), new HashMap<>(2), header);
                 String validateKey = getValidateKey(content2);
 
                 AuthenticationResponse response = new AuthenticationResponse();
@@ -118,6 +129,7 @@ public class TradeUserServiceImpl implements TradeUserService {
         AuthenticationResponse response = resultVo.getData().get(0);
         tradeUser.setCookie(response.getCookie());
         tradeUser.setValidateKey(response.getValidateKey());
+        tradeUser.setUpdateTime(LocalDateTime.now());
         tradeUserDomainService.updateById(
                 tradeUserAssembler.entityToDo(
                         tradeUser
@@ -126,6 +138,39 @@ public class TradeUserServiceImpl implements TradeUserService {
         log.info("系统用户{}更新cookie和validateKey成功", tradeUser.getUserId());
         tradeUserVo.setUserId(tradeUserRo.getId());
         return OutputResult.buildSucc(tradeUserVo);
+    }
+
+    private void setRequestSecInfo(AuthenticationRequest request) {
+        if (emSecSecurityServerUrl == null) {
+            return;
+        }
+
+        try {
+            tradeClient.openSession();
+            String content = tradeClient.sendNewInstance(emSecSecurityServerUrl + request.getIdentifyCode(), null, null);
+            @SuppressWarnings("unchecked")
+            Map<String, String> map = JSON.parseObject(content, Map.class);
+            String userInfo = map.get("userInfo");
+            request.setSecInfo(userInfo);
+        } catch (Exception e) {
+            log.info("not code get from EM SecSecurity Server");
+        } finally {
+            tradeClient.destoryCurrentSession();
+        }
+    }
+
+    private Map<String, String> getHeader(BaseTradeRequest request) {
+        //根据id 去查询对应的交易账户
+        TradeUser tradeUser = tradeUserAssembler.doToEntity(
+                tradeUserDomainService.getByUserId(request.getUserId())
+        );
+        HashMap<String, String> header = new HashMap<>();
+        if (!(request instanceof AuthenticationRequest)) {
+            header.put("cookie", tradeUser.getCookie());
+        }
+        header.put("gw_reqtimestamp", System.currentTimeMillis() + "");
+        header.put("X-Requested-With", "XMLHttpRequest");
+        return header;
     }
 
     @Override
@@ -166,7 +211,10 @@ public class TradeUserServiceImpl implements TradeUserService {
         if (password.length() != 6) {
             return password;
         }
-        String publicKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDHdsyxT66pDG4p73yope7jxA92c0AT4qIJ/xtbBcHkFPK77upnsfDTJiVEuQDH+MiMeb+XhCLNKZGp0yaUU6GlxZdp+nLW8b7Kmijr3iepaDhcbVTsYBWchaWUXauj9Lrhz58/6AE/NF0aMolxIGpsi+ST2hSHPu3GSXMdhPCkWQIDAQAB";
+        String publicKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDHdsyxT66pDG4p73yope7jxA92\n" +
+                "c0AT4qIJ/xtbBcHkFPK77upnsfDTJiVEuQDH+MiMeb+XhCLNKZGp0yaUU6GlxZdp\n" +
+                "+nLW8b7Kmijr3iepaDhcbVTsYBWchaWUXauj9Lrhz58/6AE/NF0aMolxIGpsi+ST\n" +
+                "2hSHPu3GSXMdhPCkWQIDAQAB";
         return RSAUtil.encodeWithPublicKey(password, publicKey);
     }
 
@@ -178,7 +226,7 @@ public class TradeUserServiceImpl implements TradeUserService {
     private Map<String, Object> getParams(Object request) {
         Map<Object, Object> beanMap = new BeanMap(request);
         HashMap<String, Object> params = new HashMap<>();
-        beanMap.entrySet().stream().filter(entry -> !Const.IgnoreList.contains(entry.getKey()))
+        beanMap.entrySet().stream().filter(entry -> !TradeApiServiceImpl.IgnoreList.contains(String.valueOf(entry.getKey())))
                 .forEach(entry -> params.put(String.valueOf(entry.getKey()), entry.getValue()));
         return params;
     }

@@ -21,4 +21,8 @@ public class TradeResultVo<T> {
     public Boolean getSuccess() {
         return Status == TradeResultVo.STATUS_SUCCESS;
     }
+
+    public static boolean success(int Status) {
+        return Status == TradeResultVo.STATUS_SUCCESS;
+    }
 }

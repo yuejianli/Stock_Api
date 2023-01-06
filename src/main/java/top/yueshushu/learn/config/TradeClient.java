@@ -1,6 +1,7 @@
 package top.yueshushu.learn.config;
 
 import org.apache.http.client.CookieStore;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -8,9 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import top.yueshushu.learn.crawler.util.HttpUtil;
 import top.yueshushu.learn.exception.ServiceException;
+import top.yueshushu.learn.exception.UnauthorizedException;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -18,7 +19,7 @@ import java.util.stream.Collectors;
 @Component
 public class TradeClient {
 
-    private ThreadLocal<ClientWrapper> threadLocal = new ThreadLocal<>();
+    private final ThreadLocal<ClientWrapper> threadLocal = new ThreadLocal<>();
 
     @Autowired
     private CloseableHttpClient httpClient;
@@ -26,7 +27,7 @@ public class TradeClient {
     public String send(String url, Map<String, Object> params, Map<String, String> header) {
         String content = HttpUtil.sendPost(httpClient, url, params, header);
         if (content.contains("Object moved")) {
-            throw new ServiceException("unauthorized " + url);
+            throw new UnauthorizedException("unauthorized " + url);
         }
         return content;
     }
@@ -34,25 +35,27 @@ public class TradeClient {
     public String sendListJson(String url, List<Map<String, Object>> list, Map<String, String> header) {
         String content = HttpUtil.sendPostJson(httpClient, url, list, header);
         if (content.contains("Object moved")) {
-            throw new ServiceException("unauthorized " + url);
+            throw new UnauthorizedException("unauthorized " + url);
         }
         return content;
     }
 
     public void openSession() {
+        RequestConfig requestConfig = RequestConfig.custom()
+                .setConnectionRequestTimeout(2)
+                .setConnectTimeout(2)
+                .setSocketTimeout(2).build();
+
         ClientWrapper wrapper = new ClientWrapper();
         wrapper.cookieStore = new BasicCookieStore();
-        wrapper.httpClient = HttpClients.custom().setDefaultCookieStore(wrapper.cookieStore).build();
+        wrapper.httpClient = HttpClients.custom().setDefaultRequestConfig(requestConfig).setDefaultCookieStore(wrapper.cookieStore).build();
         threadLocal.set(wrapper);
     }
 
-    public String sendNewInstance(String url, Map<String, Object> params) {
+    public String sendNewInstance(String url, Map<String, Object> params, Map<String, String> header) {
         ClientWrapper clientWrapper = threadLocal.get();
         assertOpened(clientWrapper);
-        Map<String,String> headerMap = new HashMap<>();
-        headerMap.put("Referer","https://jywg.18.cn/Login?el=1&clear=1");
-        headerMap.put("Origin","https://jywg.18.cn");
-        return HttpUtil.sendPost(clientWrapper.httpClient, url, params,null);
+        return HttpUtil.sendPost(clientWrapper.httpClient, url, params, header);
     }
 
     public String getCurrentCookie() {

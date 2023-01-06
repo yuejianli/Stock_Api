@@ -15,7 +15,7 @@ import top.yueshushu.learn.api.request.GetHisOrdersDataRequest;
 import top.yueshushu.learn.api.request.GetOrdersDataRequest;
 import top.yueshushu.learn.api.response.GetHisOrdersDataResponse;
 import top.yueshushu.learn.api.response.GetOrdersDataResponse;
-import top.yueshushu.learn.api.responseparse.DefaultResponseParser;
+import top.yueshushu.learn.api.responseparse.DataObjResponseParser;
 import top.yueshushu.learn.assembler.TradeEntrustAssembler;
 import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.common.ResultCode;
@@ -28,8 +28,8 @@ import top.yueshushu.learn.enumtype.MockType;
 import top.yueshushu.learn.mode.dto.TradeEntrustQueryDto;
 import top.yueshushu.learn.mode.ro.TradeEntrustRo;
 import top.yueshushu.learn.mode.vo.TradeEntrustVo;
-import top.yueshushu.learn.response.PageResponse;
 import top.yueshushu.learn.response.OutputResult;
+import top.yueshushu.learn.response.PageResponse;
 import top.yueshushu.learn.service.TradeEntrustService;
 import top.yueshushu.learn.util.TradeUtil;
 
@@ -54,7 +54,7 @@ public class TradeEntrustServiceImpl implements TradeEntrustService {
     private TradeEntrustAssembler tradeEntrustAssembler;
 
     @Resource
-    private DefaultResponseParser defaultResponseParser;
+    private DataObjResponseParser dataObjResponseParser;
     @Resource
     private TradeUtil tradeUtil;
     @Resource
@@ -139,8 +139,9 @@ public class TradeEntrustServiceImpl implements TradeEntrustService {
         log.debug("trade {} request: {}", request.getMethod(), params);
         String content = tradeClient.send(url, params, header);
         log.debug("trade {} response: {}", request.getMethod(), content);
-        TradeResultVo<GetOrdersDataResponse> result= defaultResponseParser.parse(content,
-                new TypeReference<GetOrdersDataResponse>(){});
+        TradeResultVo<GetOrdersDataResponse> result = dataObjResponseParser.parse(content,
+                new TypeReference<GetOrdersDataResponse>() {
+                });
         return result;
     }
 
@@ -208,8 +209,9 @@ public class TradeEntrustServiceImpl implements TradeEntrustService {
         log.debug("trade {} request: {}", request.getMethod(), params);
         String content = tradeClient.send(url, params, header);
         log.debug("trade {} response: {}", request.getMethod(), content);
-        TradeResultVo<GetHisOrdersDataResponse> result= defaultResponseParser.parse(content,
-                new TypeReference<GetHisOrdersDataResponse>(){});
+        TradeResultVo<GetHisOrdersDataResponse> result = dataObjResponseParser.parse(content,
+                new TypeReference<GetHisOrdersDataResponse>() {
+                });
         return result;
     }
     @Override

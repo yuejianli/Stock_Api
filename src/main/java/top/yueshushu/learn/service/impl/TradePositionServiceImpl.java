@@ -9,7 +9,7 @@ import org.springframework.util.CollectionUtils;
 import top.yueshushu.learn.api.TradeResultVo;
 import top.yueshushu.learn.api.request.GetStockListRequest;
 import top.yueshushu.learn.api.response.GetStockListResponse;
-import top.yueshushu.learn.api.responseparse.DefaultResponseParser;
+import top.yueshushu.learn.api.responseparse.DataObjResponseParser;
 import top.yueshushu.learn.assembler.TradePositionAssembler;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.config.TradeClient;
@@ -50,7 +50,7 @@ public class TradePositionServiceImpl implements TradePositionService {
     @Resource
     private TradePositionDomainService tradePositionDomainService;
     @Resource
-    private DefaultResponseParser defaultResponseParser;
+    private DataObjResponseParser dataObjResponseParser;
 
     @Resource
     private TradeClient tradeClient;
@@ -194,8 +194,9 @@ public class TradePositionServiceImpl implements TradePositionService {
         log.debug("trade {} request: {}", request.getMethod(), params);
         String content = tradeClient.send(url, params, header);
         log.debug("trade {} response: {}", request.getMethod(), content);
-        return defaultResponseParser.parse(content,
-                new TypeReference<GetStockListResponse>(){});
+        return dataObjResponseParser.parse(content,
+                new TypeReference<GetStockListResponse>() {
+                });
     }
 
     @Override

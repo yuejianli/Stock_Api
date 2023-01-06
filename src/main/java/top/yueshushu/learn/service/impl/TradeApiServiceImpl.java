@@ -3,8 +3,6 @@ package top.yueshushu.learn.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import org.apache.commons.beanutils.BeanMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import top.yueshushu.learn.api.TradeResultVo;
@@ -20,9 +18,7 @@ import java.util.*;
 @Service
 public class TradeApiServiceImpl extends AbstractTradeApiService {
 
-    private final Logger logger = LoggerFactory.getLogger(TradeApiServiceImpl.class);
-
-    private static final List<String> IgnoreList = Arrays.asList("class", "userId", "method");
+    public static final List<String> IgnoreList = Arrays.asList("class", "userId", "method");
 
     private final ResponseParser revokeResponseParser = new ResponseParser() {
         @Override

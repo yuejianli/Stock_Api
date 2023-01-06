@@ -21,13 +21,17 @@ public class AuthenticationRequest extends BaseTradeRequest {
     private String duration = "1800";
     private String type = "Z";
     private String authCode;
+    private String secInfo;
 
-    public AuthenticationRequest(){
-        this(1);
+
+    public AuthenticationRequest() {
+
     }
+
     public AuthenticationRequest(int userId) {
         super(userId);
     }
+
     @Override
     public String getMethod() {
         return TradeMethodType.AuthenticationRequest.getCode();

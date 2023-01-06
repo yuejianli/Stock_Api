@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import org.springframework.stereotype.Service;
 import top.yueshushu.learn.api.TradeResultVo;
+import top.yueshushu.learn.api.request.BaseTradeRequest;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,12 +17,12 @@ import java.util.List;
  * @Date 2022/1/2 21:51
  * @Version 1.0
  **/
-@Service("defaultResponseParser")
-public class DefaultResponseParser implements ResponseParser {
-
+@Service("dataListResponseParser")
+public class DataListResponseParser implements ResponseParser {
     @Override
     public <T> TradeResultVo<T> parse(String content, TypeReference<T> responseType) {
-        TradeResultVo<T> resultVo = JSON.parseObject(content, new TypeReference<TradeResultVo<T>>() {});
+        TradeResultVo<T> resultVo = JSON.parseObject(content, new TypeReference<TradeResultVo<T>>() {
+        });
         if (resultVo.getSuccess()) {
             List<T> list = resultVo.getData();
             ArrayList<T> newList = new ArrayList<>();
@@ -41,6 +42,11 @@ public class DefaultResponseParser implements ResponseParser {
 
     @Override
     public String name() {
-        return "defaultResponseParser";
+        return null;
+    }
+
+    @Override
+    public int version() {
+        return BaseTradeRequest.VERSION_DATA_LIST;
     }
 }
