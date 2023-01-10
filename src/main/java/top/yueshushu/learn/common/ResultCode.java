@@ -218,6 +218,13 @@ public class ResultCode {
             new ResultCode(true, 10019013, "查询真实今日成交信息失败");
     public static final ResultCode TRADE_DEAL_HISTORY_FAIL =
             new ResultCode(true, 10019014, "查询真实历史成交信息失败");
+    public static final ResultCode REAL_BUY_ERROR =
+            new ResultCode(true, 10019015, "调用接口买入股票失败");
+    public static final ResultCode REAL_SELL_ERROR =
+            new ResultCode(true, 10019016, "调用接口卖出股票失败");
+    public static final ResultCode REAL_REVOKE_ERROR =
+            new ResultCode(true, 10019017, "调用接口撤销股票委托失败");
+
     public static final ResultCode STOCK_ASYNC_NO_CHANGE =
             new ResultCode(false, 20010007, "股票信息未发生改变");
     public static final ResultCode STOCK_ASYNC_NO_START_DATE =

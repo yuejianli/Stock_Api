@@ -28,10 +28,10 @@ public interface UserBusiness {
     /**
      * 转换交易用户的密码
      *
-     * @param password 交易用户密码
-     * @return 转换交易用户的密码
+     * @param text 交易用户信息
+     * @return 转换交易用户的信息
      */
-    OutputResult tradePassword(String password);
+    OutputResult tradeUserText(String text);
 
     /**
      * 将配置文件中的敏感信息加密

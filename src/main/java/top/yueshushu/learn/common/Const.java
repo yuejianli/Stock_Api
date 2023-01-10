@@ -52,7 +52,8 @@ public class Const {
     public static final String POSITION_HISTORY = "ph:";
     public static final String DATE_WORKING = "work:";
     public static final String JOB_INFO = "jobInfo:";
-
+    public static final String RSA_PUBLIC_KEY = "publicKey";
+    public static final String RSA_PRIVATE_KEY = "privateKey";
 
     private static final String CACHE_KEY_DATA_PREFIX = CACHE_PUBLIC_KEY_PREFIX + "data:";
     public static final String CACHE_STOCK_INFO = Const.CACHE_PUBLIC_KEY_PREFIX + "info";

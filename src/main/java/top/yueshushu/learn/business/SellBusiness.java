@@ -11,8 +11,17 @@ import top.yueshushu.learn.response.OutputResult;
 public interface SellBusiness {
     /**
      * 卖出股票
+     *
      * @param sellRo 卖出股票
      * @return 卖出股票
      */
     OutputResult sell(SellRo sellRo);
+
+    /**
+     * 真实的卖出操作
+     *
+     * @param sellRo 卖出对象
+     */
+    OutputResult realSell(SellRo sellRo);
+
 }

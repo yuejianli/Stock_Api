@@ -62,7 +62,7 @@ public class EmailServiceImpl implements EmailService {
 			javaMailSender.send(simpleMailMessage);
 			return true;
 		} catch (Exception e) {
-			log.error("send simple mail error", e);
+			log.error("componentAndSendReqeust simple mail error", e);
 			return false;
 		}
 	}
@@ -80,7 +80,7 @@ public class EmailServiceImpl implements EmailService {
 			javaMailSender.send(mimeMessage);
 			return true;
 		} catch (MessagingException e) {
-			log.error("send mail error ", e);
+            log.error("componentAndSendReqeust mail error ", e);
 			return false;
 		}
 	}
@@ -92,7 +92,7 @@ public class EmailServiceImpl implements EmailService {
 			// log.info(">>>得到信息:{}", velocityMailText);
 			return sendHtmlMail(toArr, subject, velocityMailText);
 		} catch (Exception ex) {
-			log.error(">>>send email type {}  is error,", velocityTemplateType.getCode(), ex);
+            log.error(">>>componentAndSendReqeust email type {}  is error,", velocityTemplateType.getCode(), ex);
 			return false;
 		}
 	}

@@ -28,5 +28,8 @@ public class GetAssetsResponse extends BaseTradeResponse {
      * 市值金额
      */
     private String Zxsz;
-
+    /**
+     * 持仓盈亏
+     */
+    private String Ljyk;
 }

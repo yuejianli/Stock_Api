@@ -19,7 +19,6 @@ public interface ResponseParser {
      * @return
      */
     <T> TradeResultVo<T> parse(String content, TypeReference<T> responseType);
-
     /**
      * 解析器的名称
      *

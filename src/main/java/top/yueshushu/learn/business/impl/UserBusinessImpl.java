@@ -73,8 +73,8 @@ public class UserBusinessImpl implements UserBusiness {
     }
 
     @Override
-    public OutputResult tradePassword(String password) {
-        return userService.tradePassword(password);
+    public OutputResult tradeUserText(String text) {
+        return userService.tradeUserText(text);
     }
 
     @Override

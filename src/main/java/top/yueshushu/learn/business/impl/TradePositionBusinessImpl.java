@@ -20,7 +20,6 @@ import top.yueshushu.learn.entity.User;
 import top.yueshushu.learn.enumtype.EntrustStatusType;
 import top.yueshushu.learn.enumtype.MockType;
 import top.yueshushu.learn.enumtype.SelectedType;
-import top.yueshushu.learn.enumtype.TradeRealValueType;
 import top.yueshushu.learn.helper.DateHelper;
 import top.yueshushu.learn.mode.dto.TradeEntrustQueryDto;
 import top.yueshushu.learn.mode.ro.TradePositionRo;
@@ -89,10 +88,10 @@ public class TradePositionBusinessImpl implements TradePositionBusiness {
 
     @Override
     public OutputResult realList(TradePositionRo tradePositionRo) {
-        if (!tradeCacheService.needSyncReal(TradeRealValueType.TRADE_POSITION, tradePositionRo.getUserId())) {
-            return mockList(tradePositionRo);
-        }
-        log.info(">>>此次员工{}查询需要同步真实的持仓数据",tradePositionRo.getUserId());
+//        if (!tradeCacheService.needSyncReal(TradeRealValueType.TRADE_POSITION, tradePositionRo.getUserId())) {
+//            return mockList(tradePositionRo);
+//        }
+        log.info(">>>此次员工{}查询需要同步真实的持仓数据", tradePositionRo.getUserId());
         OutputResult<List<TradePositionVo>> outputResult = tradePositionService.realList(tradePositionRo);
         if (!outputResult.getSuccess()) {
             return outputResult;
@@ -101,7 +100,7 @@ public class TradePositionBusinessImpl implements TradePositionBusiness {
         List<TradePositionVo> tradePositionVoList = outputResult.getData();
         // 将数据保存下来
         tradePositionService.syncRealPositionByUserId(tradePositionRo.getUserId(), tradePositionVoList);
-        return parseFillInfo(tradePositionVoList, tradePositionRo);
+        return outputResult;
     }
 
     @Override

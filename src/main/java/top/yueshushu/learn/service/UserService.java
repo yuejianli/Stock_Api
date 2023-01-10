@@ -78,10 +78,10 @@ public interface UserService  {
     /**
      * 转换交易用户的密码
      *
-     * @param password 交易用户密码
-     * @return 转换交易用户的密码
+     * @param text 交易用户信息
+     * @return 转换交易用户的信息
      */
-    OutputResult tradePassword(String password);
+    OutputResult tradeUserText(String text);
 
     /**
      * 查询需要通知的用户列表

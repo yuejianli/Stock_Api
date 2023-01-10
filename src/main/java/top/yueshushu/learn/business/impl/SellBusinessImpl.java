@@ -4,6 +4,9 @@ import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import top.yueshushu.learn.api.TradeResultVo;
+import top.yueshushu.learn.api.request.SubmitRequest;
+import top.yueshushu.learn.api.response.SubmitResponse;
 import top.yueshushu.learn.business.SellBusiness;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.common.SystemConst;
@@ -15,6 +18,7 @@ import top.yueshushu.learn.enumtype.ConfigCodeType;
 import top.yueshushu.learn.enumtype.DataFlagType;
 import top.yueshushu.learn.enumtype.DealType;
 import top.yueshushu.learn.enumtype.EntrustStatusType;
+import top.yueshushu.learn.helper.TradeRequestHelper;
 import top.yueshushu.learn.mode.ro.SellRo;
 import top.yueshushu.learn.mode.vo.ConfigVo;
 import top.yueshushu.learn.response.OutputResult;
@@ -44,13 +48,15 @@ public class SellBusinessImpl implements SellBusiness {
     private StockCacheService stockCacheService;
     @Resource
     private TradeEntrustDomainService tradeEntrustDomainService;
+    @Resource
+    private TradeRequestHelper tradeRequestHelper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public OutputResult sell(SellRo sellRo) {
         log.info(">>>试图卖出股票 {},股票信息是:{}", sellRo.getCode(), sellRo);
         Stock stock = stockCacheService.selectByCode(sellRo.getCode());
-        if (stock ==null){
+        if (stock == null) {
             return OutputResult.buildAlert(ResultCode.STOCK_CODE_NO_EXIST);
         }
         log.info("卖出股票时用户{}的股票编码验证通过", sellRo.getUserId());
@@ -116,5 +122,22 @@ public class SellBusinessImpl implements SellBusiness {
         log.info("卖出股票时用户{}生成委托信息{}", sellRo.getUserId(), tradeEntrustDo);
         tradeEntrustDomainService.save(tradeEntrustDo);
         return OutputResult.buildSucc();
+    }
+
+    @Override
+    public OutputResult realSell(SellRo sellRo) {
+        SubmitRequest request = new SubmitRequest();
+        request.setUserId(sellRo.getUserId());
+        request.setAmount(sellRo.getAmount());
+        request.setPrice(sellRo.getPrice().doubleValue());
+        request.setStockCode(sellRo.getCode());
+        request.setZqmc(sellRo.getName());
+        request.setTradeType(SubmitRequest.S);
+        request.setMarket(StockUtil.getStockMarket(request.getStockCode()));
+        TradeResultVo<SubmitResponse> response = tradeRequestHelper.sendRealSellReq(request);
+        if (!response.getSuccess()) {
+            return OutputResult.buildFail(ResultCode.REAL_SELL_ERROR);
+        }
+        return OutputResult.buildSucc(response.getData().get(0).getWtbh());
     }
 }

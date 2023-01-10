@@ -2,7 +2,6 @@ package top.yueshushu.learn.service.impl;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
-import com.alibaba.fastjson.TypeReference;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -11,30 +10,33 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import top.yueshushu.learn.api.TradeResultVo;
-import top.yueshushu.learn.api.request.GetHisOrdersDataRequest;
-import top.yueshushu.learn.api.request.GetOrdersDataRequest;
 import top.yueshushu.learn.api.response.GetHisOrdersDataResponse;
 import top.yueshushu.learn.api.response.GetOrdersDataResponse;
-import top.yueshushu.learn.api.responseparse.DataObjResponseParser;
 import top.yueshushu.learn.assembler.TradeEntrustAssembler;
 import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.common.ResultCode;
-import top.yueshushu.learn.config.TradeClient;
 import top.yueshushu.learn.domain.TradeEntrustDo;
 import top.yueshushu.learn.domainservice.TradeEntrustDomainService;
 import top.yueshushu.learn.entity.TradeEntrust;
+import top.yueshushu.learn.enumtype.DataFlagType;
 import top.yueshushu.learn.enumtype.EntrustStatusType;
+import top.yueshushu.learn.enumtype.EntrustType;
 import top.yueshushu.learn.enumtype.MockType;
+import top.yueshushu.learn.helper.TradeRequestHelper;
 import top.yueshushu.learn.mode.dto.TradeEntrustQueryDto;
 import top.yueshushu.learn.mode.ro.TradeEntrustRo;
 import top.yueshushu.learn.mode.vo.TradeEntrustVo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.response.PageResponse;
 import top.yueshushu.learn.service.TradeEntrustService;
-import top.yueshushu.learn.util.TradeUtil;
+import top.yueshushu.learn.util.*;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -52,13 +54,8 @@ public class TradeEntrustServiceImpl implements TradeEntrustService {
     private TradeEntrustDomainService tradeEntrustDomainService;
     @Resource
     private TradeEntrustAssembler tradeEntrustAssembler;
-
     @Resource
-    private DataObjResponseParser dataObjResponseParser;
-    @Resource
-    private TradeUtil tradeUtil;
-    @Resource
-    private TradeClient tradeClient;
+    private TradeRequestHelper tradeRequestHelper;
 
     @Override
     public List<TradeEntrust> listNowRunEntrust(Integer userId, Integer mockType) {
@@ -86,19 +83,73 @@ public class TradeEntrustServiceImpl implements TradeEntrustService {
     @Override
     public OutputResult<List<TradeEntrustVo>> realList(TradeEntrustRo tradeEntrustRo) {
         //获取响应信息
-        TradeResultVo<GetOrdersDataResponse> tradeResultVo = getOrdersDataResponse(tradeEntrustRo.getUserId());
+        TradeResultVo<GetOrdersDataResponse> tradeResultVo = tradeRequestHelper.findRealEntrust(tradeEntrustRo.getUserId());
         if (!tradeResultVo.getSuccess()) {
             return OutputResult.buildAlert(ResultCode.TRADE_ENTRUST_FAIL);
         }
         List<GetOrdersDataResponse> data = tradeResultVo.getData();
 
         List<TradeEntrustVo> tradeEntrustVoList = new ArrayList<>();
-        for(GetOrdersDataResponse getOrdersDataResponse:data){
+        for(GetOrdersDataResponse getOrdersDataResponse:data) {
             TradeEntrustVo tradeEntrustVo = new TradeEntrustVo();
-            tradeEntrustVo.setCode(getOrdersDataResponse.getMmlb());
+            tradeEntrustVo.setCode(getOrdersDataResponse.getZqdm());
+            tradeEntrustVo.setName(getOrdersDataResponse.getZqmc());
+            tradeEntrustVo.setEntrustCode(getOrdersDataResponse.getWtbh());
+            tradeEntrustVo.setEntrustDate(MyDateUtil.convertToTodayDate(null, getOrdersDataResponse.getWtsj()));
+            tradeEntrustVo.setEntrustNum(Integer.parseInt(getOrdersDataResponse.getWtsl()));
+            tradeEntrustVo.setEntrustPrice(BigDecimalUtil.toBigDecimal(getOrdersDataResponse.getWtjg()));
+            tradeEntrustVo.setDealType(getOrdersDataResponse.toDealType());
+            tradeEntrustVo.setEntrustStatus(getOrdersDataResponse.toEntrustStatus());
+            tradeEntrustVo.setEntrustType(EntrustType.HANDLER.getCode());
+            // 看是否成交了
+            tradeEntrustVo.setUserId(ThreadLocalUtils.getUserId());
+            tradeEntrustVo.setMockType(MockType.REAL.getCode());
+            tradeEntrustVo.setFlag(DataFlagType.NORMAL.getCode());
+
+            // 处理金额
+            tradeEntrustVo.setUseMoney(BigDecimal.ZERO);
+            tradeEntrustVo.setTakeoutMoney(BigDecimal.ZERO);
+            tradeEntrustVo.setEntrustMoney(
+                    StockUtil.allMoney(
+                            tradeEntrustVo.getEntrustNum(),
+                            tradeEntrustVo.getEntrustPrice()
+                    )
+            );
+            tradeEntrustVo.setHandMoney(
+                    StockUtil.getBuyHandMoney(
+                            tradeEntrustVo.getEntrustNum(),
+                            tradeEntrustVo.getEntrustPrice(),
+                            BigDecimalUtil.toBigDecimal(tradeEntrustVo.getCode())
+                    )
+            );
+            //获取对应的手续费
+            BigDecimal buyMoney = getBuyMoney(
+                    tradeEntrustVo.getEntrustNum(),
+                    tradeEntrustVo.getEntrustPrice(),
+                    BigDecimalUtil.toBigDecimal(tradeEntrustVo.getCode())
+            );
+            tradeEntrustVo.setTotalMoney(buyMoney);
+
+
             tradeEntrustVoList.add(tradeEntrustVo);
         }
         return OutputResult.buildSucc(tradeEntrustVoList);
+    }
+
+    /**
+     * 获取买入，总共需要的手续费
+     *
+     * @param amount
+     * @param price
+     * @param tranPrice
+     * @return
+     */
+    private BigDecimal getBuyMoney(Integer amount, BigDecimal price, BigDecimal tranPrice) {
+        return StockUtil.getBuyMoney(
+                amount,
+                price,
+                tranPrice
+        );
     }
 
     @Override
@@ -124,27 +175,6 @@ public class TradeEntrustServiceImpl implements TradeEntrustService {
         ).collect(Collectors.toList());
         tradeEntrustDomainService.saveBatch(entrustDoList);
     }
-
-    /**
-     * 获取委托的信息
-     * @param userId 用户编号
-     * @return 获取委托的信息
-     */
-    private TradeResultVo<GetOrdersDataResponse> getOrdersDataResponse(Integer userId) {
-        GetOrdersDataRequest request = new GetOrdersDataRequest(userId);
-        String url = tradeUtil.getUrl(request);
-        Map<String, String> header = tradeUtil.getHeader(request);
-        Map<String, Object> params = null;
-        params = tradeUtil.getParams(request);
-        log.debug("trade {} request: {}", request.getMethod(), params);
-        String content = tradeClient.send(url, params, header);
-        log.debug("trade {} response: {}", request.getMethod(), content);
-        TradeResultVo<GetOrdersDataResponse> result = dataObjResponseParser.parse(content,
-                new TypeReference<GetOrdersDataResponse>() {
-                });
-        return result;
-    }
-
     @Override
     public OutputResult mockList(TradeEntrustRo tradeEntrustRo) {
         DateTime now = DateUtil.date();
@@ -176,43 +206,56 @@ public class TradeEntrustServiceImpl implements TradeEntrustService {
     public OutputResult realHistoryList(TradeEntrustRo tradeEntrustRo) {
         //获取响应信息
         TradeResultVo<GetHisOrdersDataResponse> tradeResultVo =
-                getHistoryOrdersDataResponse(tradeEntrustRo.getUserId());
+                tradeRequestHelper.findRealHistoryEntrust(tradeEntrustRo.getUserId());
         if (!tradeResultVo.getSuccess()) {
             return OutputResult.buildAlert(ResultCode.TRADE_ENTRUST_HISTORY_FAIL);
         }
         List<GetHisOrdersDataResponse> data = tradeResultVo.getData();
 
         List<TradeEntrustVo> tradeEntrustVoList = new ArrayList<>();
-        for(GetHisOrdersDataResponse getOrdersDataResponse:data){
+        for(GetHisOrdersDataResponse getOrdersDataResponse : data) {
             TradeEntrustVo tradeEntrustVo = new TradeEntrustVo();
-            tradeEntrustVo.setCode(getOrdersDataResponse.getMmlb());
+            tradeEntrustVo.setCode(getOrdersDataResponse.getZqdm());
+            tradeEntrustVo.setName(getOrdersDataResponse.getZqmc());
+            tradeEntrustVo.setEntrustCode(getOrdersDataResponse.getWtbh());
+            tradeEntrustVo.setEntrustDate(MyDateUtil.convertToTodayDate(getOrdersDataResponse.getWtrq(),
+                    getOrdersDataResponse.getWtsj().substring(0, getOrdersDataResponse.getWtsj().length() - 2)));
+            tradeEntrustVo.setEntrustNum(Integer.parseInt(getOrdersDataResponse.getWtsl()));
+            tradeEntrustVo.setEntrustPrice(BigDecimalUtil.toBigDecimal(getOrdersDataResponse.getWtjg()));
+            tradeEntrustVo.setDealType(getOrdersDataResponse.toDealType());
+            tradeEntrustVo.setEntrustStatus(getOrdersDataResponse.toEntrustStatus());
+            tradeEntrustVo.setEntrustType(EntrustType.HANDLER.getCode());
+            // 看是否成交了
+            tradeEntrustVo.setUserId(ThreadLocalUtils.getUserId());
+            tradeEntrustVo.setMockType(MockType.REAL.getCode());
+            tradeEntrustVo.setFlag(DataFlagType.NORMAL.getCode());
+
+            // 处理金额
+            tradeEntrustVo.setUseMoney(BigDecimal.ZERO);
+            tradeEntrustVo.setTakeoutMoney(BigDecimal.ZERO);
+            tradeEntrustVo.setEntrustMoney(
+                    StockUtil.allMoney(
+                            tradeEntrustVo.getEntrustNum(),
+                            tradeEntrustVo.getEntrustPrice()
+                    )
+            );
+            tradeEntrustVo.setHandMoney(
+                    StockUtil.getBuyHandMoney(
+                            tradeEntrustVo.getEntrustNum(),
+                            tradeEntrustVo.getEntrustPrice(),
+                            BigDecimalUtil.toBigDecimal(tradeEntrustVo.getCode())
+                    )
+            );
+            //获取对应的手续费
+            BigDecimal buyMoney = getBuyMoney(
+                    tradeEntrustVo.getEntrustNum(),
+                    tradeEntrustVo.getEntrustPrice(),
+                    BigDecimalUtil.toBigDecimal(tradeEntrustVo.getCode())
+            );
+            tradeEntrustVo.setTotalMoney(buyMoney);
             tradeEntrustVoList.add(tradeEntrustVo);
         }
-        return OutputResult.buildSucc(tradeEntrustVoList);
-    }
-
-    /**
-     * 获取历史响应信息
-     * @param userId
-     * @return
-     */
-    private TradeResultVo<GetHisOrdersDataResponse> getHistoryOrdersDataResponse(Integer userId) {
-        GetHisOrdersDataRequest request = new GetHisOrdersDataRequest(userId);
-        request.setEt(DateUtil.format(new Date(), "yyyy-MM-dd"));
-        Date et = new Date();
-        et.setTime(et.getTime() - 7 * 24 * 3600 * 1000);
-        request.setSt(DateUtil.format(et, "yyyy-MM-dd"));
-        String url = tradeUtil.getUrl(request);
-        Map<String, String> header = tradeUtil.getHeader(request);
-        Map<String, Object> params = null;
-        params = tradeUtil.getParams(request);
-        log.debug("trade {} request: {}", request.getMethod(), params);
-        String content = tradeClient.send(url, params, header);
-        log.debug("trade {} response: {}", request.getMethod(), content);
-        TradeResultVo<GetHisOrdersDataResponse> result = dataObjResponseParser.parse(content,
-                new TypeReference<GetHisOrdersDataResponse>() {
-                });
-        return result;
+        return PageUtil.pageResult(tradeEntrustVoList, tradeEntrustRo.getPageNum(), tradeEntrustRo.getPageSize());
     }
     @Override
     public OutputResult mockHistoryList(TradeEntrustRo tradeEntrustRo) {

@@ -1,15 +1,12 @@
 package top.yueshushu.learn.mode.vo;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -28,6 +25,10 @@ public class TradeEntrustVo implements Serializable {
     private String code;
     @ApiModelProperty("股票名称")
     private String name;
+    /**
+     * 使用@JsonFormat注解格式化日期
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @ApiModelProperty("交易时间")
     private Date entrustDate;
     @ApiModelProperty("交易类型 1为买  2为卖")
@@ -54,6 +55,8 @@ public class TradeEntrustVo implements Serializable {
     private Integer entrustType;
     @ApiModelProperty("类型 1为虚拟 0为正式")
     private Integer mockType;
+    @ApiModelProperty("用户编号")
+    private Integer userId;
     @ApiModelProperty("1正常 0 删除")
     private Integer flag;
 }

@@ -59,11 +59,11 @@ public class UserController extends BaseController {
         return userBusiness.convertPassWord(password);
     }
 
-    @GetMapping("/tradePassword")
-    @ApiOperation("转换交易用户的密码")
+    @GetMapping("/tradeUserText")
+    @ApiOperation("转换交易用户的信息")
     @AuthToken
-    public OutputResult tradePassword(String password) {
-        return userBusiness.tradePassword(password);
+    public OutputResult tradeUserText(String text) {
+        return userBusiness.tradeUserText(text);
     }
 
     @GetMapping("/encrypt")

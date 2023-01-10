@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import top.yueshushu.learn.annotation.AuthToken;
 import top.yueshushu.learn.business.SellBusiness;
 import top.yueshushu.learn.common.ResultCode;
+import top.yueshushu.learn.enumtype.MockType;
 import top.yueshushu.learn.mode.ro.SellRo;
 import top.yueshushu.learn.response.OutputResult;
 
@@ -41,16 +42,19 @@ public class SellController extends BaseController {
         if(sellRo.getAmount() ==null){
             return OutputResult.buildAlert(ResultCode.TOOL_NUMBER_IS_EMPTY);
         }
-        if (sellRo.getAmount()%100 !=0){
+        if (sellRo.getAmount() % 100 != 0) {
             return OutputResult.buildAlert(
                     ResultCode.TOOL_NUMBER_IS_HUNDREDS
             );
         }
-        if(sellRo.getPrice() ==null){
+        if (sellRo.getPrice() == null) {
             return OutputResult.buildAlert(ResultCode.TOOL_PRICE_IS_EMPTY);
         }
-        return sellBusiness.sell(sellRo);
+
+        if (MockType.MOCK.getCode().equals(sellRo.getMockType())) {
+            // 虚拟盘
+            return sellBusiness.sell(sellRo);
+        }
+        return sellBusiness.realSell(sellRo);
     }
-
-
 }

@@ -16,6 +16,8 @@ import lombok.Data;
 public class RevokeRo extends TradeRo {
     @ApiModelProperty("撤销单的id信息")
     private Integer id;
+    @ApiModelProperty("撤销单的编码信息")
+    private String code;
     @ApiModelProperty("类型 1为手动，0为自动. 默认是手动")
     private Integer entrustType = 1;
 }

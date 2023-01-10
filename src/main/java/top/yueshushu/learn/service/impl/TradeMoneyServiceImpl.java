@@ -98,6 +98,7 @@ public class TradeMoneyServiceImpl implements TradeMoneyService {
         tradeMoneyVo.setMarketMoney(new BigDecimal(response.getZxsz()));
         tradeMoneyVo.setTotalMoney(new BigDecimal(response.getZzc()));
         tradeMoneyVo.setTakeoutMoney(new BigDecimal(response.getKqzj()));
+        tradeMoneyVo.setProfitMoney(new BigDecimal(response.getLjyk()));
         tradeMoneyVo.setMockType(MockType.REAL.getCode());
         return OutputResult.buildSucc(tradeMoneyVo);
     }

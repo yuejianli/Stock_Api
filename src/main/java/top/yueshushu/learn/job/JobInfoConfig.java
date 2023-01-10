@@ -1,6 +1,7 @@
 package top.yueshushu.learn.job;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.TriggerContext;
@@ -8,6 +9,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.scheduling.support.CronTrigger;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import top.yueshushu.learn.business.JobInfoBusiness;
 import top.yueshushu.learn.enumtype.EntrustType;
@@ -25,6 +27,8 @@ import java.util.Date;
  */
 @Configuration
 @EnableScheduling
+@ConditionalOnProperty(value = {"enableJob"}, matchIfMissing = true)
+@Component
 @Slf4j
 public class JobInfoConfig implements SchedulingConfigurer {
     @Resource
@@ -35,6 +39,7 @@ public class JobInfoConfig implements SchedulingConfigurer {
 
     @Override
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
+        log.info(">>>>>  启动定时任务配置");
         // 获取每一个定时任务列表.
         JobInfoType[] values = JobInfoType.values();
         for (JobInfoType jobInfoType : values) {

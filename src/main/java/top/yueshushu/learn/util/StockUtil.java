@@ -4,11 +4,13 @@ import cn.hutool.core.util.RandomUtil;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import top.yueshushu.learn.common.SystemConst;
+import top.yueshushu.learn.enumtype.ExchangeMarketType;
 import top.yueshushu.learn.enumtype.ExchangeType;
 import top.yueshushu.learn.mode.dto.PoundageDto;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -263,14 +265,70 @@ public class StockUtil {
         }
     }
     public static Integer convertExchange(Integer exchange){
-        Assert.notNull(exchange,"类型不能为空");
-        if(ExchangeType.SZ.getCode().equals(exchange)){
+        Assert.notNull(exchange, "类型不能为空");
+        if (ExchangeType.SZ.getCode().equals(exchange)) {
             return ExchangeType.SH.getCode();
         }
-        if(ExchangeType.SH.getCode().equals(exchange)){
+        if (ExchangeType.SH.getCode().equals(exchange)) {
             return ExchangeType.SZ.getCode();
         }
         return ExchangeType.OTHER.getCode();
+    }
+
+    public static String getStockMarket(String stockCode) {
+        String exchange = getExchange(stockCode);
+        if (exchange == null) {
+            return null;
+        }
+        return ExchangeMarketType.getExchangeType(exchange).getDesc();
+    }
+
+    private static final List<String> CODES_SH_A = Arrays.asList("600", "601", "603", "605", "688", "689");
+    private static final List<String> CODES_SH_INDEX = Collections.singletonList("000001");
+    private static final List<String> CODES_SH_ETF = Arrays.asList("51", "56", "58");
+    private static final List<String> CODES_SH_CB = Arrays.asList("100", "110");
+
+    private static final List<String> CODES_SZ_A = Arrays.asList("000", "001", "002", "003", "004", "300", "301");
+    private static final List<String> CODES_SZ_INDEX = Arrays.asList("399001", "399006");
+    private static final List<String> CODES_SZ_ETF = Collections.singletonList("15");
+    private static final List<String> CODES_SZ_CB = Arrays.asList("12");
+
+    private static final List<String> CODES_BJ_A = Arrays.asList("83", "87", "43");
+    private static final List<String> CODES_BJ_INDEX = Collections.emptyList();
+    private static final List<String> CODES_BJ_ETF = Collections.emptyList();
+    private static final List<String> CODES_BJ_CB = Collections.emptyList();
+
+    public static String getExchange(String code) {
+        if (!StringUtils.hasLength(code)) {
+            return null;
+        }
+        if (isCodeStart(code, CODES_SH_A, CODES_SH_ETF, CODES_SH_CB)) {
+            return ExchangeMarketType.SH.getCode();
+        }
+        if (isCodeStart(code, CODES_SZ_A, CODES_SZ_ETF, CODES_SZ_CB)) {
+            return ExchangeMarketType.SZ.getCode();
+        }
+        if (isCodeStart(code, CODES_BJ_A, CODES_BJ_ETF, CODES_BJ_CB)) {
+            return ExchangeMarketType.BJ.getCode();
+        }
+        return null;
+    }
+
+    public static boolean isOriName(String name) {
+        for (String namePrefix : Arrays.asList("N", "XD", "XR", "DR")) {
+            if (name.startsWith(namePrefix)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static boolean isCodeStart(String code, List<String> list) {
+        return list.stream().anyMatch(code::startsWith);
+    }
+
+    private static boolean isCodeStart(String code, List<String> list01, List<String> list02, List<String> list03) {
+        return isCodeStart(code, list01) || isCodeStart(code, list02) || isCodeStart(code, list03);
     }
 
 }

@@ -1,5 +1,6 @@
 package top.yueshushu.learn.util;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanMap;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -23,6 +24,7 @@ import java.util.Map;
  * @Date 2022/1/3 17:52
  **/
 @Component
+@Slf4j
 public class TradeUtil {
     @Resource
     private TradeMethodDomainService tradeMethodDomainService;
@@ -79,6 +81,8 @@ public class TradeUtil {
 
     @Resource(name = "dataListResponseParser")
     private DataListResponseParser dataListResponseParser;
+    @Resource(name = "dataPropertiesListResponseParser")
+    private DataPropertiesListResponseParser dataPropertiesListResponseParser;
 
     public ResponseParser getResponseParser(BaseTradeRequest request) {
         if (request.responseVersion() == dataObjResponseParser.version()) {
@@ -92,6 +96,9 @@ public class TradeUtil {
         }
         if (request.responseVersion() == dataListResponseParser.version()) {
             return dataListResponseParser;
+        }
+        if (request.responseVersion() == dataPropertiesListResponseParser.version()) {
+            return dataPropertiesListResponseParser;
         }
         // 设置一个默认的
         return dataObjResponseParser;

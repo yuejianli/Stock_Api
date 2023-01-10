@@ -1,13 +1,15 @@
 package top.yueshushu.learn.util;
 
-import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import org.springframework.util.StringUtils;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 /**
  * @ClassName:MyDateUtil
@@ -17,9 +19,6 @@ import java.util.List;
  * @Version 1.0
  **/
 public class MyDateUtil {
-    static List<String> holiday;
-    static List<String> extraWorkDay;
-
     private static LocalTime MORNING_START_TIME = LocalTime.parse("09:20:00");
     private static LocalTime MORNING_END_TIME = LocalTime.parse("11:30:05");
 
@@ -98,77 +97,15 @@ public class MyDateUtil {
     }
 
     public static void main(String[] args) {
-       // System.out.println(after15Hour());
-        System.out.println(before930());
+        // System.out.println(after15Hour());
+        System.out.println(convertToTodayDate(null, "112201"));
     }
-    /**
-     * 是否是节假日
-     */
-    public static Boolean isWorkingDay(DateTime dateTime) {
-        String formatTime = DateUtil.format(dateTime,"yyyy-MM-dd");
-        //是否加班日
-        //if(extraWorkDay.contains(formatTime)){
-        //    return true;
-        //}
-        //是否节假日
-        if(holiday.contains(formatTime)){
-            return false;
-        }
-        //如果是1-5表示周一到周五  是工作日
-        if(DateUtil.isWeekend(dateTime)){
-            return false;
-        }
-        return true;
 
-    }
-    /**
-     *  初始化节假日
-     */
-     static{
-        holiday =new ArrayList<>();
-        holiday.add("2021-01-01");
-        holiday.add("2021-01-02");
-        holiday.add("2021-01-03");
-        holiday.add("2021-02-11");
-        holiday.add("2021-02-12");
-        holiday.add("2021-02-13");
-        holiday.add("2021-02-14");
-        holiday.add("2021-02-15");
-        holiday.add("2021-02-16");
-        holiday.add("2021-02-17");
-        holiday.add("2021-04-03");
-        holiday.add("2021-04-04");
-        holiday.add("2021-04-05");
-        holiday.add("2021-05-01");
-        holiday.add("2021-05-02");
-        holiday.add("2021-05-03");
-        holiday.add("2021-05-04");
-        holiday.add("2021-05-05");
-        holiday.add("2021-06-12");
-        holiday.add("2021-06-13");
-        holiday.add("2021-06-14");
-        holiday.add("2021-09-19");
-        holiday.add("2021-09-20");
-        holiday.add("2021-09-21");
-        holiday.add("2021-10-01");
-        holiday.add("2021-10-02");
-        holiday.add("2021-10-03");
-        holiday.add("2021-10-04");
-        holiday.add("2021-10-05");
-        holiday.add("2021-10-06");
-        holiday.add("2021-10-07");
-    }
-    /**
-     *  初始化额外加班日
-     */
-    static{
-        extraWorkDay =new ArrayList<>();
-        extraWorkDay.add("2021-02-07");
-        extraWorkDay.add("2021-02-20");
-        extraWorkDay.add("2021-04-25");
-        extraWorkDay.add("2021-05-08");
-        extraWorkDay.add("2021-09-18");
-        extraWorkDay.add("2021-09-26");
-        extraWorkDay.add("2021-10-09");
+    public static Date convertToTodayDate(String dateStr, String timeStr) {
+        // String --> LocalDate
+        LocalDate localDate = StringUtils.hasText(dateStr) ? LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("yyyyMMdd")) : LocalDate.now();
+        // String --> LocalTime
+        LocalTime localTime = StringUtils.hasText(timeStr) ? LocalTime.parse(timeStr, DateTimeFormatter.ofPattern("HHmmss")) : LocalTime.now();
+        return Date.from(LocalDateTime.of(localDate, localTime).atZone(ZoneId.systemDefault()).toInstant());
     }
 }

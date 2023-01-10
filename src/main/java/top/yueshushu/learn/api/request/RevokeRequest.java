@@ -20,4 +20,9 @@ public class RevokeRequest extends BaseTradeRequest {
         return TradeMethodType.RevokeRequest.getCode();
     }
 
+    @Override
+    public int responseVersion() {
+        return VERSION_MSG;
+    }
+
 }

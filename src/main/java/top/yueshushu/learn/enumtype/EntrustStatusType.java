@@ -8,6 +8,7 @@ import org.springframework.util.Assert;
  * @author 两个蝴蝶飞
  */
 public enum EntrustStatusType {
+    NO_BAO(0, "未报"),
     ING(1, "委托中"),
     SUCCESS(2, "成交"),
     HAND_REVOKE(3, "手动撤单"),

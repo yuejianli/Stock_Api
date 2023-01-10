@@ -1,11 +1,6 @@
 package top.yueshushu.learn.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -39,6 +34,10 @@ public class TradeUser implements Serializable {
     private LocalDateTime updateTime;
 
     private Integer flag;
+
+    // 登录时使用的
+    private String identifyCode;
+    private String randNum;
 
 
 }

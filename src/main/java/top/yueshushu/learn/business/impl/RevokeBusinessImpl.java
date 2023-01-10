@@ -1,8 +1,12 @@
 package top.yueshushu.learn.business.impl;
 
+import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import top.yueshushu.learn.api.TradeResultVo;
+import top.yueshushu.learn.api.request.RevokeRequest;
+import top.yueshushu.learn.api.response.RevokeResponse;
 import top.yueshushu.learn.business.RevokeBusiness;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.domain.TradeEntrustDo;
@@ -12,6 +16,7 @@ import top.yueshushu.learn.entity.TradePosition;
 import top.yueshushu.learn.enumtype.DealType;
 import top.yueshushu.learn.enumtype.EntrustStatusType;
 import top.yueshushu.learn.enumtype.EntrustType;
+import top.yueshushu.learn.helper.TradeRequestHelper;
 import top.yueshushu.learn.mode.ro.RevokeRo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.service.TradeMoneyService;
@@ -19,6 +24,7 @@ import top.yueshushu.learn.service.TradePositionService;
 import top.yueshushu.learn.util.BigDecimalUtil;
 
 import javax.annotation.Resource;
+import java.util.Date;
 
 /**
  * @Description 委托撤销
@@ -36,6 +42,8 @@ public class RevokeBusinessImpl implements RevokeBusiness {
     private TradePositionService tradePositionService;
     @Resource
     private TradeEntrustDomainService tradeEntrustDomainService;
+    @Resource
+    private TradeRequestHelper tradeRequestHelper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -65,8 +73,19 @@ public class RevokeBusinessImpl implements RevokeBusiness {
         }
     }
 
+    @Override
+    public OutputResult realRevoke(RevokeRo revokeRo) {
+        RevokeRequest request = new RevokeRequest(revokeRo.getUserId());
+        String revokes = String.format("%s_%s", DateUtil.format(new Date(), "yyyyMMdd"), revokeRo.getCode());
+        request.setRevokes(revokes);
+        TradeResultVo<RevokeResponse> response = tradeRequestHelper.sendRealRevokeReq(request);
+        if (!response.getSuccess()) {
+            return OutputResult.buildFail(ResultCode.REAL_REVOKE_ERROR);
+        }
+        return OutputResult.buildSucc(response.getMessage());
+    }
+
     private OutputResult sellRevoke(TradeEntrustDo tradeEntrustDo) {
-        //取消的话，改变这个记录的状态。
         //更新
         tradeEntrustDomainService.updateById(tradeEntrustDo);
 

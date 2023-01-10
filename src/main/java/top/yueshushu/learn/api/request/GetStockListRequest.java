@@ -10,6 +10,7 @@ import top.yueshushu.learn.enumtype.TradeMethodType;
 public class GetStockListRequest extends BaseTradeRequest {
     private Integer qqhs =1000;
     private Integer dwc;
+
     public GetStockListRequest(int userId) {
         super(userId);
     }
@@ -19,4 +20,8 @@ public class GetStockListRequest extends BaseTradeRequest {
         return TradeMethodType.GetStockList.getCode();
     }
 
+    @Override
+    public int responseVersion() {
+        return VERSION_DATA_PROPERTIES_LIST;
+    }
 }

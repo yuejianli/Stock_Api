@@ -1,12 +1,14 @@
 package top.yueshushu.learn.api.response;
 
 import lombok.Data;
+import top.yueshushu.learn.enumtype.DealType;
+import top.yueshushu.learn.enumtype.EntrustStatusType;
 
 /**
  * 当日成交响应
  */
 @Data
-public class GetDealDataResponse {
+public class GetDealDataResponse extends BaseTradeResponse {
 
     /**
      * 买卖类别-买
@@ -54,4 +56,12 @@ public class GetDealDataResponse {
      * @see #S
      */
     private String Mmlb;
+
+    public Integer toDealType() {
+        return B.equalsIgnoreCase(getMmlb()) ? DealType.BUY.getCode() : DealType.SELL.getCode();
+    }
+
+    public Integer toEntrustStatus() {
+        return EntrustStatusType.SUCCESS.getCode();
+    }
 }

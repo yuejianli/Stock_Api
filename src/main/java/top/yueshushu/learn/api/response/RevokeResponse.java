@@ -6,6 +6,6 @@ import lombok.Data;
  * 撤单响应
  */
 @Data
-public class RevokeResponse {
+public class RevokeResponse extends BaseTradeResponse {
 
 }

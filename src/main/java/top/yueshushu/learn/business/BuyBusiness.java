@@ -11,8 +11,17 @@ import top.yueshushu.learn.response.OutputResult;
 public interface BuyBusiness {
     /**
      * 委托买入处理
+     *
      * @param buyRo 买入对象
      * @return 返回委托买入的处理结果
      */
     OutputResult buy(BuyRo buyRo);
+
+    /**
+     * 真实的买入处理
+     *
+     * @param buyRo 真实的买入对象
+     */
+    OutputResult realBuy(BuyRo buyRo);
+
 }

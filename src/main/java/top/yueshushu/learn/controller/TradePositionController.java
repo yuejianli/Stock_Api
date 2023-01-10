@@ -16,11 +16,13 @@ import top.yueshushu.learn.mode.vo.AddPositionVo;
 import top.yueshushu.learn.mode.vo.TradePositionShowVo;
 import top.yueshushu.learn.mode.vo.TradePositionVo;
 import top.yueshushu.learn.response.OutputResult;
+import top.yueshushu.learn.util.BigDecimalUtil;
 import top.yueshushu.learn.util.ThreadLocalUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * <p>
@@ -61,7 +63,10 @@ public class TradePositionController extends BaseController{
 
         BigDecimal todayMoneySum = new BigDecimal(0);
         for (TradePositionVo tradePositionVo : data) {
-            todayMoneySum = todayMoneySum.add(tradePositionVo.getTodayMoney());
+            todayMoneySum = BigDecimalUtil.addBigDecimal(
+                    todayMoneySum,
+                    Optional.ofNullable(tradePositionVo.getTodayMoney()).orElse(BigDecimal.ZERO)
+            );
         }
         tradePositionShowVo.setTodayMoney(todayMoneySum);
         return OutputResult.buildSucc(tradePositionShowVo);

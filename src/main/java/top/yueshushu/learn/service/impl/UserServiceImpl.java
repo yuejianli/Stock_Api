@@ -18,6 +18,7 @@ import top.yueshushu.learn.service.UserService;
 import top.yueshushu.learn.service.cache.UserCacheService;
 import top.yueshushu.learn.util.JwtUtils;
 import top.yueshushu.learn.util.RSAUtil;
+import top.yueshushu.learn.util.RedisUtil;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
@@ -45,8 +46,12 @@ public class UserServiceImpl implements UserService {
     private UserCacheService userCacheService;
     @Resource
     private JwtUtils jwtUtils;
+    @Resource
+    private RedisUtil redisUtil;
+
     /**
      * 用户登录
+     *
      * @param userRo
      * @return
      */
@@ -92,12 +97,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public OutputResult tradePassword(String password) {
-        if (password.length() != 6) {
-            return OutputResult.buildSucc(password);
+    public OutputResult tradeUserText(String text) {
+        //进行 rsa 加密， 处理密码。
+        try {
+            String redisPublicKey = redisUtil.get(Const.RSA_PUBLIC_KEY);
+            // 进行替换
+            redisPublicKey = redisPublicKey.replaceAll("X+", "X");
+            return OutputResult.buildSucc(RSAUtil.encryptByPublicKey(redisPublicKey, text));
+        } catch (Exception e) {
+            log.error(">>> 转换用户交易密码出错", e);
+            return OutputResult.buildFail();
         }
-        String publicKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDHdsyxT66pDG4p73yope7jxA92c0AT4qIJ/xtbBcHkFPK77upnsfDTJiVEuQDH+MiMeb+XhCLNKZGp0yaUU6GlxZdp+nLW8b7Kmijr3iepaDhcbVTsYBWchaWUXauj9Lrhz58/6AE/NF0aMolxIGpsi+ST2hSHPu3GSXMdhPCkWQIDAQAB";
-        return OutputResult.buildSucc(RSAUtil.encodeWithPublicKey(password, publicKey));
     }
 
     @Override

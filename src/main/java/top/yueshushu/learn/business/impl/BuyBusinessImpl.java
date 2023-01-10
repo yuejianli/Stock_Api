@@ -4,6 +4,9 @@ import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import top.yueshushu.learn.api.TradeResultVo;
+import top.yueshushu.learn.api.request.SubmitRequest;
+import top.yueshushu.learn.api.response.SubmitResponse;
 import top.yueshushu.learn.business.BuyBusiness;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.common.SystemConst;
@@ -15,6 +18,7 @@ import top.yueshushu.learn.enumtype.ConfigCodeType;
 import top.yueshushu.learn.enumtype.DataFlagType;
 import top.yueshushu.learn.enumtype.DealType;
 import top.yueshushu.learn.enumtype.EntrustStatusType;
+import top.yueshushu.learn.helper.TradeRequestHelper;
 import top.yueshushu.learn.mode.ro.BuyRo;
 import top.yueshushu.learn.mode.vo.ConfigVo;
 import top.yueshushu.learn.response.OutputResult;
@@ -44,13 +48,15 @@ public class BuyBusinessImpl implements BuyBusiness {
     private TradeEntrustDomainService tradeEntrustDomainService;
     @Resource
     private StockCacheService stockCacheService;
+    @Resource
+    private TradeRequestHelper tradeRequestHelper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public OutputResult buy(BuyRo buyRo) {
         log.info(">>>试图买入股票 {},股票信息是:{}", buyRo.getCode(), buyRo);
         Stock stock = stockCacheService.selectByCode(buyRo.getCode());
-        if (stock ==null){
+        if (stock == null) {
             return OutputResult.buildAlert(ResultCode.STOCK_CODE_NO_EXIST);
         }
         log.info("买入股票时用户{}的股票编码验证通过", buyRo.getUserId());
@@ -147,8 +153,30 @@ public class BuyBusinessImpl implements BuyBusiness {
         return OutputResult.buildSucc();
     }
 
+    @Override
+    public OutputResult realBuy(BuyRo buyRo) {
+        SubmitRequest request = new SubmitRequest();
+        Stock stock = stockCacheService.selectByCode(buyRo.getCode());
+        if (stock == null) {
+            return OutputResult.buildAlert(ResultCode.STOCK_CODE_NO_EXIST);
+        }
+        request.setUserId(buyRo.getUserId());
+        request.setAmount(buyRo.getAmount());
+        request.setPrice(buyRo.getPrice().doubleValue());
+        request.setStockCode(buyRo.getCode());
+        request.setZqmc(stock.getName());
+        request.setTradeType(SubmitRequest.B);
+        request.setMarket(StockUtil.getStockMarket(request.getStockCode()));
+        TradeResultVo<SubmitResponse> response = tradeRequestHelper.sendRealBuyReq(request);
+        if (!response.getSuccess()) {
+            return OutputResult.buildFail(ResultCode.REAL_BUY_ERROR);
+        }
+        return OutputResult.buildSucc(response.getData().get(0).getWtbh());
+    }
+
     /**
      * 获取买入，总共需要的手续费
+     *
      * @param amount
      * @param price
      * @param tranPrice

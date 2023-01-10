@@ -17,6 +17,8 @@ public abstract class BaseTradeRequest {
     public static final int VERSION_MSG = 2;
     // { }
     public static final int VERSION_OBJ = 3;
+    // { Data: [ {properties}] }
+    public static final int VERSION_DATA_PROPERTIES_LIST = 4;
     private int userId;
 
     public BaseTradeRequest() {

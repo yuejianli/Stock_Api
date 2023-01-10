@@ -2,34 +2,37 @@ package top.yueshushu.learn.service.impl;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
-import com.alibaba.fastjson.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import top.yueshushu.learn.api.TradeResultVo;
-import top.yueshushu.learn.api.request.GetStockListRequest;
 import top.yueshushu.learn.api.response.GetStockListResponse;
 import top.yueshushu.learn.api.responseparse.DataObjResponseParser;
 import top.yueshushu.learn.assembler.TradePositionAssembler;
 import top.yueshushu.learn.common.ResultCode;
-import top.yueshushu.learn.config.TradeClient;
 import top.yueshushu.learn.domain.TradePositionDo;
 import top.yueshushu.learn.domain.TradePositionHistoryDo;
 import top.yueshushu.learn.domainservice.TradePositionDomainService;
 import top.yueshushu.learn.domainservice.TradePositionHistoryDomainService;
 import top.yueshushu.learn.entity.TradePosition;
 import top.yueshushu.learn.enumtype.MockType;
+import top.yueshushu.learn.enumtype.SelectedType;
+import top.yueshushu.learn.helper.TradeRequestHelper;
 import top.yueshushu.learn.mode.ro.TradePositionRo;
 import top.yueshushu.learn.mode.vo.TradePositionVo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.service.TradePositionService;
-import top.yueshushu.learn.util.TradeUtil;
+import top.yueshushu.learn.util.BigDecimalUtil;
 
 import javax.annotation.Resource;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -51,12 +54,8 @@ public class TradePositionServiceImpl implements TradePositionService {
     private TradePositionDomainService tradePositionDomainService;
     @Resource
     private DataObjResponseParser dataObjResponseParser;
-
     @Resource
-    private TradeClient tradeClient;
-
-    @Resource
-    private TradeUtil tradeUtil;
+    private TradeRequestHelper tradeRequestHelper;
 
     @Resource
     private TradePositionAssembler tradePositionAssembler;
@@ -110,18 +109,28 @@ public class TradePositionServiceImpl implements TradePositionService {
     @Override
     public OutputResult<List<TradePositionVo>> realList(TradePositionRo tradePositionRo) {
         //获取响应信息
-        TradeResultVo<GetStockListResponse> tradeResultVo = getStockListResponse(tradePositionRo.getUserId());
+        TradeResultVo<GetStockListResponse> tradeResultVo = tradeRequestHelper.findRealPosition(tradePositionRo.getUserId());
         if (!tradeResultVo.getSuccess()) {
             return OutputResult.buildAlert(ResultCode.TRADE_POSITION_FAIL);
         }
         log.info(">>>用户{}获取真实的持仓信息成功",tradePositionRo.getUserId());
         List<GetStockListResponse> data = tradeResultVo.getData();
-
         List<TradePositionVo> tradePositionVoList = new ArrayList<>();
-        for(GetStockListResponse getStockListResponse:data){
+        for(GetStockListResponse getStockListResponse:data) {
             TradePositionVo tradePositionVo = new TradePositionVo();
-            tradePositionVo.setCode(getStockListResponse.getKysl());
+            tradePositionVo.setCode(getStockListResponse.getZqdm());
+            tradePositionVo.setName(getStockListResponse.getZqmc());
+            tradePositionVo.setAvgPrice(BigDecimalUtil.toBigDecimal(getStockListResponse.getCbjg()));
+            tradePositionVo.setAllAmount(Integer.parseInt(getStockListResponse.getZqsl()));
+            tradePositionVo.setUseAmount(Integer.parseInt(getStockListResponse.getKysl()));
+            tradePositionVo.setPrice(BigDecimalUtil.toBigDecimal(getStockListResponse.getZxjg()));
+            tradePositionVo.setFloatMoney(BigDecimalUtil.toBigDecimal(getStockListResponse.getLjyk()));
+            tradePositionVo.setFloatProportion(BigDecimalUtil.toBigDecimal(getStockListResponse.getYkbl()));
+            tradePositionVo.setAllMoney(BigDecimalUtil.toBigDecimal(getStockListResponse.getZxsz()));
+            tradePositionVo.setTodayMoney(BigDecimalUtil.toBigDecimal(
+                    StringUtils.hasText(getStockListResponse.getDryk()) ? getStockListResponse.getDryk() : "0.00"));
             tradePositionVo.setMockType(MockType.REAL.getCode());
+            tradePositionVo.setSelectType(SelectedType.POSITION.getCode());
             tradePositionVoList.add(tradePositionVo);
         }
         log.info(">>>用户{}解析真实的持仓信息成功",tradePositionRo.getUserId());
@@ -178,27 +187,6 @@ public class TradePositionServiceImpl implements TradePositionService {
             tradePositionDomainService.updateById(editTradePositionDo);
         }
     }
-
-    /**
-     * 获取真实的股票持仓响应的信息
-     *
-     * @param userId 用户编号
-     * @return 获取真实的股票持仓响应的信息
-     */
-    private TradeResultVo<GetStockListResponse> getStockListResponse(Integer userId) {
-        GetStockListRequest request = new GetStockListRequest(userId);
-        String url = tradeUtil.getUrl(request);
-        Map<String, String> header = tradeUtil.getHeader(request);
-        Map<String, Object> params;
-        params = tradeUtil.getParams(request);
-        log.debug("trade {} request: {}", request.getMethod(), params);
-        String content = tradeClient.send(url, params, header);
-        log.debug("trade {} response: {}", request.getMethod(), content);
-        return dataObjResponseParser.parse(content,
-                new TypeReference<GetStockListResponse>() {
-                });
-    }
-
     @Override
     public OutputResult<List<TradePositionVo>> mockList(TradePositionRo tradePositionRo) {
 

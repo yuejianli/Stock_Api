@@ -37,8 +37,8 @@ public class SystemJob {
     @Resource
     private JobInfoBusiness jobInfoBusiness;
 
-    @Value("${xxlJobTime}")
-    boolean xxlJobTime;
+    @Value("${enableJob}")
+    boolean enableJob;
 
     // @Scheduled(cron = "1 1 0 1 1 ?")
     public void holiday() {
@@ -79,7 +79,7 @@ public class SystemJob {
     // @Scheduled(cron = "1/10 * 9,10,11,13,14 ? * 1-5")
     public void stockPrice() {
         //获取当前的股票信息。取第一个值.
-        if (xxlJobTime) {
+        if (enableJob) {
             if (!dateHelper.isTradeTime(DateUtil.date())) {
                 return;
             }

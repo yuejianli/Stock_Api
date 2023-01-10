@@ -11,8 +11,16 @@ import top.yueshushu.learn.response.OutputResult;
 public interface RevokeBusiness {
     /**
      * 撤销委托信息
+     *
      * @param revokeRo 委托信息
      * @return 撤销委托信息
      */
     OutputResult revoke(RevokeRo revokeRo);
+
+    /**
+     * 真实的撤消操作
+     *
+     * @param revokeRo 撤消对象
+     */
+    OutputResult realRevoke(RevokeRo revokeRo);
 }

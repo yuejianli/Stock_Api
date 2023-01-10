@@ -6,6 +6,6 @@ import lombok.Data;
  * 提交挂单响应
  */
 @Data
-public class SubmitResponse {
+public class SubmitResponse extends BaseTradeResponse {
     private String Wtbh;
 }

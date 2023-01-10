@@ -1,5 +1,6 @@
+SERVER_IP: 139.155.90.176
 # 配置 Mysql 需要修改的常量
-MYSQL_HOST: 139.155.90.176:3306
+MYSQL_HOST: ${SERVER_IP}:3306
 MYSQL_USERNAME: ENC(wv7ZajBE7Fida2xzgYhBmTT2BPzuQC+Kq1Vd2ZC7NjZJXBUZmk4mFdKSnPwzvkyE)
 MYSQL_PASSWORD: ENC(wv7ZajBE7Fida2xzgYhBmTT2BPzuQC+Kq1Vd2ZC7NjZJXBUZmk4mFdKSnPwzvkyE)
 
@@ -8,7 +9,7 @@ DRUID_USERNAME: yuejianli
 DRUID_PASSWORD: ENC(1gDhO2RSRp5O4Y7E/lC0rfnX3U6MaZO/dvvmVCMAi8XgINr6KlWqM9pDTSo5yfGu)
 
 # 配置Redis 的信息:
-REDIS_HOST: 139.155.90.176
+REDIS_HOST: ${SERVER_IP}
 REDIS_PORT: 6379
 REDIS_PASSWORD: zk123
 REDIS_DATABASE: 8
@@ -17,8 +18,8 @@ REDIS_DATABASE: 8
 SWAGGER_USERNAME: admin
 SWAGGER_PASSWORD: ENC(oNEYdaPhQJloQiYdM2lecPtjcIVgJW6Jj08nzIYy6IpMtvM0v6mgqOdJ3XQDlCuX)
 
-# 是否开启xxl_job的相应时间验证
-xxlJobTime: false
+# 是否启用任务
+enableJob: true
 
 server:
   port: 8088
@@ -162,6 +163,7 @@ weixin:
   corpId: ENC(5NynxYfBMsJQellJS1hVS+g7jCOaCqDOhqIftIDeaf0R1xmLBYsrD0nZPgOYa1r413IaYAtFz1+FCJz0Lah8YA==)
   coprsecret: ENC(VgGGFEP4B8Azohzz69QBTlRLZ/GnXAZrdydxo/M3lzE004LbRBPX0c1Nt9YBHVoPxV5Xgc69+t1Dx9YrTLcnp7era8il0zCzoYaBg1EQyew=)
   agentId: 1000003
+emSecSecurityServerUrl: http://127.0.0.1:18888/api/verifyUserInfo?
 # 配置文件加密设置
 # 指定bean
 jasypt:

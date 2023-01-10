@@ -15,26 +15,27 @@ import javax.annotation.Resource;
 
 /**
  * 用户1的定时任务
+ *
  * @author Yue Jianli
  * @date 2022-05-31
  */
 @Component
 @Slf4j
 @Configuration
-@ConditionalOnProperty(value = {"xxlJobTime"}, matchIfMissing = true)
+@ConditionalOnProperty(value = {"enableJob"}, matchIfMissing = true)
 public class UserId1Job {
-    @Value("${xxlJobTime}")
-    boolean xxlJobTime;
+    @Value("${enableJob}")
+    boolean enableJob;
     @Resource
     private DateHelper dateHelper;
     @Resource
     private JobInfoBusiness jobInfoBusiness;
 
     // @Scheduled(cron = "2/5 * 9,10,11,13,14,15 ? * 1-5")
-    public void mockDeal(){
-        if (xxlJobTime){
+    public void mockDeal() {
+        if (enableJob) {
             if (!dateHelper.isTradeTime(DateUtil.date())) {
-                return ;
+                return;
             }
         }
         jobInfoBusiness.execJob(JobInfoType.MOCK_DEAL, EntrustType.AUTO.getCode());
@@ -42,7 +43,7 @@ public class UserId1Job {
 
     // @Scheduled(cron = "2/5 * 9,10,11,13,14,15 ? * 1-5")
     public void mockEntrust() {
-        if (xxlJobTime) {
+        if (enableJob) {
             if (!dateHelper.isTradeTime(DateUtil.date())) {
                 return;
             }

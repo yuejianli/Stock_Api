@@ -2,7 +2,6 @@ package top.yueshushu.learn.service.impl;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
-import com.alibaba.fastjson.TypeReference;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -11,34 +10,32 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import top.yueshushu.learn.api.TradeResultVo;
-import top.yueshushu.learn.api.request.GetDealDataRequest;
-import top.yueshushu.learn.api.request.GetHisDealDataRequest;
 import top.yueshushu.learn.api.response.GetDealDataResponse;
 import top.yueshushu.learn.api.response.GetHisDealDataResponse;
-import top.yueshushu.learn.api.responseparse.DataObjResponseParser;
 import top.yueshushu.learn.assembler.TradeDealAssembler;
 import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.common.ResultCode;
-import top.yueshushu.learn.config.TradeClient;
 import top.yueshushu.learn.domain.TradeDealDo;
 import top.yueshushu.learn.domain.TradeEntrustDo;
 import top.yueshushu.learn.domainservice.TradeDealDomainService;
 import top.yueshushu.learn.enumtype.DataFlagType;
+import top.yueshushu.learn.enumtype.EntrustType;
 import top.yueshushu.learn.enumtype.MockType;
+import top.yueshushu.learn.helper.TradeRequestHelper;
 import top.yueshushu.learn.mode.dto.TradeDealQueryDto;
 import top.yueshushu.learn.mode.ro.TradeDealRo;
 import top.yueshushu.learn.mode.vo.TradeDealVo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.response.PageResponse;
 import top.yueshushu.learn.service.TradeDealService;
-import top.yueshushu.learn.util.BigDecimalUtil;
-import top.yueshushu.learn.util.PageUtil;
-import top.yueshushu.learn.util.StockUtil;
-import top.yueshushu.learn.util.TradeUtil;
+import top.yueshushu.learn.util.*;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -57,11 +54,7 @@ public class TradeDealServiceImpl implements TradeDealService {
     @Resource
     private TradeDealAssembler tradeDealAssembler;
     @Resource
-    private DataObjResponseParser dataObjResponseParser;
-    @Resource
-    private TradeUtil tradeUtil;
-    @Resource
-    private TradeClient tradeClient;
+    private TradeRequestHelper tradeRequestHelper;
 
     @Override
     public void addDealRecord(TradeEntrustDo tradeEntrustDo) {
@@ -99,41 +92,39 @@ public class TradeDealServiceImpl implements TradeDealService {
     @Override
     public OutputResult<List<TradeDealVo>> realList(TradeDealRo tradeDealRo) {
         //获取响应信息
-        TradeResultVo<GetDealDataResponse> tradeResultVo = getDealDataResponse(tradeDealRo.getUserId());
+        TradeResultVo<GetDealDataResponse> tradeResultVo = tradeRequestHelper.listRealDeal(tradeDealRo.getUserId());
         if (!tradeResultVo.getSuccess()) {
             return OutputResult.buildAlert(ResultCode.TRADE_DEAL_FAIL);
         }
         List<GetDealDataResponse> data = tradeResultVo.getData();
 
         List<TradeDealVo> tradeDealVoList = new ArrayList<>();
-        for(GetDealDataResponse getDealDataResponse:data){
+        for(GetDealDataResponse getDealDataResponse:data) {
             TradeDealVo tradeDealVo = new TradeDealVo();
-            tradeDealVo.setCode(getDealDataResponse.getCjbh());
+            tradeDealVo.setCode(getDealDataResponse.getZqdm());
+            tradeDealVo.setName(getDealDataResponse.getZqmc());
+            tradeDealVo.setEntrustCode(getDealDataResponse.getWtbh());
+            tradeDealVo.setDealCode(getDealDataResponse.getCjbh());
+            tradeDealVo.setDealDate(MyDateUtil.convertToTodayDate(null, getDealDataResponse.getCjsj()));
+            tradeDealVo.setDealNum(Integer.parseInt(getDealDataResponse.getWtsl()));
+            tradeDealVo.setDealPrice(BigDecimalUtil.toBigDecimal(getDealDataResponse.getCjjg()));
+            tradeDealVo.setDealType(getDealDataResponse.toDealType());
+            tradeDealVo.setEntrustType(EntrustType.HANDLER.getCode());
+            // 看是否成交了
+            tradeDealVo.setUserId(ThreadLocalUtils.getUserId());
+            tradeDealVo.setMockType(MockType.REAL.getCode());
+            tradeDealVo.setFlag(DataFlagType.NORMAL.getCode());
+            tradeDealVo.setDealMoney(
+                    BigDecimalUtil.toBigDecimal(
+                            tradeDealVo.getDealPrice(),
+                            new BigDecimal(
+                                    tradeDealVo.getDealNum()
+                            )
+                    )
+            );
             tradeDealVoList.add(tradeDealVo);
         }
         return OutputResult.buildSucc(tradeDealVoList);
-    }
-
-    /**
-     * 获取响应的信息
-     * @param userId
-     * @return
-     */
-    private TradeResultVo<GetDealDataResponse> getDealDataResponse(Integer userId) {
-        GetDealDataRequest request = new GetDealDataRequest(userId);
-        String url = tradeUtil.getUrl(request);
-        Map<String, String> header = tradeUtil.getHeader(request);
-
-        List<Map<String, Object>> paramList = null;
-        Map<String, Object> params = null;
-        params = tradeUtil.getParams(request);
-        log.debug("trade {} request: {}", request.getMethod(), params);
-        String content = tradeClient.send(url, params, header);
-        log.debug("trade {} response: {}", request.getMethod(), content);
-        TradeResultVo<GetDealDataResponse> result = dataObjResponseParser.parse(content,
-                new TypeReference<GetDealDataResponse>() {
-                });
-        return result;
     }
     @Override
     public OutputResult mockList(TradeDealRo tradeDealRo) {
@@ -165,15 +156,35 @@ public class TradeDealServiceImpl implements TradeDealService {
     @Override
     public OutputResult realHistoryList(TradeDealRo tradeDealRo) {
         //获取响应信息
-        TradeResultVo<GetHisDealDataResponse> tradeResultVo = getHisDealDataResponse(tradeDealRo.getUserId());
+        TradeResultVo<GetHisDealDataResponse> tradeResultVo = tradeRequestHelper.listRealHistoryDeal(tradeDealRo.getUserId());
         if (!tradeResultVo.getSuccess()) {
             return OutputResult.buildAlert(ResultCode.TRADE_DEAL_HISTORY_FAIL);
         }
         List<GetHisDealDataResponse> data = tradeResultVo.getData();
         List<TradeDealVo> tradeDealVoList = new ArrayList<>();
-        for(GetHisDealDataResponse getDealDataResponse:data){
+        for(GetHisDealDataResponse getDealDataResponse:data) {
             TradeDealVo tradeDealVo = new TradeDealVo();
-            tradeDealVo.setCode(getDealDataResponse.getCjbh());
+            tradeDealVo.setCode(getDealDataResponse.getZqdm());
+            tradeDealVo.setName(getDealDataResponse.getZqmc());
+            tradeDealVo.setEntrustCode(getDealDataResponse.getWtbh());
+            tradeDealVo.setDealCode(getDealDataResponse.getCjbh());
+            tradeDealVo.setDealDate(MyDateUtil.convertToTodayDate(getDealDataResponse.getCjrq(), getDealDataResponse.getCjsj()));
+            tradeDealVo.setDealNum(Integer.parseInt(getDealDataResponse.getWtsl()));
+            tradeDealVo.setDealPrice(BigDecimalUtil.toBigDecimal(getDealDataResponse.getCjjg()));
+            tradeDealVo.setDealType(getDealDataResponse.toDealType());
+            tradeDealVo.setEntrustType(EntrustType.HANDLER.getCode());
+            // 看是否成交了
+            tradeDealVo.setUserId(ThreadLocalUtils.getUserId());
+            tradeDealVo.setMockType(MockType.REAL.getCode());
+            tradeDealVo.setFlag(DataFlagType.NORMAL.getCode());
+            tradeDealVo.setDealMoney(
+                    BigDecimalUtil.toBigDecimal(
+                            tradeDealVo.getDealPrice(),
+                            new BigDecimal(
+                                    tradeDealVo.getDealNum()
+                            )
+                    )
+            );
             tradeDealVoList.add(tradeDealVo);
         }
         List<TradeDealVo> list = PageUtil.startPage(tradeDealVoList, tradeDealRo.getPageNum(),
@@ -204,31 +215,6 @@ public class TradeDealServiceImpl implements TradeDealService {
                 }
         ).collect(Collectors.toList());
         tradeDealDomainService.saveBatch(entrustDoList);
-    }
-
-    /**
-     * 获取响应的信息
-     * @param userId
-     * @return
-     */
-    private TradeResultVo<GetHisDealDataResponse> getHisDealDataResponse(Integer userId) {
-        GetHisDealDataRequest request = new GetHisDealDataRequest(userId);
-        request.setEt(DateUtil.format(new Date(), "yyyy-MM-dd"));
-        Date et = new Date();
-        et.setTime(et.getTime() - 7 * 24 * 3600 * 1000);
-        request.setSt(DateUtil.format(et, "yyyy-MM-dd"));
-        String url = tradeUtil.getUrl(request);
-        Map<String, String> header = tradeUtil.getHeader(request);
-        List<Map<String, Object>> paramList = null;
-        Map<String, Object> params = null;
-        params = tradeUtil.getParams(request);
-        log.debug("trade {} request: {}", request.getMethod(), params);
-        String content = tradeClient.send(url, params, header);
-        log.debug("trade {} response: {}", request.getMethod(), content);
-        TradeResultVo<GetHisDealDataResponse> result = dataObjResponseParser.parse(content,
-                new TypeReference<GetHisDealDataResponse>() {
-                });
-        return result;
     }
 
     /**

@@ -8,7 +8,6 @@ import top.yueshushu.learn.enumtype.TradeMethodType;
  */
 @Data
 public class SubmitRequest extends BaseTradeRequest {
-
     /**
      * 买卖类别-买
      */
@@ -22,6 +21,7 @@ public class SubmitRequest extends BaseTradeRequest {
     private double price;
     private int amount;
     private String zqmc = "unknow";
+    private String market;
 
     /**
      * 买卖类别
@@ -30,10 +30,6 @@ public class SubmitRequest extends BaseTradeRequest {
      * @see #S
      */
     private String tradeType;
-
-    public SubmitRequest(int userId) {
-        super(userId);
-    }
 
 
     @Override
