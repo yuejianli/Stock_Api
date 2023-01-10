@@ -1,6 +1,7 @@
 package top.yueshushu.learn.service.cache.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.enumtype.TradeRealValueType;
@@ -8,9 +9,7 @@ import top.yueshushu.learn.service.cache.TradeCacheService;
 import top.yueshushu.learn.util.RedisUtil;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -23,29 +22,28 @@ import java.util.concurrent.TimeUnit;
 public class TradeCacheServiceImpl implements TradeCacheService {
     @Resource
     private RedisUtil redisUtil;
-
+    @Value("${easyMoney.second:300}")
+    private Integer easyMoneySecond;
 
     @Override
-    public boolean needSyncReal(TradeRealValueType tradeRealValueType, Integer userId) {
-        if (userId == null){
-            return true;
-        }
-        return redisUtil.setIfAbsent(buildRealPositionKey(tradeRealValueType,userId).get(0),1,30, TimeUnit.MINUTES);
+    public void removeRealEasyMoneyCache(TradeRealValueType tradeRealValueType, Integer userId) {
+        redisUtil.remove(buildCacheKey(tradeRealValueType, userId));
     }
 
     @Override
-    public void immediatelySyncReal(TradeRealValueType tradeRealValueType,Integer userId) {
-        if(userId ==null){
-            redisUtil.delete(buildRealPositionKey(tradeRealValueType,null));
-        }else{
-            redisUtil.delByKey(buildRealPositionKey(tradeRealValueType,userId).get(0));
-        }
+    public void buildRealEasyMoneyCache(TradeRealValueType tradeRealValueType, Integer userId, Object value) {
+        redisUtil.set(buildCacheKey(tradeRealValueType, userId), value, easyMoneySecond, TimeUnit.SECONDS);
     }
-    private List<String> buildRealPositionKey(TradeRealValueType tradeRealValueType,Integer userId){
-        String keyPrefix = Const.CACHE_PUBLIC_KEY_PREFIX+"trade:"+tradeRealValueType.getCode()+":";
-        if (userId !=null){
-            return Collections.singletonList(keyPrefix+userId);
-        }
-        return new ArrayList<>(redisUtil.keys(keyPrefix));
+
+    @Override
+    public Object getRealEasyMoneyCache(TradeRealValueType tradeRealValueType, Integer userId) {
+        return Optional.ofNullable(redisUtil.get(buildCacheKey(tradeRealValueType, userId))).orElse(null);
     }
+
+
+    private String buildCacheKey(TradeRealValueType tradeRealValueType, Integer userId) {
+        return Const.CACHE_PRIVATE_KEY_PREFIX + userId + ":" + tradeRealValueType.getCode();
+    }
+
+
 }

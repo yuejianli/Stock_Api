@@ -197,6 +197,17 @@ public class TradeRequestHelper {
     }
 
     /**
+     * 可申请的股票列表
+     *
+     * @param userId 用户编号
+     */
+    public TradeResultVo<GetCanBuyNewStockListV3Response> getCanBuyNewStockListV3(Integer userId) {
+        GetCanBuyNewStockListV3Request request = new GetCanBuyNewStockListV3Request(userId);
+        return componentAndSendReqeust(request, new TypeReference<GetCanBuyNewStockListV3Response>() {
+        });
+    }
+
+    /**
      * 发送真实的撤销请求
      *
      * @param request 撤销请求
@@ -204,6 +215,16 @@ public class TradeRequestHelper {
      */
     public TradeResultVo<RevokeResponse> sendRealRevokeReq(RevokeRequest request) {
         return componentAndSendReqeust(request, new TypeReference<RevokeResponse>() {
+        });
+    }
+
+    /**
+     * 批量申购
+     *
+     * @param submitBatTradeV2Request 申购请求
+     */
+    public TradeResultVo<SubmitBatTradeV2Response> submitBatTradeV2(SubmitBatTradeV2Request submitBatTradeV2Request) {
+        return componentAndSendReqeust(submitBatTradeV2Request, new TypeReference<SubmitBatTradeV2Response>() {
         });
     }
 
@@ -233,7 +254,6 @@ public class TradeRequestHelper {
         log.debug("trade {} response: {}", request.getMethod(), content);
         return responseParse.parse(content, responseType);
     }
-
     /**
      * 设置信息
      *

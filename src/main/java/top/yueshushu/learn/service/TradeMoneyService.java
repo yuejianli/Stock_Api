@@ -48,14 +48,23 @@ public interface TradeMoneyService {
      */
     OutputResult<TradeMoneyVo> realInfo(TradeMoneyRo tradeMoneyRo);
 
-    /**
-     * 保存金额的历史记录处理
-     *
-     * @param userId      用户编号
-     * @param mock        类型
-     * @param currentDate 日期信息
-     */
-    void saveMoneyHistory(Integer userId, MockType mock, Date currentDate);
+	/**
+	 * 保存金额的历史记录处理
+	 *
+	 * @param userId      用户编号
+	 * @param mock        类型
+	 * @param currentDate 日期信息
+	 */
+	void saveMoneyHistory(Integer userId, MockType mock, Date currentDate);
+
+
+	/**
+	 * 同步东财的金额数据到数据库里面
+	 *
+	 * @param userId   用户编号
+	 * @param mockType 类型
+	 */
+	void syncEasyMoneyToDB(Integer userId, MockType mockType);
 
 	/**
 	 * 更新今日的盈亏数

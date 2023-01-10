@@ -9,4 +9,6 @@ package top.yueshushu.learn.ocr;
 
 public interface OcrService {
     String process(String url);
+
+    String processBase64(String base64);
 }

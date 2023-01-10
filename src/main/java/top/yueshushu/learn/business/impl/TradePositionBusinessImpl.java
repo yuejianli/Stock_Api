@@ -20,6 +20,7 @@ import top.yueshushu.learn.entity.User;
 import top.yueshushu.learn.enumtype.EntrustStatusType;
 import top.yueshushu.learn.enumtype.MockType;
 import top.yueshushu.learn.enumtype.SelectedType;
+import top.yueshushu.learn.enumtype.TradeRealValueType;
 import top.yueshushu.learn.helper.DateHelper;
 import top.yueshushu.learn.mode.dto.TradeEntrustQueryDto;
 import top.yueshushu.learn.mode.ro.TradePositionRo;
@@ -88,9 +89,11 @@ public class TradePositionBusinessImpl implements TradePositionBusiness {
 
     @Override
     public OutputResult realList(TradePositionRo tradePositionRo) {
-//        if (!tradeCacheService.needSyncReal(TradeRealValueType.TRADE_POSITION, tradePositionRo.getUserId())) {
-//            return mockList(tradePositionRo);
-//        }
+        // 对数据进行处理。
+        Object realEasyMoneyCache = tradeCacheService.getRealEasyMoneyCache(TradeRealValueType.TRADE_POSITION, tradePositionRo.getUserId());
+        if (!ObjectUtils.isEmpty(realEasyMoneyCache)) {
+            return OutputResult.buildSucc(realEasyMoneyCache);
+        }
         log.info(">>>此次员工{}查询需要同步真实的持仓数据", tradePositionRo.getUserId());
         OutputResult<List<TradePositionVo>> outputResult = tradePositionService.realList(tradePositionRo);
         if (!outputResult.getSuccess()) {
@@ -99,7 +102,7 @@ public class TradePositionBusinessImpl implements TradePositionBusiness {
         //获取到最新的持仓信息，更新到相应的数据库中.
         List<TradePositionVo> tradePositionVoList = outputResult.getData();
         // 将数据保存下来
-        tradePositionService.syncRealPositionByUserId(tradePositionRo.getUserId(), tradePositionVoList);
+        tradeCacheService.buildRealEasyMoneyCache(TradeRealValueType.TRADE_POSITION, tradePositionRo.getUserId(), tradePositionVoList);
         return outputResult;
     }
 
@@ -109,14 +112,11 @@ public class TradePositionBusinessImpl implements TradePositionBusiness {
         if (MockType.REAL.equals(mockType)) {
             return;
         }
-
         // 查询一下信息.
         TradePositionRo tradePositionRo = new TradePositionRo();
         tradePositionRo.setUserId(userId);
         tradePositionRo.setMockType(mockType.getCode());
         tradePositionRo.setSelectType(SelectedType.POSITION.getCode());
-
-
         List<TradePositionVo> tradePositionVoList = (List<TradePositionVo>) mockList(tradePositionRo).getData();
 
         // 更新股票的持仓信息.

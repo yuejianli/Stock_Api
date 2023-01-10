@@ -8,6 +8,7 @@ import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import top.yueshushu.learn.api.TradeResultVo;
 import top.yueshushu.learn.api.response.GetHisOrdersDataResponse;
@@ -18,10 +19,7 @@ import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.domain.TradeEntrustDo;
 import top.yueshushu.learn.domainservice.TradeEntrustDomainService;
 import top.yueshushu.learn.entity.TradeEntrust;
-import top.yueshushu.learn.enumtype.DataFlagType;
-import top.yueshushu.learn.enumtype.EntrustStatusType;
-import top.yueshushu.learn.enumtype.EntrustType;
-import top.yueshushu.learn.enumtype.MockType;
+import top.yueshushu.learn.enumtype.*;
 import top.yueshushu.learn.helper.TradeRequestHelper;
 import top.yueshushu.learn.mode.dto.TradeEntrustQueryDto;
 import top.yueshushu.learn.mode.ro.TradeEntrustRo;
@@ -29,7 +27,11 @@ import top.yueshushu.learn.mode.vo.TradeEntrustVo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.response.PageResponse;
 import top.yueshushu.learn.service.TradeEntrustService;
-import top.yueshushu.learn.util.*;
+import top.yueshushu.learn.service.cache.TradeCacheService;
+import top.yueshushu.learn.util.BigDecimalUtil;
+import top.yueshushu.learn.util.MyDateUtil;
+import top.yueshushu.learn.util.StockUtil;
+import top.yueshushu.learn.util.ThreadLocalUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -56,6 +58,8 @@ public class TradeEntrustServiceImpl implements TradeEntrustService {
     private TradeEntrustAssembler tradeEntrustAssembler;
     @Resource
     private TradeRequestHelper tradeRequestHelper;
+    @Resource
+    private TradeCacheService tradeCacheService;
 
     @Override
     public List<TradeEntrust> listNowRunEntrust(Integer userId, Integer mockType) {
@@ -199,16 +203,22 @@ public class TradeEntrustServiceImpl implements TradeEntrustService {
     /**********对历史记录的处理*************/
     /**
      * 正式盘的历史处理方式
+     *
      * @param tradeEntrustRo
      * @return
      */
     @Override
-    public OutputResult realHistoryList(TradeEntrustRo tradeEntrustRo) {
+    public List<TradeEntrustVo> realHistoryList(TradeEntrustRo tradeEntrustRo) {
+        Object realEasyMoneyCache = tradeCacheService.getRealEasyMoneyCache(TradeRealValueType.TRADE_ENTRUST_HISTORY, tradeEntrustRo.getUserId());
+        if (!ObjectUtils.isEmpty(realEasyMoneyCache)) {
+            return (List<TradeEntrustVo>) realEasyMoneyCache;
+        }
+
         //获取响应信息
         TradeResultVo<GetHisOrdersDataResponse> tradeResultVo =
                 tradeRequestHelper.findRealHistoryEntrust(tradeEntrustRo.getUserId());
         if (!tradeResultVo.getSuccess()) {
-            return OutputResult.buildAlert(ResultCode.TRADE_ENTRUST_HISTORY_FAIL);
+            return null;
         }
         List<GetHisOrdersDataResponse> data = tradeResultVo.getData();
 
@@ -255,8 +265,17 @@ public class TradeEntrustServiceImpl implements TradeEntrustService {
             tradeEntrustVo.setTotalMoney(buyMoney);
             tradeEntrustVoList.add(tradeEntrustVo);
         }
-        return PageUtil.pageResult(tradeEntrustVoList, tradeEntrustRo.getPageNum(), tradeEntrustRo.getPageSize());
+        tradeCacheService.buildRealEasyMoneyCache(TradeRealValueType.TRADE_ENTRUST_HISTORY, tradeEntrustRo.getUserId(), tradeEntrustVoList);
+        return tradeEntrustVoList;
     }
+
+    @Override
+    public void syncEasyMoneyToDB(Integer userId, MockType mockType) {
+        TradeEntrustRo tradeEntrustRo = new TradeEntrustRo();
+        tradeEntrustRo.setUserId(userId);
+        syncRealEntrustByUserId(userId, realHistoryList(tradeEntrustRo));
+    }
+
     @Override
     public OutputResult mockHistoryList(TradeEntrustRo tradeEntrustRo) {
 

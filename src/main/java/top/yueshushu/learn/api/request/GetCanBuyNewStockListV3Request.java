@@ -18,4 +18,9 @@ public class GetCanBuyNewStockListV3Request extends BaseTradeRequest {
         return TradeMethodType.GetCanBuyNewStockListV3.getCode();
     }
 
+    @Override
+    public int responseVersion() {
+        return VERSION_OBJ;
+    }
+
 }

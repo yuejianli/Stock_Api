@@ -46,8 +46,7 @@ public class TradeUserController extends BaseController {
             return OutputResult.buildAlert(ResultCode.TRADE_IDENTIFY_CODE_IS_EMPTY);
         }
         tradeUserRo.setId(ThreadLocalUtils.getUserId());
-
-        String randNum = redisUtil.get(httpSession.getId() + "RAND_NUM");
+        String randNum = redisUtil.get(ThreadLocalUtils.getUserId() + "_RAND_NUM");
         tradeUserRo.setRandNum(randNum);
         return tradeUserBusiness.login(tradeUserRo);
     }

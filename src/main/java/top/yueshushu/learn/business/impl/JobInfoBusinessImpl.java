@@ -7,22 +7,18 @@ import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-import top.yueshushu.learn.business.DealBusiness;
-import top.yueshushu.learn.business.JobInfoBusiness;
-import top.yueshushu.learn.business.TradePositionBusiness;
+import top.yueshushu.learn.business.*;
 import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.domain.JobInfoDo;
 import top.yueshushu.learn.entity.JobInfo;
-import top.yueshushu.learn.enumtype.DataFlagType;
-import top.yueshushu.learn.enumtype.EntrustType;
-import top.yueshushu.learn.enumtype.JobInfoType;
-import top.yueshushu.learn.enumtype.MockType;
+import top.yueshushu.learn.enumtype.*;
 import top.yueshushu.learn.helper.DateHelper;
 import top.yueshushu.learn.message.weixin.service.WeChatService;
 import top.yueshushu.learn.mode.ro.BuyRo;
 import top.yueshushu.learn.mode.ro.DealRo;
 import top.yueshushu.learn.mode.ro.JobInfoRo;
+import top.yueshushu.learn.mode.vo.ConfigVo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.service.*;
 import top.yueshushu.learn.service.cache.StockCacheService;
@@ -81,7 +77,16 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
     private DateHelper dateHelper;
     @Resource
     private StockBigDealService stockBigDealService;
-
+    @Resource
+    private TradeEntrustService tradeEntrustService;
+    @Resource
+    private TradeDealService tradeDealService;
+    @Resource
+    private ConfigService configService;
+    @Resource
+    private BuyNewStockBusiness buyNewStockBusiness;
+    @Resource
+    private AutoLoginBusiness autoLoginBusiness;
     @SuppressWarnings("all")
     @Resource(name = Const.ASYNC_SERVICE_EXECUTOR_BEAN_NAME)
     private AsyncTaskExecutor executor;
@@ -120,7 +125,6 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
         //股票历史
         if (JobInfoType.STOCK_HISTORY.equals(jobInfoType)) {
             if (!MyDateUtil.after15Hour()) {
-              //  log.info(">>> 执行任务 {} 被拒绝", jobInfoType.getDesc());
                 return OutputResult.buildFail(ResultCode.JOB_AFTER_3);
             }
         }
@@ -253,9 +257,70 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
                     }
                     //去重
                     codeList = codeList.stream().distinct().collect(Collectors.toList());
-
                     stockBigDealService.syncBigDeal(codeList);
 
+                    break;
+                }
+                case SYNC_EASY_MONEY: {
+                    List<Integer> userIdList = userService.listUserIds();
+                    // 设置类型为虚拟
+                    userIdList
+                            .forEach(
+                                    userId -> {
+                                        try {
+                                            tradeMoneyService.syncEasyMoneyToDB(userId, MockType.REAL);
+                                            sleepTime(200);
+                                            tradePositionService.syncEasyMoneyToDB(userId, MockType.REAL);
+                                            sleepTime(200);
+                                            // 委托处理。
+                                            tradeEntrustService.syncEasyMoneyToDB(userId, MockType.REAL);
+                                            sleepTime(200);
+                                            // 成交处理
+                                            tradeDealService.syncEasyMoneyToDB(userId, MockType.REAL);
+                                            sleepTime(200);
+                                        } catch (Exception e) {
+
+                                        }
+                                    }
+                            );
+                    break;
+                }
+                case BUY_NEW_STOCK: {
+                    List<Integer> userIdList = userService.listUserIds();
+                    // 设置类型为虚拟
+                    userIdList
+                            .forEach(
+                                    userId -> {
+                                        try {
+                                            ConfigVo config = configService.getConfig(userId, ConfigCodeType.BUY_NEW_STOCK);
+                                            if (FunctionUseType.USE.getCode().equalsIgnoreCase(config.getCodeValue())) {
+                                                // 启用
+                                                buyNewStockBusiness.applyBuyNewStock(userId);
+                                            }
+                                        } catch (Exception e) {
+
+                                        }
+                                    }
+                            );
+                    break;
+                }
+                case AUTO_LOGIN: {
+                    List<Integer> userIdList = userService.listUserIds();
+                    // 设置类型为虚拟
+                    userIdList
+                            .forEach(
+                                    userId -> {
+                                        try {
+                                            ConfigVo config = configService.getConfig(userId, ConfigCodeType.AUTO_LOGIN);
+                                            if (FunctionUseType.USE.getCode().equalsIgnoreCase(config.getCodeValue())) {
+                                                // 自动登录
+                                                autoLoginBusiness.autoLogin(userId);
+                                            }
+                                        } catch (Exception e) {
+
+                                        }
+                                    }
+                            );
                     break;
                 }
                 default: {
@@ -343,6 +408,14 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
         // 清理缓存信息
         stockCacheService.clearJobInfoCronCacheByCode(job.getCode());
         return OutputResult.buildSucc();
+    }
+
+    private void sleepTime(int milliSeconds) {
+        try {
+            TimeUnit.MILLISECONDS.sleep(milliSeconds);
+        } catch (Exception e) {
+
+        }
     }
 
     /**

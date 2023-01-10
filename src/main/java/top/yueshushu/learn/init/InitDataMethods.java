@@ -2,7 +2,7 @@ package top.yueshushu.learn.init;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.util.RSAUtil;
 import top.yueshushu.learn.util.RedisUtil;
@@ -12,7 +12,7 @@ import javax.annotation.Resource;
 import java.util.Map;
 
 /**
- * 用途描述
+ * 系统启动后运行。
  *
  * @author yuejianli
  * @date 2022-10-13
@@ -36,7 +36,7 @@ public class InitDataMethods {
     public void initRsaKey() {
         try {
             // 如果没有公钥，私钥 才进行生成.
-            if (!ObjectUtils.isEmpty(redisUtil.get(Const.RSA_PUBLIC_KEY))) {
+            if (StringUtils.hasText(redisUtil.get(Const.RSA_PUBLIC_KEY)) && StringUtils.hasText(redisUtil.get(Const.RSA_PRIVATE_KEY))) {
                 return;
             }
             //生成密钥对
@@ -53,7 +53,7 @@ public class InitDataMethods {
             redisUtil.set(Const.RSA_PUBLIC_KEY, publicKeyStr);
             redisUtil.set(Const.RSA_PRIVATE_KEY, privateKeyStr);
         } catch (Exception e) {
-            log.error(">>>> 初始化公钥私钥错误");
+            log.error(">>>> 初始化公钥私钥错误", e);
         }
     }
 }

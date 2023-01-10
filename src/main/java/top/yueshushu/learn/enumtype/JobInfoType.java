@@ -21,6 +21,9 @@ public enum JobInfoType {
     STOCK_UPDATE("stockUpdate", "股票更新"),
     STOCK_FIVE_EMAIL("stockFiveEmail", "最近五天记录发送到邮箱"),
     BIG_DEAL("bigDeal", "大宗交易信息同步"),
+    SYNC_EASY_MONEY("syncEasyMoney", "同步东财数据保存到数据库"),
+    BUY_NEW_STOCK("buyNewStock", "新股申购"),
+    AUTO_LOGIN("autoLogin", "自动登录"),
     ;
 
     private String code;

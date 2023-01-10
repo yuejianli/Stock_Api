@@ -128,6 +128,49 @@ public class TradeMoneyServiceImpl implements TradeMoneyService {
     }
 
     @Override
+    public void syncEasyMoneyToDB(Integer userId, MockType mockType) {
+        if (!MockType.REAL.equals(mockType)) {
+            return;
+        }
+        // 用户编号
+        TradeMoneyRo tradeMoneyRo = new TradeMoneyRo();
+        tradeMoneyRo.setUserId(userId);
+        // 获取真实的数据
+        TradeMoneyVo tradeMoneyVo = realInfo(tradeMoneyRo).getData();
+
+        TradeMoneyDo editTradeMoneyDo = tradeMoneyAssembler.entityToDo(tradeMoneyAssembler.voToEntity(tradeMoneyVo));
+        // 为空， 不为空。
+        if (editTradeMoneyDo == null) {
+            // 设置为空的数据，进行保存。
+            editTradeMoneyDo = new TradeMoneyDo();
+            editTradeMoneyDo.setUseMoney(BigDecimal.ZERO);
+            editTradeMoneyDo.setTotalMoney(BigDecimal.ZERO);
+            editTradeMoneyDo.setTakeoutMoney(BigDecimal.ZERO);
+            editTradeMoneyDo.setMarketMoney(BigDecimal.ZERO);
+            editTradeMoneyDo.setProfitMoney(BigDecimal.ZERO);
+            editTradeMoneyDo.setMockType(MockType.REAL.getCode());
+            editTradeMoneyDo.setUserId(userId);
+            // 进行保存
+            tradeMoneyDomainService.save(editTradeMoneyDo);
+        } else {
+            // 能查询出来。
+            editTradeMoneyDo.setUserId(userId);
+            editTradeMoneyDo.setMockType(MockType.REAL.getCode());
+            TradeMoney tradeMoneyDBInfo = getByUserIdAndMockType(userId, MockType.REAL.getCode());
+            if (null == tradeMoneyDBInfo) {
+                tradeMoneyDomainService.save(editTradeMoneyDo);
+            } else {
+                // 不为空，有值.
+                editTradeMoneyDo.setId(tradeMoneyDBInfo.getId());
+                tradeMoneyDomainService.updateById(editTradeMoneyDo);
+            }
+        }
+        // 对历史记录进行处理.
+        saveMoneyHistory(userId, MockType.REAL, DateUtil.date());
+
+    }
+
+    @Override
     public void updateToDayMoney(Integer userId, MockType mockType, BigDecimal todayMoneySum) {
         DateTime now = DateUtil.date();
         //获取昨天的金额信息,如果没有记录,则 返回 0

@@ -31,6 +31,9 @@ public abstract class AbstractOcrService implements OcrService {
         return processBase64(base64);
     }
 
-    protected abstract String processBase64(String base64);
+    @Override
+    public String processBase64(String base64) {
+        return null;
+    }
 
 }

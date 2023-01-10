@@ -162,6 +162,21 @@ public class TradePositionServiceImpl implements TradePositionService {
     }
 
     @Override
+    public void syncEasyMoneyToDB(Integer userId, MockType mockType) {
+        TradePositionRo tradePositionRo = new TradePositionRo();
+        tradePositionRo.setUserId(userId);
+        List<TradePositionVo> tradePositionVoList = realList(tradePositionRo).getData();
+        // 没有持仓记录
+        if (CollectionUtils.isEmpty(tradePositionVoList)) {
+            return;
+        }
+
+        // 有持仓了。
+        syncRealPositionByUserId(userId, tradePositionVoList);
+
+    }
+
+    @Override
     public void updateById(TradePosition tradePosition) {
         tradePositionDomainService.updateById(tradePositionAssembler.entityToDo(tradePosition));
     }

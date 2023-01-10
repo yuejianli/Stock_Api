@@ -3,8 +3,6 @@ package top.yueshushu.learn.job;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.Trigger;
-import org.springframework.scheduling.TriggerContext;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
@@ -17,7 +15,6 @@ import top.yueshushu.learn.enumtype.JobInfoType;
 import top.yueshushu.learn.service.cache.StockCacheService;
 
 import javax.annotation.Resource;
-import java.util.Date;
 
 /**
  * 定时任务处理
@@ -47,16 +44,13 @@ public class JobInfoConfig implements SchedulingConfigurer {
                     () -> {
                         jobInfoBusiness.execJob(jobInfoType, EntrustType.AUTO.getCode());
                     },
-                    new Trigger() {
-                        @Override
-                        public Date nextExecutionTime(TriggerContext triggerContext) {
-                            String cron = stockCacheService.getJobInfoCronCacheByCode(jobInfoType.getCode());
-                            if (!StringUtils.hasText(cron)) {
-                                return null;
-                            }
-                            CronTrigger cronTrigger = new CronTrigger(cron);
-                            return cronTrigger.nextExecutionTime(triggerContext);
+                    triggerContext -> {
+                        String cron = stockCacheService.getJobInfoCronCacheByCode(jobInfoType.getCode());
+                        if (!StringUtils.hasText(cron)) {
+                            return null;
                         }
+                        CronTrigger cronTrigger = new CronTrigger(cron);
+                        return cronTrigger.nextExecutionTime(triggerContext);
                     }
             );
         }

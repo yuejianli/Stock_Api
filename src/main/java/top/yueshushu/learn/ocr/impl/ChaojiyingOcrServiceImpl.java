@@ -23,10 +23,10 @@ public class ChaojiyingOcrServiceImpl extends AbstractOcrService {
     private String pass;
 
     @Value("${ocr.third.chaojiying.softid}")
-    private int softid;
+    private String softid;
 
     @Override
-    protected String processBase64(String base64) {
+    public String processBase64(String base64) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("user", user);
         params.put("pass", pass);

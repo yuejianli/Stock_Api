@@ -67,10 +67,19 @@ public interface TradePositionService {
 
     /**
      * 通过员工编号，同步最新的持仓记录
-     * @param userId 员工编号
+     *
+     * @param userId              员工编号
      * @param tradePositionVoList 查询到的持仓列表
      */
     void syncRealPositionByUserId(Integer userId, List<TradePositionVo> tradePositionVoList);
+
+    /**
+     * 同步东财的数据，并保存到数据库里面。
+     *
+     * @param userId   用户编号
+     * @param mockType 类型
+     */
+    void syncEasyMoneyToDB(Integer userId, MockType mockType);
 
     /**
      * 更新持仓数量

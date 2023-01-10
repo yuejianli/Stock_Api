@@ -2,12 +2,17 @@ package top.yueshushu.learn.business.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 import top.yueshushu.learn.business.TradeEntrustBusiness;
+import top.yueshushu.learn.enumtype.TradeRealValueType;
 import top.yueshushu.learn.mode.ro.TradeEntrustRo;
 import top.yueshushu.learn.mode.vo.TradeEntrustVo;
 import top.yueshushu.learn.response.OutputResult;
+import top.yueshushu.learn.response.PageResponse;
 import top.yueshushu.learn.service.TradeEntrustService;
 import top.yueshushu.learn.service.cache.TradeCacheService;
+import top.yueshushu.learn.util.PageUtil;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -34,9 +39,10 @@ public class TradeEntrustBusinessImpl implements TradeEntrustBusiness {
 
     @Override
     public OutputResult realList(TradeEntrustRo tradeEntrustRo) {
-//        if (!tradeCacheService.needSyncReal(TradeRealValueType.TRADE_ENTRUST, tradeEntrustRo.getUserId())) {
-//            return mockList(tradeEntrustRo);
-//        }
+        Object realEasyMoneyCache = tradeCacheService.getRealEasyMoneyCache(TradeRealValueType.TRADE_ENTRUST, tradeEntrustRo.getUserId());
+        if (!ObjectUtils.isEmpty(realEasyMoneyCache)) {
+            return OutputResult.buildSucc(realEasyMoneyCache);
+        }
         log.info(">>>此次员工{}查询需要同步真实的今日委托数据", tradeEntrustRo.getUserId());
         OutputResult<List<TradeEntrustVo>> outputResult = tradeEntrustService.realList(tradeEntrustRo);
         if (!outputResult.getSuccess()) {
@@ -45,7 +51,7 @@ public class TradeEntrustBusinessImpl implements TradeEntrustBusiness {
         //获取到最新的持仓信息，更新到相应的数据库中.
         List<TradeEntrustVo> tradePositionVoList = outputResult.getData();
         // 将数据保存下来
-        tradeEntrustService.syncRealEntrustByUserId(tradeEntrustRo.getUserId(), tradePositionVoList);
+        tradeCacheService.buildRealEasyMoneyCache(TradeRealValueType.TRADE_ENTRUST, tradeEntrustRo.getUserId(), tradePositionVoList);
         return outputResult;
     }
 
@@ -56,6 +62,10 @@ public class TradeEntrustBusinessImpl implements TradeEntrustBusiness {
 
     @Override
     public OutputResult realHistoryList(TradeEntrustRo tradeEntrustRo) {
-        return tradeEntrustService.realHistoryList(tradeEntrustRo);
+        List<TradeEntrustVo> tradeEntrustVoList = tradeEntrustService.realHistoryList(tradeEntrustRo);
+        if (CollectionUtils.isEmpty(tradeEntrustVoList)) {
+            return OutputResult.buildSucc(PageResponse.emptyPageResponse());
+        }
+        return PageUtil.pageResult(tradeEntrustVoList, tradeEntrustRo.getPageNum(), tradeEntrustRo.getPageSize());
     }
 }

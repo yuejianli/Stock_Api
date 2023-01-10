@@ -12,6 +12,7 @@ import top.yueshushu.learn.domain.UserDo;
 import top.yueshushu.learn.domainservice.UserDomainService;
 import top.yueshushu.learn.entity.User;
 import top.yueshushu.learn.enumtype.DataFlagType;
+import top.yueshushu.learn.init.InitDataMethods;
 import top.yueshushu.learn.mode.ro.UserRo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.service.UserService;
@@ -48,6 +49,8 @@ public class UserServiceImpl implements UserService {
     private JwtUtils jwtUtils;
     @Resource
     private RedisUtil redisUtil;
+    @Resource
+    private InitDataMethods initDataMethods;
 
     /**
      * 用户登录
@@ -101,8 +104,12 @@ public class UserServiceImpl implements UserService {
         //进行 rsa 加密， 处理密码。
         try {
             String redisPublicKey = redisUtil.get(Const.RSA_PUBLIC_KEY);
+            if (!StringUtils.hasText(redisPublicKey)) {
+                initDataMethods.initRsaKey();
+                redisPublicKey = redisUtil.get(Const.RSA_PUBLIC_KEY);
+            }
             // 进行替换
-            redisPublicKey = redisPublicKey.replaceAll("X+", "X");
+            redisPublicKey = redisPublicKey.replaceFirst("X\\+", "X");
             return OutputResult.buildSucc(RSAUtil.encryptByPublicKey(redisPublicKey, text));
         } catch (Exception e) {
             log.error(">>> 转换用户交易密码出错", e);

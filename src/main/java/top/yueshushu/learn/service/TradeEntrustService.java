@@ -1,6 +1,7 @@
 package top.yueshushu.learn.service;
 
 import top.yueshushu.learn.entity.TradeEntrust;
+import top.yueshushu.learn.enumtype.MockType;
 import top.yueshushu.learn.mode.ro.TradeEntrustRo;
 import top.yueshushu.learn.mode.vo.TradeEntrustVo;
 import top.yueshushu.learn.response.OutputResult;
@@ -51,10 +52,20 @@ public interface TradeEntrustService {
      * @return 查询虚拟的历史委托信息
      */
     OutputResult mockHistoryList(TradeEntrustRo tradeEntrustRo);
+
     /**
      * 查询真实的历史委托信息
+     *
      * @param tradeEntrustRo 委托对象
      * @return 查询真实的历史委托信息
      */
-    OutputResult realHistoryList(TradeEntrustRo tradeEntrustRo);
+    List<TradeEntrustVo> realHistoryList(TradeEntrustRo tradeEntrustRo);
+
+    /**
+     * 同步东方财富委托信息到数据库
+     *
+     * @param userId   用户编号
+     * @param mockType 类型
+     */
+    void syncEasyMoneyToDB(Integer userId, MockType mockType);
 }

@@ -7,10 +7,27 @@ import java.util.List;
  * 查询可申购新股列表的响应
  */
 @Data
-public class GetCanBuyNewStockListV3Response {
+public class GetCanBuyNewStockListV3Response extends BaseTradeResponse {
 
     private List<NewQuotaInfo> NewQuota;
     private List<NewStock> NewStockList;
+
+    public List<NewQuotaInfo> getNewQuota() {
+        return NewQuota;
+    }
+
+    public void setNewQuota(List<NewQuotaInfo> newQuota) {
+        NewQuota = newQuota;
+    }
+
+    public List<NewStock> getNewStockList() {
+        return NewStockList;
+    }
+
+    public void setNewStockList(List<NewStock> newStockList) {
+        NewStockList = newStockList;
+    }
+
     public static class NewQuotaInfo {
         private String Gddm;
         private String Kcbsged;

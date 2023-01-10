@@ -37,7 +37,6 @@ public interface TradePositionBusiness {
      * @param mockType 类型
      */
     void callProfit(Integer userId, MockType mockType);
-
     /**
      * 要处理的今日持仓信息
      *

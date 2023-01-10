@@ -1,8 +1,8 @@
 SERVER_IP: 139.155.90.176
 # 配置 Mysql 需要修改的常量
 MYSQL_HOST: ${SERVER_IP}:3306
-MYSQL_USERNAME: ENC(wv7ZajBE7Fida2xzgYhBmTT2BPzuQC+Kq1Vd2ZC7NjZJXBUZmk4mFdKSnPwzvkyE)
-MYSQL_PASSWORD: ENC(wv7ZajBE7Fida2xzgYhBmTT2BPzuQC+Kq1Vd2ZC7NjZJXBUZmk4mFdKSnPwzvkyE)
+MYSQL_USERNAME: ENC(3k5hWjexw22lBdEHjZfJ2chP3zFk42R//LoCx9MunnyzsbzgC3bdg+REUOtUYtw+)
+MYSQL_PASSWORD: ENC(zTUmHjQhZgtFr+6C2uLqT9540T+WFlIorFvwPU2Vc3ycXCqKI3j51AoGfyMPoBjt)
 
 # 配置 Druid 的用户名和密码
 DRUID_USERNAME: yuejianli
@@ -11,7 +11,7 @@ DRUID_PASSWORD: ENC(1gDhO2RSRp5O4Y7E/lC0rfnX3U6MaZO/dvvmVCMAi8XgINr6KlWqM9pDTSo5
 # 配置Redis 的信息:
 REDIS_HOST: ${SERVER_IP}
 REDIS_PORT: 6379
-REDIS_PASSWORD: zk123
+REDIS_PASSWORD: ENC(xk3HYxfgbamIHi05v6YMbkHwVNyPqWQ4TQHNzHqnmV0OGK2eKtG90u2Hi9FTiTLG)
 REDIS_DATABASE: 8
 
 # 配置 swagger 的用户名和密码
@@ -20,7 +20,9 @@ SWAGGER_PASSWORD: ENC(oNEYdaPhQJloQiYdM2lecPtjcIVgJW6Jj08nzIYy6IpMtvM0v6mgqOdJ3X
 
 # 是否启用任务
 enableJob: true
-
+# 调用东财的接口频率，间隔时长
+easyMoney:
+  second: 300
 server:
   port: 8088
   undertow:
@@ -174,12 +176,10 @@ tianxing:
   key1: bdea38f89ed9d2f98f626225ffe453f4
   key2: 682b53e4b8e13c01a94200c5815c49e4
 ocr:
-  service: txOcrService
-  path: /usr/app/orc/
+  service: chaojiyingOcrService
+  path: /usr/app/ocr/
   third:
-    aliyun:
-      appcode:
     chaojiying:
-      user:
-      pass:
-      softid: 000000
+      user: yueshushu
+      pass: abc123
+      softid: 0f1aad8b4659e731c672f3024e89b5cd

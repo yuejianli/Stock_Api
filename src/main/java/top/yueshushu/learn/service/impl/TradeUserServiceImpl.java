@@ -12,6 +12,7 @@ import top.yueshushu.learn.domainservice.TradeUserDomainService;
 import top.yueshushu.learn.entity.TradeUser;
 import top.yueshushu.learn.enumtype.DataFlagType;
 import top.yueshushu.learn.helper.TradeRequestHelper;
+import top.yueshushu.learn.init.InitDataMethods;
 import top.yueshushu.learn.mode.ro.TradeUserRo;
 import top.yueshushu.learn.mode.vo.TradeUserVo;
 import top.yueshushu.learn.response.OutputResult;
@@ -42,6 +43,8 @@ public class TradeUserServiceImpl implements TradeUserService {
     private RedisUtil redisUtil;
     @Resource
     private TradeRequestHelper tradeRequestHelper;
+    @Resource
+    private InitDataMethods initDataMethods;
 
     @Override
     public OutputResult login(TradeUserRo tradeUserRo) {
@@ -127,8 +130,12 @@ public class TradeUserServiceImpl implements TradeUserService {
         try {
             // 将密码进行解密
             String redisPrivateKey = redisUtil.get(Const.RSA_PRIVATE_KEY);
+            if (!StringUtils.hasText(redisPrivateKey)) {
+                initDataMethods.initRsaKey();
+                redisPrivateKey = redisUtil.get(Const.RSA_PRIVATE_KEY);
+            }
             // 进行替换
-            redisPrivateKey = redisPrivateKey.replaceAll("X+", "X");
+            redisPrivateKey = redisPrivateKey.replaceFirst("X\\+", "X");
 
             String originPassword = RSAUtil.decryptByPrivateKey(redisPrivateKey, password);
             return RSAUtil.encryptByPublicKey(publicKey, originPassword);
@@ -148,8 +155,12 @@ public class TradeUserServiceImpl implements TradeUserService {
         try {
             // 将密码进行解密
             String redisPrivateKey = redisUtil.get(Const.RSA_PRIVATE_KEY);
+            if (!StringUtils.hasText(redisPrivateKey)) {
+                initDataMethods.initRsaKey();
+                redisPrivateKey = redisUtil.get(Const.RSA_PRIVATE_KEY);
+            }
             // 进行替换
-            redisPrivateKey = redisPrivateKey.replaceAll("X+", "X");
+            redisPrivateKey = redisPrivateKey.replaceFirst("X\\+", "X");
             return RSAUtil.decryptByPrivateKey(redisPrivateKey, account);
         } catch (Exception e) {
             log.error("私钥解密账号错误", e);

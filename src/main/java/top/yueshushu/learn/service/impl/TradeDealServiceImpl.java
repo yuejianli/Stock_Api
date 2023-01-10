@@ -8,6 +8,7 @@ import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import top.yueshushu.learn.api.TradeResultVo;
 import top.yueshushu.learn.api.response.GetDealDataResponse;
@@ -21,6 +22,7 @@ import top.yueshushu.learn.domainservice.TradeDealDomainService;
 import top.yueshushu.learn.enumtype.DataFlagType;
 import top.yueshushu.learn.enumtype.EntrustType;
 import top.yueshushu.learn.enumtype.MockType;
+import top.yueshushu.learn.enumtype.TradeRealValueType;
 import top.yueshushu.learn.helper.TradeRequestHelper;
 import top.yueshushu.learn.mode.dto.TradeDealQueryDto;
 import top.yueshushu.learn.mode.ro.TradeDealRo;
@@ -28,7 +30,11 @@ import top.yueshushu.learn.mode.vo.TradeDealVo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.response.PageResponse;
 import top.yueshushu.learn.service.TradeDealService;
-import top.yueshushu.learn.util.*;
+import top.yueshushu.learn.service.cache.TradeCacheService;
+import top.yueshushu.learn.util.BigDecimalUtil;
+import top.yueshushu.learn.util.MyDateUtil;
+import top.yueshushu.learn.util.StockUtil;
+import top.yueshushu.learn.util.ThreadLocalUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -55,6 +61,8 @@ public class TradeDealServiceImpl implements TradeDealService {
     private TradeDealAssembler tradeDealAssembler;
     @Resource
     private TradeRequestHelper tradeRequestHelper;
+    @Resource
+    private TradeCacheService tradeCacheService;
 
     @Override
     public void addDealRecord(TradeEntrustDo tradeEntrustDo) {
@@ -150,19 +158,24 @@ public class TradeDealServiceImpl implements TradeDealService {
 
     /**
      * 正式盘的处理方式
+     *
      * @param tradeDealRo
      * @return
      */
     @Override
-    public OutputResult realHistoryList(TradeDealRo tradeDealRo) {
+    public List<TradeDealVo> realHistoryList(TradeDealRo tradeDealRo) {
+        Object realEasyMoneyCache = tradeCacheService.getRealEasyMoneyCache(TradeRealValueType.TRADE_DEAL_HISTORY, tradeDealRo.getUserId());
+        if (!ObjectUtils.isEmpty(realEasyMoneyCache)) {
+            return (List<TradeDealVo>) realEasyMoneyCache;
+        }
         //获取响应信息
         TradeResultVo<GetHisDealDataResponse> tradeResultVo = tradeRequestHelper.listRealHistoryDeal(tradeDealRo.getUserId());
         if (!tradeResultVo.getSuccess()) {
-            return OutputResult.buildAlert(ResultCode.TRADE_DEAL_HISTORY_FAIL);
+            return null;
         }
         List<GetHisDealDataResponse> data = tradeResultVo.getData();
         List<TradeDealVo> tradeDealVoList = new ArrayList<>();
-        for(GetHisDealDataResponse getDealDataResponse:data) {
+        for (GetHisDealDataResponse getDealDataResponse : data) {
             TradeDealVo tradeDealVo = new TradeDealVo();
             tradeDealVo.setCode(getDealDataResponse.getZqdm());
             tradeDealVo.setName(getDealDataResponse.getZqmc());
@@ -187,10 +200,8 @@ public class TradeDealServiceImpl implements TradeDealService {
             );
             tradeDealVoList.add(tradeDealVo);
         }
-        List<TradeDealVo> list = PageUtil.startPage(tradeDealVoList, tradeDealRo.getPageNum(),
-                tradeDealRo.getPageSize());
-        return OutputResult.buildSucc(new PageResponse<>((long) list.size(),
-                list));
+        tradeCacheService.buildRealEasyMoneyCache(TradeRealValueType.TRADE_DEAL_HISTORY, tradeDealRo.getUserId(), tradeDealVoList);
+        return tradeDealVoList;
     }
 
     @Override
@@ -207,7 +218,7 @@ public class TradeDealServiceImpl implements TradeDealService {
         }
         List<TradeDealDo> entrustDoList = tradeDealVoList.stream().map(
                 n -> {
-                    TradeDealDo tradeDealDo=
+                    TradeDealDo tradeDealDo =
                             tradeDealAssembler.entityToDo(tradeDealAssembler.voToEntity(n));
                     tradeDealDo.setUserId(userId);
                     tradeDealDo.setMockType(MockType.REAL.getCode());
@@ -217,8 +228,17 @@ public class TradeDealServiceImpl implements TradeDealService {
         tradeDealDomainService.saveBatch(entrustDoList);
     }
 
+    @Override
+    public void syncEasyMoneyToDB(Integer userId, MockType mockType) {
+        TradeDealRo tradeDealRo = new TradeDealRo();
+        tradeDealRo.setUserId(userId);
+        List<TradeDealVo> tradeDealVoList = realList(tradeDealRo).getData();
+        syncRealDealByUserId(userId, tradeDealVoList);
+    }
+
     /**
      * 查询虚拟盘的信息
+     *
      * @param tradeDealRo
      * @return
      */
