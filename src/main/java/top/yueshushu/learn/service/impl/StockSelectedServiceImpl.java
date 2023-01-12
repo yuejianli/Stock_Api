@@ -245,7 +245,7 @@ public class StockSelectedServiceImpl implements StockSelectedService {
                     ()-> {
                         try {
                             stockCrawlerService.updateCodePrice(code);
-                            TimeUnit.MILLISECONDS.sleep(100);
+                            TimeUnit.MILLISECONDS.sleep(50);
                         } catch (Exception e) {
 
                         }
@@ -261,7 +261,7 @@ public class StockSelectedServiceImpl implements StockSelectedService {
                     ()-> {
                         try {
                             stockCrawlerService.updateCodePrice(code);
-                            TimeUnit.MILLISECONDS.sleep(500);
+                            TimeUnit.MILLISECONDS.sleep(50);
                         } catch (Exception e) {
 
                         }
