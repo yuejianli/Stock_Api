@@ -189,7 +189,7 @@ public class StockCrawlerServiceImpl implements StockCrawlerService {
         // 先将昨天的最近的记录清理一下。
         stockCacheService.cleanLastTradePositionHistory();
         //重置计数器
-        Const.priceCounter.set(0);
+        Const.PRICE_COUNTER = 0;
         //1. 查询当前所有的股票信息
         List<StockDo> dbAllStockList = stockDomainService.list();
         log.info(">>>数据库查询所有的股票记录成功，查询条数为:{}", dbAllStockList.size());
@@ -349,11 +349,11 @@ public class StockCrawlerServiceImpl implements StockCrawlerService {
 
         int size = SpringUtil.getBeansOfType(RealTimePriceService.class).size();
 
-        int newCount = Const.priceCounter.incrementAndGet();
+        int newCount = Const.PRICE_COUNTER++;
         int useCount = newCount % size;
         // 获取 Service
         RealTimePriceService realTimePriceService = SpringUtil.getBean("realTimePriceService" + useCount, RealTimePriceService.class);
-        BigDecimal nowPrice = realTimePriceService.getNowPrice(code, fullCode);
+        BigDecimal nowPrice = realTimePriceService.getNowPrice(code, fullCode, newCount);
         stockCacheService.setNowCachePrice(code, nowPrice);
 
     }

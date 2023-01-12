@@ -9,5 +9,5 @@ import java.math.BigDecimal;
  * @date 2023-01-12
  */
 public interface RealTimePriceService {
-    BigDecimal getNowPrice(String code, String fullCode);
+    BigDecimal getNowPrice(String code, String fullCode, Integer counter);
 }

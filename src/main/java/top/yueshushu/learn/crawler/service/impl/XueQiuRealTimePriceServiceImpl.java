@@ -2,7 +2,6 @@ package top.yueshushu.learn.crawler.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.crawler.crawler.CrawlerService;
 import top.yueshushu.learn.crawler.service.RealTimePriceService;
 
@@ -22,10 +21,10 @@ public class XueQiuRealTimePriceServiceImpl implements RealTimePriceService {
     private CrawlerService crawlerService;
 
     @Override
-    public BigDecimal getNowPrice(String code, String fullCode) {
+    public BigDecimal getNowPrice(String code, String fullCode, Integer counter) {
         fullCode = fullCode.toUpperCase();
         BigDecimal price = crawlerService.xueQiuGetPrice(fullCode);
-        log.info(">>>>> 雪球 {} 获取 股票 {} 的价格为: {}", Const.priceCounter.get(), code, price);
+        log.info(">>>>> 雪球 获取 股票 {} 的价格为: {}", counter + ":" + code, price);
         return price;
     }
 }

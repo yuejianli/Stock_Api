@@ -141,7 +141,7 @@ public class TradeUserServiceImpl implements TradeUserService {
             return RSAUtil.encryptByPublicKey(publicKey, originPassword);
         } catch (Exception e) {
             log.error("公钥加密密码错误", e);
-            return null;
+            return password;
         }
     }
 
@@ -164,7 +164,7 @@ public class TradeUserServiceImpl implements TradeUserService {
             return RSAUtil.decryptByPrivateKey(redisPrivateKey, account);
         } catch (Exception e) {
             log.error("私钥解密账号错误", e);
-            return null;
+            return account;
         }
     }
 }

@@ -260,7 +260,7 @@ public class StockSelectedServiceImpl implements StockSelectedService {
             executor.submit(
                     ()-> {
                         try {
-                            stockCrawlerService.updateCodePrice(code);
+                            stockCrawlerService.updateCodePrice(selectedCode);
                             TimeUnit.MILLISECONDS.sleep(50);
                         } catch (Exception e) {
 

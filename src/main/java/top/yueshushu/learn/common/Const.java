@@ -1,7 +1,7 @@
 package top.yueshushu.learn.common;
+
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @ClassName:Const
@@ -62,5 +62,5 @@ public class Const {
 
     public static final List<String> IgnoreList = Arrays.asList("class", "userId", "method");
 
-    public static AtomicInteger priceCounter = new AtomicInteger(0);
+    public static volatile Integer PRICE_COUNTER = 0;
 }

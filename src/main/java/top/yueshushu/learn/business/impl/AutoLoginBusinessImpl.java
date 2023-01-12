@@ -86,11 +86,11 @@ public class AutoLoginBusinessImpl implements AutoLoginBusiness {
         String randNum = redisUtil.get(userId + "_RAND_NUM");
         tradeUserRo.setRandNum(randNum);
         tradeUserRo.setIdentifyCode(identifyCode);
-        Boolean flag = tradeUserBusiness.login(tradeUserRo).getSuccess();
+        boolean flag = tradeUserBusiness.login(tradeUserRo).getSuccess();
         User user = userService.getById(userId);
         String message = MessageFormat.format(
-                "用户 id: {0}, 姓名是:{1} 执行自动登录, 运行 {2}",
-                user.getId(), user.getName(), flag ? "成功" : "失败"
+                "用户 :{0} 执行自动登录, 运行 {1}",
+                user.getName(), flag == true ? "成功" : "失败"
         );
         weChatService.sendTextMessage(user.getId(), message);
         dingTalkService.sendTextMessage(user.getId(), message);
