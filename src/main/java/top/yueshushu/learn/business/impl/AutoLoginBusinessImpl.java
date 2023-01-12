@@ -12,6 +12,7 @@ import top.yueshushu.learn.business.TradeUserBusiness;
 import top.yueshushu.learn.entity.User;
 import top.yueshushu.learn.enumtype.TradeRealValueType;
 import top.yueshushu.learn.helper.DateHelper;
+import top.yueshushu.learn.message.dingtalk.DingTalkService;
 import top.yueshushu.learn.message.weixin.service.WeChatService;
 import top.yueshushu.learn.mode.ro.TradeMoneyRo;
 import top.yueshushu.learn.mode.ro.TradeUserRo;
@@ -44,6 +45,8 @@ public class AutoLoginBusinessImpl implements AutoLoginBusiness {
     private RedisUtil redisUtil;
     @Resource
     private WeChatService weChatService;
+    @Resource
+    private DingTalkService dingTalkService;
     @Resource
     private TradeUserBusiness tradeUserBusiness;
     @Resource
@@ -89,7 +92,8 @@ public class AutoLoginBusinessImpl implements AutoLoginBusiness {
                 "用户 id: {0}, 姓名是:{1} 执行自动登录, 运行 {2}",
                 user.getId(), user.getName(), flag ? "成功" : "失败"
         );
-        weChatService.sendTextMessage(user.getWxUserId(), message);
+        weChatService.sendTextMessage(user.getId(), message);
+        dingTalkService.sendTextMessage(user.getId(), message);
         return flag;
     }
 }

@@ -74,6 +74,18 @@ public class UserDo implements Serializable {
     private String wxUserId;
 
     /**
+     * 企业用户发送的钉钉用户id
+     */
+    @TableField("ding_user_id")
+    private String dingUserId;
+
+    /**
+     * 企业用户发送的钉钉用户id
+     */
+    @TableField("reboot_id")
+    private Integer rebootId;
+
+    /**
      * 用户创建时间
      */
     @TableField("create_time")

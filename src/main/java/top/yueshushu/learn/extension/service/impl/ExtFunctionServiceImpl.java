@@ -23,7 +23,7 @@ import java.util.Map;
 @Service
 public class ExtFunctionServiceImpl implements ExtFunctionService {
 	
-	@Resource
+	@Resource(name = "restTemplate")
 	private RestTemplate restTemplate;
 	
 	/*

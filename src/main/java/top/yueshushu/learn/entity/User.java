@@ -20,6 +20,8 @@ public class User {
     private String phone;
     private String email;
     private String wxUserId;
+    private String dingUserId;
+    private Integer rebootId;
     private Date createTime;
     private Date updateTime;
     private Date lastLoginTime;

@@ -22,6 +22,7 @@ import top.yueshushu.learn.enumtype.CharPriceType;
 import top.yueshushu.learn.enumtype.WeekStatType;
 import top.yueshushu.learn.enumtype.message.VelocityTemplateType;
 import top.yueshushu.learn.helper.DateHelper;
+import top.yueshushu.learn.message.dingtalk.DingTalkService;
 import top.yueshushu.learn.message.email.EmailService;
 import top.yueshushu.learn.message.weixin.service.WeChatService;
 import top.yueshushu.learn.mode.dto.StockTenToEmailDto;
@@ -77,6 +78,8 @@ public class StatBusinessImpl implements StatBusiness {
     private EmailService emailService;
     @Resource
     private WeChatService weChatService;
+    @Resource
+    private DingTalkService dingTalkService;
 
     @Override
     public OutputResult getWeekStat(StockStatRo stockStatRo) {
@@ -296,7 +299,8 @@ public class StatBusinessImpl implements StatBusiness {
         );
         if (!emailFlag) {
             log.error("发送最近十天的自选股票涨跌记录 给用户{} 失败 ", user.getName());
-            weChatService.sendSystemUserTextMessage("发送最近十天的自选股票涨跌记录 给用户" + user.getName() + "失败");
+            weChatService.sendTextMessage(Const.DEFAULT_USER_ID, "发送最近十天的自选股票涨跌记录 给用户" + user.getName() + "失败");
+            dingTalkService.sendTextMessage(Const.DEFAULT_USER_ID, "发送最近十天的自选股票涨跌记录 给用户" + user.getName() + "失败");
         }
     }
 

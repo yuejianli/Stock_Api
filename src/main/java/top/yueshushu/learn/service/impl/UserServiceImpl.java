@@ -189,7 +189,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getDefaultUser() {
-        return userAssembler.doToEntity(userDomainService.getById(1));
+        return userAssembler.doToEntity(userDomainService.getById(Const.DEFAULT_USER_ID));
     }
 
     @Override

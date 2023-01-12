@@ -18,6 +18,10 @@ REDIS_DATABASE: 8
 SWAGGER_USERNAME: admin
 SWAGGER_PASSWORD: ENC(oNEYdaPhQJloQiYdM2lecPtjcIVgJW6Jj08nzIYy6IpMtvM0v6mgqOdJ3XQDlCuX)
 
+# 钉钉配置信息
+dingtalk:
+  robot:
+    webhook: Xxxx
 # 是否启用任务
 enableJob: true
 # 调用东财的接口频率，间隔时长

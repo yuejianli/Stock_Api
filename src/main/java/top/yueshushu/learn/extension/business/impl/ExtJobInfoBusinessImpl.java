@@ -157,7 +157,7 @@ public class ExtJobInfoBusinessImpl implements ExtJobInfoBusiness {
                 sendMessagetList.add(stringBuilder.toString());
                 //对响应的集合，进行处理.
                 for (String sendMessage : sendMessagetList) {
-                    weChatService.sendTextMessage(extCustomerDo.getWxId(), sendMessage);
+                    weChatService.sendTextMessageBySign(extCustomerDo.getWxId(), sendMessage);
                 }
             }
             jobInfo.setTriggerLastResult(1);
@@ -168,7 +168,7 @@ public class ExtJobInfoBusinessImpl implements ExtJobInfoBusiness {
             //执行任务失败，会发送消息到当前的用户.
             String errorWxMessage = MessageFormat.format("执行任务 {0} 失败，失败原因是:{1}",
                     jobInfoType.getDesc(), e.getMessage());
-            weChatService.sendSystemUserTextMessage(errorWxMessage);
+            weChatService.sendTextMessage(Const.DEFAULT_USER_ID, errorWxMessage);
             log.error("执行任务失败{}", e);
         } finally {
             //设置下次触发的时间
@@ -353,7 +353,7 @@ public class ExtJobInfoBusinessImpl implements ExtJobInfoBusiness {
                     ExtCustomer extCustomer = extCustomerDoMap.get(customerId);
                     if (extCustomer != null) {
                         String content = "你好," + extCustomer.getName() + System.lineSeparator();
-                        weChatService.sendTextMessage(extCustomer.getWxId(), content + result);
+                        weChatService.sendTextMessageBySign(extCustomer.getWxId(), content + result);
                     }
                 }
             }
@@ -365,7 +365,7 @@ public class ExtJobInfoBusinessImpl implements ExtJobInfoBusiness {
             //执行任务失败，会发送消息到当前的用户.
             String errorWxMessage = MessageFormat.format("执行任务 {0} 失败，失败原因是:{1}",
                     jobInfoType.getDesc(), e.getMessage());
-            weChatService.sendSystemUserTextMessage(errorWxMessage);
+            weChatService.sendTextMessage(Const.DEFAULT_USER_ID, errorWxMessage);
             log.error("执行任务失败{}", e);
         } finally {
             //设置下次触发的时间

@@ -14,6 +14,7 @@ import top.yueshushu.learn.domain.JobInfoDo;
 import top.yueshushu.learn.entity.JobInfo;
 import top.yueshushu.learn.enumtype.*;
 import top.yueshushu.learn.helper.DateHelper;
+import top.yueshushu.learn.message.dingtalk.DingTalkService;
 import top.yueshushu.learn.message.weixin.service.WeChatService;
 import top.yueshushu.learn.mode.ro.BuyRo;
 import top.yueshushu.learn.mode.ro.DealRo;
@@ -87,6 +88,8 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
     private BuyNewStockBusiness buyNewStockBusiness;
     @Resource
     private AutoLoginBusiness autoLoginBusiness;
+    @Resource
+    private DingTalkService dingTalkService;
     @SuppressWarnings("all")
     @Resource(name = Const.ASYNC_SERVICE_EXECUTOR_BEAN_NAME)
     private AsyncTaskExecutor executor;
@@ -335,8 +338,9 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
             jobInfo.setTriggerLastErrorMessage(e.getMessage());
             //执行任务失败，会发送消息到当前的用户.
             String errorWxMessage = MessageFormat.format("执行任务 {0} 失败，失败原因是:{1}",
-                    jobInfoType.getDesc(), e.getMessage());
-            weChatService.sendSystemUserTextMessage(errorWxMessage);
+                    jobInfoType.getDesc(), e);
+            weChatService.sendTextMessage(Const.DEFAULT_USER_ID, errorWxMessage);
+            //  dingTalkService.sendTextMessage(Const.DEFAULT_USER_ID, errorWxMessage);
             log.error("执行任务失败{}", e);
         } finally {
             //设置下次触发的时间

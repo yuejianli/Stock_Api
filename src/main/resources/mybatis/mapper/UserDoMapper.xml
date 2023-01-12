@@ -11,6 +11,8 @@
         <result column="phone" property="phone" />
         <result column="email" property="email" />
         <result column="wx_user_id" property="wxUserId"/>
+        <result column="ding_user_id" property="dingUserId"/>
+        <result column="reboot_id" property="rebootId"/>
         <result column="create_time" property="createTime" />
         <result column="update_time" property="updateTime" />
         <result column="last_login_time" property="lastLoginTime" />
@@ -20,7 +22,9 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, account, name, password, phone, email, wx_user_id,create_time, update_time, last_login_time, status, flag
+        id, account, name, password, phone, email, wx_user_id,
+        ding_user_id,reboot_id,
+        create_time, update_time, last_login_time, status, flag
     </sql>
 
 </mapper>

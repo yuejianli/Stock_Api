@@ -13,9 +13,15 @@ import org.springframework.web.client.RestTemplate;
  **/
 @Configuration
 public class RestConfig {
-    @Bean
-    public RestTemplate restTemplate(){
-        RestTemplate restTemplate=  new RestTemplate();
+    @Bean(name = "restTemplate")
+    public RestTemplate restTemplate() {
+        RestTemplate restTemplate = new RestTemplate();
+        return restTemplate;
+    }
+
+    @Bean(name = "dingTalkRobotRestTemplate")
+    public RestTemplate getDingTalkRobotRestTemplate() {
+        RestTemplate restTemplate = new RestTemplate();
         return restTemplate;
     }
 }

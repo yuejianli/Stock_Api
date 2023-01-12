@@ -111,13 +111,11 @@ public class TradeMoneyServiceImpl implements TradeMoneyService {
                 userId, mock.getCode(), handlerDate
         );
         //查看当前的持仓信息
-        TradeMoneyDo tradeMoneyDo = tradeMoneyDomainService.getByUserIdAndMockType(
-                userId, mock.getCode());
+        TradeMoneyDo tradeMoneyDo = tradeMoneyDomainService.getByUserIdAndMockType(userId, mock.getCode());
         // 进行保存
         if (tradeMoneyDo == null) {
             return;
         }
-
         Instant instant = currentDate.toInstant();
         ZoneId zoneId = ZoneId.systemDefault();
         LocalDateTime localDateTime = instant.atZone(zoneId).toLocalDateTime();
@@ -135,6 +133,7 @@ public class TradeMoneyServiceImpl implements TradeMoneyService {
         // 用户编号
         TradeMoneyRo tradeMoneyRo = new TradeMoneyRo();
         tradeMoneyRo.setUserId(userId);
+        tradeMoneyRo.setMockType(MockType.REAL.getCode());
         // 获取真实的数据
         TradeMoneyVo tradeMoneyVo = realInfo(tradeMoneyRo).getData();
 
@@ -165,9 +164,6 @@ public class TradeMoneyServiceImpl implements TradeMoneyService {
                 tradeMoneyDomainService.updateById(editTradeMoneyDo);
             }
         }
-        // 对历史记录进行处理.
-        saveMoneyHistory(userId, MockType.REAL, DateUtil.date());
-
     }
 
     @Override

@@ -10,6 +10,7 @@ import top.yueshushu.learn.api.response.GetOrdersDataResponse;
 import top.yueshushu.learn.business.BuyNewStockBusiness;
 import top.yueshushu.learn.entity.User;
 import top.yueshushu.learn.helper.TradeRequestHelper;
+import top.yueshushu.learn.message.dingtalk.DingTalkService;
 import top.yueshushu.learn.message.weixin.service.WeChatService;
 import top.yueshushu.learn.service.UserService;
 
@@ -31,6 +32,8 @@ public class BuyNewStockBusinessImpl implements BuyNewStockBusiness {
     private WeChatService weChatService;
     @Resource
     private UserService userService;
+    @Resource
+    private DingTalkService dingTalkService;
 
     @Override
     public boolean applyBuyNewStock(Integer userId) {
@@ -74,7 +77,8 @@ public class BuyNewStockBusinessImpl implements BuyNewStockBusiness {
         String message = MessageFormat.format(
                 "可申购提醒: {0}", stockInfoList.toString()
         );
-        weChatService.sendTextMessage(user.getWxUserId(), message);
+        weChatService.sendTextMessage(user.getId(), message);
+        dingTalkService.sendTextMessage(user.getId(), message);
         return true;
     }
 }

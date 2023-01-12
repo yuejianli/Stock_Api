@@ -277,7 +277,11 @@
             <artifactId>tencentcloud-sdk-java-ocr</artifactId>
             <version>3.1.322</version>
         </dependency>
-
+        <dependency>
+            <groupId>cn.snowheart</groupId>
+            <artifactId>spring-boot-dingtalk-robot-starter</artifactId>
+            <version>1.0.2.RELEASE</version>
+        </dependency>
     </dependencies>
     <build>
         <!--将该目录下的文件全部打包成类的路径-->

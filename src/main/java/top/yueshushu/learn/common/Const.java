@@ -15,6 +15,7 @@ public class Const {
     public static final String Authorization = "Authorization";
     public static final Integer DEFAULT_NO = 0;
     public static final Integer DEFAULT_USER_ID = 1;
+    public static final Integer DEFAULT_REBOOT_ID = 1;
     public static final String TRADE_PASSWORD_AES_KEY = "yuezelinyuezelin";
 
     public static final String CACHE_PUBLIC_KEY_PREFIX = "stock:public:";

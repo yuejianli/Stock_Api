@@ -38,29 +38,25 @@ public class WeChatService {
 	private UserDomainService userDomainService;
 
 	/**
-	 * 通过微信企业号向系统管理员发送失败的消息
+	 * 通过微信企业号发送普通消息
 	 *
+	 * @param userId  微信用户标识
 	 * @param content 发送的内容
 	 * @return 通过微信企业号发送消息
 	 */
-	public String sendSystemUserTextMessage(String content) {
-		UserDo userDo = userDomainService.getById(1);
-		return sendTextMessage(userDo.getWxUserId(), content);
-	}
-
-	/**
-	 * 通过微信企业号发送普通消息
-	 *
-	 * @param wxUserId 微信用户标识
-	 * @param content  发送的内容
-	 * @return 通过微信企业号发送消息
-	 */
-	public String sendTextMessage(String wxUserId, String content) {
-
+	public String sendTextMessage(Integer userId, String content) {
+		UserDo userDo = userDomainService.getById(userId);
+		if (null == userDo) {
+			return null;
+		}
+		String wxUserId = userDo.getWxUserId();
 		if (!StringUtils.hasText(wxUserId)) {
 			return "";
 		}
+		return sendTextMessageBySign(wxUserId, content);
+	}
 
+	public String sendTextMessageBySign(String wxUserId, String content) {
 		// 1. 获取 token
 		String accessToken = getWeiXinToken();
 		// 2 构建普通文本对象
@@ -82,21 +78,29 @@ public class WeChatService {
 		// 3. 发送 json 形式的获取，获取响应信息
 		return messageResponse(accessToken, jsonMessage);
 	}
-	
-	
+
+
 	/**
 	 * 通过微信企业号发送 markdown 消息
 	 *
-	 * @param wxUserId 微信用户标识
-	 * @param title    标题
-	 * @param content  发送的内容，支持 html 格式
+	 * @param userId  微信用户id
+	 * @param title   标题
+	 * @param content 发送的内容，支持 html 格式
 	 * @return 通过微信企业号发送消息
 	 */
-	public String sendTextCardMessage(String wxUserId, String title, String content) {
-
+	public String sendMarkdownMessage(Integer userId, String title, String content) {
+		UserDo userDo = userDomainService.getById(userId);
+		if (null == userDo) {
+			return null;
+		}
+		String wxUserId = userDo.getWxUserId();
 		if (!StringUtils.hasText(wxUserId)) {
 			return "";
 		}
+		return sendMarkdownMessageBySign(wxUserId, title, content);
+	}
+
+	public String sendMarkdownMessageBySign(String wxUserId, String title, String content) {
 		// 1.获取access_token:根据企业id和应用密钥获取access_token,并拼接请求url
 		String accessToken = getWeiXinToken();
 		// 2.获取发送对象，并转成json
@@ -119,8 +123,8 @@ public class WeChatService {
 		// 3.获取请求的url
 		return messageResponse(accessToken, jsonMessage);
 	}
-	
-	
+
+
 	/**
 	 * 获取微信登录的token
 	 */

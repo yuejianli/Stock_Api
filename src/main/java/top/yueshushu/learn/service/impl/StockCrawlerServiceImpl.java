@@ -25,6 +25,7 @@ import top.yueshushu.learn.enumtype.BigDealKindType;
 import top.yueshushu.learn.enumtype.DataFlagType;
 import top.yueshushu.learn.enumtype.StockUpdateType;
 import top.yueshushu.learn.enumtype.SyncStockHistoryType;
+import top.yueshushu.learn.message.dingtalk.DingTalkService;
 import top.yueshushu.learn.message.weixin.service.WeChatService;
 import top.yueshushu.learn.mode.info.StockShowInfo;
 import top.yueshushu.learn.mode.ro.StockRo;
@@ -70,7 +71,8 @@ public class StockCrawlerServiceImpl implements StockCrawlerService {
     private UserService userService;
     @Resource
     private WeChatService weChatService;
-
+    @Resource
+    private DingTalkService dingTalkService;
 
     @Override
     public OutputResult<StockShowInfo> getStockInfo(StockRo stockRo) {
@@ -218,10 +220,11 @@ public class StockCrawlerServiceImpl implements StockCrawlerService {
                 List<User> userList = userService.listNotice();
                 String newStockMessage = "打新股提醒:股票 " + downloadStockInfo.getCode() + ",股票名称:" + downloadStockInfo.getName() + "今天上市了";
                 userList.forEach(
-                        n -> {
-                            weChatService.sendTextMessage(n.getWxUserId(), newStockMessage);
+                        user -> {
+                            weChatService.sendTextMessage(user.getId(), newStockMessage);
                         }
                 );
+                dingTalkService.sendTextMessage(null, newStockMessage);
             } else {
                 //如果编码相同，看名称是否相同.
                 StockDo updateStockDo = dbStockCodeMap.get(downloadStockInfo.getCode());

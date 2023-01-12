@@ -39,7 +39,7 @@ public class HolidayCalendarServiceImpl implements HolidayCalendarService {
     private HolidayCalendarDomainService holidayCalendarDomainService;
     @Resource
     private HolidayCalendarAssembler holidayCalendarAssembler;
-    @Resource
+    @Resource(name = "restTemplate")
     private RestTemplate restTemplate;
     @Override
     public OutputResult listHoliday(HolidayRo holidayRo) {

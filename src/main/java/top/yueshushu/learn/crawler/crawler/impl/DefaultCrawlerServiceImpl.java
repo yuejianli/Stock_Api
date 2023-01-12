@@ -53,7 +53,7 @@ public class DefaultCrawlerServiceImpl implements CrawlerService {
     @Resource
     private DefaultProperties defaultProperties;
 
-    @Resource
+    @Resource(name = "restTemplate")
     private RestTemplate restTemplate;
 
     @Resource(name = "defaultDailyTradingInfoParse")

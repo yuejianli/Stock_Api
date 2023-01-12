@@ -14,10 +14,10 @@ import top.yueshushu.learn.common.SystemConst;
 import top.yueshushu.learn.domain.TradeEntrustDo;
 import top.yueshushu.learn.domainservice.TradeEntrustDomainService;
 import top.yueshushu.learn.domainservice.TradePositionDomainService;
-import top.yueshushu.learn.domainservice.TradePositionHistoryDomainService;
 import top.yueshushu.learn.entity.*;
 import top.yueshushu.learn.enumtype.DealType;
 import top.yueshushu.learn.enumtype.EntrustStatusType;
+import top.yueshushu.learn.message.dingtalk.DingTalkService;
 import top.yueshushu.learn.message.weixin.service.WeChatService;
 import top.yueshushu.learn.mode.dto.TradeEntrustQueryDto;
 import top.yueshushu.learn.mode.ro.DealRo;
@@ -64,7 +64,7 @@ public class DealBusinessImpl implements DealBusiness {
     @Resource
     private UserService userService;
     @Resource
-    private TradePositionHistoryDomainService tradePositionHistoryDomainService;
+    private DingTalkService dingTalkService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -123,8 +123,8 @@ public class DealBusinessImpl implements DealBusiness {
                             tradeEntrustDo.getEntrustNum(), tradeEntrustDo.getEntrustPrice(),
                             tradeEntrustDo.getEntrustMoney()
                     );
-					weChatService.sendTextMessage(user.getWxUserId(),
-							message);
+                    weChatService.sendTextMessage(user.getId(), message);
+                    dingTalkService.sendTextMessage(user.getId(), message);
                 }
             }else{
                 //卖的时候，  当前价格 > 卖出价格，则成交.
@@ -141,8 +141,8 @@ public class DealBusinessImpl implements DealBusiness {
                             tradeEntrustDo.getEntrustNum(), tradeEntrustDo.getEntrustPrice(),
                             tradeEntrustDo.getEntrustMoney()
                     );
-					weChatService.sendTextMessage(user.getWxUserId(),
-							message);
+                    weChatService.sendTextMessage(user.getId(), message);
+                    dingTalkService.sendTextMessage(user.getId(), message);
                 }
             }
         }
