@@ -1,15 +1,16 @@
 package top.yueshushu.learn.service.impl;
+
 import cn.hutool.core.date.DateUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import top.yueshushu.learn.assembler.TradeRuleAssembler;
 import top.yueshushu.learn.common.ResultCode;
-import top.yueshushu.learn.domain.StockDo;
+import top.yueshushu.learn.domain.TradeRuleDo;
 import top.yueshushu.learn.domainservice.TradeRuleDomainService;
 import top.yueshushu.learn.entity.TradeRule;
 import top.yueshushu.learn.entity.TradeRuleCondition;
@@ -20,18 +21,11 @@ import top.yueshushu.learn.enumtype.DealType;
 import top.yueshushu.learn.mode.dto.StockRuleDto;
 import top.yueshushu.learn.mode.dto.TradeRuleStockQueryDto;
 import top.yueshushu.learn.mode.ro.TradeRuleRo;
-import top.yueshushu.learn.mode.vo.StockVo;
 import top.yueshushu.learn.mode.vo.TradeRuleVo;
-import top.yueshushu.learn.response.PageResponse;
-import top.yueshushu.learn.domain.TradeRuleDo;
-import top.yueshushu.learn.mapper.TradeRuleDoMapper;
-import top.yueshushu.learn.domain.TradeRuleConditionDo;
-import top.yueshushu.learn.domain.TradeRuleStockDo;
 import top.yueshushu.learn.response.OutputResult;
+import top.yueshushu.learn.response.PageResponse;
 import top.yueshushu.learn.service.TradeRuleConditionService;
 import top.yueshushu.learn.service.TradeRuleService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.springframework.stereotype.Service;
 import top.yueshushu.learn.service.TradeRuleStockService;
 
 import javax.annotation.Resource;
@@ -61,26 +55,22 @@ public class TradeRuleServiceImpl implements TradeRuleService {
     private TradeRuleAssembler tradeRuleAssembler;
 
     @Override
-    public OutputResult listRule(TradeRuleRo tradeRuleRo) {
-
-
+    public OutputResult<PageResponse<TradeRuleVo>> listRule(TradeRuleRo tradeRuleRo) {
         Page<Object> pageGithubResult = PageHelper.startPage(tradeRuleRo.getPageNum(), tradeRuleRo.getPageSize());
-        List<TradeRuleDo> tradeRuleDoList = tradeRuleDomainService.listByQuery(
-                tradeRuleRo.getUserId(),
-                tradeRuleRo.getMockType(),
-                tradeRuleRo.getRuleType()
-        );
-        if (CollectionUtils.isEmpty(tradeRuleDoList)){
-            return OutputResult.buildSucc(
-                    PageResponse.emptyPageResponse()
-            );
-        }
 
+        TradeRuleStockQueryDto tradeRuleStockQueryDto = new TradeRuleStockQueryDto();
+        tradeRuleStockQueryDto.setUserId(tradeRuleRo.getUserId());
+        tradeRuleStockQueryDto.setMockType(tradeRuleRo.getMockType());
+        tradeRuleStockQueryDto.setRuleType(tradeRuleRo.getRuleType());
+
+        List<TradeRuleDo> tradeRuleDoList = tradeRuleDomainService.listByQuery(tradeRuleStockQueryDto);
+        if (CollectionUtils.isEmpty(tradeRuleDoList)) {
+            return OutputResult.buildSucc(PageResponse.emptyPageResponse());
+        }
         List<TradeRuleVo> pageResultList = convertVo(tradeRuleDoList);
 
-        PageInfo pageInfo=new PageInfo<>(pageResultList);
-        return OutputResult.buildSucc(new PageResponse<TradeRuleVo>(pageGithubResult.getTotal(),
-                pageInfo.getList()));
+        PageInfo pageInfo = new PageInfo<>(pageResultList);
+        return OutputResult.buildSucc(new PageResponse<TradeRuleVo>(pageGithubResult.getTotal(), pageInfo.getList()));
     }
 
     /**
@@ -92,18 +82,18 @@ public class TradeRuleServiceImpl implements TradeRuleService {
         //查询全部的规则信息.
         List<TradeRuleCondition> tradeRuleConditionList = tradeRuleConditionService.listAll();
         //转换成对应的Map 形式
-        Map<String, String> condtionNameMap = tradeRuleConditionList.stream().collect(Collectors.toMap(
-                TradeRuleCondition::getCode,
+        Map<Integer, String> conditionNameMap = tradeRuleConditionList.stream().collect(Collectors.toMap(
+                TradeRuleCondition::getId,
                 TradeRuleCondition::getName
         ));
         List<TradeRuleVo> result = new ArrayList<>();
         records.stream().forEach(
-                n->{
+                n -> {
                     TradeRuleVo tradeRuleVo = new TradeRuleVo();
-                    BeanUtils.copyProperties(n,tradeRuleVo);
+                    BeanUtils.copyProperties(n, tradeRuleVo);
                     tradeRuleVo.setConditionName(
-                            condtionNameMap.getOrDefault(
-                                    n.getConditionCode(),""
+                            conditionNameMap.getOrDefault(
+                                    n.getConditionId(), ""
                             )
                     );
                     result.add(tradeRuleVo);
@@ -116,22 +106,21 @@ public class TradeRuleServiceImpl implements TradeRuleService {
     public OutputResult addRule(TradeRuleRo tradeRuleRo) {
 
         TradeRule tradeRule = tradeRuleAssembler.roToEntity(tradeRuleRo);
-        //为禁用状态
+        // 规则默认是禁用状态
         tradeRule.setStatus(DataFlagType.DELETE.getCode());
         //根据不同的类型，设置不同的信息.
-        if(DealType.BUY.equals(tradeRuleRo.getRuleType())){
-             //是买入规则
+        if (DealType.BUY.getCode().equals(tradeRuleRo.getRuleType())) {
+            //是买入规则
             tradeRule.setConditionType(ConditionType.LT.getCode());
-        }else{
+        } else {
             //是卖出规则
             tradeRule.setConditionType(ConditionType.GT.getCode());
         }
         tradeRule.setCreateTime(DateUtil.date());
+        tradeRule.setUpdateTime(DateUtil.date());
         tradeRule.setFlag(DataFlagType.NORMAL.getCode());
         //进行添加规则
-        tradeRuleDomainService.save(
-                tradeRuleAssembler.entityToDo(tradeRule)
-        );
+        tradeRuleDomainService.save(tradeRuleAssembler.entityToDo(tradeRule));
         return OutputResult.buildSucc();
     }
 
@@ -144,7 +133,7 @@ public class TradeRuleServiceImpl implements TradeRuleService {
         TradeRuleDo dbRule = (TradeRuleDo) outputResult.getData();
         //进行更新
         dbRule.setName(tradeRuleRo.getName());
-        dbRule.setConditionCode(tradeRuleRo.getConditionCode());
+        dbRule.setConditionId(tradeRuleRo.getConditionId());
         dbRule.setRuleValueType(tradeRuleRo.getRuleValueType());
         dbRule.setRuleValue(tradeRuleRo.getRuleValue());
         dbRule.setTradeNum(tradeRuleRo.getTradeNum());
@@ -157,12 +146,16 @@ public class TradeRuleServiceImpl implements TradeRuleService {
 
     @Override
     public OutputResult enableRule(TradeRuleRo tradeRuleRo) {
+        return changeRuleStatus(tradeRuleRo, DataFlagType.NORMAL);
+    }
+
+    private OutputResult changeRuleStatus(TradeRuleRo tradeRuleRo, DataFlagType status) {
         OutputResult outputResult = validRule(tradeRuleRo);
-        if(!outputResult.getSuccess()){
+        if (!outputResult.getSuccess()) {
             return outputResult;
         }
         TradeRuleDo dbRule = (TradeRuleDo) outputResult.getData();
-        dbRule.setStatus(DataFlagType.NORMAL.getCode());
+        dbRule.setStatus(status.getCode());
         dbRule.setUpdateTime(DateUtil.date());
         tradeRuleDomainService.updateById(dbRule);
         return OutputResult.buildSucc();
@@ -170,15 +163,7 @@ public class TradeRuleServiceImpl implements TradeRuleService {
 
     @Override
     public OutputResult disableRule(TradeRuleRo tradeRuleRo) {
-        OutputResult outputResult = validRule(tradeRuleRo);
-        if(!outputResult.getSuccess()){
-            return outputResult;
-        }
-        TradeRuleDo dbRule = (TradeRuleDo) outputResult.getData();
-        dbRule.setStatus(DataFlagType.DELETE.getCode());
-        dbRule.setUpdateTime(DateUtil.date());
-        tradeRuleDomainService.updateById(dbRule);
-        return OutputResult.buildSucc();
+        return changeRuleStatus(tradeRuleRo, DataFlagType.DELETE);
     }
 
     @Override
@@ -205,7 +190,7 @@ public class TradeRuleServiceImpl implements TradeRuleService {
 
     @Override
     public List<StockRuleDto> getRuleByQuery(TradeRuleStockQueryDto tradeRuleStockQueryDto) {
-        return tradeRuleDomainService.getRuleByQuery(tradeRuleStockQueryDto);
+        return tradeRuleDomainService.listStockRuleByQuery(tradeRuleStockQueryDto);
     }
 
     @Override

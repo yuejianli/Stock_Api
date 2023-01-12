@@ -1,12 +1,9 @@
 package top.yueshushu.learn.mode.vo;
 
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import org.springframework.boot.convert.DataSizeUnit;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -28,7 +25,7 @@ public class TradeRuleVo implements Serializable {
     @ApiModelProperty("规则的名称")
     private String name;
     @ApiModelProperty("规则条件编号")
-    private String conditionCode;
+    private Integer conditionId;
     @ApiModelProperty("规则条件名称")
     private String conditionName;
     @ApiModelProperty("比较类型 1为金额 2为比例")

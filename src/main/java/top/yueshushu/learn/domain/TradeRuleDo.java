@@ -1,15 +1,15 @@
 package top.yueshushu.learn.domain;
 
-import java.math.BigDecimal;
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableField;
-import java.io.Serializable;
-import java.util.Date;
-
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * <p>
@@ -41,8 +41,8 @@ public class TradeRuleDo implements Serializable {
     /**
      * 规则条件编号
      */
-    @TableField("condition_code")
-    private String conditionCode;
+    @TableField("condition_id")
+    private Integer conditionId;
 
     /**
      * 规则计算 1为小于 2为大于
@@ -121,6 +121,4 @@ public class TradeRuleDo implements Serializable {
      */
     @TableField("flag")
     private Integer flag;
-
-
 }

@@ -23,7 +23,7 @@ public class TradeRuleRo extends PageRo implements Serializable {
     @ApiModelProperty("规则的名称")
     private String name;
     @ApiModelProperty("规则条件编号")
-    private String conditionCode;
+    private Integer conditionId;
     @ApiModelProperty("规则计算 1为小于 2为大于")
     private Integer conditionType;
     @ApiModelProperty("比较类型 1为金额 2为比例")

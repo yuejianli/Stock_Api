@@ -1,6 +1,5 @@
 package top.yueshushu.learn.mode.vo;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -18,8 +17,6 @@ import java.util.Date;
 public class HolidayCalendarVo implements Serializable {
     private static final long serialVersionUID = 1L;
     private Integer id;
-    /** 使用@JsonFormat注解格式化日期 */
-    @JsonFormat(pattern="yyyy-MM-dd",timezone="GMT+8")
     private Date holidayDate;
     private Integer currYear;
     private Integer dateType;

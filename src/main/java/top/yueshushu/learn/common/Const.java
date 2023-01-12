@@ -1,6 +1,7 @@
 package top.yueshushu.learn.common;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @ClassName:Const
@@ -12,7 +13,6 @@ import java.util.List;
 public class Const {
     public static final String SALT = "twoButterfly";
     public static final String RAND_NUMBER_PREFIX = "0.903";
-    public static final String Authorization = "Authorization";
     public static final Integer DEFAULT_NO = 0;
     public static final Integer DEFAULT_USER_ID = 1;
     public static final Integer DEFAULT_REBOOT_ID = 1;
@@ -48,34 +48,19 @@ public class Const {
     public static final String HOLIDAY_CALENDAR_CACHE = "holiday_calendar";
 
     public static final String KEY_AUTH_USER_ID = "user_id";
-
-    public static final String KEY_AUTH_TOKEN = "auth-token";
     public static final String POSITION_HISTORY = "ph:";
     public static final String DATE_WORKING = "work:";
     public static final String JOB_INFO = "jobInfo:";
     public static final String RSA_PUBLIC_KEY = "publicKey";
     public static final String RSA_PRIVATE_KEY = "privateKey";
 
-    private static final String CACHE_KEY_DATA_PREFIX = CACHE_PUBLIC_KEY_PREFIX + "data:";
     public static final String CACHE_STOCK_INFO = Const.CACHE_PUBLIC_KEY_PREFIX + "info";
 
-    private static final String CACHE_KEY_CONFIG_PREFIX = CACHE_PUBLIC_KEY_PREFIX + "config:";
-    public static final String CACHE_KEY_CONFIG_ROBOT = Const.CACHE_KEY_CONFIG_PREFIX + "robot";
-
-    private static final String CACHE_KEY_TRADE_PREFIX = CACHE_PUBLIC_KEY_PREFIX + "trade:";
-    public static final String CACHE_KEY_TRADE_USER = Const.CACHE_KEY_TRADE_PREFIX + "tradeUser";
-    public static final String CACHE_KEY_TRADE_METHOD = Const.CACHE_KEY_TRADE_PREFIX + "tradeMethod";
 
     public static final String Jasypt_KEY = "enc_safe";
-
-    public static final String CACHE_KEY_TRADE_STRATEGY = CACHE_PUBLIC_KEY_PREFIX + "trade:tradeStrategy";
-
-    public static final long DURATION_REDIS_DEFAULT = 3600 * 24 * 2;
 
 
     public static final List<String> IgnoreList = Arrays.asList("class", "userId", "method");
 
-    public static String getCacheKeyPrefix(Integer userId){
-        return CACHE_PUBLIC_KEY_PREFIX +userId+":";
-    }
+    public static AtomicInteger priceCounter = new AtomicInteger(0);
 }

@@ -1,6 +1,5 @@
 package top.yueshushu.learn.extension.model.vo;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -43,10 +42,6 @@ public class ExtJobInfoVo implements Serializable {
     @ApiModelProperty("创建者")
     private String author;
 
-    /**
-     * 使用@JsonFormat注解格式化日期
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty("更新时间")
     private LocalDateTime updateTime;
 
@@ -60,10 +55,6 @@ public class ExtJobInfoVo implements Serializable {
     @ApiModelProperty("触发状态 1启动中 0为禁止")
     private Integer triggerStatus;
 
-    /**
-     * 使用@JsonFormat注解格式化日期
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty("上次触发的时间")
     private LocalDateTime triggerLastTime;
 
@@ -72,10 +63,6 @@ public class ExtJobInfoVo implements Serializable {
 
     @ApiModelProperty("上次触发错误的错误信息")
     private String triggerLastErrorMessage;
-    /**
-     * 使用@JsonFormat注解格式化日期
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty("下次触发的时间")
     private LocalDateTime triggerNextTime;
 

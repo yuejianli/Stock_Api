@@ -1,6 +1,5 @@
 package top.yueshushu.learn.mode.vo;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -23,10 +22,6 @@ public class ConfigVo implements Serializable {
     private String name;
     private String codeValue;
     private Integer userId;
-    /**
-     * 使用@JsonFormat注解格式化日期
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date createTime;
     private Integer flag;
 }

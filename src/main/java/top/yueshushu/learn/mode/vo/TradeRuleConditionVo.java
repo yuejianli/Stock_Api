@@ -6,18 +6,21 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * @author 岳建立 自定义的
- * @since 2022-06-04
+ * <p>
+ * 交易规则可使用的条件表
+ * </p>
+ *
+ * @author 两个蝴蝶飞 自定义的
+ * @since 2022-01-26
  */
 @Data
-public class StockUpdateLogVo implements Serializable {
-
+public class TradeRuleConditionVo implements Serializable {
     private static final long serialVersionUID = 1L;
     private Integer id;
     private String code;
     private String name;
-    private Integer exchange;
-    private String fullCode;
+    private String description;
+    private Date createTime;
     private Date updateTime;
-    private Integer updateType;
+    private Integer flag;
 }

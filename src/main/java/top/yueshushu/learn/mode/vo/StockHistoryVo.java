@@ -1,6 +1,5 @@
 package top.yueshushu.learn.mode.vo;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -22,8 +21,6 @@ public class StockHistoryVo implements Serializable {
     private Integer id;
     private String code;
     private String name;
-    /** 使用@JsonFormat注解格式化日期 */
-    @JsonFormat(pattern="yyyy-MM-dd",timezone="GMT+8")
     private LocalDateTime currDate;
     private BigDecimal lowestPrice;
     private BigDecimal openingPrice;

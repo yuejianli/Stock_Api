@@ -25,18 +25,18 @@ public class TradeRuleDomainServiceImpl extends ServiceImpl<TradeRuleDoMapper, T
     private TradeRuleDoMapper tradeRuleDoMapper;
 
     @Override
-    public List<StockRuleDto> getRuleByQuery(TradeRuleStockQueryDto tradeRuleStockQueryDto) {
-        return tradeRuleDoMapper.listRuleByQuery(tradeRuleStockQueryDto);
+    public List<StockRuleDto> listStockRuleByQuery(TradeRuleStockQueryDto tradeRuleStockQueryDto) {
+        return tradeRuleDoMapper.listStockRuleByQuery(tradeRuleStockQueryDto);
     }
 
     @Override
-    public List<TradeRuleDo> listByQuery(Integer userId, Integer mockType, Integer ruleType) {
-       return this.lambdaQuery()
-                .eq(userId != null,TradeRuleDo::getUserId, userId)
-                .eq(mockType != null,TradeRuleDo::getMockType, mockType)
-                .eq(ruleType != null,TradeRuleDo::getRuleType, ruleType)
-                .orderByDesc(
-                        TradeRuleDo::getUpdateTime
-                ).list();
+    public List<TradeRuleDo> listByQuery(TradeRuleStockQueryDto tradeRuleStockQueryDto) {
+        return this.lambdaQuery()
+                .eq(tradeRuleStockQueryDto.getUserId() != null, TradeRuleDo::getUserId, tradeRuleStockQueryDto.getUserId())
+                .eq(tradeRuleStockQueryDto.getMockType() != null, TradeRuleDo::getMockType, tradeRuleStockQueryDto.getMockType())
+                .eq(tradeRuleStockQueryDto.getRuleType() != null, TradeRuleDo::getRuleType, tradeRuleStockQueryDto.getRuleType())
+                .eq(tradeRuleStockQueryDto.getRuleId() != null, TradeRuleDo::getId, tradeRuleStockQueryDto.getRuleId())
+                .eq(tradeRuleStockQueryDto.getRuleConditionId() != null, TradeRuleDo::getConditionId, tradeRuleStockQueryDto.getRuleConditionId())
+                .orderByDesc(TradeRuleDo::getUpdateTime).list();
     }
 }

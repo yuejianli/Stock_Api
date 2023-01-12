@@ -1,10 +1,10 @@
 package top.yueshushu.learn.business;
 
-import top.yueshushu.learn.entity.TradeMethod;
-import top.yueshushu.learn.enumtype.TradeMethodType;
-import top.yueshushu.learn.mode.ro.TradeMethodRo;
 import top.yueshushu.learn.mode.ro.TradeRuleConditionRo;
+import top.yueshushu.learn.mode.vo.TradeRuleConditionVo;
 import top.yueshushu.learn.response.OutputResult;
+
+import java.util.List;
 
 /**
  * @Description 交易规则条件编排层
@@ -14,14 +14,31 @@ import top.yueshushu.learn.response.OutputResult;
 public interface TradeRuleConditionBusiness {
     /**
      * 查询规则的条件列表
-     * @return  查询规则的条件列表
+     *
+     * @return 查询规则的条件列表
      */
-    OutputResult list();
+    OutputResult<List<TradeRuleConditionVo>> list();
 
     /**
      * 更新规则信息
-     * @param tradeRuleConditionRo 更新规则对象
+     *
+     * @param tradeRuleConditionRo 更新规则条件对象
      * @return 更新规则信息
      */
     OutputResult updateCondition(TradeRuleConditionRo tradeRuleConditionRo);
+
+    /**
+     * 添加规则信息
+     *
+     * @param tradeRuleConditionRo 添加规则条件对象
+     */
+    OutputResult addCondition(TradeRuleConditionRo tradeRuleConditionRo);
+
+    /**
+     * 删除规则条件
+     *
+     * @param id 规则条件id
+     */
+    OutputResult deleteCondition(Integer id);
+
 }

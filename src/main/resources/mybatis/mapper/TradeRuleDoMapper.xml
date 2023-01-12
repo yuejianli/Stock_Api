@@ -6,7 +6,7 @@
     <resultMap id="BaseResultMap" type="top.yueshushu.learn.domain.TradeRuleDo">
         <id column="id" property="id" />
         <result column="name" property="name" />
-        <result column="condition_code" property="conditionCode" />
+        <result column="condition_id" property="conditionId" />
         <result column="condition_type" property="conditionType" />
         <result column="rule_value_type" property="ruleValueType" />
         <result column="rule_value" property="ruleValue" />
@@ -24,9 +24,9 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id,name, condition_code, condition_type, rule_value_type, rule_value, trade_num, trade_value_type, trade_price, rule_type, status, user_id, mock_type, create_time, update_time, flag
+        id,name, condition_id, condition_type, rule_value_type, rule_value, trade_num, trade_value_type, trade_price, rule_type, status, user_id, mock_type, create_time, update_time, flag
     </sql>
-    <select id="listRuleByQuery" resultType="top.yueshushu.learn.mode.dto.StockRuleDto">
+    <select id="listStockRuleByQuery" resultType="top.yueshushu.learn.mode.dto.StockRuleDto">
         select trs.stock_code as stockCode,
         tr.id as ruleId,tr.name as ruleName,
         trs.create_time as createTime,

@@ -1,7 +1,9 @@
 package top.yueshushu.learn.crawler.crawler.impl;
 
 import cn.hutool.core.codec.Base64;
+import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -12,11 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
+import top.yueshushu.learn.common.SystemConst;
 import top.yueshushu.learn.crawler.crawler.CrawlerService;
-import top.yueshushu.learn.crawler.entity.DownloadStockInfo;
-import top.yueshushu.learn.crawler.entity.StockBigDealInfo;
-import top.yueshushu.learn.crawler.entity.StockHistoryCsvInfo;
-import top.yueshushu.learn.crawler.entity.TxStockHistoryInfo;
+import top.yueshushu.learn.crawler.entity.*;
 import top.yueshushu.learn.crawler.parse.DailyTradingInfoParse;
 import top.yueshushu.learn.crawler.parse.StockInfoParser;
 import top.yueshushu.learn.crawler.parse.StockShowInfoParse;
@@ -27,7 +27,11 @@ import top.yueshushu.learn.crawler.util.QueryParamUtil;
 import top.yueshushu.learn.mode.info.StockShowInfo;
 
 import javax.annotation.Resource;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.InputStreamReader;
+import java.math.BigDecimal;
+import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -114,19 +118,19 @@ public class DefaultCrawlerServiceImpl implements CrawlerService {
     }
 
     @Override
-    public StockShowInfo getNowInfo(String code) {
+    public StockShowInfo getNowInfo(String fullCode) {
         //处理，拼接成信息
-        String url = MessageFormat.format(defaultProperties.getShowDayUrl(), code);
+        String url = MessageFormat.format(defaultProperties.getShowDayUrl(), fullCode);
         log.info(">>>访问地址:" + url);
         try {
             //获取内容
             Map<String, String> header = new HashMap<>();
-            header.put("Referer","https://finance.sina.com.cn");
-            String content = HttpUtil.sendGet(httpClient, url, header,"gbk");
+            header.put("Referer", "https://finance.sina.com.cn");
+            String content = HttpUtil.sendGet(httpClient, url, header, "gbk");
             //将内容进行转换，解析
             return stockShowInfoParse.parse(content);
         } catch (Exception e) {
-            log.error("获取股票{} 当前信息 列表出错",code,e);
+            log.error("获取股票{} 当前信息 列表出错", fullCode, e);
             return null;
         }
     }
@@ -200,21 +204,85 @@ public class DefaultCrawlerServiceImpl implements CrawlerService {
     }
 
     @Override
-    public String sinaGetPrice(String fullCode) {
+    public BigDecimal sinaGetPrice(String fullCode) {
         //处理，拼接成信息
         String url = MessageFormat.format(defaultProperties.getShowDayUrl(), fullCode);
-      //  log.info(">>>访问地址:" + url);
+        //  log.info(">>>访问地址:" + url);
         try {
             //获取内容
             //获取内容
             Map<String, String> header = new HashMap<>();
-            header.put("Referer","https://finance.sina.com.cn");
-            String content = HttpUtil.sendGet(httpClient, url, header,"gbk");
+            header.put("Referer", "https://finance.sina.com.cn");
+            String content = HttpUtil.sendGet(httpClient, url, header, "gbk");
             //将内容直接按照 ,号进行拆分
-            return content.split("\\,")[3];
+            return new BigDecimal(content.split("\\,")[3]);
         } catch (Exception e) {
-            log.error("获取股票{} 当前 价格 出错",fullCode,e);
-            return "0.00";
+            log.error("获取股票{} 当前 价格 出错", fullCode, e);
+            return SystemConst.DEFAULT_EMPTY;
+        }
+    }
+
+    @Override
+    public BigDecimal txGetPrice(String fullCode) {
+        List<TxStockHistoryInfo> txStockHistoryInfos = parseTxMoneyYesHistory(Collections.singletonList(fullCode), new DateTime());
+        if (CollectionUtils.isEmpty(txStockHistoryInfos)) {
+            return SystemConst.DEFAULT_EMPTY;
+        }
+        return txStockHistoryInfos.get(0).getNowPrice();
+    }
+
+    @Override
+    public BigDecimal xueQiuGetPrice(String fullCode) {
+        String xueQiuUrl = "https://stock.xueqiu.com/v5/stock/realtime/quotec.json?symbol={0}&_=" + System.currentTimeMillis();
+        String url = MessageFormat.format(xueQiuUrl, fullCode);
+        try {
+            String content = HttpUtil.sendGet(httpClient, url, null, "gbk");
+            //将内容进行转换，解析
+            if (!StringUtils.hasText(content)) {
+                return SystemConst.DEFAULT_EMPTY;
+            }
+            XueQiuResponseStockInfo xueQiuResponseStockInfo = JSON.parseObject(content, XueQiuResponseStockInfo.class);
+            if (CollectionUtils.isEmpty(xueQiuResponseStockInfo.getData())) {
+                return SystemConst.DEFAULT_EMPTY;
+            }
+            return new BigDecimal(xueQiuResponseStockInfo.getData().get(0).getCurrent());
+        } catch (Exception e) {
+            log.error("获取股票最近历史记录 {} 当前信息 列表出错", fullCode, e);
+            return SystemConst.DEFAULT_EMPTY;
+        }
+    }
+
+    @Override
+    public BigDecimal easyMoneyGetPrice(String code) {
+        List<StockHistoryCsvInfo> easyMoneyStockHistoryCsvInfos = parseEasyMoneyYesHistory(Collections.singletonList(code), new DateTime());
+
+        if (CollectionUtils.isEmpty(easyMoneyStockHistoryCsvInfos)) {
+            return SystemConst.DEFAULT_EMPTY;
+        }
+        return easyMoneyStockHistoryCsvInfos.get(0).getNowPrice();
+    }
+
+    @Override
+    public BigDecimal wangYiGetPrice(String fullCode) {
+        String wangYiUrl = "http://quotes.money.163.com/service/chddata.html?code={0}&start={1}&end={2}";
+        String timeStr = DateUtil.format(DateUtil.date(), DatePattern.PURE_DATE_PATTERN);
+        String url = MessageFormat.format(wangYiUrl, fullCode, timeStr, timeStr);
+        try {
+            String content = HttpUtil.sendGet(httpClient, url, null, "gbk");
+            //将内容进行转换，解析
+            if (!StringUtils.hasText(content)) {
+                return SystemConst.DEFAULT_EMPTY;
+            }
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(content.getBytes(Charset.forName("utf8"))), Charset.forName("utf8")));
+            br.readLine();
+            //读取第二行的数据才是真正想要的数据信息。
+            String line = br.readLine();
+            String nowPriceStr = line.split("\\,")[3];
+            return new BigDecimal(Optional.ofNullable(nowPriceStr).orElse("0.00"));
+        } catch (Exception e) {
+            log.error("获取股票最近历史记录 {} 当前信息 列表出错", fullCode, e);
+            return SystemConst.DEFAULT_EMPTY;
         }
     }
 
@@ -222,10 +290,9 @@ public class DefaultCrawlerServiceImpl implements CrawlerService {
     public List<StockHistoryCsvInfo> parseEasyMoneyYesHistory(List<String> codeList, DateTime beforeLastWorking) {
         //处理，拼接成信息
         String url = defaultProperties.getEasyMoneyHistoryUrl();
-        log.info(">>>访问地址:" + url);
         try {
             //获取内容
-            String content = HttpUtil.sendGet(httpClient,url);
+            String content = HttpUtil.sendGet(httpClient, url);
             //将内容进行转换，解析
             List<StockHistoryCsvInfo> stockHistoryCsvInfoList = dailyTradingInfoParse.parseEasyMoneyHistory(content,
                     codeList, beforeLastWorking);
@@ -235,13 +302,11 @@ public class DefaultCrawlerServiceImpl implements CrawlerService {
             return Collections.emptyList();
         }
     }
-
     @Override
     public List<TxStockHistoryInfo> parseTxMoneyYesHistory(List<String> codeList, DateTime beforeLastWorking) {
         //处理，拼接成信息
         String qParam = StrUtil.join(",", codeList);
         String url = MessageFormat.format(defaultProperties.getTxMoneyHistoryUrl(), qParam);
-        log.info(">>>访问地址:" + url);
         try {
             //获取内容
             Map<String, String> header = new HashMap<>();

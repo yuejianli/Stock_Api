@@ -21,4 +21,10 @@ public class TradeRuleConditionDomainServiceImpl extends ServiceImpl<TradeRuleCo
     @Resource
     private TradeRuleConditionDoMapper tradeRuleConditionDoMapper;
 
+    @Override
+    public TradeRuleConditionDo getByCode(String code) {
+        return this.lambdaQuery()
+                .eq(TradeRuleConditionDo::getCode, code)
+                .one();
+    }
 }

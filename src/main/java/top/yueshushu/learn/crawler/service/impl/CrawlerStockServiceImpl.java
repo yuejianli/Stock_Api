@@ -55,9 +55,7 @@ public class CrawlerStockServiceImpl implements CrawlerStockService {
                     ResultCode.STOCK_CODE_ERROR
             );
         }
-        StockShowInfo nowInfo = crawlerService.getNowInfo(
-                stock.getFullCode()
-        );
+        StockShowInfo nowInfo = crawlerService.getNowInfo(stock.getFullCode());
         nowInfo.setCode(stock.getCode());
         nowInfo.setFullCode(
                 stock.getFullCode()

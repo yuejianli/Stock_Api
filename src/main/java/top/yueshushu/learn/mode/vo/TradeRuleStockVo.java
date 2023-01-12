@@ -1,5 +1,6 @@
 package top.yueshushu.learn.mode.vo;
 
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -15,6 +16,7 @@ import java.util.List;
  * @Since 1.0
  **/
 @Data
+@ApiModel("股票配置规则")
 public class TradeRuleStockVo implements Serializable {
     @ApiModelProperty("所有的自选股票信息")
     private List<StockSelectedVo> allList;

@@ -4,25 +4,26 @@ import org.springframework.util.Assert;
 
 /**
  * 交易所的类型
+ *
  * @author 两个蝴蝶飞
  */
 public enum ExchangeType {
     /**
      * 上海
      */
-    SH(1,"sh"),
+    SH(0, "sh"),
     /**
      * 深圳
      */
-    SZ(0,"sz"),
+    SZ(1, "sz"),
     /**
      * 北京
      */
-    BJ(2,"bj"),
+    BJ(2, "bj"),
     /**
      * 其它的非上述地区
      */
-    OTHER(10,"other");
+    OTHER(10, "other");
 
     private Integer code;
 

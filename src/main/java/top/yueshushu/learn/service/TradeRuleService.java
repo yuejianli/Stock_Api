@@ -4,9 +4,9 @@ import top.yueshushu.learn.entity.TradeRule;
 import top.yueshushu.learn.mode.dto.StockRuleDto;
 import top.yueshushu.learn.mode.dto.TradeRuleStockQueryDto;
 import top.yueshushu.learn.mode.ro.TradeRuleRo;
-import top.yueshushu.learn.domain.TradeRuleDo;
-import com.baomidou.mybatisplus.extension.service.IService;
+import top.yueshushu.learn.mode.vo.TradeRuleVo;
 import top.yueshushu.learn.response.OutputResult;
+import top.yueshushu.learn.response.PageResponse;
 
 import java.util.List;
 
@@ -21,18 +21,21 @@ import java.util.List;
 public interface TradeRuleService  {
     /**
      * 查询交易的规则
+     *
+     * @param tradeRuleRo 规则对象
+     * @return top.yueshushu.learn.response.OutputResult
      * @date 2022/1/27 10:01
      * @author zk_yjl
-     * @param tradeRuleRo 规则对象
-     * @return top.yueshushu.learn.response.OutputResult
      */
-    OutputResult listRule(TradeRuleRo tradeRuleRo);
+    OutputResult<PageResponse<TradeRuleVo>> listRule(TradeRuleRo tradeRuleRo);
+
     /**
      * 添加交易规则
-     * @date 2022/1/26 15:50
-     * @author zk_yjl
+     *
      * @param tradeRuleRo 规则对象
      * @return top.yueshushu.learn.response.OutputResult
+     * @date 2022/1/26 15:50
+     * @author zk_yjl
      */
     OutputResult addRule(TradeRuleRo tradeRuleRo);
     /**

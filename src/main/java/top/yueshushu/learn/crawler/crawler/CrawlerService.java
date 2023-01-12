@@ -7,6 +7,7 @@ import top.yueshushu.learn.crawler.entity.StockHistoryCsvInfo;
 import top.yueshushu.learn.crawler.entity.TxStockHistoryInfo;
 import top.yueshushu.learn.mode.info.StockShowInfo;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
@@ -39,10 +40,11 @@ public interface CrawlerService {
 
     /**
      * 获取该股票展示的数据
-     * @param code 股票编码
+     *
+     * @param fullCode 股票编码
      * @return 获取该股票展示的数据
      */
-    default StockShowInfo getNowInfo(String code) {
+    default StockShowInfo getNowInfo(String fullCode) {
         return new StockShowInfo();
     }
 
@@ -84,10 +86,19 @@ public interface CrawlerService {
 
     /**
      * 新浪获取股票当前的价格
+     *
      * @param fullCode 股票的全编码
      * @return 新浪获取股票当前的价格
      */
-    String sinaGetPrice(String fullCode);
+    BigDecimal sinaGetPrice(String fullCode);
+
+    /**
+     * 腾讯获取当前股票的价格
+     *
+     * @param fullCode 股票代码
+     * @return
+     */
+    BigDecimal txGetPrice(String fullCode);
 
     /**
      * 东方财富，同步股票交易信息
@@ -118,4 +129,24 @@ public interface CrawlerService {
      */
     List<StockBigDealInfo> parseBigDealByCode(String fullCode, Integer minVolume, String day);
 
+    /**
+     * 雪球获取当前股票的价格信息
+     *
+     * @param fullCode 股票编码，是大写的
+     */
+    BigDecimal xueQiuGetPrice(String fullCode);
+
+    /**
+     * 东方财富获取当前股票的价格信息
+     *
+     * @param code 股票编码，是大写的
+     */
+    BigDecimal easyMoneyGetPrice(String code);
+
+    /**
+     * 网易获取当前股票的价格信息
+     *
+     * @param fullCode 股票编码
+     */
+    BigDecimal wangYiGetPrice(String fullCode);
 }

@@ -1,6 +1,5 @@
 package top.yueshushu.learn.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -23,15 +22,7 @@ public class TradeMethod implements Serializable {
     private String name;
     private String url;
     private String description;
-    /**
-     * 使用@JsonFormat注解格式化日期
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date createTime;
-    /**
-     * 使用@JsonFormat注解格式化日期
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date updateTime;
     private Integer flag;
 

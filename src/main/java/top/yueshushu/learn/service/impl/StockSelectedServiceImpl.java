@@ -38,6 +38,7 @@ import top.yueshushu.learn.service.cache.StockCacheService;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -241,8 +242,13 @@ public class StockSelectedServiceImpl implements StockSelectedService {
     public void updateSelectedCodePrice(String code) {
         if (StringUtils.hasText(code)){
             executor.submit(
-                    ()->{
-                        stockCrawlerService.updateCodePrice(code);
+                    ()-> {
+                        try {
+                            stockCrawlerService.updateCodePrice(code);
+                            TimeUnit.MILLISECONDS.sleep(100);
+                        } catch (Exception e) {
+
+                        }
                     }
             );
 
@@ -252,8 +258,13 @@ public class StockSelectedServiceImpl implements StockSelectedService {
         List<String> codeList = stockSelectedDomainService.findCodeList(null);
         for (String selectedCode : codeList){
             executor.submit(
-                    ()->{
-                        stockCrawlerService.updateCodePrice(selectedCode);
+                    ()-> {
+                        try {
+                            stockCrawlerService.updateCodePrice(code);
+                            TimeUnit.MILLISECONDS.sleep(500);
+                        } catch (Exception e) {
+
+                        }
                     }
             );
         }

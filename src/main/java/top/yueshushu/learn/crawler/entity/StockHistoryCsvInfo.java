@@ -1,6 +1,7 @@
 package top.yueshushu.learn.crawler.entity;
 
 import cn.hutool.core.annotation.Alias;
+import cn.hutool.core.annotation.PropIgnore;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -81,4 +82,11 @@ public class StockHistoryCsvInfo {
      */
     @Alias("成交金额")
     private BigDecimal tradingValue;
+
+
+    /**
+     * 当前价
+     */
+    @PropIgnore
+    private BigDecimal nowPrice;
 }

@@ -264,17 +264,6 @@ public class StockUtil {
             }
         }
     }
-    public static Integer convertExchange(Integer exchange){
-        Assert.notNull(exchange, "类型不能为空");
-        if (ExchangeType.SZ.getCode().equals(exchange)) {
-            return ExchangeType.SH.getCode();
-        }
-        if (ExchangeType.SH.getCode().equals(exchange)) {
-            return ExchangeType.SZ.getCode();
-        }
-        return ExchangeType.OTHER.getCode();
-    }
-
     public static String getStockMarket(String stockCode) {
         String exchange = getExchange(stockCode);
         if (exchange == null) {

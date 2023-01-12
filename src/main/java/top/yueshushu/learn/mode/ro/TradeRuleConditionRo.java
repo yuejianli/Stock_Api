@@ -3,7 +3,6 @@ package top.yueshushu.learn.mode.ro;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import top.yueshushu.learn.controller.BaseController;
 
 import java.io.Serializable;
 
@@ -20,10 +19,10 @@ import java.io.Serializable;
 public class TradeRuleConditionRo implements Serializable {
     @ApiModelProperty("id编号")
     private Integer id;
+    @ApiModelProperty("编码")
+    private String code;
     @ApiModelProperty("名称")
     private String name;
     @ApiModelProperty("描述信息")
     private String description;
-    @ApiModelProperty("用户Id")
-    private Integer userId;
 }

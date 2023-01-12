@@ -3,6 +3,7 @@ package top.yueshushu.learn.service.impl;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,7 @@ import top.yueshushu.learn.crawler.business.CrawlerStockHistoryBusiness;
 import top.yueshushu.learn.crawler.crawler.CrawlerService;
 import top.yueshushu.learn.crawler.entity.DownloadStockInfo;
 import top.yueshushu.learn.crawler.entity.StockBigDealInfo;
+import top.yueshushu.learn.crawler.service.RealTimePriceService;
 import top.yueshushu.learn.domain.StockBigDealDo;
 import top.yueshushu.learn.domain.StockDo;
 import top.yueshushu.learn.domain.StockUpdateLogDo;
@@ -186,7 +188,8 @@ public class StockCrawlerServiceImpl implements StockCrawlerService {
     public void updateAllStock() {
         // 先将昨天的最近的记录清理一下。
         stockCacheService.cleanLastTradePositionHistory();
-
+        //重置计数器
+        Const.priceCounter.set(0);
         //1. 查询当前所有的股票信息
         List<StockDo> dbAllStockList = stockDomainService.list();
         log.info(">>>数据库查询所有的股票记录成功，查询条数为:{}", dbAllStockList.size());
@@ -340,15 +343,18 @@ public class StockCrawlerServiceImpl implements StockCrawlerService {
         String fullCode = StockUtil.getFullCode(code);
         stockRo.setCode(fullCode);
         //获取当前的价格
-        OutputResult outputResult = crawlerStockBusiness.getStockPrice(fullCode);
-        //获取信息
-        String priceReturn = (String) (outputResult.getData());
-        //将这个信息进行转换，转换成对应的 BigDecimal
-        BigDecimal price = BigDecimalUtil.toBigDecimal(priceReturn);
+//        OutputResult outputResult = crawlerStockBusiness.getStockPrice(fullCode);
+//        //获取信息
+//        BigDecimal price = (BigDecimal) (outputResult.getData());
 
-        stockCacheService.setNowCachePrice(
-                code, price
-        );
+        int size = SpringUtil.getBeansOfType(RealTimePriceService.class).size();
+
+        int newCount = Const.priceCounter.incrementAndGet();
+        int useCount = newCount % size;
+        // 获取 Service
+        RealTimePriceService realTimePriceService = SpringUtil.getBean("realTimePriceService" + useCount, RealTimePriceService.class);
+        BigDecimal nowPrice = realTimePriceService.getNowPrice(code, fullCode);
+        stockCacheService.setNowCachePrice(code, nowPrice);
 
     }
 }

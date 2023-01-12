@@ -181,6 +181,10 @@ public class ResultCode {
             new ResultCode(true, 10018002, "交易规则条件不存在,请刷新后重试");
     public static final ResultCode NO_AUTH =
             new ResultCode(true, 10018003, "没有权限操作");
+    public static final ResultCode RULE_CONDITION_CODE_EXIST =
+            new ResultCode(true, 10018004, "交易规则条件关键字已存在");
+    public static final ResultCode RULE_CONDITION_USE =
+            new ResultCode(true, 10018005, "交易规则条件已经被规则使用了,请先解除绑定关系");
     /**
      * 持仓信息 100 19（编排）+ 001 (三位随机)
      */
@@ -190,7 +194,7 @@ public class ResultCode {
             new ResultCode(true, 10019002, "交易的类型只支持模拟和真实两种");
     public static final ResultCode TRADE_POSITION_FAIL =
             new ResultCode(true, 10019003, "查询真实持仓信息失败");
-    public static final ResultCode TRADE_MONEY_FAIL=
+    public static final ResultCode TRADE_MONEY_FAIL =
             new ResultCode(true, 10019004, "查询真实持仓金额信息失败");
     public static final ResultCode TRADE_ENTRUST_FAIL=
             new ResultCode(true, 10019005, "查询真实今日委托信息失败");

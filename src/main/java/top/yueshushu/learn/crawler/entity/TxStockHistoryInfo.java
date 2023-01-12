@@ -31,7 +31,10 @@ public class TxStockHistoryInfo implements Serializable {
      */
     private BigDecimal closingPrice;
 
-
+    /**
+     * 当前价格
+     */
+    private BigDecimal nowPrice;
     /**
      * 最高价格
      */

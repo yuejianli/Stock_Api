@@ -17,14 +17,16 @@ import java.io.Serializable;
 @Data
 @ApiModel("交易股票规则查询")
 public class TradeRuleStockQueryDto implements Serializable {
-   @ApiModelProperty("用户id")
+    @ApiModelProperty("用户id")
     private Integer userId;
-   @ApiModelProperty("规则id")
+    @ApiModelProperty("规则id")
     private Integer ruleId;
-   @ApiModelProperty("对应的类型")
+    @ApiModelProperty("对应的类型")
     private Integer ruleType;
     @ApiModelProperty("是否是模拟的")
     private Integer mockType;
     @ApiModelProperty("股票编码")
     private String stockCode;
+    @ApiModelProperty("规则条件Id")
+    private Integer ruleConditionId;
 }

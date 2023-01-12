@@ -84,7 +84,7 @@ public class DefaultDailyTradingInfoParse implements DailyTradingInfoParse {
         EasyMoneyHistoryVo.StockResultVo stockResultVo = JSON.parseObject(new String(newCharArr, 0, i),
                 EasyMoneyHistoryVo.StockResultVo.class);
         /**
-         * f2: 3299 收盘价 /100,
+         * f2: 3299 收盘价 /100, 当前价
          * f3: -138 涨跌福 /100,
          * f4: -46 涨跌额  /100,
          * f5: 545259 成交量 *100,
@@ -107,6 +107,7 @@ public class DefaultDailyTradingInfoParse implements DailyTradingInfoParse {
             stockHistoryCsvInfo.setName(v.getF14());
             stockHistoryCsvInfo.setCurrDate(currDate);
             stockHistoryCsvInfo.setClosingPrice(new BigDecimal(v.getF2()).movePointLeft(2));
+            stockHistoryCsvInfo.setNowPrice(new BigDecimal(v.getF2()).movePointLeft(2));
             stockHistoryCsvInfo.setHighestPrice(new BigDecimal(v.getF15()).movePointLeft(2));
             stockHistoryCsvInfo.setLowestPrice(new BigDecimal(v.getF16()).movePointLeft(2));
             stockHistoryCsvInfo.setOpeningPrice(new BigDecimal(v.getF17()).movePointLeft(2));
@@ -244,6 +245,7 @@ public class DefaultDailyTradingInfoParse implements DailyTradingInfoParse {
         result.setLowestPrice(BigDecimalUtil.toBigDecimal(splitArr[42]));
         result.setOpeningPrice(BigDecimalUtil.toBigDecimal(splitArr[5]));
         result.setYesClosingPrice(BigDecimalUtil.toBigDecimal(splitArr[4]));
+        result.setNowPrice(BigDecimalUtil.toBigDecimal(splitArr[3]));
         result.setAmplitude(BigDecimalUtil.toBigDecimal(splitArr[31]));
         result.setAmplitudeProportion(BigDecimalUtil.toBigDecimal(splitArr[32]));
         // 175.76/64869/1129392874  最新价/成交量（手）/成交额（元）

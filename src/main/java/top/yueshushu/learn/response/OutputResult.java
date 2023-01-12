@@ -26,6 +26,7 @@ public class OutputResult<T> implements Serializable {
     private Integer code;
     private Boolean success;
     private String message;
+    private long timestamp;
     private String exceptionMessage;
     private static ResultCode DEFAULT_SUCCESS = ResultCode.SUCCESS;
     private static ResultCode DEFAULT_ALERT = ResultCode.ALERT;
@@ -52,6 +53,7 @@ public class OutputResult<T> implements Serializable {
         this.code = code;
         this.message = message;
         this.data = data;
+        this.timestamp = System.currentTimeMillis();
     }
 
     public static <T> OutputResult<T> buildFail() {

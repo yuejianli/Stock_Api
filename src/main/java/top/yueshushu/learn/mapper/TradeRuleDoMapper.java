@@ -1,10 +1,10 @@
 package top.yueshushu.learn.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
+import top.yueshushu.learn.domain.TradeRuleDo;
 import top.yueshushu.learn.mode.dto.StockRuleDto;
 import top.yueshushu.learn.mode.dto.TradeRuleStockQueryDto;
-import top.yueshushu.learn.domain.TradeRuleDo;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 import java.util.List;
 
@@ -25,5 +25,5 @@ public interface TradeRuleDoMapper extends BaseMapper<TradeRuleDo> {
      * @date 2022/1/28 15:50
      * @author zk_yjl
      */
-    List<StockRuleDto> listRuleByQuery(@Param("tradeRuleStockQueryDto") TradeRuleStockQueryDto tradeRuleStockQueryDto);
+    List<StockRuleDto> listStockRuleByQuery(@Param("tradeRuleStockQueryDto") TradeRuleStockQueryDto tradeRuleStockQueryDto);
 }
