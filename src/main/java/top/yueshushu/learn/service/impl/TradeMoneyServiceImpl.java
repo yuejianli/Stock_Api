@@ -12,6 +12,7 @@ import top.yueshushu.learn.api.responseparse.DataObjResponseParser;
 import top.yueshushu.learn.api.responseparse.ResponseParser;
 import top.yueshushu.learn.assembler.TradeMoneyAssembler;
 import top.yueshushu.learn.assembler.TradeMoneyHistoryAssembler;
+import top.yueshushu.learn.business.AutoLoginBusiness;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.config.TradeClient;
 import top.yueshushu.learn.domain.TradeMoneyDo;
@@ -24,7 +25,6 @@ import top.yueshushu.learn.mode.ro.TradeMoneyRo;
 import top.yueshushu.learn.mode.vo.TradeMoneyVo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.service.TradeMoneyService;
-import top.yueshushu.learn.service.cache.StockCacheService;
 import top.yueshushu.learn.util.TradeUtil;
 
 import javax.annotation.Resource;
@@ -36,6 +36,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 /**
  * <p>
@@ -63,7 +64,7 @@ public class TradeMoneyServiceImpl implements TradeMoneyService {
     @Resource
     private TradeMoneyHistoryDomainService tradeMoneyHistoryDomainService;
     @Resource
-    private StockCacheService stockCacheService;
+    private AutoLoginBusiness autoLoginBusiness;
 
     @Override
     public void updateMoney(TradeMoney tradeMoney) {
@@ -135,34 +136,36 @@ public class TradeMoneyServiceImpl implements TradeMoneyService {
         tradeMoneyRo.setUserId(userId);
         tradeMoneyRo.setMockType(MockType.REAL.getCode());
         // 获取真实的数据
-        TradeMoneyVo tradeMoneyVo = realInfo(tradeMoneyRo).getData();
+        OutputResult<TradeMoneyVo> tradeMoneyVoOutputResult = realInfo(tradeMoneyRo);
+        if (!tradeMoneyVoOutputResult.getSuccess()) {
+            // 如果失败， 则自动登录一下.
+            boolean flag = autoLoginBusiness.autoLogin(userId);
+            if (!flag) {
+                // 未登录成功，不进行操作.
+                return;
+            }
+            try {
+                TimeUnit.SECONDS.sleep(3);
+            } catch (Exception e) {
 
+            }
+            tradeMoneyVoOutputResult = realInfo(tradeMoneyRo);
+        }
+        TradeMoneyVo tradeMoneyVo = tradeMoneyVoOutputResult.getData();
+        if (tradeMoneyVo == null) {
+            return;
+        }
         TradeMoneyDo editTradeMoneyDo = tradeMoneyAssembler.entityToDo(tradeMoneyAssembler.voToEntity(tradeMoneyVo));
-        // 为空， 不为空。
-        if (editTradeMoneyDo == null) {
-            // 设置为空的数据，进行保存。
-            editTradeMoneyDo = new TradeMoneyDo();
-            editTradeMoneyDo.setUseMoney(BigDecimal.ZERO);
-            editTradeMoneyDo.setTotalMoney(BigDecimal.ZERO);
-            editTradeMoneyDo.setTakeoutMoney(BigDecimal.ZERO);
-            editTradeMoneyDo.setMarketMoney(BigDecimal.ZERO);
-            editTradeMoneyDo.setProfitMoney(BigDecimal.ZERO);
-            editTradeMoneyDo.setMockType(MockType.REAL.getCode());
-            editTradeMoneyDo.setUserId(userId);
-            // 进行保存
+        // 能查询出来。
+        editTradeMoneyDo.setUserId(userId);
+        editTradeMoneyDo.setMockType(MockType.REAL.getCode());
+        TradeMoney tradeMoneyDBInfo = getByUserIdAndMockType(userId, MockType.REAL.getCode());
+        if (null == tradeMoneyDBInfo) {
             tradeMoneyDomainService.save(editTradeMoneyDo);
         } else {
-            // 能查询出来。
-            editTradeMoneyDo.setUserId(userId);
-            editTradeMoneyDo.setMockType(MockType.REAL.getCode());
-            TradeMoney tradeMoneyDBInfo = getByUserIdAndMockType(userId, MockType.REAL.getCode());
-            if (null == tradeMoneyDBInfo) {
-                tradeMoneyDomainService.save(editTradeMoneyDo);
-            } else {
-                // 不为空，有值.
-                editTradeMoneyDo.setId(tradeMoneyDBInfo.getId());
-                tradeMoneyDomainService.updateById(editTradeMoneyDo);
-            }
+            // 不为空，有值.
+            editTradeMoneyDo.setId(tradeMoneyDBInfo.getId());
+            tradeMoneyDomainService.updateById(editTradeMoneyDo);
         }
     }
 
