@@ -21,10 +21,8 @@ import top.yueshushu.learn.mode.ro.StockRo;
 import top.yueshushu.learn.response.OutputResult;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.math.BigDecimal;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -148,9 +146,12 @@ public class CrawlerStockServiceImpl implements CrawlerStockService {
 
     @Override
     public OutputResult getCrawlerPrice(String fullCode) {
-        return OutputResult.buildSucc(
-                crawlerService.sinaGetPrice(fullCode)
-        );
+        Map<String, BigDecimal> valueMap = crawlerService.sinaGetPrice(Collections.singletonList(fullCode));
+        if (CollectionUtils.isEmpty(valueMap)) {
+            return OutputResult.buildSucc(BigDecimal.ZERO);
+        }
+        BigDecimal[] data = valueMap.values().toArray(new BigDecimal[valueMap.size()]);
+        return OutputResult.buildSucc(data[0]);
     }
 
     @Override

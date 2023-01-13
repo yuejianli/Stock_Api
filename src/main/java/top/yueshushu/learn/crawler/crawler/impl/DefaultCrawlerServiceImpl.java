@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
-import top.yueshushu.learn.common.SystemConst;
 import top.yueshushu.learn.crawler.crawler.CrawlerService;
 import top.yueshushu.learn.crawler.entity.*;
 import top.yueshushu.learn.crawler.parse.DailyTradingInfoParse;
@@ -35,6 +34,7 @@ import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * @Description 东方财富的相关实现
@@ -204,10 +204,10 @@ public class DefaultCrawlerServiceImpl implements CrawlerService {
     }
 
     @Override
-    public BigDecimal sinaGetPrice(String fullCode) {
+    public Map<String, BigDecimal> sinaGetPrice(List<String> fullCodeList) {
         //处理，拼接成信息
-        String url = MessageFormat.format(defaultProperties.getShowDayUrl(), fullCode);
-        //  log.info(">>>访问地址:" + url);
+        String codeListStr = StrUtil.join(",", fullCodeList);
+        String url = MessageFormat.format(defaultProperties.getShowDayUrl(), codeListStr);
         try {
             //获取内容
             //获取内容
@@ -215,77 +215,102 @@ public class DefaultCrawlerServiceImpl implements CrawlerService {
             header.put("Referer", "https://finance.sina.com.cn");
             String content = HttpUtil.sendGet(httpClient, url, header, "gbk");
             //将内容直接按照 ,号进行拆分
-            return new BigDecimal(content.split("\\,")[3]);
+            BufferedReader br = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(content.getBytes(Charset.forName("utf8"))), Charset.forName("utf8")));
+
+            Map<String, BigDecimal> result = new HashMap<>();
+            String prefix = "var hq_str_sz";
+            String singleContent = "";
+            while ((singleContent = br.readLine()) != null) {
+                // 对数据进行处理.
+                String[] splitValue = singleContent.split("\\,");
+                result.put(splitValue[0].substring(prefix.length(), prefix.length() + 6), new BigDecimal(splitValue[3]));
+            }
+            return result;
         } catch (Exception e) {
-            log.error("获取股票{} 当前 价格 出错", fullCode, e);
-            return SystemConst.DEFAULT_EMPTY;
+            log.error("获取股票{} 当前 价格 出错", fullCodeList, e);
+            return Collections.emptyMap();
         }
     }
 
     @Override
-    public BigDecimal txGetPrice(String fullCode) {
-        List<TxStockHistoryInfo> txStockHistoryInfos = parseTxMoneyYesHistory(Collections.singletonList(fullCode), new DateTime());
+    public Map<String, BigDecimal> txGetPrice(List<String> fullCodeList) {
+        List<TxStockHistoryInfo> txStockHistoryInfos = parseTxMoneyYesHistory(fullCodeList, new DateTime());
         if (CollectionUtils.isEmpty(txStockHistoryInfos)) {
-            return SystemConst.DEFAULT_EMPTY;
+            return Collections.emptyMap();
         }
-        return txStockHistoryInfos.get(0).getNowPrice();
+        return txStockHistoryInfos.stream().collect(Collectors.toMap(TxStockHistoryInfo::getCode, TxStockHistoryInfo::getNowPrice));
     }
 
     @Override
-    public BigDecimal xueQiuGetPrice(String fullCode) {
+    public Map<String, BigDecimal> xueQiuGetPrice(List<String> fullCodeList) {
+        //处理，拼接成信息
+        String codeListStr = StrUtil.join(",", fullCodeList);
         String xueQiuUrl = "https://stock.xueqiu.com/v5/stock/realtime/quotec.json?symbol={0}&_=" + System.currentTimeMillis();
-        String url = MessageFormat.format(xueQiuUrl, fullCode);
+        String url = MessageFormat.format(xueQiuUrl, codeListStr);
         try {
             String content = HttpUtil.sendGet(httpClient, url, null, "gbk");
             //将内容进行转换，解析
             if (!StringUtils.hasText(content)) {
-                return SystemConst.DEFAULT_EMPTY;
+                return Collections.emptyMap();
             }
             XueQiuResponseStockInfo xueQiuResponseStockInfo = JSON.parseObject(content, XueQiuResponseStockInfo.class);
             if (CollectionUtils.isEmpty(xueQiuResponseStockInfo.getData())) {
-                return SystemConst.DEFAULT_EMPTY;
+                return Collections.emptyMap();
             }
-            return new BigDecimal(xueQiuResponseStockInfo.getData().get(0).getCurrent());
+
+            Map<String, BigDecimal> result = new HashMap<>();
+
+            for (XueQiuStockInfo xueQiuStockInfo : xueQiuResponseStockInfo.getData()) {
+                result.put(xueQiuStockInfo.getSymbol().substring(xueQiuStockInfo.getSymbol().length() - 6),
+                        new BigDecimal(xueQiuStockInfo.getCurrent()));
+            }
+            return result;
         } catch (Exception e) {
-            log.error("获取股票最近历史记录 {} 当前信息 列表出错", fullCode, e);
-            return SystemConst.DEFAULT_EMPTY;
+            log.error("获取股票最近历史记录 {} 当前信息 列表出错", fullCodeList, e);
+            return Collections.emptyMap();
         }
     }
 
     @Override
-    public BigDecimal easyMoneyGetPrice(String code) {
-        List<StockHistoryCsvInfo> easyMoneyStockHistoryCsvInfos = parseEasyMoneyYesHistory(Collections.singletonList(code), new DateTime());
+    public Map<String, BigDecimal> easyMoneyGetPrice(List<String> codeList) {
+        List<StockHistoryCsvInfo> easyMoneyStockHistoryCsvInfos = parseEasyMoneyYesHistory(codeList, new DateTime());
 
         if (CollectionUtils.isEmpty(easyMoneyStockHistoryCsvInfos)) {
-            return SystemConst.DEFAULT_EMPTY;
+            return Collections.emptyMap();
         }
-        return easyMoneyStockHistoryCsvInfos.get(0).getNowPrice();
+        return easyMoneyStockHistoryCsvInfos.stream().collect(Collectors.toMap(StockHistoryCsvInfo::getCode, StockHistoryCsvInfo::getNowPrice));
     }
 
+
     @Override
-    public BigDecimal wangYiGetPrice(String fullCode) {
-        String wangYiUrl = "http://quotes.money.163.com/service/chddata.html?code={0}&start={1}&end={2}";
+    public Map<String, BigDecimal> souHuGetPrice(List<String> fullCodeList) {
+        String wangYiUrl = "http://q.stock.sohu.com/hisHq?code={0}&start={1}&end={2}";
+        //处理，拼接成信息
+        String codeListStr = StrUtil.join(",", fullCodeList);
         String timeStr = DateUtil.format(DateUtil.date(), DatePattern.PURE_DATE_PATTERN);
-        String url = MessageFormat.format(wangYiUrl, fullCode, timeStr, timeStr);
+        String url = MessageFormat.format(wangYiUrl, codeListStr, timeStr, timeStr);
         try {
             String content = HttpUtil.sendGet(httpClient, url, null, "gbk");
             //将内容进行转换，解析
             if (!StringUtils.hasText(content)) {
-                return SystemConst.DEFAULT_EMPTY;
+                return Collections.emptyMap();
             }
-
+            //将内容直接按照 ,号进行拆分
             BufferedReader br = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(content.getBytes(Charset.forName("utf8"))), Charset.forName("utf8")));
-            br.readLine();
-            //读取第二行的数据才是真正想要的数据信息。
-            String line = br.readLine();
-            String nowPriceStr = line.split("\\,")[3];
-            return new BigDecimal(Optional.ofNullable(nowPriceStr).orElse("0.00"));
+            Map<String, BigDecimal> result = new HashMap<>();
+            String prefix = "var hq_str_sz";
+            String singleContent = "";
+            while ((singleContent = br.readLine()) != null) {
+                // 对数据进行处理.
+                String[] splitValue = singleContent.split("\\,");
+                result.put(splitValue[0].substring(prefix.length(), prefix.length() + 6), new BigDecimal(splitValue[3]));
+            }
+            return result;
         } catch (Exception e) {
-            log.error("获取股票最近历史记录 {} 当前信息 列表出错", fullCode, e);
-            return SystemConst.DEFAULT_EMPTY;
+            log.error("获取股票最近历史记录 {} 当前信息 列表出错", fullCodeList, e);
+            return Collections.emptyMap();
         }
     }
-
     @Override
     public List<StockHistoryCsvInfo> parseEasyMoneyYesHistory(List<String> codeList, DateTime beforeLastWorking) {
         //处理，拼接成信息

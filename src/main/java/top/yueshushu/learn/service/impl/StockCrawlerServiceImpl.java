@@ -184,6 +184,12 @@ public class StockCrawlerServiceImpl implements StockCrawlerService {
     }
 
     @Override
+    public void batchUpdateNowPrice(List<String> codeList) {
+        //生成真实数据。
+        batchGenerateRealPriceData(codeList);
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateAllStock() {
         // 先将昨天的最近的记录清理一下。
@@ -348,13 +354,35 @@ public class StockCrawlerServiceImpl implements StockCrawlerService {
 //        BigDecimal price = (BigDecimal) (outputResult.getData());
 
         int size = SpringUtil.getBeansOfType(RealTimePriceService.class).size();
-
         int newCount = Const.PRICE_COUNTER++;
         int useCount = newCount % size;
         // 获取 Service
         RealTimePriceService realTimePriceService = SpringUtil.getBean("realTimePriceService" + useCount, RealTimePriceService.class);
-        BigDecimal nowPrice = realTimePriceService.getNowPrice(code, fullCode, newCount);
+        BigDecimal nowPrice = realTimePriceService.getNowPrice(code, fullCode);
         stockCacheService.setNowCachePrice(code, nowPrice);
 
+    }
+
+    // 批量生成 股票价格信息
+    private void batchGenerateRealPriceData(List<String> codeList) {
+        // 对数据进行处理.
+        if (CollectionUtils.isEmpty(codeList)) {
+            return;
+        }
+        List<String> fullCodeList = codeList.stream().map(
+                n -> StockUtil.getFullCode(n)
+        ).collect(Collectors.toList());
+
+        int size = SpringUtil.getBeansOfType(RealTimePriceService.class).size();
+        int newCount = Const.PRICE_COUNTER++;
+        int useCount = newCount % size;
+        // 获取 Service
+        RealTimePriceService realTimePriceService = SpringUtil.getBean("realTimePriceService" + useCount, RealTimePriceService.class);
+        Map<String, BigDecimal> batchPriceMap = realTimePriceService.batchGetNowPrice(codeList, fullCodeList);
+
+        log.info(">>> 批量获取股票 编码 {} 成功， 对应的 价格是:{},使用的接口是:{}", codeList, batchPriceMap, useCount);
+        for (String code : codeList) {
+            stockCacheService.setNowCachePrice(code, batchPriceMap.getOrDefault(code, BigDecimal.ZERO));
+        }
     }
 }

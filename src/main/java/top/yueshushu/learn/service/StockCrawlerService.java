@@ -54,6 +54,13 @@ public interface StockCrawlerService {
     void updateCodePrice(String code);
 
     /**
+     * 批量更新股票的编码集合
+     *
+     * @param codeList 股票编码
+     */
+    void batchUpdateNowPrice(List<String> codeList);
+
+    /**
      * 更新所有的股票信息
      */
     void updateAllStock();

@@ -240,33 +240,72 @@ public class StockSelectedServiceImpl implements StockSelectedService {
 
     @Override
     public void updateSelectedCodePrice(String code) {
-        if (StringUtils.hasText(code)){
+//        if (StringUtils.hasText(code)){
+//            executor.submit(
+//                    ()-> {
+//                        try {
+//                            stockCrawlerService.updateCodePrice(code);
+//                            TimeUnit.MILLISECONDS.sleep(50);
+//                        } catch (Exception e) {
+//
+//                        }
+//                    }
+//            );
+//
+//            return ;
+//        }
+//        //查询出所有的自选表里面的股票编码
+//        List<String> codeList = stockSelectedDomainService.findCodeList(null);
+//        for (String selectedCode : codeList){
+//            executor.submit(
+//                    ()-> {
+//                        try {
+//                            stockCrawlerService.updateCodePrice(selectedCode);
+//                            TimeUnit.MILLISECONDS.sleep(50);
+//                        } catch (Exception e) {
+//
+//                        }
+//                    }
+//            );
+//        }
+        // 对股票编码进行处理。
+        List<String> executeCodeList = new ArrayList<>();
+        if (StringUtils.hasText(code)) {
+            executeCodeList.add(code);
+            List<String> finalExecuteCodeList1 = executeCodeList;
             executor.submit(
-                    ()-> {
+                    () -> {
                         try {
-                            stockCrawlerService.updateCodePrice(code);
+                            stockCrawlerService.batchUpdateNowPrice(finalExecuteCodeList1);
                             TimeUnit.MILLISECONDS.sleep(50);
                         } catch (Exception e) {
 
                         }
                     }
             );
+            return;
+        } else {
+            List<String> codeList = stockSelectedDomainService.findCodeList(null);
+            // 对股票编码进行分组， 每 5个为一组，进行查询。
+            if (CollectionUtils.isEmpty(codeList)) {
+                return;
+            }
+            int count = 5;
+            for (int i = 0; i < codeList.size(); i = i + count) {
+                int maxIndex = Math.min(i + count, codeList.size());
+                executeCodeList = codeList.subList(i, maxIndex);
+                List<String> finalExecuteCodeList = executeCodeList;
+                executor.submit(
+                        () -> {
+                            try {
+                                stockCrawlerService.batchUpdateNowPrice(finalExecuteCodeList);
+                                TimeUnit.MILLISECONDS.sleep(50);
+                            } catch (Exception e) {
 
-            return ;
-        }
-        //查询出所有的自选表里面的股票编码
-        List<String> codeList = stockSelectedDomainService.findCodeList(null);
-        for (String selectedCode : codeList){
-            executor.submit(
-                    ()-> {
-                        try {
-                            stockCrawlerService.updateCodePrice(selectedCode);
-                            TimeUnit.MILLISECONDS.sleep(50);
-                        } catch (Exception e) {
-
+                            }
                         }
-                    }
-            );
+                );
+            }
         }
     }
 

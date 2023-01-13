@@ -1,6 +1,8 @@
 package top.yueshushu.learn.crawler.service;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 实时价格处理
@@ -9,5 +11,8 @@ import java.math.BigDecimal;
  * @date 2023-01-12
  */
 public interface RealTimePriceService {
-    BigDecimal getNowPrice(String code, String fullCode, Integer counter);
+    BigDecimal getNowPrice(String code, String fullCode);
+
+    Map<String, BigDecimal> batchGetNowPrice(List<String> codeList, List<String> fullCodeList);
+
 }

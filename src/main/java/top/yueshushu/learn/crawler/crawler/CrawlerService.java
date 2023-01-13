@@ -10,6 +10,7 @@ import top.yueshushu.learn.mode.info.StockShowInfo;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Description 爬虫的相关service接口
@@ -87,18 +88,18 @@ public interface CrawlerService {
     /**
      * 新浪获取股票当前的价格
      *
-     * @param fullCode 股票的全编码
+     * @param fullCodeList 股票的全编码
      * @return 新浪获取股票当前的价格
      */
-    BigDecimal sinaGetPrice(String fullCode);
+    Map<String, BigDecimal> sinaGetPrice(List<String> fullCodeList);
 
     /**
      * 腾讯获取当前股票的价格
      *
-     * @param fullCode 股票代码
+     * @param fullCodeList 股票代码
      * @return
      */
-    BigDecimal txGetPrice(String fullCode);
+    Map<String, BigDecimal> txGetPrice(List<String> fullCodeList);
 
     /**
      * 东方财富，同步股票交易信息
@@ -132,21 +133,24 @@ public interface CrawlerService {
     /**
      * 雪球获取当前股票的价格信息
      *
-     * @param fullCode 股票编码，是大写的
+     * @param fullCodeList 股票编码，是大写的
+     * @return
      */
-    BigDecimal xueQiuGetPrice(String fullCode);
+    Map<String, BigDecimal> xueQiuGetPrice(List<String> fullCodeList);
 
     /**
      * 东方财富获取当前股票的价格信息
      *
-     * @param code 股票编码，是大写的
+     * @param codeList 股票编码
+     * @return
      */
-    BigDecimal easyMoneyGetPrice(String code);
+    Map<String, BigDecimal> easyMoneyGetPrice(List<String> codeList);
 
     /**
-     * 网易获取当前股票的价格信息
+     * 搜狐获取当前股票的价格信息
      *
-     * @param fullCode 股票编码
+     * @param fullCodeList 股票编码
+     * @return
      */
-    BigDecimal wangYiGetPrice(String fullCode);
+    Map<String, BigDecimal> souHuGetPrice(List<String> fullCodeList);
 }

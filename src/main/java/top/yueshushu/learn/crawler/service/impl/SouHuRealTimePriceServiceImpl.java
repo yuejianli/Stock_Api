@@ -1,7 +1,6 @@
 package top.yueshushu.learn.crawler.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 import top.yueshushu.learn.crawler.crawler.CrawlerService;
 import top.yueshushu.learn.crawler.service.RealTimePriceService;
 
@@ -13,14 +12,14 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * 新浪接口获取股票的价格
+ * 搜狐接口获取股票的价格. 只能获取历史价格，不使用这个。
  *
  * @author yuejianli
  * @date 2023-01-12
  */
-@Service("realTimePriceService3")
+// @Service("realTimePriceService4")
 @Slf4j
-public class XueQiuRealTimePriceServiceImpl implements RealTimePriceService {
+public class SouHuRealTimePriceServiceImpl implements RealTimePriceService {
     @Resource
     private CrawlerService crawlerService;
 
@@ -31,7 +30,7 @@ public class XueQiuRealTimePriceServiceImpl implements RealTimePriceService {
 
     @Override
     public Map<String, BigDecimal> batchGetNowPrice(List<String> codeList, List<String> fullCodeList) {
-        List<String> upperList = fullCodeList.stream().map(n -> n.toUpperCase()).collect(Collectors.toList());
-        return crawlerService.xueQiuGetPrice(upperList);
+        List<String> convertCodeList = codeList.stream().map(n -> "cn_".concat(n)).collect(Collectors.toList());
+        return crawlerService.souHuGetPrice(convertCodeList);
     }
 }
