@@ -91,19 +91,22 @@ public class TradePositionBusinessImpl implements TradePositionBusiness {
     public OutputResult realList(TradePositionRo tradePositionRo) {
         // 对数据进行处理。
         Object realEasyMoneyCache = tradeCacheService.getRealEasyMoneyCache(TradeRealValueType.TRADE_POSITION, tradePositionRo.getUserId());
+        List<TradePositionVo> tradePositionVoList = new ArrayList<>();
         if (!ObjectUtils.isEmpty(realEasyMoneyCache)) {
-            return OutputResult.buildSucc(realEasyMoneyCache);
+            tradePositionVoList = (List<TradePositionVo>) realEasyMoneyCache;
+        } else {
+            log.info(">>>此次员工{}查询需要同步真实的持仓数据", tradePositionRo.getUserId());
+            OutputResult<List<TradePositionVo>> outputResult = tradePositionService.realList(tradePositionRo);
+            if (!outputResult.getSuccess()) {
+                return outputResult;
+            }
+            //获取到最新的持仓信息，更新到相应的数据库中.
+            tradePositionVoList = outputResult.getData();
+            // 将数据保存下来
+            tradeCacheService.buildRealEasyMoneyCache(TradeRealValueType.TRADE_POSITION, tradePositionRo.getUserId(), tradePositionVoList);
         }
-        log.info(">>>此次员工{}查询需要同步真实的持仓数据", tradePositionRo.getUserId());
-        OutputResult<List<TradePositionVo>> outputResult = tradePositionService.realList(tradePositionRo);
-        if (!outputResult.getSuccess()) {
-            return outputResult;
-        }
-        //获取到最新的持仓信息，更新到相应的数据库中.
-        List<TradePositionVo> tradePositionVoList = outputResult.getData();
-        // 将数据保存下来
-        tradeCacheService.buildRealEasyMoneyCache(TradeRealValueType.TRADE_POSITION, tradePositionRo.getUserId(), tradePositionVoList);
-        return outputResult;
+        fillSelectedStockList(tradePositionRo, tradePositionVoList);
+        return OutputResult.buildSucc(tradePositionVoList);
     }
 
     @Override
@@ -287,14 +290,25 @@ public class TradePositionBusinessImpl implements TradePositionBusiness {
             }
             result.addAll(tradePositionVoList);
         }
-        if(!SelectedType.POSITION.getCode().equals(tradePositionRo.getSelectType())){
+        fillSelectedStockList(tradePositionRo, result);
+        return OutputResult.buildSucc(result);
+    }
+
+    /**
+     * 填充自选信息
+     *
+     * @param tradePositionRo 配置信息
+     * @param result          结果
+     */
+    private void fillSelectedStockList(TradePositionRo tradePositionRo, List<TradePositionVo> result) {
+        if (!SelectedType.POSITION.getCode().equals(tradePositionRo.getSelectType())) {
             //持仓的股票信息
             List<String> positionCodeList = result.stream().map(
                     TradePositionVo::getCode
             ).collect(Collectors.toList());
 
             //查询该员工对应的自选基金
-            List<StockSelectedVo> stockInfoList=
+            List<StockSelectedVo> stockInfoList =
                     stockSelectedService.listSelf(tradePositionRo.getUserId(),
                             null);
             //对自选基金进行处理,如果有的话，就不用处理了。
@@ -305,12 +319,11 @@ public class TradePositionBusinessImpl implements TradePositionBusiness {
                     }
                     //如果没有的话，就进行相关的查询，组装.
                     TradePositionVo tradePositionVo = getTradePositionVoBySelected(
-                            stockSelectedVo,tradePositionRo.getMockType()
+                            stockSelectedVo, tradePositionRo.getMockType()
                     );
                     result.add(tradePositionVo);
                 } }
         }
-        return OutputResult.buildSucc(result);
     }
 
     /**

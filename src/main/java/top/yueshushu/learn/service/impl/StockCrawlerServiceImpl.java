@@ -379,8 +379,6 @@ public class StockCrawlerServiceImpl implements StockCrawlerService {
         // 获取 Service
         RealTimePriceService realTimePriceService = SpringUtil.getBean("realTimePriceService" + useCount, RealTimePriceService.class);
         Map<String, BigDecimal> batchPriceMap = realTimePriceService.batchGetNowPrice(codeList, fullCodeList);
-
-        log.info(">>> 批量获取股票 编码 {} 成功， 对应的 价格是:{},使用的接口是:{}", codeList, batchPriceMap, useCount);
         for (String code : codeList) {
             stockCacheService.setNowCachePrice(code, batchPriceMap.getOrDefault(code, BigDecimal.ZERO));
         }

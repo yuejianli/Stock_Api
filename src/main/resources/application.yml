@@ -40,6 +40,8 @@ server:
 uploadFilePath: /usr/app
 # 引入 数据库的相关配置
 spring:
+  profiles:
+    active: prod
   main:
     allow-bean-definition-overriding: true
   # 配置 json
