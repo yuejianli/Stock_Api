@@ -67,7 +67,7 @@ public abstract class BaseStrategyHandler<I extends BaseStrategyInput, R extends
 
         //可以买入
         BuyRo mockBuyRo = buildBuyRo(tradeStockRuleDto, code, currentPrice);
-        BuyBusiness buyBusiness = SpringUtil.getBean("BuyBusiness", BuyBusiness.class);
+        BuyBusiness buyBusiness = SpringUtil.getBean("buyBusiness", BuyBusiness.class);
         // 进行买入.
         buyBusiness.buy(mockBuyRo);
         return mockBuyRo;

@@ -36,7 +36,7 @@ import javax.annotation.Resource;
  * @author Yue Jianli
  * @date 2022-05-26
  */
-@Service
+@Service("sellBusiness")
 @Slf4j(topic = "sell")
 
 public class SellBusinessImpl implements SellBusiness {

@@ -37,7 +37,7 @@ import java.math.BigDecimal;
  * @Date 2022/5/28 19:44
  **/
 @Slf4j(topic = "buy")
-@Service
+@Service("buyBusiness")
 public class BuyBusinessImpl implements BuyBusiness {
 
     @Resource

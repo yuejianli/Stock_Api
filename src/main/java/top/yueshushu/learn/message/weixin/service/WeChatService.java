@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
  * @Author yuejianli
  * @Date 2022/6/4 16:26
  **/
-@Component
+@Component("weChatService")
 @Slf4j
 public class WeChatService {
 	private static String sendMessage_url = "https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token={0}";

@@ -1,5 +1,6 @@
 package top.yueshushu.learn.business.impl;
 
+import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -118,12 +119,12 @@ public class DealBusinessImpl implements DealBusiness {
                     deal(newRo);
                     User user = userService.getById(dealRo.getUserId());
                     String message = MessageFormat.format(
-                            "成交提醒: 买入股票 {0},名称{1},买入{2}股，买入的价格是:{3},花费金额:{4},委托时间是:{5},成交时间:{6}",
+                            "成交提醒: 成交时间:{0},买入股票 {1},名称{2},买入{3}股，买入的价格是:{4},花费金额:{5},委托时间是:{6}",
+                            DateUtil.now(),
                             tradeEntrustDo.getCode(), tradeEntrustDo.getName(),
                             tradeEntrustDo.getEntrustNum(), tradeEntrustDo.getEntrustPrice(),
                             tradeEntrustDo.getEntrustMoney(),
-                            tradeEntrustDo.getEntrustDate(),
-                            DateUtil.now()
+                            DateUtil.format(tradeEntrustDo.getEntrustDate(), DatePattern.NORM_DATETIME_PATTERN)
                     );
                     weChatService.sendTextMessage(user.getId(), message);
                 }
