@@ -6,12 +6,14 @@ import org.springframework.util.StringUtils;
 import top.yueshushu.learn.common.SystemConst;
 import top.yueshushu.learn.enumtype.ExchangeMarketType;
 import top.yueshushu.learn.enumtype.ExchangeType;
+import top.yueshushu.learn.enumtype.StockType;
 import top.yueshushu.learn.mode.dto.PoundageDto;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * @ClassName:StockUtil
@@ -320,4 +322,33 @@ public class StockUtil {
         return isCodeStart(code, list01) || isCodeStart(code, list02) || isCodeStart(code, list03);
     }
 
+    public static int getStockType(String exchange, String code) {
+        if (exchange == null) {
+            exchange = StockUtil.getExchange(code);
+        }
+        if (ExchangeType.SH.equals(ExchangeType.prefix(exchange))) {
+            if (CODES_SH_INDEX.contains(code)) {
+                return StockType.Index.value();
+            }
+        } else if (ExchangeType.SZ.equals(ExchangeType.prefix(exchange))) {
+            if (CODES_SZ_INDEX.contains(code)) {
+                return StockType.Index.value();
+            }
+        } else {
+            if (CODES_BJ_INDEX.contains(code)) {
+                return StockType.Index.value();
+            }
+        }
+
+        if (isCodeStart(code, CODES_SH_A, CODES_SZ_A, CODES_BJ_A)) {
+            return StockType.A.value();
+        }
+        if (isCodeStart(code, CODES_SH_ETF, CODES_SZ_ETF, CODES_BJ_ETF)) {
+            return StockType.ETF.value();
+        }
+        if (isCodeStart(code, CODES_SH_CB, CODES_SZ_CB, CODES_BJ_CB)) {
+            return StockType.CB.value();
+        }
+        throw new NoSuchElementException("no stock type exchange " + exchange + ", code " + code);
+    }
 }

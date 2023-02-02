@@ -7,6 +7,8 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,7 @@ import top.yueshushu.learn.crawler.parse.DailyTradingInfoParse;
 import top.yueshushu.learn.crawler.parse.StockInfoParser;
 import top.yueshushu.learn.crawler.parse.StockShowInfoParse;
 import top.yueshushu.learn.crawler.properties.DefaultProperties;
+import top.yueshushu.learn.crawler.properties.ExtendProperties;
 import top.yueshushu.learn.crawler.util.HttpUtil;
 import top.yueshushu.learn.crawler.util.ImageUtil;
 import top.yueshushu.learn.crawler.util.QueryParamUtil;
@@ -56,6 +59,8 @@ public class DefaultCrawlerServiceImpl implements CrawlerService {
 
     @Resource
     private DefaultProperties defaultProperties;
+    @Resource
+    private ExtendProperties extendProperties;
 
     @Resource(name = "restTemplate")
     private RestTemplate restTemplate;
@@ -311,6 +316,39 @@ public class DefaultCrawlerServiceImpl implements CrawlerService {
             return Collections.emptyMap();
         }
     }
+
+    @Override
+    public HotStockInfo hotMapList(Date date) {
+        //处理，拼接成信息
+        String time = DateUtil.format(Optional.ofNullable(date).orElse(DateUtil.date()), DatePattern.NORM_DATE_PATTERN);
+        String url = MessageFormat.format(extendProperties.getHotMapUrl(), time);
+        try {
+            //获取内容
+            Map<String, String> header = new HashMap<>();
+            header.put("Referer", "https://26d3254z77.zicp.fun");
+            String content = HttpUtil.sendGet(httpClient, url, header);
+
+
+            //将内容进行转换，解析
+            if (!StringUtils.hasText(content)) {
+                return null;
+            }
+
+            Map<String, List<String>> resultMap = new HashMap<>();
+            JSONArray arrays = JSON.parseArray(content);
+            for (int i = 0; i < arrays.size(); i++) {
+                //用toJavaObject toJavaObject
+                Map<String, List<String>> dataMap = JSONObject.parseObject(arrays.getJSONObject(i).toJSONString(), new TypeReference<Map<String, List<String>>>() {
+                });
+                resultMap.putAll(dataMap);
+            }
+            return new HotStockInfo(resultMap);
+        } catch (Exception e) {
+            log.error("获取 {} 热点行情出错", time, e);
+            return null;
+        }
+    }
+
     @Override
     public List<StockHistoryCsvInfo> parseEasyMoneyYesHistory(List<String> codeList, DateTime beforeLastWorking) {
         //处理，拼接成信息

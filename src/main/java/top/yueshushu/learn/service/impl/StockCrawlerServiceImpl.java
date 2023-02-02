@@ -221,19 +221,7 @@ public class StockCrawlerServiceImpl implements StockCrawlerService {
                 addStockDo.setCreateUser("job");
                 addStockDo.setFlag(DataFlagType.NORMAL.getCode());
                 addStockDoList.add(addStockDo);
-                log.info(">>>>>添加股票:{}", addStockDo);
-                StockUpdateLogDo stockUpdateLogDo = stockUpdateLogAssembler.stockEntityToDo(addStockDo);
-                stockUpdateLogDo.setUpdateTime(now);
-                stockUpdateLogDo.setUpdateType(StockUpdateType.NEW.getCode());
-                stockUpdateLogDoList.add(stockUpdateLogDo);
-                List<User> userList = userService.listNotice();
-                String newStockMessage = "打新股提醒:股票 " + downloadStockInfo.getCode() + ",股票名称:" + downloadStockInfo.getName() + "今天上市了";
-                userList.forEach(
-                        user -> {
-                            weChatService.sendTextMessage(user.getId(), newStockMessage);
-                        }
-                );
-                dingTalkService.sendTextMessage(null, newStockMessage);
+                log.info(">>>>>新增加股票:{}", addStockDo);
             } else {
                 //如果编码相同，看名称是否相同.
                 StockDo updateStockDo = dbStockCodeMap.get(downloadStockInfo.getCode());
@@ -245,6 +233,19 @@ public class StockCrawlerServiceImpl implements StockCrawlerService {
                 //更新名称.
                 updateStockDo.setName(downloadStockInfo.getName());
 
+                boolean newStockFlag = false;
+                if (downloadStockInfo.getName().startsWith("N")) {
+                    newStockFlag = true;
+                    List<User> userList = userService.listNotice();
+                    String newStockMessage = "今日新上市股票提醒 " + downloadStockInfo.getCode() + ",股票名称:" + downloadStockInfo.getName() + "今天上市了";
+                    userList.forEach(
+                            user -> {
+                                weChatService.sendTextMessage(user.getId(), newStockMessage);
+                            }
+                    );
+                    dingTalkService.sendTextMessage(null, newStockMessage);
+                }
+
                 log.info(">>>>>更新股票:{}", updateStockDo);
                 updateStockDoList.add(updateStockDo);
 
@@ -253,7 +254,7 @@ public class StockCrawlerServiceImpl implements StockCrawlerService {
                 stockUpdateLogDo.setName(oldName + "--->" + downloadStockInfo.getName());
                 //id为空，避免使用的是股票编码的id
                 stockUpdateLogDo.setId(null);
-                stockUpdateLogDo.setUpdateType(StockUpdateType.CHANGE.getCode());
+                stockUpdateLogDo.setUpdateType(newStockFlag ? StockUpdateType.NEW.getCode() : StockUpdateType.CHANGE.getCode());
                 stockUpdateLogDoList.add(stockUpdateLogDo);
             }
         }
@@ -283,7 +284,6 @@ public class StockCrawlerServiceImpl implements StockCrawlerService {
 
         //对日志处理
         stockUpdateLogDomainService.saveBatch(stockUpdateLogDoList);
-
         // 清除缓存信息
         stockCacheService.clearStockInfo();
         log.info(">>>> 更新股票记录成功");

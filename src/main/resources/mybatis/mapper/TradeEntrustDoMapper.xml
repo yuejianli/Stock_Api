@@ -13,6 +13,7 @@
         <result column="entrust_price" property="entrustPrice" />
         <result column="entrust_status" property="entrustStatus" />
         <result column="entrust_code" property="entrustCode" />
+        <result column="deal_code" property="dealCode" />
         <result column="use_money" property="useMoney" />
         <result column="takeout_money" property="takeoutMoney" />
         <result column="entrust_money" property="entrustMoney" />
@@ -26,7 +27,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, code, name, entrust_date, deal_type, entrust_num, entrust_price, entrust_status, entrust_code,
+        id, code, name, entrust_date, deal_type, entrust_num, entrust_price, entrust_status, entrust_code,deal_code,
         use_money,takeout_money,entrust_money,
         hand_money,
         total_money,user_id,
@@ -63,6 +64,15 @@
         </if>
         <if test="tradeEntrustQueryDto.endEntrustDate != null">
             and entrust_date &lt; #{tradeEntrustQueryDto.endEntrustDate}
+        </if>
+        <if test="tradeEntrustQueryDto.entrustStatus != null">
+            and entrust_status =#{tradeEntrustQueryDto.entrustStatus}
+        </if>
+        <if test="tradeEntrustQueryDto.inEntrustStatus != null and tradeEntrustQueryDto.inEntrustStatus.size() != 0">
+            and entrust_status in
+            <foreach collection="tradeEntrustQueryDto.inEntrustStatus" item="entrustStatus" open="(" close=")" separator=",">
+                #{entrustStatus}
+            </foreach>
         </if>
         order by entrust_date desc
     </select>

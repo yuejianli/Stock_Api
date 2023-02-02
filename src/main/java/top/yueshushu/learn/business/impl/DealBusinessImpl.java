@@ -111,24 +111,25 @@ public class DealBusinessImpl implements DealBusiness {
             }
             if(DealType.BUY.getCode().equals(tradeEntrustDo.getDealType())){
                 //买的时候，  当前价格 < 买入价格，则成交.
-                if(price.compareTo(tradeEntrustDo.getEntrustPrice())<0) {
+                if (price.compareTo(tradeEntrustDo.getEntrustPrice()) <= 0) {
                     DealRo newRo = new DealRo();
                     BeanUtils.copyProperties(dealRo, newRo);
                     newRo.setId(tradeEntrustDo.getId());
                     deal(newRo);
                     User user = userService.getById(dealRo.getUserId());
                     String message = MessageFormat.format(
-                            "成交提醒: 买入股票 {0},股票名称{1},买入{2}份，买入的价格是:{3},花费金额:{4}",
+                            "成交提醒: 买入股票 {0},名称{1},买入{2}股，买入的价格是:{3},花费金额:{4},委托时间是:{5},成交时间:{6}",
                             tradeEntrustDo.getCode(), tradeEntrustDo.getName(),
                             tradeEntrustDo.getEntrustNum(), tradeEntrustDo.getEntrustPrice(),
-                            tradeEntrustDo.getEntrustMoney()
+                            tradeEntrustDo.getEntrustMoney(),
+                            tradeEntrustDo.getEntrustDate(),
+                            DateUtil.now()
                     );
                     weChatService.sendTextMessage(user.getId(), message);
-                    dingTalkService.sendTextMessage(user.getId(), message);
                 }
             }else{
                 //卖的时候，  当前价格 > 卖出价格，则成交.
-                if(price.compareTo(tradeEntrustDo.getEntrustPrice())>0) {
+                if (price.compareTo(tradeEntrustDo.getEntrustPrice()) >= 0) {
                     DealRo newRo = new DealRo();
                     BeanUtils.copyProperties(dealRo, newRo);
                     newRo.setId(tradeEntrustDo.getId());
@@ -136,13 +137,14 @@ public class DealBusinessImpl implements DealBusiness {
 
                     User user = userService.getById(dealRo.getUserId());
                     String message = MessageFormat.format(
-                            "成交提醒: 卖出股票 {0},股票名称{1},卖出{2}份，卖出的价格是:{3},卖出金额:{4}",
+                            "成交提醒: 卖出股票 {0},名称{1},卖出{2}股，卖出的价格是:{3},卖出金额:{4},委托时间是:{5},成交时间:{6}",
                             tradeEntrustDo.getCode(), tradeEntrustDo.getName(),
                             tradeEntrustDo.getEntrustNum(), tradeEntrustDo.getEntrustPrice(),
-                            tradeEntrustDo.getEntrustMoney()
+                            tradeEntrustDo.getEntrustMoney(),
+                            tradeEntrustDo.getEntrustDate(),
+                            DateUtil.now()
                     );
                     weChatService.sendTextMessage(user.getId(), message);
-                    dingTalkService.sendTextMessage(user.getId(), message);
                 }
             }
         }
@@ -151,6 +153,7 @@ public class DealBusinessImpl implements DealBusiness {
     private OutputResult sellDeal(TradeEntrustDo tradeEntrustDo) {
         //取消的话，改变这个记录的状态。
         tradeEntrustDo.setEntrustStatus(EntrustStatusType.SUCCESS.getCode());
+        tradeEntrustDo.setDealCode(StockUtil.generateDealCode());
         //更新
         tradeEntrustDomainService.updateById(tradeEntrustDo);
         //成交了，金额不动。 动持仓信息
@@ -283,6 +286,7 @@ public class DealBusinessImpl implements DealBusiness {
         //取消的话，改变这个记录的状态。
         log.info("用户{},成交买入委托单{}", tradeEntrustDo.getUserId(), tradeEntrustDo.getId());
         tradeEntrustDo.setEntrustStatus(EntrustStatusType.SUCCESS.getCode());
+        tradeEntrustDo.setDealCode(StockUtil.generateDealCode());
         //更新
         tradeEntrustDomainService.updateById(tradeEntrustDo);
         //成交了，金额不动。 动持仓信息

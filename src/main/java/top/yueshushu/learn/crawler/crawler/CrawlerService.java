@@ -1,14 +1,12 @@
 package top.yueshushu.learn.crawler.crawler;
 
 import cn.hutool.core.date.DateTime;
-import top.yueshushu.learn.crawler.entity.DownloadStockInfo;
-import top.yueshushu.learn.crawler.entity.StockBigDealInfo;
-import top.yueshushu.learn.crawler.entity.StockHistoryCsvInfo;
-import top.yueshushu.learn.crawler.entity.TxStockHistoryInfo;
+import top.yueshushu.learn.crawler.entity.*;
 import top.yueshushu.learn.mode.info.StockShowInfo;
 
 import java.math.BigDecimal;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -153,4 +151,11 @@ public interface CrawlerService {
      * @return
      */
     Map<String, BigDecimal> souHuGetPrice(List<String> fullCodeList);
+
+    /**
+     * 根据日期爬取热力图
+     *
+     * @param date 日期
+     */
+    HotStockInfo hotMapList(Date date);
 }

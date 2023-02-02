@@ -1,35 +1,17 @@
 package top.yueshushu.learn.service.impl;
 
-import cn.hutool.core.date.DateUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import top.yueshushu.learn.assembler.TradeRuleStockAssembler;
-import top.yueshushu.learn.common.ResultCode;
+import top.yueshushu.learn.domain.TradeRuleStockDo;
 import top.yueshushu.learn.domainservice.TradeRuleStockDomainService;
 import top.yueshushu.learn.entity.TradeRuleStock;
-import top.yueshushu.learn.enumtype.DealType;
-import top.yueshushu.learn.mode.dto.StockRuleDto;
 import top.yueshushu.learn.mode.dto.TradeRuleStockQueryDto;
-import top.yueshushu.learn.mode.ro.TradeRuleStockRo;
-import top.yueshushu.learn.mode.vo.StockRuleVo;
 import top.yueshushu.learn.mode.vo.StockSelectedVo;
-import top.yueshushu.learn.mode.vo.TradeRuleStockVo;
-import top.yueshushu.learn.domain.TradeRuleDo;
-import top.yueshushu.learn.domain.TradeRuleStockDo;
-import top.yueshushu.learn.mapper.TradeRuleStockDoMapper;
-import top.yueshushu.learn.response.OutputResult;
-import top.yueshushu.learn.service.StockSelectedService;
-import top.yueshushu.learn.service.TradeRuleService;
 import top.yueshushu.learn.service.TradeRuleStockService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -76,12 +58,33 @@ public class TradeRuleStockServiceImpl  implements TradeRuleStockService {
                     stockSelectedVo.setStockCode(n.getStockCode());
                     stockSelectedVo.setStockName(
                             stockNameMap.getOrDefault(
-                                    n.getStockCode(),""
+                                    n.getStockCode(), ""
                             )
                     );
                     otherApplyList.add(stockSelectedVo);
                 }
         );
         return otherApplyList;
+    }
+
+    @Override
+    public Map<String, List<Integer>> listRuleIdByCode(List<String> codeList) {
+        List<TradeRuleStockDo> tradeRuleStockDoList = tradeRuleStockDomainService.listByCodeList(codeList);
+        if (CollectionUtils.isEmpty(tradeRuleStockDoList)) {
+            return Collections.emptyMap();
+        }
+        // 转换成 map
+        Map<String, List<Integer>> result = new HashMap<>(codeList.size(), 1.0f);
+
+        for (TradeRuleStockDo tradeRuleStockDo : tradeRuleStockDoList) {
+            if (result.containsKey(tradeRuleStockDo.getStockCode())) {
+                result.get(tradeRuleStockDo.getStockCode()).add(tradeRuleStockDo.getRuleId());
+            } else {
+                List<Integer> tempRuleIdList = new ArrayList<>();
+                tempRuleIdList.add(tradeRuleStockDo.getRuleId());
+                result.put(tradeRuleStockDo.getStockCode(), tempRuleIdList);
+            }
+        }
+        return result;
     }
 }

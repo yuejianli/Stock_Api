@@ -38,10 +38,7 @@ import top.yueshushu.learn.util.ThreadLocalUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -82,7 +79,7 @@ public class TradeDealServiceImpl implements TradeDealService {
                 )
         );
         tradeDealDo.setDealCode(
-                StockUtil.generateDealCode()
+                Optional.of(tradeEntrustDo.getDealCode()).orElse(StockUtil.generateDealCode())
         );
         tradeDealDo.setEntrustCode(tradeEntrustDo.getEntrustCode());
         tradeDealDo.setEntrustType(tradeEntrustDo.getEntrustType());
@@ -138,8 +135,6 @@ public class TradeDealServiceImpl implements TradeDealService {
     public OutputResult mockList(TradeDealRo tradeDealRo) {
         Date now = DateUtil.date();
         DateTime beginNow = DateUtil.beginOfDay(now);
-
-
         TradeDealQueryDto tradeDealQueryDto = new TradeDealQueryDto();
         tradeDealQueryDto.setUserId(tradeDealRo.getUserId());
         tradeDealQueryDto.setMockType(tradeDealRo.getMockType());
@@ -243,7 +238,7 @@ public class TradeDealServiceImpl implements TradeDealService {
      * @return
      */
     @Override
-    public OutputResult mockHistoryList(TradeDealRo tradeDealRo) {
+    public OutputResult<PageResponse<TradeDealVo>> mockHistoryList(TradeDealRo tradeDealRo) {
         Page<Object> pageGithubResult = PageHelper.startPage(tradeDealRo.getPageNum(), tradeDealRo.getPageSize());
         DateTime now = DateUtil.date();
         //不包含今天
@@ -253,11 +248,11 @@ public class TradeDealServiceImpl implements TradeDealService {
         tradeDealQueryDto.setMockType(tradeDealRo.getMockType());
         tradeDealQueryDto.setDealType(tradeDealRo.getDealType());
         tradeDealQueryDto.setCode(tradeDealRo.getCode());
-        if (!StringUtils.hasText(tradeDealRo.getStartDate())){
+        if (!StringUtils.hasText(tradeDealRo.getStartDate())) {
             //获取14天前的日期
-            DateTime before14Day = DateUtil.offsetDay(beginNow,-14);
+            DateTime before14Day = DateUtil.offsetDay(beginNow, -14);
             tradeDealQueryDto.setStartDealDate(before14Day);
-        }else{
+        } else {
             tradeDealQueryDto.setStartDealDate(DateUtil.parse(tradeDealRo.getStartDate(), Const.SIMPLE_DATE_FORMAT));
         }
 

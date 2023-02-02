@@ -3,6 +3,7 @@ package top.yueshushu.learn.mode.vo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import top.yueshushu.learn.enumtype.EntrustStatusType;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -36,6 +37,8 @@ public class TradeEntrustVo implements Serializable {
     private Integer entrustStatus;
     @ApiModelProperty("委托编号")
     private String entrustCode;
+    @ApiModelProperty("成交编号")
+    private String dealCode;
     @ApiModelProperty("可用金额")
     private BigDecimal useMoney;
     @ApiModelProperty("可取金额")
@@ -54,4 +57,17 @@ public class TradeEntrustVo implements Serializable {
     private Integer userId;
     @ApiModelProperty("1正常 0 删除")
     private Integer flag;
+
+
+    public boolean isDealed() {
+        return EntrustStatusType.SUCCESS.getCode().equals(entrustStatus);
+    }
+
+    public boolean isValid() {
+        return isDealed() || EntrustStatusType.NO_BAO.getCode().equals(entrustStatus) || EntrustStatusType.ING.getCode().equals(entrustStatus);
+    }
+
+    public boolean isManual() {
+        return dealCode != null && dealCode.startsWith("m");
+    }
 }

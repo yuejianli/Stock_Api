@@ -1,29 +1,34 @@
 package top.yueshushu.learn.service.impl;
 
+import cn.hutool.extra.spring.SpringUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import top.yueshushu.learn.business.BuyBusiness;
 import top.yueshushu.learn.business.RevokeBusiness;
 import top.yueshushu.learn.business.SellBusiness;
+import top.yueshushu.learn.domain.TradeRuleDo;
 import top.yueshushu.learn.domainservice.StockSelectedDomainService;
+import top.yueshushu.learn.domainservice.TradeRuleDomainService;
 import top.yueshushu.learn.entity.Stock;
 import top.yueshushu.learn.entity.TradeEntrust;
-import top.yueshushu.learn.enumtype.ConfigCodeType;
+import top.yueshushu.learn.entity.TradeRuleCondition;
 import top.yueshushu.learn.enumtype.EntrustType;
+import top.yueshushu.learn.enumtype.RuleConditionType;
+import top.yueshushu.learn.mode.dto.TradeRuleStockQueryDto;
 import top.yueshushu.learn.mode.ro.BuyRo;
 import top.yueshushu.learn.mode.ro.RevokeRo;
-import top.yueshushu.learn.mode.ro.SellRo;
-import top.yueshushu.learn.mode.vo.ConfigVo;
-import top.yueshushu.learn.service.ConfigService;
-import top.yueshushu.learn.service.TradeEntrustService;
-import top.yueshushu.learn.service.TradeStrategyService;
+import top.yueshushu.learn.service.*;
 import top.yueshushu.learn.service.cache.StockCacheService;
-import top.yueshushu.learn.util.BigDecimalUtil;
+import top.yueshushu.learn.strategy.bs.base.BaseStrategyHandler;
+import top.yueshushu.learn.strategy.bs.model.TradeStockRuleDto;
 
 import javax.annotation.Resource;
-import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @ClassName:TradeStrategyServiceImpl
@@ -50,74 +55,94 @@ public class TradeStrategyServiceImpl implements TradeStrategyService {
     private TradeEntrustService tradeEntrustService;
     @Resource
     private RevokeBusiness revokeBusiness;
+    @Resource
+    private TradeRuleStockService tradeRuleStockService;
+    @Resource
+    private TradeRuleDomainService tradeRuleDomainService;
+    @Resource
+    private TradeRuleConditionService tradeRuleConditionService;
 
     @Override
     public void mockEntrustXxlJob(BuyRo buyRo) {
-        // 查询虚拟的买入差值价
-        ConfigVo buyPriceVo = configService.getConfig(buyRo.getUserId(), ConfigCodeType.MOCK_BUY_SUB_PRICE);
-        BigDecimal buySubPrice = BigDecimalUtil.toBigDecimal(buyPriceVo.getCodeValue());
 
-        ConfigVo sellPriceVo = configService.getConfig(buyRo.getUserId(), ConfigCodeType.MOCK_SELL_SUB_PRICE);
-        BigDecimal sellSubPrice = BigDecimalUtil.toBigDecimal(sellPriceVo.getCodeValue());
+        //1. 获取该员工目前的自选股票编码 ----> 后续可以改成分组。
+        List<String> codeList = stockSelectedDomainService.findCodeList(buyRo.getUserId());
+        if (CollectionUtils.isEmpty(codeList)) {
+            return;
+        }
 
+        // 对 codeList 进行处理，如果已经没有交易次数了， 那么就不处理这个股票信息。
 
-        List<String> codeList = stockSelectedDomainService.findCodeList(null);
-        //查询该员工最开始的收盘价
-        for(String code:codeList) {
-            //获取昨天的价格
-            BigDecimal lastBuyPrice = stockCacheService.getLastBuyCachePrice(code);
-            BigDecimal lastSellPrice = stockCacheService.getLastSellCachePrice(code);
-            //获取今天的价格
-            BigDecimal currentPrice = stockCacheService.getNowCachePrice(code);
-            //查询当前股票的名称
-            Stock stock = stockCacheService.selectByCode(code);
-            //+ 相差 2元，就    110  2    --->  108 106  2
-            if (BigDecimalUtil.subBigDecimal(lastBuyPrice, currentPrice).compareTo(buySubPrice) > 0) {
-                //可以买入
-                BuyRo mockBuyRo = new BuyRo();
-                mockBuyRo.setUserId(buyRo.getUserId());
-                mockBuyRo.setMockType(buyRo.getMockType());
-                mockBuyRo.setCode(code);
-                mockBuyRo.setAmount(100);
-                mockBuyRo.setName(stock.getName());
-                mockBuyRo.setPrice(currentPrice);
-                log.info(">>>可以买入股票{}", code);
-                mockBuyRo.setEntrustType(EntrustType.AUTO.getCode());
-                buyBusiness.buy(mockBuyRo);
-                //立即修改当前买入的价格
-                stockCacheService.setLastBuyCachePrice(code, currentPrice);
-//
-//                User user = userService.getById(buyRo.getUserId());
-//                String message = MessageFormat.format(
-//                        "委托买入提醒: 买入股票 {0},股票名称{1},买入{2}份，买入的价格是:{3}",
-//                        mockBuyRo.getCode(), mockBuyRo.getName(),
-//                        mockBuyRo.getAmount(), mockBuyRo.getPrice()
-//                );
-//				weChatService.sendTextMessage(user.getWxUserId(), message);
+        List<String> canBSStockList = new ArrayList<>();
+
+        for (String code : codeList) {
+
+            Long todayBuySurplusNum = stockCacheService.getTodayBuySurplusNum(buyRo.getUserId(), buyRo.getMockType(), code);
+            Long todaySellSurplusNum = stockCacheService.getTodaySellSurplusNum(buyRo.getUserId(), buyRo.getMockType(), code);
+            if (todayBuySurplusNum <= 0 && todaySellSurplusNum <= 0) {
+                continue;
             }
+            canBSStockList.add(code);
+        }
 
-            if (BigDecimalUtil.subBigDecimal(currentPrice, lastSellPrice).compareTo(sellSubPrice) > 0) {
-                //开始买
-                SellRo sellRo = new SellRo();
-                sellRo.setUserId(buyRo.getUserId());
-                sellRo.setMockType(buyRo.getMockType());
-                sellRo.setCode(code);
-                sellRo.setAmount(100);
-                sellRo.setName(stock.getName());
-                sellRo.setPrice(currentPrice);
-                sellRo.setEntrustType(EntrustType.AUTO.getCode());
-                log.info(">>>可以卖出股票{}", code);
-                stockCacheService.setLastSellCachePrice(code, currentPrice);
-                sellBusiness.sell(sellRo);
 
-//                User user = userService.getById(buyRo.getUserId());
-//                String message = MessageFormat.format(
-//                        "委托卖出提醒: 卖出股票 {0},股票名称{1},卖出{2}份，卖出的价格是:{3}",
-//                        sellRo.getCode(), sellRo.getName(),
-//                        sellRo.getAmount(), sellRo.getPrice()
-//                );
-//				weChatService.sendTextMessage(user.getWxUserId(),
-//						message);
+        if (CollectionUtils.isEmpty(canBSStockList)) {
+            return;
+        }
+
+
+        //2. 对每一个股票进行处理， 获取相应的规则。   如果没有规则，则不自动委托。
+        Map<String, List<Integer>> stockRelationRuleIdMap = tradeRuleStockService.listRuleIdByCode(canBSStockList);
+        if (CollectionUtils.isEmpty(stockRelationRuleIdMap)) {
+            return;
+        }
+        // 获取所有的规则 id 集合。
+        List<Integer> allRuleIdList = new ArrayList<>();
+        stockRelationRuleIdMap.forEach((stockCode, ruleIdList) -> allRuleIdList.addAll(ruleIdList));
+        // 根据规则 id 获取对应的数据信息.
+        TradeRuleStockQueryDto tradeRuleStockQueryDto = new TradeRuleStockQueryDto();
+        tradeRuleStockQueryDto.setRuleIdList(allRuleIdList);
+        tradeRuleStockQueryDto.setMockType(buyRo.getMockType());
+        tradeRuleStockQueryDto.setUserId(buyRo.getUserId());
+        List<TradeRuleDo> tradeRuleDoList = tradeRuleDomainService.listByQuery(tradeRuleStockQueryDto);
+        // 转换成对应的 Map
+        Map<Integer, TradeRuleDo> tradeRuleIdMap = tradeRuleDoList.stream().collect(Collectors.toMap(TradeRuleDo::getId, n -> n));
+        //查询该员工最开始的收盘价
+        List<TradeRuleCondition> tradeRuleConditions = tradeRuleConditionService.listAll();
+        Map<Integer, TradeRuleCondition> tradeRuleConditionMap = tradeRuleConditions.stream().collect(Collectors.toMap(TradeRuleCondition::getId, n -> n));
+        for (String code : canBSStockList) {
+            // 获取对应的规则
+            List<Integer> ruleIdList = stockRelationRuleIdMap.get(code);
+            if (CollectionUtils.isEmpty(ruleIdList) || ruleIdList.size() > 2) {
+                continue;
+            }
+            Stock stock = stockCacheService.selectByCode(code);
+            for (Integer ruleId : ruleIdList) {
+                TradeRuleDo tradeRuleDo = tradeRuleIdMap.get(ruleId);
+                if (tradeRuleDo == null) {
+                    continue;
+                }
+                // 获取对应的规则编码集合.
+                TradeRuleCondition tradeRuleCondition = tradeRuleConditionMap.get(tradeRuleDo.getConditionId());
+                if (null == tradeRuleCondition) {
+                    continue;
+                }
+
+                // 获取条件编码对应的策略。
+                RuleConditionType ruleConditionType = RuleConditionType.getByConditionCode(tradeRuleCondition.getCode(), tradeRuleDo.getRuleType());
+                if (null == ruleConditionType) {
+                    continue;
+                }
+                // 执行该程序。
+                BaseStrategyHandler baseStrategyHandler =
+                        SpringUtil.getBean(ruleConditionType.getBeanName(), BaseStrategyHandler.class);
+
+                TradeStockRuleDto tradeStockRuleDto = new TradeStockRuleDto();
+                BeanUtils.copyProperties(tradeRuleDo, tradeStockRuleDto);
+                tradeStockRuleDto.setStockCode(code);
+                tradeStockRuleDto.setStockName(stock.getName());
+                // 执行策略
+                baseStrategyHandler.handle(tradeStockRuleDto);
             }
         }
     }

@@ -3,6 +3,8 @@ package top.yueshushu.learn.mode.dto;
 import cn.hutool.core.date.DateTime;
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * @Description 股票交易查询对象
  * @Author yuejianli
@@ -23,4 +25,6 @@ public class TradeEntrustQueryDto {
      * 结束委托时间
      */
     private DateTime endEntrustDate;
+
+    private List<Integer> inEntrustStatus;
 }

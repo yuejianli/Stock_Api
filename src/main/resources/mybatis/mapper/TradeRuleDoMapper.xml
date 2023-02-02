@@ -34,9 +34,29 @@
         tr.mock_type as mockType
         from trade_rule tr ,trade_rule_stock trs
         where tr.id =trs.rule_id
-          and trs.stock_code = #{tradeRuleStockQueryDto.stockCode}
-          and tr.user_id = #{tradeRuleStockQueryDto.userId}
-          and tr.rule_type = #{tradeRuleStockQueryDto.ruleType}
-          and tr.mock_type = #{tradeRuleStockQueryDto.mockType}
+        and tr.user_id = #{tradeRuleStockQueryDto.userId}
+        and tr.mock_type = #{tradeRuleStockQueryDto.mockType}
+        <if test="tradeRuleStockQueryDto.stockCode !=null">
+              and trs.stock_code = #{tradeRuleStockQueryDto.stockCode}
+        </if>
+        <if test="tradeRuleStockQueryDto.ruleType !=null">
+            and tr.rule_type = #{tradeRuleStockQueryDto.ruleType}
+        </if>
+        <if test="tradeRuleStockQueryDto.ruleId !=null">
+            and tr.id = #{tradeRuleStockQueryDto.ruleId}
+        </if>
+        <if test="tradeRuleStockQueryDto.stockCodeList != null and tradeRuleStockQueryDto.stockCodeList.size() != 0">
+            and trs.stock_code in
+            <foreach collection="tradeRuleStockQueryDto.stockCodeList" item="stockCode" separator="," open="(" close=")">
+                #{stockCode}
+            </foreach>
+        </if>
+        <if test="tradeRuleStockQueryDto.ruleIdList != null and tradeRuleStockQueryDto.ruleIdList.size() != 0">
+            and tr.id in
+            <foreach collection="tradeRuleStockQueryDto.ruleIdList" item="ruleId" separator="," open="(" close=")">
+                #{ruleId}
+            </foreach>
+        </if>
+
     </select>
 </mapper>

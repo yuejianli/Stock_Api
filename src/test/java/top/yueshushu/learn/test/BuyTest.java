@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import top.yueshushu.learn.domainservice.StockSelectedDomainService;
 import top.yueshushu.learn.enumtype.ConfigCodeType;
+import top.yueshushu.learn.enumtype.MockType;
 import top.yueshushu.learn.mode.ro.BuyRo;
 import top.yueshushu.learn.mode.ro.DealRo;
 import top.yueshushu.learn.mode.ro.RevokeRo;
@@ -104,21 +105,21 @@ public class BuyTest {
 
         String code = "001317";
         //获取昨天的价格
-        BigDecimal lastBuyPrice = stockCacheService.getLastBuyCachePrice(code);
-        BigDecimal lastSellPrice = stockCacheService.getLastSellCachePrice(code);
+        BigDecimal lastBuyPrice = stockCacheService.getLastBuyCachePrice(1, MockType.MOCK.getCode(), code);
+        BigDecimal lastSellPrice = stockCacheService.getLastSellCachePrice(1, MockType.MOCK.getCode(), code);
         //获取今天的价格
         BigDecimal currentPrice = stockCacheService.getNowCachePrice(code);
         //+ 相差 2元，就    110  2    --->  108 106  2
         if (BigDecimalUtil.subBigDecimal(lastBuyPrice, currentPrice).compareTo(buySubPrice) > 0) {
             log.info("买入");
             //立即修改当前买入的价格
-            stockCacheService.setLastBuyCachePrice(code, currentPrice);
+            stockCacheService.setLastBuyCachePrice(1, MockType.MOCK.getCode(), code, currentPrice);
         }
 
         if (BigDecimalUtil.subBigDecimal(currentPrice, lastSellPrice).compareTo(sellSubPrice) > 0) {
             //开始买
             log.info("开始卖出");
-            stockCacheService.setLastSellCachePrice(code, currentPrice);
+            stockCacheService.setLastSellCachePrice(1, MockType.MOCK.getCode(), code, currentPrice);
         }
     }
 }

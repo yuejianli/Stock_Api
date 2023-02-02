@@ -1,4 +1,4 @@
-package top.yueshushu.learn.mode.dto;
+package top.yueshushu.learn.mode.vo;
 
 import lombok.Data;
 

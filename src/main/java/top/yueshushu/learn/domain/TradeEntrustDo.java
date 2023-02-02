@@ -1,15 +1,15 @@
 package top.yueshushu.learn.domain;
 
-import java.math.BigDecimal;
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableField;
-import java.io.Serializable;
-import java.util.Date;
-
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * <p>
@@ -79,7 +79,11 @@ public class TradeEntrustDo implements Serializable {
      */
     @TableField("entrust_code")
     private String entrustCode;
-
+    /**
+     * 成交编号
+     */
+    @TableField("deal_code")
+    private String dealCode;
     /**
      * 可用金额
      */

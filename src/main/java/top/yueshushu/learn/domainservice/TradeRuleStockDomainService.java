@@ -1,9 +1,7 @@
 package top.yueshushu.learn.domainservice;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import top.yueshushu.learn.domain.TradeRuleConditionDo;
 import top.yueshushu.learn.domain.TradeRuleStockDo;
-import top.yueshushu.learn.entity.TradeRuleStock;
 import top.yueshushu.learn.mode.dto.TradeRuleStockQueryDto;
 
 import java.util.List;
@@ -29,9 +27,17 @@ public interface TradeRuleStockDomainService extends IService<TradeRuleStockDo> 
 
     /**
      * 删除其它的股票信息
-     * @param userId 用户编号
-     * @param mockType 类型
+     *
+     * @param userId         用户编号
+     * @param mockType       类型
      * @param removeCodeList 要删除的股票编码
      */
     void removeOtherStock(Integer userId, Integer mockType, List<String> removeCodeList);
+
+    /**
+     * 根据股票编码列表获取 规则信息.
+     *
+     * @param codeList 股票编码列表
+     */
+    List<TradeRuleStockDo> listByCodeList(List<String> codeList);
 }

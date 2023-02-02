@@ -45,14 +45,17 @@ public interface StockHistoryDomainService extends IService<StockHistoryDo> {
 
     /**
      * 根据股票的编码和日期获取当时的历史记录
-     * @param code 股票编码
+     *
+     * @param code     股票编码
      * @param currDate 日期
      * @return 返回当前的历史记录
      */
-    StockHistoryDo getByCodeAndCurrDate(String code, DateTime currDate);
+    StockHistoryDo getByCodeAndCurrDate(String code, Date currDate);
+
     /**
      * 根据股票的编码和日期，获取距离这一天最近的股票历史记录数据。
-     * @param code 股票编码
+     *
+     * @param code    股票编码
      * @param endDate 最近的记录日期
      * @return 根据股票的编码和日期，获取距离这一天最近的股票历史记录数据。
      */

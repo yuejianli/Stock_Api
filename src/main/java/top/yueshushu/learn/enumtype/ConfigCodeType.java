@@ -15,6 +15,8 @@ public enum ConfigCodeType {
     SELECT_MAX_NUM("selectMaxNum", "最大的自选数量"),
     BUY_NEW_STOCK("buyNewStock", "申购新股"),
     AUTO_LOGIN("autoLogin", "自动登录"),
+    TODAY_BUY_NUM("todayBuyNum", "今天买入交易次数"),
+    TODAY_SELL_NUM("todaySellNum", "今天卖出交易次数"),
     ;
 
     private String code;

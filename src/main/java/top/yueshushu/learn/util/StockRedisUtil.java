@@ -66,7 +66,7 @@ public class StockRedisUtil {
     }
 
     private String buildYesKey(String code){
-        return Const.STOCK_YES_PRICE+code;
+        return Const.STOCK_YES_CLOSE_PRICE + code;
     }
 
     public void setYesPrice(String code, BigDecimal price) {

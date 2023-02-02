@@ -60,7 +60,7 @@ public interface StockHistoryDoMapper extends BaseMapper<StockHistoryDo> {
      * @param currDate
      * @return
      */
-    StockHistoryDo getStockForDate(@Param("code") String code, @Param("currDate") DateTime currDate);
+    StockHistoryDo getStockForDate(@Param("code") String code, @Param("currDate") Date currDate);
 
     /**
      * 查询股票对应的最近收盘价信息

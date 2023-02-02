@@ -33,15 +33,15 @@ public class TradeEntrustBusinessImpl implements TradeEntrustBusiness {
     private TradeCacheService tradeCacheService;
 
     @Override
-    public OutputResult mockList(TradeEntrustRo tradeEntrustRo) {
+    public OutputResult<List<TradeEntrustVo>> mockList(TradeEntrustRo tradeEntrustRo) {
         return tradeEntrustService.mockList(tradeEntrustRo);
     }
 
     @Override
-    public OutputResult realList(TradeEntrustRo tradeEntrustRo) {
+    public OutputResult<List<TradeEntrustVo>> realList(TradeEntrustRo tradeEntrustRo) {
         Object realEasyMoneyCache = tradeCacheService.getRealEasyMoneyCache(TradeRealValueType.TRADE_ENTRUST, tradeEntrustRo.getUserId());
         if (!ObjectUtils.isEmpty(realEasyMoneyCache)) {
-            return OutputResult.buildSucc(realEasyMoneyCache);
+            return OutputResult.buildSucc((List<TradeEntrustVo>) realEasyMoneyCache);
         }
         log.info(">>>此次员工{}查询需要同步真实的今日委托数据", tradeEntrustRo.getUserId());
         OutputResult<List<TradeEntrustVo>> outputResult = tradeEntrustService.realList(tradeEntrustRo);
@@ -56,12 +56,12 @@ public class TradeEntrustBusinessImpl implements TradeEntrustBusiness {
     }
 
     @Override
-    public OutputResult mockHistoryList(TradeEntrustRo tradeEntrustRo) {
+    public OutputResult<PageResponse<TradeEntrustVo>> mockHistoryList(TradeEntrustRo tradeEntrustRo) {
         return tradeEntrustService.mockHistoryList(tradeEntrustRo);
     }
 
     @Override
-    public OutputResult realHistoryList(TradeEntrustRo tradeEntrustRo) {
+    public OutputResult<PageResponse<TradeEntrustVo>> realHistoryList(TradeEntrustRo tradeEntrustRo) {
         List<TradeEntrustVo> tradeEntrustVoList = tradeEntrustService.realHistoryList(tradeEntrustRo);
         if (CollectionUtils.isEmpty(tradeEntrustVoList)) {
             return OutputResult.buildSucc(PageResponse.emptyPageResponse());

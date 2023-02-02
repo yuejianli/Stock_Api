@@ -3,6 +3,7 @@ package top.yueshushu.learn.domainservice.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import top.yueshushu.learn.domain.TradeRuleDo;
 import top.yueshushu.learn.domainservice.TradeRuleDomainService;
 import top.yueshushu.learn.mapper.TradeRuleDoMapper;
@@ -36,6 +37,7 @@ public class TradeRuleDomainServiceImpl extends ServiceImpl<TradeRuleDoMapper, T
                 .eq(tradeRuleStockQueryDto.getMockType() != null, TradeRuleDo::getMockType, tradeRuleStockQueryDto.getMockType())
                 .eq(tradeRuleStockQueryDto.getRuleType() != null, TradeRuleDo::getRuleType, tradeRuleStockQueryDto.getRuleType())
                 .eq(tradeRuleStockQueryDto.getRuleId() != null, TradeRuleDo::getId, tradeRuleStockQueryDto.getRuleId())
+                .in(!CollectionUtils.isEmpty(tradeRuleStockQueryDto.getRuleIdList()), TradeRuleDo::getId, tradeRuleStockQueryDto.getRuleIdList())
                 .eq(tradeRuleStockQueryDto.getRuleConditionId() != null, TradeRuleDo::getConditionId, tradeRuleStockQueryDto.getRuleConditionId())
                 .orderByDesc(TradeRuleDo::getUpdateTime).list();
     }

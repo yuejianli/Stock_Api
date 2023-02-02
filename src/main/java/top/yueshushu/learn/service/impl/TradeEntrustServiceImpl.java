@@ -179,8 +179,9 @@ public class TradeEntrustServiceImpl implements TradeEntrustService {
         ).collect(Collectors.toList());
         tradeEntrustDomainService.saveBatch(entrustDoList);
     }
+
     @Override
-    public OutputResult mockList(TradeEntrustRo tradeEntrustRo) {
+    public OutputResult<List<TradeEntrustVo>> mockList(TradeEntrustRo tradeEntrustRo) {
         DateTime now = DateUtil.date();
         //根据用户去查询信息
         TradeEntrustQueryDto tradeEntrustQueryDto = new TradeEntrustQueryDto();
@@ -277,7 +278,7 @@ public class TradeEntrustServiceImpl implements TradeEntrustService {
     }
 
     @Override
-    public OutputResult mockHistoryList(TradeEntrustRo tradeEntrustRo) {
+    public OutputResult<PageResponse<TradeEntrustVo>> mockHistoryList(TradeEntrustRo tradeEntrustRo) {
 
         Page<Object> pageGithubResult = PageHelper.startPage(tradeEntrustRo.getPageNum(), tradeEntrustRo.getPageSize());
 
@@ -287,19 +288,19 @@ public class TradeEntrustServiceImpl implements TradeEntrustService {
         TradeEntrustQueryDto tradeEntrustQueryDto = new TradeEntrustQueryDto();
         tradeEntrustQueryDto.setUserId(tradeEntrustRo.getUserId());
         tradeEntrustQueryDto.setMockType(tradeEntrustRo.getMockType());
-        if (!StringUtils.hasText(tradeEntrustRo.getStartDate())){
+        if (!StringUtils.hasText(tradeEntrustRo.getStartDate())) {
             //获取14天前的日期
-            DateTime before14Day = DateUtil.offsetDay(beginNow,-14);
+            DateTime before14Day = DateUtil.offsetDay(beginNow, -14);
             tradeEntrustQueryDto.setStartEntrustDate(
                     before14Day
             );
-        }else{
+        } else {
             tradeEntrustQueryDto.setStartEntrustDate(
                     DateUtil.parse(tradeEntrustRo.getStartDate(), Const.SIMPLE_DATE_FORMAT)
             );
         }
         tradeEntrustQueryDto.setEndEntrustDate(beginNow);
-
+        tradeEntrustQueryDto.setInEntrustStatus(tradeEntrustRo.getStatusList());
         //根据用户去查询信息
         List<TradeEntrustDo> tradeEntrustDoList = tradeEntrustDomainService.listHistoryByQuery(tradeEntrustQueryDto);
         if (CollectionUtils.isEmpty(tradeEntrustDoList)){

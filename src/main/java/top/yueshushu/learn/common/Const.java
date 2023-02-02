@@ -1,5 +1,6 @@
 package top.yueshushu.learn.common;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
@@ -18,18 +19,31 @@ public class Const {
     public static final Integer DEFAULT_REBOOT_ID = 1;
     public static final String TRADE_PASSWORD_AES_KEY = "yuezelinyuezelin";
 
-    public static final String CACHE_PUBLIC_KEY_PREFIX = "stock:public:";
-    public static final String CACHE_PRIVATE_KEY_PREFIX = "stock:private:";
+    public static final String CACHE_PUBLIC_KEY_PREFIX = "stock_public:";
+    public static final String CACHE_PRIVATE_KEY_PREFIX = "stock_private:";
     public static final String CACHE_WE_CHAT = "stock:wechat";
 
     public static final String STOCK_PRICE = CACHE_PUBLIC_KEY_PREFIX + "now:";
-    public static final String STOCK_YES_PRICE = CACHE_PUBLIC_KEY_PREFIX + "yes:";
-    public static final String STOCK_BUY_PRICE = CACHE_PUBLIC_KEY_PREFIX + "buy:";
-    public static final String STOCK_SELL_PRICE = CACHE_PUBLIC_KEY_PREFIX + "sell:";
+    public static final String STOCK_YES_CLOSE_PRICE = CACHE_PUBLIC_KEY_PREFIX + "yes:close:";
+    public static final String STOCK_YES_OPENING_PRICE = CACHE_PUBLIC_KEY_PREFIX + "yes:opening:";
+    public static final String STOCK_YES_HIGH_PRICE = CACHE_PUBLIC_KEY_PREFIX + "yes:high:";
+    public static final String STOCK_YES_LOWEST_PRICE = CACHE_PUBLIC_KEY_PREFIX + "yes:lowest:";
+
+
+    public static final String STOCK_BUY_PRICE = CACHE_PRIVATE_KEY_PREFIX + "buy:";
+    public static final String STOCK_SELL_PRICE = CACHE_PRIVATE_KEY_PREFIX + "sell:";
+
+    public static final String STOCK_TODAY_BUY_PRICE = CACHE_PRIVATE_KEY_PREFIX + "today_buy:";
+    public static final String STOCK_TODAY_SELL_PRICE = CACHE_PRIVATE_KEY_PREFIX + "today_sell:";
+
+    public static final String STOCK_TODAY_BUY_NUM = CACHE_PRIVATE_KEY_PREFIX + "today_buy_num:";
+    public static final String STOCK_TODAY_SELL_NUM = CACHE_PRIVATE_KEY_PREFIX + "today_sell_num:";
+
 
     public static final String X_REAL_IP = "x-real-ip";
     public static final int TOKEN_EXPIRE_TIME = 7 * 24 * 3600;
     public static final int STOCK_PRICE_EXPIRE_TIME = 3 * 24 * 3600;
+    public static final int STOCK_TODAY_PRICE_EXPIRE_TIME = 7 * 3600;
     public static final int JOB_CRON_EXPIRE_TIME = 7 * 24 * 3600;
 
     public static final int YZM_TIME = 60;
@@ -61,6 +75,8 @@ public class Const {
 
 
     public static final List<String> IgnoreList = Arrays.asList("class", "userId", "method");
+
+    public static final BigDecimal DEFAULT_PRICE = BigDecimal.ZERO;
 
     public static volatile Integer PRICE_COUNTER = 0;
 }

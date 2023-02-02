@@ -25,4 +25,14 @@ public class TradeResultVo<T> {
     public static boolean success(int Status) {
         return Status == TradeResultVo.STATUS_SUCCESS;
     }
+
+    public TradeResultVo() {
+
+    }
+
+    public TradeResultVo(List<T> dataList) {
+        this.Status = TradeResultVo.STATUS_SUCCESS;
+        this.Data = dataList;
+        this.success = getSuccess();
+    }
 }

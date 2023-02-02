@@ -19,6 +19,7 @@ import top.yueshushu.learn.crawler.service.CrawlerStockHistoryService;
 import top.yueshushu.learn.domain.StockSelectedDo;
 import top.yueshushu.learn.domainservice.StockSelectedDomainService;
 import top.yueshushu.learn.entity.Stock;
+import top.yueshushu.learn.entity.StockHistory;
 import top.yueshushu.learn.entity.StockSelected;
 import top.yueshushu.learn.enumtype.DataFlagType;
 import top.yueshushu.learn.enumtype.SyncStockHistoryType;
@@ -36,7 +37,6 @@ import top.yueshushu.learn.service.StockService;
 import top.yueshushu.learn.service.cache.StockCacheService;
 
 import javax.annotation.Resource;
-import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -382,14 +382,18 @@ public class StockSelectedServiceImpl implements StockSelectedService {
         stockCrawlerService.stockHistoryAsync(stockRo);
         // 设置当前的价格信息
         stockCrawlerService.updateCodePrice(stockCode);
-        // 获取价格信息, 获取该股票昨天的价格
-        List<StockPriceCacheDto> priceCacheDtoList = stockHistoryService.listClosePrice(Collections.singletonList(stockCode));
-        if (!CollectionUtils.isEmpty(priceCacheDtoList)) {
-            StockPriceCacheDto stockPriceCacheDto = priceCacheDtoList.get(0);
-            stockCacheService.setLastBuyCachePrice(stockCode, stockPriceCacheDto.getPrice());
-            stockCacheService.setLastSellCachePrice(stockCode, stockPriceCacheDto.getPrice());
-            stockCacheService.setYesterdayCloseCachePrice(stockCode, stockPriceCacheDto.getPrice());
+
+
+        //如果不存在的话
+        StockHistory lastHistory = stockHistoryService.getLastHistory(stockCode);
+        if (lastHistory == null) {
+            return;
         }
+        stockCacheService.setYesterdayCloseCachePrice(stockCode, lastHistory.getClosingPrice());
+        stockCacheService.setYesterdayOpenCachePrice(stockCode, lastHistory.getOpeningPrice());
+        stockCacheService.setYesterdayHighCachePrice(stockCode, lastHistory.getHighestPrice());
+        stockCacheService.setYesterdayLowestCachePrice(stockCode, lastHistory.getLowestPrice());
+
     }
 
     @Override
@@ -471,23 +475,17 @@ public class StockSelectedServiceImpl implements StockSelectedService {
             // 早上执行的，同步的是昨天的。
             crawlerStockHistoryService.txMoneyYesStockHistory(noHistoryList, stockService.listFullCode(noHistoryList));
         }
-        priceCacheDtoList = stockHistoryService.listClosePrice(codeList);
-        //循环设置缓存信息
-        Map<String, StockPriceCacheDto> priceCacheCodeMap = priceCacheDtoList.stream().collect(Collectors.toMap(StockPriceCacheDto::getCode, n -> n));
         // 对每一条股票记录进行处理
         for (String code : codeList) {
             //如果不存在的话
-            StockPriceCacheDto priceCacheDto = priceCacheCodeMap.get(code);
-            //为空的话，将当前的最后价格，设置成昨天的价格.
-            BigDecimal yesClosePrice;
-            if (priceCacheDto != null) {
-                yesClosePrice = priceCacheDto.getPrice();
-            } else {
-                yesClosePrice = stockCacheService.getNowCachePrice(code);
+            StockHistory lastHistory = stockHistoryService.getLastHistory(code);
+            if (lastHistory == null) {
+                continue;
             }
-            stockCacheService.setYesterdayCloseCachePrice(code, yesClosePrice);
-            stockCacheService.setLastBuyCachePrice(code, yesClosePrice);
-            stockCacheService.setLastSellCachePrice(code, yesClosePrice);
+            stockCacheService.setYesterdayCloseCachePrice(code, lastHistory.getClosingPrice());
+            stockCacheService.setYesterdayOpenCachePrice(code, lastHistory.getOpeningPrice());
+            stockCacheService.setYesterdayHighCachePrice(code, lastHistory.getHighestPrice());
+            stockCacheService.setYesterdayLowestCachePrice(code, lastHistory.getLowestPrice());
         }
     }
 

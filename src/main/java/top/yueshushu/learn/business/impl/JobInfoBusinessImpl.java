@@ -47,6 +47,7 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class JobInfoBusinessImpl implements JobInfoBusiness {
+    public static final String JOB_PARAM_SPLIT = "\\,";
     @Resource
     private JobInfoService jobInfoService;
 
@@ -192,8 +193,11 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
                     break;
                 }
                 case MOCK_DEAL: {
+                    if (!MyDateUtil.isWorkingTime() || !dateHelper.isWorkingDay(DateUtil.date())) {
+                        return OutputResult.buildSucc();
+                    }
                     String userIdList = param;
-                    for (String userId : userIdList.split("\\,")) {
+                    for (String userId : userIdList.split(JOB_PARAM_SPLIT)) {
                         DealRo dealRo = new DealRo();
                         dealRo.setMockType(MockType.MOCK.getCode());
                         dealRo.setUserId(Integer.parseInt(userId));
@@ -203,8 +207,11 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
                     break;
                 }
                 case MOCK_ENTRUST: {
+                    if (!MyDateUtil.isWorkingTime() || !dateHelper.isWorkingDay(DateUtil.date())) {
+                        return OutputResult.buildSucc();
+                    }
                     String userIdList = param;
-                    for (String userId : userIdList.split("\\,")) {
+                    for (String userId : userIdList.split(JOB_PARAM_SPLIT)) {
                         BuyRo buyRo = new BuyRo();
                         buyRo.setMockType(MockType.MOCK.getCode());
                         buyRo.setUserId(Integer.parseInt(userId));

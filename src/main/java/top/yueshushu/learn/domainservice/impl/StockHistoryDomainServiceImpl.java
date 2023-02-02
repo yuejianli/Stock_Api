@@ -47,7 +47,7 @@ public class StockHistoryDomainServiceImpl extends ServiceImpl<StockHistoryDoMap
     }
 
     @Override
-    public StockHistoryDo getByCodeAndCurrDate(String code, DateTime currDate) {
+    public StockHistoryDo getByCodeAndCurrDate(String code, Date currDate) {
         return stockHistoryDoMapper.getStockForDate(
                 code, currDate
         );

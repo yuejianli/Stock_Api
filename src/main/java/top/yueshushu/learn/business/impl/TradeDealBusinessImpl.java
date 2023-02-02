@@ -33,15 +33,15 @@ public class TradeDealBusinessImpl implements TradeDealBusiness {
     private TradeCacheService tradeCacheService;
 
     @Override
-    public OutputResult mockList(TradeDealRo tradeDealRo) {
+    public OutputResult<List<TradeDealVo>> mockList(TradeDealRo tradeDealRo) {
         return tradeDealService.mockList(tradeDealRo);
     }
 
     @Override
-    public OutputResult realList(TradeDealRo tradeDealRo) {
+    public OutputResult<List<TradeDealVo>> realList(TradeDealRo tradeDealRo) {
         Object realEasyMoneyCache = tradeCacheService.getRealEasyMoneyCache(TradeRealValueType.TRADE_DEAL, tradeDealRo.getUserId());
         if (!ObjectUtils.isEmpty(realEasyMoneyCache)) {
-            return OutputResult.buildSucc(realEasyMoneyCache);
+            return OutputResult.buildSucc((List<TradeDealVo>) realEasyMoneyCache);
         }
         log.info(">>>此次员工{}查询需要同步真实的今日成交数据", tradeDealRo.getUserId());
         OutputResult<List<TradeDealVo>> outputResult = tradeDealService.realList(tradeDealRo);
@@ -56,12 +56,12 @@ public class TradeDealBusinessImpl implements TradeDealBusiness {
     }
 
     @Override
-    public OutputResult mockHistoryList(TradeDealRo tradeDealRo) {
+    public OutputResult<PageResponse<TradeDealVo>> mockHistoryList(TradeDealRo tradeDealRo) {
         return tradeDealService.mockHistoryList(tradeDealRo);
     }
 
     @Override
-    public OutputResult realHistoryList(TradeDealRo tradeDealRo) {
+    public OutputResult<PageResponse<TradeDealVo>> realHistoryList(TradeDealRo tradeDealRo) {
         List<TradeDealVo> tradeDealVoList = tradeDealService.realHistoryList(tradeDealRo);
         if (CollectionUtils.isEmpty(tradeDealVoList)) {
             // 为空

@@ -44,15 +44,6 @@ public interface StockCacheService {
      */
     void setYesterdayCloseCachePrice(String code, BigDecimal price);
 
-
-    /**
-     * 删除股票的昨天的收盘价
-     *
-     * @param code 股票代码
-     */
-    void deleteYesterdayCloseCachePrice(String code);
-
-
     /**
      * 获取缓存中股票的昨天的收盘价
      *
@@ -61,53 +52,176 @@ public interface StockCacheService {
     BigDecimal getYesterdayCloseCachePrice(String code);
 
     /**
+     * 设置股票的昨天的开盘价
+     *
+     * @param code  股票代码
+     * @param price 股票的价格
+     */
+    void setYesterdayOpenCachePrice(String code, BigDecimal price);
+
+    /**
+     * 获取缓存中股票的昨天的开盘价
+     *
+     * @param code 股票代码
+     */
+    BigDecimal getYesterdayOpenCachePrice(String code);
+
+
+    /**
+     * 设置股票的昨天的最高价
+     *
+     * @param code  股票代码
+     * @param price 股票的价格
+     */
+    void setYesterdayHighCachePrice(String code, BigDecimal price);
+
+    /**
+     * 获取缓存中股票的昨天的最高价
+     *
+     * @param code 股票代码
+     */
+    BigDecimal getYesterdayHighCachePrice(String code);
+
+    /**
+     * 设置股票的昨天的开盘价
+     *
+     * @param code  股票代码
+     * @param price 股票的价格
+     */
+    void setYesterdayLowestCachePrice(String code, BigDecimal price);
+
+    /**
+     * 获取缓存中股票的昨天的开盘价
+     *
+     * @param code 股票代码
+     */
+    BigDecimal getYesterdayLowestCachePrice(String code);
+
+
+    /**
      * 清空所有的昨日价格
      */
     void clearYesPrice();
 
     /**
-     * 设置缓存中股票的最近一次买入的价格  第二天为重置成昨晚的收盘价
+     * 设置缓存中股票的最近一次买入成交的价格
      *
-     * @param code  股票代码
-     * @param price 股票的价格
+     * @param userId   用户编号
+     * @param mockType 类型
+     * @param code     股票代码
+     * @param price    股票的价格
      */
-    void setLastBuyCachePrice(String code, BigDecimal price);
-
-    /**
-     * 删除缓存中股票的最近一次买入的价格  第二天为重置成昨晚的收盘价
-     *
-     * @param code 股票代码
-     */
-    void deleteLastBuyCachePrice(String code);
+    void setLastBuyCachePrice(Integer userId, Integer mockType, String code, BigDecimal price);
 
     /**
      * 获取缓存中股票的最近一次买入的价格
      *
-     * @param code 股票代码
+     * @param userId   用户编号
+     * @param mockType 类型
+     * @param code     股票代码
      */
-    BigDecimal getLastBuyCachePrice(String code);
+    BigDecimal getLastBuyCachePrice(Integer userId, Integer mockType, String code);
+
 
     /**
-     * 设置缓存中股票的最近一次卖出的价格  第二天为重置成昨晚的收盘价
+     * 设置缓存中股票的最近一次卖出的价格
      *
-     * @param code  股票代码
-     * @param price 股票的价格
+     * @param userId
+     * @param mockType
+     * @param code     股票代码
+     * @param price    股票的价格
      */
-    void setLastSellCachePrice(String code, BigDecimal price);
+    void setLastSellCachePrice(Integer userId, Integer mockType, String code, BigDecimal price);
 
-    /**
-     * 删除缓存中股票的最近一次卖出的价格  第二天为重置成昨晚的收盘价
-     *
-     * @param code 股票代码
-     */
-    void deleteLastSellCachePrice(String code);
 
     /**
      * 获取缓存中股票的最近一次卖出的价格
      *
-     * @param code 股票代码
+     * @param userId
+     * @param mockType
+     * @param code     股票代码
      */
-    BigDecimal getLastSellCachePrice(String code);
+    BigDecimal getLastSellCachePrice(Integer userId, Integer mockType, String code);
+
+
+    /**
+     * 设置缓存中股票的今日一次买入成交的价格
+     *
+     * @param userId   用户编号
+     * @param mockType 类型
+     * @param code     股票代码
+     * @param price    股票的价格
+     */
+    void setTodayBuyCachePrice(Integer userId, Integer mockType, String code, BigDecimal price);
+
+    /**
+     * 获取缓存中股票的最近一次买入的价格
+     *
+     * @param userId   用户编号
+     * @param mockType 类型
+     * @param code     股票代码
+     */
+    BigDecimal getTodayBuyCachePrice(Integer userId, Integer mockType, String code);
+
+
+    /**
+     * 设置缓存中股票的最近一次卖出的价格
+     *
+     * @param userId
+     * @param mockType
+     * @param code     股票代码
+     * @param price    股票的价格
+     */
+    void setTodaySellCachePrice(Integer userId, Integer mockType, String code, BigDecimal price);
+
+
+    /**
+     * 获取缓存中股票的最近一次卖出的价格
+     *
+     * @param userId
+     * @param mockType
+     * @param code     股票代码
+     */
+    BigDecimal getTodaySellCachePrice(Integer userId, Integer mockType, String code);
+
+
+    /**
+     * 减少该股票可买次数
+     *
+     * @param userId   用户编号
+     * @param mockType 类型
+     * @param code     股票代码
+     */
+    void reduceTodayBuySurplusNum(Integer userId, Integer mockType, String code);
+
+    /**
+     * 获取今日可买次数
+     *
+     * @param userId   用户编号
+     * @param mockType 类型
+     * @param code     股票代码
+     */
+    Long getTodayBuySurplusNum(Integer userId, Integer mockType, String code);
+
+
+    /**
+     * 减少该股票的可卖次数
+     *
+     * @param userId   用户编号
+     * @param mockType 类型
+     * @param code     股票代码
+     */
+    void reduceTodaySellSurplusNum(Integer userId, Integer mockType, String code);
+
+    /**
+     * 获取该股票今日的可卖次数
+     *
+     * @param userId   用户编号
+     * @param mockType 类型
+     * @param code     股票代码
+     */
+    Long getTodaySellSurplusNum(Integer userId, Integer mockType, String code);
+
 
     /**
      * @param userId   用户编号

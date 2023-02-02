@@ -129,6 +129,7 @@ public class DealServiceImpl implements DealService {
     private OutputResult sellDeal(TradeEntrustDo tradeEntrustDo) {
         //取消的话，改变这个记录的状态。
         tradeEntrustDo.setEntrustStatus(EntrustStatusType.SUCCESS.getCode());
+        tradeEntrustDo.setDealCode(StockUtil.generateDealCode());
         //更新
         tradeEntrustDomainService.updateById(tradeEntrustDo);
         //成交了，金额不动。 动持仓信息
@@ -211,6 +212,7 @@ public class DealServiceImpl implements DealService {
     private OutputResult buyDeal(TradeEntrustDo tradeEntrustDo) {
         //取消的话，改变这个记录的状态。
         tradeEntrustDo.setEntrustStatus(EntrustStatusType.SUCCESS.getCode());
+        tradeEntrustDo.setDealCode(StockUtil.generateDealCode());
         //更新
         tradeEntrustDomainService.updateById(tradeEntrustDo);
         //成交了，金额不动。 动持仓信息

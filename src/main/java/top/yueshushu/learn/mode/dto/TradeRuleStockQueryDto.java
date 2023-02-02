@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @ClassName:TradeRuleStockQueryDto
@@ -29,4 +30,10 @@ public class TradeRuleStockQueryDto implements Serializable {
     private String stockCode;
     @ApiModelProperty("规则条件Id")
     private Integer ruleConditionId;
+
+    @ApiModelProperty("规则id集合")
+    private List<Integer> ruleIdList;
+
+    @ApiModelProperty("股票编码集合")
+    private List<String> stockCodeList;
 }

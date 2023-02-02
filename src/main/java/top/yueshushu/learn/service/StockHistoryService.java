@@ -37,6 +37,14 @@ public interface StockHistoryService{
 
 
     /**
+     * 获取股票昨天的历史记录信息
+     *
+     * @param stockCode 股票编码
+     * @return
+     */
+    StockHistory getLastHistory(String stockCode);
+
+    /**
      * 查询最近十天的股票交易信息
      *
      * @param stockCode 股票编码

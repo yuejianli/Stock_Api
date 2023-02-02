@@ -5,6 +5,7 @@ import top.yueshushu.learn.enumtype.MockType;
 import top.yueshushu.learn.mode.ro.TradeEntrustRo;
 import top.yueshushu.learn.mode.vo.TradeEntrustVo;
 import top.yueshushu.learn.response.OutputResult;
+import top.yueshushu.learn.response.PageResponse;
 
 import java.util.List;
 
@@ -27,10 +28,11 @@ public interface TradeEntrustService {
 
     /**
      * 查询虚拟的今日委托信息
+     *
      * @param tradeEntrustRo 委托对象
      * @return 查询虚拟的今日委托信息
      */
-    OutputResult mockList(TradeEntrustRo tradeEntrustRo);
+    OutputResult<List<TradeEntrustVo>> mockList(TradeEntrustRo tradeEntrustRo);
 
     /**
      * 查询真实的今日委托信息
@@ -48,10 +50,11 @@ public interface TradeEntrustService {
 
     /**
      * 查询虚拟的历史委托信息
+     *
      * @param tradeEntrustRo 委托对象
      * @return 查询虚拟的历史委托信息
      */
-    OutputResult mockHistoryList(TradeEntrustRo tradeEntrustRo);
+    OutputResult<PageResponse<TradeEntrustVo>> mockHistoryList(TradeEntrustRo tradeEntrustRo);
 
     /**
      * 查询真实的历史委托信息

@@ -1,6 +1,7 @@
 package top.yueshushu.learn.entity;
 
 import lombok.Data;
+import top.yueshushu.learn.enumtype.RuleValueType;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -34,4 +35,8 @@ public class TradeRule implements Serializable {
     private Date createTime;
     private Date updateTime;
     private Integer flag;
+
+    public boolean isProportion() {
+        return RuleValueType.PROPORTION.getCode().equals(ruleValueType);
+    }
 }

@@ -23,10 +23,19 @@ public interface TradeDealDomainService extends IService<TradeDealDo> {
      * @param tradeDealQueryDto 今日的交易信息对象
      */
     void deleteToDayByQuery(TradeDealQueryDto tradeDealQueryDto);
+
     /**
      * 根据用户编号和交易类型，查询历史交易记录信息
+     *
      * @param tradeDealQueryDto 成交交易查询对象，包含用户编号和类型
      * @return 根据用户编号和交易类型，查询历史14天的交易记录信息
      */
     List<TradeDealDo> listHistoryByQuery(TradeDealQueryDto tradeDealQueryDto);
+
+    /**
+     * 获取最后一次的交易信息
+     *
+     * @param tradeDealQueryDto 交易信息对象
+     */
+    TradeDealDo getLastDeal(TradeDealQueryDto tradeDealQueryDto);
 }

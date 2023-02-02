@@ -12,7 +12,7 @@ import top.yueshushu.learn.crawler.entity.StockHistoryCsvInfo;
 import top.yueshushu.learn.crawler.entity.TxStockHistoryInfo;
 import top.yueshushu.learn.crawler.parse.DailyTradingInfoParse;
 import top.yueshushu.learn.crawler.util.MyCsvUtil;
-import top.yueshushu.learn.mode.dto.EasyMoneyHistoryVo;
+import top.yueshushu.learn.mode.vo.EasyMoneyHistoryVo;
 import top.yueshushu.learn.util.BigDecimalUtil;
 
 import java.io.File;
