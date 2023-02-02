@@ -101,7 +101,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public OutputResult tradeUserText(String text) {
-        //进行 rsa 加密， 处理密码。
+        //进行 rsa 加密， 处理用户的账号和密码。
         try {
             String redisPublicKey = redisUtil.get(Const.RSA_PUBLIC_KEY);
             if (!StringUtils.hasText(redisPublicKey)) {
@@ -112,7 +112,7 @@ public class UserServiceImpl implements UserService {
             redisPublicKey = redisPublicKey.replaceFirst("X\\+", "X");
             return OutputResult.buildSucc(RSAUtil.encryptByPublicKey(redisPublicKey, text));
         } catch (Exception e) {
-            log.error(">>> 转换用户交易密码出错", e);
+            log.error(">>> 转换用户交易信息出错", e);
             return OutputResult.buildFail();
         }
     }

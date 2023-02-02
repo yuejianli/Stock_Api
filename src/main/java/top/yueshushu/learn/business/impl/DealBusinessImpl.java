@@ -119,7 +119,7 @@ public class DealBusinessImpl implements DealBusiness {
                     deal(newRo);
                     User user = userService.getById(dealRo.getUserId());
                     String message = MessageFormat.format(
-                            "成交提醒: 成交时间:{0},买入股票 {1},名称{2},买入{3}股，买入的价格是:{4},花费金额:{5},委托时间是:{6}",
+                            "买入成交提醒: 成交时间:{0},股票 {1},名称{2},买入{3}股，价格是:{4},花费金额:{5},委托时间是:{6}",
                             DateUtil.now(),
                             tradeEntrustDo.getCode(), tradeEntrustDo.getName(),
                             tradeEntrustDo.getEntrustNum(), tradeEntrustDo.getEntrustPrice(),
@@ -138,12 +138,12 @@ public class DealBusinessImpl implements DealBusiness {
 
                     User user = userService.getById(dealRo.getUserId());
                     String message = MessageFormat.format(
-                            "成交提醒: 卖出股票 {0},名称{1},卖出{2}股，卖出的价格是:{3},卖出金额:{4},委托时间是:{5},成交时间:{6}",
+                            "卖出成交提醒: 成交时间:{0},卖出股票 {1},名称{2},卖出{3}股，价格是:{4},卖出金额:{5},委托时间是:{6}",
+                            DateUtil.now(),
                             tradeEntrustDo.getCode(), tradeEntrustDo.getName(),
                             tradeEntrustDo.getEntrustNum(), tradeEntrustDo.getEntrustPrice(),
                             tradeEntrustDo.getEntrustMoney(),
-                            tradeEntrustDo.getEntrustDate(),
-                            DateUtil.now()
+                            DateUtil.format(tradeEntrustDo.getEntrustDate(), DatePattern.NORM_DATETIME_PATTERN)
                     );
                     weChatService.sendTextMessage(user.getId(), message);
                 }

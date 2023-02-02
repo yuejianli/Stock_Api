@@ -70,7 +70,6 @@ public class TradeStrategyServiceImpl implements TradeStrategyService {
         if (CollectionUtils.isEmpty(codeList)) {
             return;
         }
-
         // 对 codeList 进行处理，如果已经没有交易次数了， 那么就不处理这个股票信息。
 
         List<String> canBSStockList = new ArrayList<>();

@@ -28,4 +28,11 @@ public interface TradeUserService {
      * @param userId    用户编号
      */
     void operateTradeUser(TradeUser tradeUser, Integer userId);
+
+    /**
+     * 更新交易用户信息
+     *
+     * @param tradeUserRo 交易用户信息
+     */
+    void editInfo(TradeUserRo tradeUserRo);
 }

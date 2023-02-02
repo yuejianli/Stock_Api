@@ -30,8 +30,8 @@ public class Const {
     public static final String STOCK_YES_LOWEST_PRICE = CACHE_PUBLIC_KEY_PREFIX + "yes:lowest:";
 
 
-    public static final String STOCK_BUY_PRICE = CACHE_PRIVATE_KEY_PREFIX + "buy:";
-    public static final String STOCK_SELL_PRICE = CACHE_PRIVATE_KEY_PREFIX + "sell:";
+    public static final String STOCK_LAST_BUY_PRICE = CACHE_PRIVATE_KEY_PREFIX + "last_buy:";
+    public static final String STOCK_LAST_SELL_PRICE = CACHE_PRIVATE_KEY_PREFIX + "last_sell:";
 
     public static final String STOCK_TODAY_BUY_PRICE = CACHE_PRIVATE_KEY_PREFIX + "today_buy:";
     public static final String STOCK_TODAY_SELL_PRICE = CACHE_PRIVATE_KEY_PREFIX + "today_sell:";

@@ -11,7 +11,7 @@ public enum RuleConditionType {
     YES_CLOSING_PRICE_SELL("yes_closing_price_2", "yesClosingPriceSellHandler"),
 
     // 开盘策略
-    YES_OPENING_PRICE_BUY("yes_opening_price_1", "yesOpeningPriceSellHandler"),
+    YES_OPENING_PRICE_BUY("yes_opening_price_1", "yesOpeningPriceBuyHandler"),
     YES_OPENING_PRICE_SELL("yes_opening_price_2", "yesOpeningPriceSellHandler"),
 
 

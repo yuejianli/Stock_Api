@@ -193,8 +193,10 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
                     break;
                 }
                 case MOCK_DEAL: {
-                    if (!MyDateUtil.isWorkingTime() || !dateHelper.isWorkingDay(DateUtil.date())) {
-                        return OutputResult.buildSucc();
+                    if (EntrustType.AUTO.getCode().equals(triggerType)) {
+                        if (!MyDateUtil.isWorkingTime() || !dateHelper.isWorkingDay(DateUtil.date())) {
+                            return OutputResult.buildSucc();
+                        }
                     }
                     String userIdList = param;
                     for (String userId : userIdList.split(JOB_PARAM_SPLIT)) {
@@ -207,8 +209,10 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
                     break;
                 }
                 case MOCK_ENTRUST: {
-                    if (!MyDateUtil.isWorkingTime() || !dateHelper.isWorkingDay(DateUtil.date())) {
-                        return OutputResult.buildSucc();
+                    if (EntrustType.AUTO.getCode().equals(triggerType)) {
+                        if (!MyDateUtil.isWorkingTime() || !dateHelper.isWorkingDay(DateUtil.date())) {
+                            return OutputResult.buildSucc();
+                        }
                     }
                     String userIdList = param;
                     for (String userId : userIdList.split(JOB_PARAM_SPLIT)) {

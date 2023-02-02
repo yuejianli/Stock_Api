@@ -7,6 +7,7 @@ import top.yueshushu.learn.business.BuyBusiness;
 import top.yueshushu.learn.business.SellBusiness;
 import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.enumtype.ConditionType;
+import top.yueshushu.learn.enumtype.DealType;
 import top.yueshushu.learn.enumtype.EntrustType;
 import top.yueshushu.learn.enumtype.RuleValueType;
 import top.yueshushu.learn.message.weixin.service.WeChatService;
@@ -38,12 +39,17 @@ public abstract class BaseStrategyHandler<I extends BaseStrategyInput, R extends
         if (null == price) {
             return;
         }
-        // 处理买入
-        BuyRo buyRo = buyHandler(tradeStockRuleDto, price);
-        handlerBuyRoResult(buyRo);
-        // 处理卖出
-        SellRo sellRo = sellHandler(tradeStockRuleDto, price);
-        handlerSellRoResult(sellRo);
+        if (DealType.BUY.getCode().equals(tradeStockRuleDto.getRuleType())) {
+            // 处理买入
+            BuyRo buyRo = buyHandler(tradeStockRuleDto, price);
+            handlerBuyRoResult(buyRo);
+        }
+        if (DealType.SELL.getCode().equals(tradeStockRuleDto.getRuleType())) {
+            // 处理卖出
+            SellRo sellRo = sellHandler(tradeStockRuleDto, price);
+            handlerSellRoResult(sellRo);
+        }
+
     }
 
 

@@ -9,6 +9,7 @@ import top.yueshushu.learn.mode.vo.TradeUserVo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.service.MenuService;
 import top.yueshushu.learn.service.TradeUserService;
+import top.yueshushu.learn.service.UserService;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -26,12 +27,14 @@ public class TradeUserBusinessImpl implements TradeUserBusiness {
     private TradeUserService tradeUserService;
     @Resource
     private MenuService menuService;
+    @Resource
+    private UserService userService;
 
     @Override
     public OutputResult login(TradeUserRo tradeUserRo) {
 
         OutputResult outputResult = tradeUserService.login(tradeUserRo);
-        if (!outputResult.getSuccess()){
+        if (!outputResult.getSuccess()) {
             return outputResult;
         }
         TradeUserVo tradeUserVo = (TradeUserVo) outputResult.getData();
@@ -41,5 +44,18 @@ public class TradeUserBusinessImpl implements TradeUserBusiness {
         tradeUserVo.setMenuList(menuVoList);
 
         return OutputResult.buildSucc(tradeUserVo);
+    }
+
+    @Override
+    public OutputResult editInfo(TradeUserRo tradeUserRo) {
+        // 对 账号进行加密.
+        tradeUserRo.setAccount(userService.tradeUserText(tradeUserRo.getAccount()).getData().toString());
+        // 对密码进行处理。
+        tradeUserRo.setPassword(userService.tradeUserText(tradeUserRo.getPassword()).getData().toString());
+
+        // 更新.
+        tradeUserService.editInfo(tradeUserRo);
+
+        return OutputResult.buildSucc();
     }
 }

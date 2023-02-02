@@ -50,4 +50,17 @@ public class TradeUserController extends BaseController {
         tradeUserRo.setRandNum(randNum);
         return tradeUserBusiness.login(tradeUserRo);
     }
+
+    @PostMapping("/editInfo")
+    @ApiOperation("修改信息")
+    @AuthToken
+    public OutputResult editInfo(@RequestBody TradeUserRo tradeUserRo) {
+
+        // 对数据进行 check
+        if (!StringUtils.hasText(tradeUserRo.getAccount()) || !StringUtils.hasText(tradeUserRo.getPassword())) {
+            return OutputResult.buildAlert(ResultCode.TRADE_IDENTIFY_CODE_IS_EMPTY);
+        }
+        tradeUserRo.setId(ThreadLocalUtils.getUserId());
+        return tradeUserBusiness.editInfo(tradeUserRo);
+    }
 }

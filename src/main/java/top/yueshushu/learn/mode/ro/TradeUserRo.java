@@ -18,19 +18,21 @@ import java.io.Serializable;
 @Data
 @ApiModel("交易用户信息Ro")
 public class TradeUserRo implements Serializable {
-    @ApiModelProperty(value = "登录的用户的id",hidden = true)
+    @ApiModelProperty(value = "登录的用户的id", hidden = true)
     private Integer id;
-    @ApiModelProperty("密码")
+    @ApiModelProperty("证券密码")
     private String password;
     @ApiModelProperty("四位纯数字的验证码")
-    private String identifyCode ;
+    private String identifyCode;
     @ApiModelProperty("随机数")
-    private String randNum ;
+    private String randNum;
+    @ApiModelProperty("证券账号")
+    private String account;
 
-    public String getRandNum(){
-        if(StringUtils.hasText(randNum)){
+    public String getRandNum() {
+        if (StringUtils.hasText(randNum)) {
             return randNum;
         }
-        return Const.RAND_NUMBER_PREFIX +System.currentTimeMillis();
+        return Const.RAND_NUMBER_PREFIX + System.currentTimeMillis();
     }
 }

@@ -11,8 +11,16 @@ import top.yueshushu.learn.response.OutputResult;
 public interface TradeUserBusiness {
     /**
      * 交易用户登录信息
+     *
      * @param tradeUserRo 交易用户登录对象
      * @return 返回交易用户登录成功后的信息
      */
     OutputResult login(TradeUserRo tradeUserRo);
+
+    /**
+     * 修改用户的账号和密码信息
+     *
+     * @param tradeUserRo 交易用户对象
+     */
+    OutputResult editInfo(TradeUserRo tradeUserRo);
 }

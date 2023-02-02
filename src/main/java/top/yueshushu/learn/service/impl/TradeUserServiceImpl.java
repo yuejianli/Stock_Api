@@ -93,12 +93,11 @@ public class TradeUserServiceImpl implements TradeUserService {
         // 先查询一下，是否存在.
 
         TradeUserDo tradeUserDo = tradeUserDomainService.getByUserId(userId);
-
         if (null == tradeUserDo) {
             // 进行插入
             tradeUserDo = new TradeUserDo();
-            tradeUserDo.setAccount("证券交易系统账号");
-            tradeUserDo.setPassword("证券交易系统密码,已加密");
+            tradeUserDo.setAccount("");
+            tradeUserDo.setPassword("");
             tradeUserDo.setUserId(userId);
             tradeUserDo.setCreateTime(LocalDateTime.now());
             tradeUserDo.setUpdateTime(LocalDateTime.now());
@@ -114,6 +113,20 @@ public class TradeUserServiceImpl implements TradeUserService {
             tradeUserDomainService.updateById(editTradeUserDo);
         }
 
+    }
+
+    @Override
+    public void editInfo(TradeUserRo tradeUserRo) {
+        TradeUserDo tradeUserDo = tradeUserDomainService.getByUserId(tradeUserRo.getId());
+        if (null == tradeUserDo) {
+            return;
+        }
+        TradeUserDo editTradeUserDo = new TradeUserDo();
+        editTradeUserDo.setId(tradeUserDo.getId());
+        editTradeUserDo.setAccount(tradeUserRo.getAccount());
+        editTradeUserDo.setPassword(tradeUserRo.getPassword());
+        // 进行更新
+        tradeUserDomainService.updateById(editTradeUserDo);
     }
 
     /**

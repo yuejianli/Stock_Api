@@ -180,25 +180,25 @@ public class StockCacheServiceImpl implements StockCacheService {
 
     @Override
     public void setLastBuyCachePrice(Integer userId, Integer mockType, String code, BigDecimal price) {
-        setDealPrice(Const.STOCK_BUY_PRICE + mockType + ":" + userId + ":" + code, price);
+        setDealPrice(Const.STOCK_LAST_BUY_PRICE + mockType + ":" + userId + ":" + code, price);
     }
 
 
     @Override
     public BigDecimal getLastBuyCachePrice(Integer userId, Integer mockType, String code) {
-        return getDealPrice(Const.STOCK_BUY_PRICE + mockType + ":" + userId + ":" + code, userId, mockType, code, DealType.BUY.getCode());
+        return getDealPrice(Const.STOCK_LAST_BUY_PRICE + mockType + ":" + userId + ":" + code, userId, mockType, code, DealType.BUY.getCode());
     }
 
 
     @Override
     public void setLastSellCachePrice(Integer userId, Integer mockType, String code, BigDecimal price) {
-        setDealPrice(Const.STOCK_SELL_PRICE + mockType + ":" + userId + ":" + code, price);
+        setDealPrice(Const.STOCK_LAST_SELL_PRICE + mockType + ":" + userId + ":" + code, price);
     }
 
 
     @Override
     public BigDecimal getLastSellCachePrice(Integer userId, Integer mockType, String code) {
-        return getDealPrice(Const.STOCK_SELL_PRICE + mockType + ":" + userId + ":" + code, userId, mockType, code, DealType.SELL.getCode());
+        return getDealPrice(Const.STOCK_LAST_SELL_PRICE + mockType + ":" + userId + ":" + code, userId, mockType, code, DealType.SELL.getCode());
     }
 
 
