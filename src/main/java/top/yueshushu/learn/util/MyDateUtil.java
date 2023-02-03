@@ -88,12 +88,21 @@ public class MyDateUtil {
 
 
     /**
-     * 当前时间是否 9点半到 15点之间
+     * 当前时间是否 9点20 到 15点之间
      *
      * @return
      */
     public static boolean isWorkingTime() {
         return isMorning() || isAfternoon();
+    }
+
+    /**
+     * 当前时间是否 9点半到 15点之间
+     *
+     * @return
+     */
+    public static boolean isDealTime() {
+        return !(before930() || after15Hour());
     }
 
     public static void main(String[] args) {

@@ -23,6 +23,12 @@ public class ExtendProperties implements Serializable {
     private String hotMapUrl;
 
     /**
+     * 查询版块列表
+     */
+    @Value("${extend.bkList}")
+    private String bkListUrl;
+
+    /**
      * 主力资金今日注入
      */
     @Value("${extend.todayPlatMoney}")

@@ -158,7 +158,7 @@ public abstract class BaseStrategyHandler<I extends BaseStrategyInput, R extends
 
     private void sendExtractSellMessage(SellRo sellRo) {
         String message = MessageFormat.format(
-                "{0} 委托卖出提醒: 代码: {1},名称{2},买入{3}股，委托价格是:{4}",
+                "{0} 委托卖出提醒: 代码: {1},名称{2},卖出{3}股，委托价格是:{4}",
                 DateUtil.now(),
                 sellRo.getCode(), sellRo.getName(),
                 sellRo.getAmount(), sellRo.getPrice()

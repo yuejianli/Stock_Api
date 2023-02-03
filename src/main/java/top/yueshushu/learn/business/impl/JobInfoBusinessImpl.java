@@ -194,7 +194,7 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
                 }
                 case MOCK_DEAL: {
                     if (EntrustType.AUTO.getCode().equals(triggerType)) {
-                        if (!MyDateUtil.isWorkingTime() || !dateHelper.isWorkingDay(DateUtil.date())) {
+                        if (!MyDateUtil.isDealTime() || !dateHelper.isWorkingDay(DateUtil.date())) {
                             return OutputResult.buildSucc();
                         }
                     }
@@ -210,7 +210,7 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
                 }
                 case MOCK_ENTRUST: {
                     if (EntrustType.AUTO.getCode().equals(triggerType)) {
-                        if (!MyDateUtil.isWorkingTime() || !dateHelper.isWorkingDay(DateUtil.date())) {
+                        if (!MyDateUtil.isDealTime() || !dateHelper.isWorkingDay(DateUtil.date())) {
                             return OutputResult.buildSucc();
                         }
                     }

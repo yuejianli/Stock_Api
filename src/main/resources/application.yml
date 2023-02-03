@@ -170,6 +170,9 @@ default:
 extend:
   # 热点图
   hotmap: https://26d3254z77.zicp.fun/queryinfo?time={0}
+  # 版块列表
+  bkList: "https://push2.eastmoney.com/api/qt/clist/get?cb={0}&pn=1&pz=500&po=1&np=1&fields=f12,f13,f14,f62\
+  &fid=f62&fs=m:90+t:2&ut=b2884a393a59ad64002292a3e90d46a5&_=1675339693635"
   # 主力资金当时注入
   todayPlatMoney: "https://push2.eastmoney.com/api/qt/clist/get?cb={0}&fid=f62&po=1&pz=150&pn=1&np=1\
   &fltt=2&invt=2&ut=b2884a393a59ad64002292a3e90d46a5&fs=m:90+t:2&fields=f12,f14,f2,f3,f62,f184,f66,f69,f72,f75,f78,f81,f84,f87,f204,f205,f124,f1,f13"
