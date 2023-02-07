@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.yueshushu.learn.mapper.StockBkMoneyHistoryMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="top.yueshushu.learn.domain.StockBkMoneyHistoryDo">
+        <id column="id" property="id" />
+        <result column="bk_code" property="bkCode" />
+        <result column="bk_name" property="bkName" />
+        <result column="curr_date" property="currentDate" />
+        <result column="bk_now_price" property="bkNowPrice" />
+        <result column="bk_now_proportion" property="bkNowProportion" />
+        <result column="market" property="market" />
+        <result column="today_main_inflow" property="todayMainInflow" />
+        <result column="today_main_inflow_proportion" property="todayMainInflowProportion" />
+        <result column="today_super_inflow" property="todaySuperInflow" />
+        <result column="today_super_inflow_proportion" property="todaySuperInflowProportion" />
+        <result column="today_more_inflow" property="todayMoreInflow" />
+        <result column="today_more_inflow_proportion" property="todayMoreInflowProportion" />
+        <result column="today_middle_inflow" property="todayMiddleInflow" />
+        <result column="today_middle_inflow_proportion" property="todayMiddleInflowProportion" />
+        <result column="today_small_inflow" property="todaySmallInflow" />
+        <result column="today_small_inflow_proportion" property="todaySmallInflowProportion" />
+        <result column="today_main_inflow_code" property="todayMainInflowCode" />
+        <result column="today_main_inflow_name" property="todayMainInflowName" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, bk_code, bk_name, curr_date, bk_now_price, bk_now_proportion, market, today_main_inflow, today_main_inflow_proportion, today_super_inflow, today_super_inflow_proportion, today_more_inflow, today_more_inflow_proportion, today_middle_inflow, today_middle_inflow_proportion, today_small_inflow, today_small_inflow_proportion, today_main_inflow_code, today_main_inflow_name
+    </sql>
+
+    <delete id="deleteByDate">
+        delete from stock_bk_money_history
+        where date_format(curr_date,'%Y%m%d') = date_format( #{currDate,jdbcType=TIMESTAMP},'%Y%m%d')
+    </delete>
+
+    <select id="listMoneyHistoryByCodeAndRangeDate" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/> from stock_bk_money_history t
+        where t.bk_code=#{bkCode}
+        <if test="startDate!=null">
+            and curr_date > #{startDate}
+        </if>
+        <if test="endDate!=null">
+            and curr_date &lt; #{endDate}
+        </if>
+        order by t.curr_date asc
+    </select>
+</mapper>

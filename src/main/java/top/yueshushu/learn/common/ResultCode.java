@@ -256,6 +256,12 @@ public class ResultCode {
     public static final ResultCode EXT_ID_NOT_EXIST =
             new ResultCode(true, 10021002, "未查询出客户信息");
 
+    /**
+     * 版块信息  100 22（编排）+ 001 (三位随机)
+     */
+    public static final ResultCode BK_CODE_IS_EMPTY =
+            new ResultCode(true, 10022001, "版块编码不能为空");
+
     private boolean success;
     private int code;
     private String message;

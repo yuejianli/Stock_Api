@@ -24,6 +24,8 @@ public enum JobInfoType {
     SYNC_EASY_MONEY("syncEasyMoney", "同步东财数据保存到数据库"),
     BUY_NEW_STOCK("buyNewStock", "新股申购"),
     AUTO_LOGIN("autoLogin", "自动登录"),
+    STOCK_BK("stockBk", "股票版块"),
+    STOCK_PRICE_SAVE("stockPriceSave", "股票价格每分钟保存"),
     ;
 
     private String code;

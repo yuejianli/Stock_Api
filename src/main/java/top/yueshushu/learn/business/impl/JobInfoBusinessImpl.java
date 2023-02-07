@@ -91,6 +91,8 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
     private AutoLoginBusiness autoLoginBusiness;
     @Resource
     private DingTalkService dingTalkService;
+    @Resource
+    private BKBusiness bkBusiness;
     @SuppressWarnings("all")
     @Resource(name = Const.ASYNC_SERVICE_EXECUTOR_BEAN_NAME)
     private AsyncTaskExecutor executor;
@@ -123,6 +125,12 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
         //是获取股票实时价格的任务，并且是自动运行。 非时间，不执行。
         if (JobInfoType.STOCK_PRICE.equals(jobInfoType) && EntrustType.AUTO.getCode().equals(triggerType)) {
             if (!MyDateUtil.isWorkingTime() || !dateHelper.isWorkingDay(DateUtil.date())) {
+                return OutputResult.buildSucc();
+            }
+        }
+        //是获取股票保存价格的任务，并且是自动运行。 非时间，不执行。
+        if (JobInfoType.STOCK_PRICE_SAVE.equals(jobInfoType) && EntrustType.AUTO.getCode().equals(triggerType)) {
+            if (!MyDateUtil.isMorning() || !dateHelper.isWorkingDay(DateUtil.date())) {
                 return OutputResult.buildSucc();
             }
         }
@@ -159,9 +167,22 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
                 case STOCK_PRICE: {
                     if (isEndStockPriceTime()) {
                         // 进行休眠30 s, 使 查询股票的价格时间 在3点之后。
-                        TimeUnit.SECONDS.sleep(30);
+                        sleepTime(30000);
                     }
                     stockSelectedService.updateSelectedCodePrice(null);
+                    break;
+                }
+                case STOCK_PRICE_SAVE: {
+                    if (!StringUtils.hasText(param)) {
+                        break;
+                    }
+                    if (isEndStockPriceTime()) {
+                        // 进行休眠 1min , 使 保存股票的价格时间 在3点之后。
+                        sleepTime(60000);
+                    }
+                    // 同步股票的编码
+                    String[] stockCodeList = param.split(JOB_PARAM_SPLIT);
+                    stockSelectedService.saveStockPrice(stockCodeList);
                     break;
                 }
                 case TRADE_ING_TO_REVOKE: {
@@ -336,6 +357,10 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
                                     }
                             );
                     break;
+                }
+                case STOCK_BK: {
+                    bkBusiness.syncBK();
+                    bkBusiness.syncBKMoney();
                 }
                 default: {
                     break;

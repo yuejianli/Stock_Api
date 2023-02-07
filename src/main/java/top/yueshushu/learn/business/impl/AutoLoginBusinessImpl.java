@@ -87,13 +87,17 @@ public class AutoLoginBusinessImpl implements AutoLoginBusiness {
         tradeUserRo.setRandNum(randNum);
         tradeUserRo.setIdentifyCode(identifyCode);
         boolean flag = tradeUserBusiness.login(tradeUserRo).getSuccess();
-        User user = userService.getById(userId);
-        String message = MessageFormat.format(
-                "用户 :{0} 执行自动登录, 运行 {1}",
-                user.getName(), flag == true ? "成功" : "失败"
-        );
-        weChatService.sendTextMessage(user.getId(), message);
-        dingTalkService.sendTextMessage(user.getId(), message);
+
+        // 运行失败的话，才发消息。
+        if (!flag) {
+            User user = userService.getById(userId);
+            String message = MessageFormat.format(
+                    "用户 :{0} 执行自动登录, 运行 {1}",
+                    user.getName(), flag == true ? "成功" : "失败"
+            );
+            weChatService.sendTextMessage(user.getId(), message);
+            dingTalkService.sendTextMessage(user.getId(), message);
+        }
         return flag;
     }
 }

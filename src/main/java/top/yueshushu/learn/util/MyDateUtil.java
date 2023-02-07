@@ -20,6 +20,7 @@ import java.util.Date;
  **/
 public class MyDateUtil {
     private static LocalTime MORNING_START_TIME = LocalTime.parse("09:20:00");
+    private static LocalTime MORNING_START_DEAL_TIME = LocalTime.parse("09:30:00");
     private static LocalTime MORNING_END_TIME = LocalTime.parse("11:30:05");
 
     private static LocalTime AFTERNOON_START_TIME = LocalTime.parse("13:00:00");
@@ -66,9 +67,19 @@ public class MyDateUtil {
      * 是否是 9点 20到 11:30 的时间
      */
     public static boolean isMorning() {
-        // 进行延迟， 如果时间在 14:59 之后，则睡眠 1分钟。
         LocalTime now = LocalTime.now();
         if (now.isAfter(MORNING_START_TIME) && now.isBefore(MORNING_END_TIME)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 是否是 9点 30 到 11:30 的时间
+     */
+    public static boolean isDealMorning() {
+        LocalTime now = LocalTime.now();
+        if (now.isAfter(MORNING_START_DEAL_TIME) && now.isBefore(MORNING_END_TIME)) {
             return true;
         }
         return false;
@@ -78,7 +89,6 @@ public class MyDateUtil {
      * 是否是 13 点 到 15:00 的时间
      */
     public static boolean isAfternoon() {
-        // 进行延迟， 如果时间在 14:59 之后，则睡眠 1分钟。
         LocalTime now = LocalTime.now();
         if (now.isAfter(AFTERNOON_START_TIME) && now.isBefore(AFTERNOON_END_TIME)) {
             return true;
@@ -102,7 +112,7 @@ public class MyDateUtil {
      * @return
      */
     public static boolean isDealTime() {
-        return !(before930() || after15Hour());
+        return isDealMorning() || isAfternoon();
     }
 
     public static void main(String[] args) {

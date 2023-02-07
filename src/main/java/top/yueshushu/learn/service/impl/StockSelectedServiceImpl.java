@@ -2,6 +2,7 @@ package top.yueshushu.learn.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.ArrayUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -16,7 +17,9 @@ import top.yueshushu.learn.assembler.StockSelectedAssembler;
 import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.crawler.service.CrawlerStockHistoryService;
+import top.yueshushu.learn.domain.StockPriceHistoryDo;
 import top.yueshushu.learn.domain.StockSelectedDo;
+import top.yueshushu.learn.domainservice.StockPriceHistoryDomainService;
 import top.yueshushu.learn.domainservice.StockSelectedDomainService;
 import top.yueshushu.learn.entity.Stock;
 import top.yueshushu.learn.entity.StockHistory;
@@ -37,6 +40,7 @@ import top.yueshushu.learn.service.StockService;
 import top.yueshushu.learn.service.cache.StockCacheService;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -71,6 +75,8 @@ public class StockSelectedServiceImpl implements StockSelectedService {
     private StockCrawlerService stockCrawlerService;
     @Resource
     private CrawlerStockHistoryService crawlerStockHistoryService;
+    @Resource
+    private StockPriceHistoryDomainService stockPriceHistoryDomainService;
 
     @SuppressWarnings("all")
     @Resource(name = Const.ASYNC_SERVICE_EXECUTOR_BEAN_NAME)
@@ -399,6 +405,30 @@ public class StockSelectedServiceImpl implements StockSelectedService {
     @Override
     public List<String> findCodeList(Integer userId) {
         return stockSelectedDomainService.findCodeList(userId);
+    }
+
+    @Override
+    public void saveStockPrice(String[] stockCodeList) {
+        if (ArrayUtil.isEmpty(stockCodeList)) {
+            return;
+        }
+
+        List<StockPriceHistoryDo> resultList = new ArrayList<>(stockCodeList.length);
+        Date now = DateUtil.date();
+        for (String stockCode : stockCodeList) {
+
+            BigDecimal nowCachePrice = stockCacheService.getNowCachePrice(stockCode);
+            if (nowCachePrice == null || BigDecimal.ZERO.equals(nowCachePrice)) {
+                continue;
+            }
+            StockPriceHistoryDo stockPriceHistoryDo = new StockPriceHistoryDo();
+            stockPriceHistoryDo.setCode(stockCode);
+            stockPriceHistoryDo.setCurrTime(now);
+            stockPriceHistoryDo.setPrice(nowCachePrice);
+            resultList.add(stockPriceHistoryDo);
+        }
+        // 批量保存， 只保存，不删除。
+        stockPriceHistoryDomainService.saveBatch(resultList);
     }
 
     @Override

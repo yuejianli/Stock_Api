@@ -1,7 +1,5 @@
 package top.yueshushu.learn.enumtype;
 
-import org.springframework.util.Assert;
-
 /**
  * 展示的价格类型
  * @author 两个蝴蝶飞
@@ -41,20 +39,7 @@ public enum CharPriceType {
         this.desc=desc;
     }
 
-    /**
-     * 获取对应的交易所的类型
-     * @param code
-     * @return
-     */
-    public static CharPriceType getKType(int code){
-        Assert.notNull(code,"code编号不能为空");
-        for(CharPriceType exchangeType: CharPriceType.values()){
-            if(exchangeType.code.equals(code)){
-                return exchangeType;
-            }
-        }
-        return null;
-    }
+
     public Integer getCode() {
         return code;
     }

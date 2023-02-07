@@ -127,4 +127,11 @@ public interface StockSelectedService {
      * @param userId 用户编号
      */
     List<String> findCodeList(Integer userId);
+
+    /**
+     * 保存股票的实时价格到数据库里
+     *
+     * @param stockCodeList 股票编码集合
+     */
+    void saveStockPrice(String[] stockCodeList);
 }
