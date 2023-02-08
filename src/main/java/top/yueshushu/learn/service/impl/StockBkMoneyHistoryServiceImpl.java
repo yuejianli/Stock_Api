@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import top.yueshushu.learn.domain.StockBkMoneyHistoryDo;
 import top.yueshushu.learn.domainservice.StockBkMoneyHistoryDomainService;
+import top.yueshushu.learn.enumtype.BKType;
 import top.yueshushu.learn.mapper.StockBkMoneyHistoryMapper;
 import top.yueshushu.learn.service.StockBkMoneyHistoryService;
 
@@ -27,8 +28,8 @@ public class StockBkMoneyHistoryServiceImpl extends ServiceImpl<StockBkMoneyHist
     private StockBkMoneyHistoryDomainService stockBkMoneyHistoryDomainService;
 
     @Override
-    public void deleteByDate(DateTime date) {
-        stockBkMoneyHistoryDomainService.deleteByDate(date);
+    public void deleteByDate(DateTime date, BKType bkType) {
+        stockBkMoneyHistoryDomainService.deleteByDate(date, bkType == null ? null : bkType.getCode());
     }
 
     @Override

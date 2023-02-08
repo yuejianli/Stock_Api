@@ -25,8 +25,8 @@ public class StockBkMoneyHistoryDomainServiceImpl extends ServiceImpl<StockBkMon
     private StockBkMoneyHistoryMapper stockBkMoneyHistoryMapper;
 
     @Override
-    public void deleteByDate(DateTime date) {
-        stockBkMoneyHistoryMapper.deleteByDate(date);
+    public void deleteByDate(DateTime date, Integer type) {
+        stockBkMoneyHistoryMapper.deleteByDate(date, type);
     }
 
     @Override

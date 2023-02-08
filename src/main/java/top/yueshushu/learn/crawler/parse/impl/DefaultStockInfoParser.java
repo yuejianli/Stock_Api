@@ -76,7 +76,7 @@ public class DefaultStockInfoParser implements StockInfoParser {
         //获取里面的data.diff 内容，是个列表对象
         JSONArray jsonArray = jsonObject.getJSONObject("data").getJSONArray("diff");
         //处理内容
-        Date now = DateUtil.beginOfDay(DateUtil.date());
+        Date now = DateUtil.date();
         List<BKMoneyInfo> result = new ArrayList<>(32);
         jsonArray.stream().forEach(
                 n -> {

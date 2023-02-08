@@ -35,6 +35,13 @@ public class StockBKController {
         return bkBusiness.listBk();
     }
 
+    @ApiOperation("查询所有的概念列表")
+    @PostMapping("/listGn")
+    @AuthToken
+    public OutputResult<List<StockBKVo>> listGn(@RequestBody StockBKMoneyStatRo stockBKMoneyStatRo) {
+        return bkBusiness.listGn();
+    }
+
 
     @ApiOperation("查询所有的版块资金类型")
     @PostMapping("/listMoneyType")

@@ -7,12 +7,13 @@
         <id column="id" property="id" />
         <result column="code" property="code" />
         <result column="name" property="name" />
+        <result column="type" property="type" />
         <result column="hot_num" property="hotNum" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, code, name,hot_num
+        id, code, name,type,hot_num
     </sql>
 
 </mapper>

@@ -42,9 +42,16 @@ public class StockBkDo implements Serializable {
     @TableField("name")
     private String name;
 
+
     /**
-     * 版块名称
+     * 类型 1是版块 2是 概念 3是地域
+     */
+    @TableField("type")
+    private Integer type;
+    /**
+     * 版块顺序
      */
     @TableField("hot_num")
     private String hotNum;
+
 }

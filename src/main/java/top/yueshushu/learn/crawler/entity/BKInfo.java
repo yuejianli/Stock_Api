@@ -14,4 +14,5 @@ import java.io.Serializable;
 public class BKInfo implements Serializable {
     private String code;
     private String name;
+    private Integer type;
 }

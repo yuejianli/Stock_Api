@@ -24,7 +24,19 @@ public interface BKBusiness {
      */
     void syncBKMoney();
 
+    /**
+     * 同步概念信息
+     */
+    void syncGN();
+
+    /**
+     * 同步 概念的金额流向信息
+     */
+    void syncGNMoney();
+
     OutputResult<List<StockBKVo>> listBk();
+
+    OutputResult<List<StockBKVo>> listGn();
 
     /**
      * 获取某个版块的历史记录信息

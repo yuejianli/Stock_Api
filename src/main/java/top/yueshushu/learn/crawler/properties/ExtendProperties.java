@@ -29,9 +29,21 @@ public class ExtendProperties implements Serializable {
     private String bkListUrl;
 
     /**
-     * 主力资金今日注入
+     * 版块主力资金今日注入
      */
     @Value("${extend.todayPlatMoney}")
     private String todayPlatMoneyUrl;
 
+
+    /**
+     * 查询版块列表
+     */
+    @Value("${extend.gnList}")
+    private String gnListUrl;
+
+    /**
+     * 概念主力资金今日注入
+     */
+    @Value("${extend.todayGnPlatMoney}")
+    private String todayGnPlatMoneyUrl;
 }

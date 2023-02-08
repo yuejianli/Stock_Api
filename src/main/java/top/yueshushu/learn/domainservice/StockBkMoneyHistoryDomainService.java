@@ -18,7 +18,7 @@ public interface StockBkMoneyHistoryDomainService extends IService<StockBkMoneyH
     /**
      * 删除之前的数据
      */
-    void deleteByDate(DateTime date);
+    void deleteByDate(DateTime date, Integer type);
 
     /**
      * 根据版块编码和日期范围查询相应的数据

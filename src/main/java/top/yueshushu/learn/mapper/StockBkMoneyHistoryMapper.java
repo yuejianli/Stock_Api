@@ -21,8 +21,9 @@ public interface StockBkMoneyHistoryMapper extends BaseMapper<StockBkMoneyHistor
      *
      * @param currDate 当前日期
      */
-    void deleteByDate(DateTime currDate);
+    void deleteByDate(@Param("currDate") DateTime currDate, @Param("type") Integer type);
 
     List<StockBkMoneyHistoryDo> listMoneyHistoryByCodeAndRangeDate(@Param("bkCode") String bkCode,
-                                                                   @Param("startDate") DateTime startDate, @Param("endDate") DateTime endDate);
+                                                                   @Param("startDate") DateTime startDate,
+                                                                   @Param("endDate") DateTime endDate);
 }

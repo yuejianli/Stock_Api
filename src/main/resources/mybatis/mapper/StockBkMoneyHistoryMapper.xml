@@ -8,6 +8,7 @@
         <result column="bk_code" property="bkCode" />
         <result column="bk_name" property="bkName" />
         <result column="curr_date" property="currentDate" />
+        <result column="type" property="type" />
         <result column="bk_now_price" property="bkNowPrice" />
         <result column="bk_now_proportion" property="bkNowProportion" />
         <result column="market" property="market" />
@@ -27,13 +28,9 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, bk_code, bk_name, curr_date, bk_now_price, bk_now_proportion, market, today_main_inflow, today_main_inflow_proportion, today_super_inflow, today_super_inflow_proportion, today_more_inflow, today_more_inflow_proportion, today_middle_inflow, today_middle_inflow_proportion, today_small_inflow, today_small_inflow_proportion, today_main_inflow_code, today_main_inflow_name
+        id, bk_code, bk_name, curr_date, type,bk_now_price, bk_now_proportion, market, today_main_inflow, today_main_inflow_proportion, today_super_inflow, today_super_inflow_proportion, today_more_inflow, today_more_inflow_proportion, today_middle_inflow, today_middle_inflow_proportion, today_small_inflow, today_small_inflow_proportion, today_main_inflow_code, today_main_inflow_name
     </sql>
 
-    <delete id="deleteByDate">
-        delete from stock_bk_money_history
-        where date_format(curr_date,'%Y%m%d') = date_format( #{currDate,jdbcType=TIMESTAMP},'%Y%m%d')
-    </delete>
 
     <select id="listMoneyHistoryByCodeAndRangeDate" resultMap="BaseResultMap">
         select <include refid="Base_Column_List"/> from stock_bk_money_history t
@@ -46,4 +43,12 @@
         </if>
         order by t.curr_date asc
     </select>
+
+    <delete id="deleteByDate">
+        delete from stock_bk_money_history
+        where date_format(curr_date,'%Y%m%d') = date_format( #{currDate,jdbcType=TIMESTAMP},'%Y%m%d')
+        <if test="type != null">
+            and type = #{type}
+        </if>
+    </delete>
 </mapper>

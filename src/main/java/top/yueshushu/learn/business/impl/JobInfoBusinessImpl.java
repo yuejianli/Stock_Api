@@ -100,6 +100,9 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
     private LocalTime STOCK_PRICE_START_TIME = LocalTime.parse("14:59:00");
     private LocalTime STOCK_PRICE_END_TIME = LocalTime.parse("15:01:00");
 
+    private LocalTime STOCK_MORNING_START_TIME = LocalTime.parse("11:29:00");
+    private LocalTime STOCK_MORNING_END_TIME = LocalTime.parse("11:31:00");
+
     @Override
     public OutputResult listJob(JobInfoRo jobInfoRo) {
         return jobInfoService.pageJob(jobInfoRo);
@@ -130,7 +133,7 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
         }
         //是获取股票保存价格的任务，并且是自动运行。 非时间，不执行。
         if (JobInfoType.STOCK_PRICE_SAVE.equals(jobInfoType) && EntrustType.AUTO.getCode().equals(triggerType)) {
-            if (!MyDateUtil.isMorning() || !dateHelper.isWorkingDay(DateUtil.date())) {
+            if (!MyDateUtil.isDealTime() || !dateHelper.isWorkingDay(DateUtil.date())) {
                 return OutputResult.buildSucc();
             }
         }
@@ -176,7 +179,7 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
                     if (!StringUtils.hasText(param)) {
                         break;
                     }
-                    if (isEndStockPriceTime()) {
+                    if (isEndStockMorningTime() || isEndStockPriceTime()) {
                         // 进行休眠 1min , 使 保存股票的价格时间 在3点之后。
                         sleepTime(60000);
                     }
@@ -361,6 +364,8 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
                 case STOCK_BK: {
                     bkBusiness.syncBK();
                     bkBusiness.syncBKMoney();
+                    bkBusiness.syncGN();
+                    bkBusiness.syncGNMoney();
                 }
                 default: {
                     break;
@@ -466,6 +471,19 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
         // 进行延迟， 如果时间在 14:59 之后，则睡眠 1分钟。
         LocalTime now = LocalTime.now();
         if (now.isAfter(STOCK_PRICE_START_TIME) && now.isBefore(STOCK_PRICE_END_TIME)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 是否是股票最后的特殊时间，
+     * 即 11:29 到  11:31 期间
+     */
+    private boolean isEndStockMorningTime() {
+        // 进行延迟， 如果时间在 14:59 之后，则睡眠 1分钟。
+        LocalTime now = LocalTime.now();
+        if (now.isAfter(STOCK_MORNING_START_TIME) && now.isBefore(STOCK_MORNING_END_TIME)) {
             return true;
         }
         return false;

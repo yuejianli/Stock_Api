@@ -134,4 +134,11 @@ public class StockExtendTest {
         List<BKMoneyInfo> allBkList = extCrawlerService.findTodayBKMoneyList();
         log.info(">>> 获取今日版块注入资金列表: {}", allBkList.get(0));
     }
+
+
+    @Test
+    public void gnListTest() {
+        List<BKInfo> allBkList = extCrawlerService.findAllGnList();
+        log.info(">>> 获取所有的 概念列表: {}", allBkList);
+    }
 }

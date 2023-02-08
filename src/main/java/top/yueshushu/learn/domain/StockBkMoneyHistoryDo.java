@@ -51,6 +51,12 @@ public class StockBkMoneyHistoryDo implements Serializable {
     private Date currentDate;
 
     /**
+     * 类型 1是版块 2是 概念 3是地域
+     */
+    @TableField("type")
+    private Integer type;
+
+    /**
      * 最新价
      */
     @TableField("bk_now_price")

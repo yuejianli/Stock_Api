@@ -22,4 +22,15 @@ public interface ExtCrawlerService {
      * 查询今日版块注入集合
      */
     List<BKMoneyInfo> findTodayBKMoneyList();
+
+
+    /**
+     * 查询概念列表
+     */
+    List<BKInfo> findAllGnList();
+
+    /**
+     * 查询概念今日版块注入集合
+     */
+    List<BKMoneyInfo> findTodayGnMoneyList();
 }

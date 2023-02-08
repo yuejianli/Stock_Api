@@ -3,6 +3,7 @@ package top.yueshushu.learn.service;
 import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.extension.service.IService;
 import top.yueshushu.learn.domain.StockBkMoneyHistoryDo;
+import top.yueshushu.learn.enumtype.BKType;
 
 import java.util.List;
 
@@ -18,7 +19,7 @@ public interface StockBkMoneyHistoryService extends IService<StockBkMoneyHistory
     /**
      * 删除之前的数据
      */
-    void deleteByDate(DateTime date);
+    void deleteByDate(DateTime date, BKType bkType);
 
     /**
      * 根据版块编码和日期范围查询相应的数据

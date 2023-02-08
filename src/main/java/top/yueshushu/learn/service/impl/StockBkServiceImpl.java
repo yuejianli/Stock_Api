@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import top.yueshushu.learn.domain.StockBkDo;
 import top.yueshushu.learn.domainservice.StockBkDomainService;
+import top.yueshushu.learn.enumtype.BKType;
 import top.yueshushu.learn.mapper.StockBkMapper;
 import top.yueshushu.learn.service.StockBkService;
 
@@ -24,8 +25,8 @@ public class StockBkServiceImpl extends ServiceImpl<StockBkMapper, StockBkDo> im
     private StockBkDomainService stockBkDomainService;
 
     @Override
-    public List<StockBkDo> listByOrder() {
-        return stockBkDomainService.listByOrder();
+    public List<StockBkDo> listByOrder(BKType bkType) {
+        return stockBkDomainService.listByOrder(bkType);
     }
 
     @Override
