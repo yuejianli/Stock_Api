@@ -3,6 +3,7 @@ package top.yueshushu.learn.crawler.crawler;
 import top.yueshushu.learn.crawler.entity.BKInfo;
 import top.yueshushu.learn.crawler.entity.BKMoneyInfo;
 import top.yueshushu.learn.crawler.entity.DBStockInfo;
+import top.yueshushu.learn.crawler.entity.StockBKStockInfo;
 import top.yueshushu.learn.enumtype.DBStockType;
 
 import java.util.Collections;
@@ -24,7 +25,7 @@ public interface ExtCrawlerService {
     /**
      * 查询今日版块注入集合
      */
-    List<BKMoneyInfo> findTodayBKMoneyList();
+    List<BKMoneyInfo> findTodayBkMoneyList();
 
 
     /**
@@ -37,6 +38,22 @@ public interface ExtCrawlerService {
      */
     List<BKMoneyInfo> findTodayGnMoneyList();
 
+    /**
+     * 查询地域列表
+     */
+    List<BKInfo> findAllDyList();
+
+    /**
+     * 查询地域今日版块注入集合
+     */
+    List<BKMoneyInfo> findTodayDyMoneyList();
+
+    /**
+     * 根据股票编码查询关联的概念信息
+     *
+     * @param code 股票编码
+     */
+    List<StockBKStockInfo> findRelationBkListByCode(String code);
 
     /**
      * 查询打版的股票集合

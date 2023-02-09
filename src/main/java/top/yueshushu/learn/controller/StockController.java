@@ -8,18 +8,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import top.yueshushu.learn.annotation.AuthToken;
 import top.yueshushu.learn.business.StockBusiness;
 import top.yueshushu.learn.common.ResultCode;
-import top.yueshushu.learn.crawler.entity.DBStockInfo;
-import top.yueshushu.learn.enumtype.DBStockType;
 import top.yueshushu.learn.mode.info.StockInfo;
 import top.yueshushu.learn.mode.ro.StockRo;
 import top.yueshushu.learn.mode.vo.StockVo;
 import top.yueshushu.learn.response.OutputResult;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 /**
  * <p>
@@ -52,25 +48,4 @@ public class StockController {
         return stockBusiness.getStockInfo(stockRo.getCode());
     }
 
-    @ApiOperation("查询所有的打版股票信息")
-    @PostMapping("/dbList")
-    @AuthToken
-    public OutputResult<List<DBStockInfo>> dbList(@RequestBody StockRo stockRo) {
-        DBStockType dbStockType = DBStockType.getStockType(stockRo.getType());
-        if (null == dbStockType) {
-            return OutputResult.buildAlert(ResultCode.STOCK_TYPE_IS_EMPTY);
-        }
-        return stockBusiness.dbList(dbStockType);
-    }
-
-    @ApiOperation("查询所有的将要打版股票信息  大于9.5% ")
-    @PostMapping("/willDbList")
-    @AuthToken
-    public OutputResult<List<DBStockInfo>> willDbList(@RequestBody StockRo stockRo) {
-        DBStockType dbStockType = DBStockType.getStockType(stockRo.getType());
-        if (null == dbStockType) {
-            return OutputResult.buildAlert(ResultCode.STOCK_TYPE_IS_EMPTY);
-        }
-        return stockBusiness.willDbList(dbStockType);
-    }
 }

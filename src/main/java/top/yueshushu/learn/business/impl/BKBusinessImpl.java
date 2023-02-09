@@ -12,8 +12,11 @@ import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.crawler.crawler.ExtCrawlerService;
 import top.yueshushu.learn.crawler.entity.BKInfo;
 import top.yueshushu.learn.crawler.entity.BKMoneyInfo;
+import top.yueshushu.learn.crawler.entity.StockBKStockInfo;
 import top.yueshushu.learn.domain.StockBkDo;
 import top.yueshushu.learn.domain.StockBkMoneyHistoryDo;
+import top.yueshushu.learn.domain.StockBkStockDo;
+import top.yueshushu.learn.domainservice.StockBkStockDomainService;
 import top.yueshushu.learn.enumtype.BKCharMoneyType;
 import top.yueshushu.learn.enumtype.BKType;
 import top.yueshushu.learn.helper.DateHelper;
@@ -29,6 +32,7 @@ import top.yueshushu.learn.util.BigDecimalUtil;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -53,6 +57,8 @@ public class BKBusinessImpl implements BKBusiness {
     private ExtCrawlerService extCrawlerService;
     @Resource
     private DateHelper dateHelper;
+    @Resource
+    private StockBkStockDomainService stockBkStockDomainService;
 
     @Override
     public void syncBK() {
@@ -65,22 +71,53 @@ public class BKBusinessImpl implements BKBusiness {
     }
 
     @Override
-    public void syncGNMoney() {
-        handlerMoney(BKType.BK);
+    public void syncDY() {
+        handlerBK(BKType.DY);
     }
 
     @Override
     public void syncBKMoney() {
+        handlerMoney(BKType.BK);
+    }
+
+    @Override
+    public void syncGNMoney() {
         handlerMoney(BKType.GN);
     }
 
+    @Override
+    public void syncDYMoney() {
+        handlerMoney(BKType.DY);
+    }
+
+    @Override
+    public List<BKInfo> crawlerBKInfoByType(BKType bkType) {
+        if (null == bkType) {
+            return Collections.emptyList();
+        }
+        switch (bkType) {
+            case BK: {
+                return extCrawlerService.findAllBkList();
+            }
+            case GN: {
+                return extCrawlerService.findAllGnList();
+            }
+            case DY: {
+                return extCrawlerService.findAllDyList();
+            }
+            default: {
+                break;
+            }
+        }
+        return Collections.emptyList();
+    }
 
     public void handlerBK(BKType bkType) {
         //1. 查询当前所有的版块
-        List<BKInfo> allBkList = BKType.BK.equals(bkType) ? extCrawlerService.findAllBkList() : extCrawlerService.findAllGnList();
+        List<BKInfo> allBkList = crawlerBKInfoByType(bkType);
         if (CollectionUtils.isEmpty(allBkList)) {
             sleep(3);
-            allBkList = BKType.BK.equals(bkType) ? extCrawlerService.findAllBkList() : extCrawlerService.findAllGnList();
+            allBkList = crawlerBKInfoByType(bkType);
             if (CollectionUtils.isEmpty(allBkList)) {
                 return;
             }
@@ -128,11 +165,34 @@ public class BKBusinessImpl implements BKBusiness {
         stockBkService.saveBatch(addStockDoList);
     }
 
+
+    @Override
+    public List<BKMoneyInfo> crawlerMoneyInfoByType(BKType bkType) {
+        if (null == bkType) {
+            return Collections.emptyList();
+        }
+        switch (bkType) {
+            case BK: {
+                return extCrawlerService.findTodayBkMoneyList();
+            }
+            case GN: {
+                return extCrawlerService.findTodayGnMoneyList();
+            }
+            case DY: {
+                return extCrawlerService.findTodayDyMoneyList();
+            }
+            default: {
+                break;
+            }
+        }
+        return Collections.emptyList();
+    }
+
     private void handlerMoney(BKType bkType) {
-        List<BKMoneyInfo> todayMoneyInfoList = BKType.BK.equals(bkType) ? extCrawlerService.findTodayBKMoneyList() : extCrawlerService.findTodayGnMoneyList();
+        List<BKMoneyInfo> todayMoneyInfoList = crawlerMoneyInfoByType(bkType);
         if (CollectionUtils.isEmpty(todayMoneyInfoList)) {
             sleep(3);
-            todayMoneyInfoList = BKType.BK.equals(bkType) ? extCrawlerService.findTodayBKMoneyList() : extCrawlerService.findTodayGnMoneyList();
+            todayMoneyInfoList = crawlerMoneyInfoByType(bkType);
             if (CollectionUtils.isEmpty(todayMoneyInfoList)) {
                 return;
             }
@@ -146,19 +206,46 @@ public class BKBusinessImpl implements BKBusiness {
 
 
     @Override
+    public List<StockBKVo> listByType(BKType bkType) {
+        if (null == bkType) {
+            return Collections.emptyList();
+        }
+
+        List<StockBkDo> stockBkDoList = new ArrayList<>();
+        switch (bkType) {
+            case BK: {
+                stockBkDoList = stockBkService.listByOrder(BKType.BK);
+                break;
+            }
+            case GN: {
+                stockBkDoList = stockBkService.listByOrder(BKType.GN);
+                break;
+            }
+            case DY: {
+                stockBkDoList = stockBkService.listByOrder(BKType.DY);
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+        return stockBkMoneyHistoryAssembler.bkVoList(stockBkDoList);
+    }
+
+
+    @Override
     public OutputResult<List<StockBKVo>> listBk() {
-        // 查询出所有的版块
-        List<StockBkDo> stockBkDoList = stockBkService.listByOrder(BKType.BK);
-        List<StockBKVo> result = stockBkMoneyHistoryAssembler.bkVoList(stockBkDoList);
-        return OutputResult.buildSucc(result);
+        return OutputResult.buildSucc(listByType(BKType.BK));
     }
 
     @Override
     public OutputResult<List<StockBKVo>> listGn() {
-        // 查询出所有的版块
-        List<StockBkDo> stockBkDoList = stockBkService.listByOrder(BKType.GN);
-        List<StockBKVo> result = stockBkMoneyHistoryAssembler.bkVoList(stockBkDoList);
-        return OutputResult.buildSucc(result);
+        return OutputResult.buildSucc(listByType(BKType.GN));
+    }
+
+    @Override
+    public OutputResult<List<StockBKVo>> listDy() {
+        return OutputResult.buildSucc(listByType(BKType.DY));
     }
 
     @Override
@@ -237,6 +324,62 @@ public class BKBusinessImpl implements BKBusiness {
         }
 
         return OutputResult.buildSucc(result);
+
+
+    }
+
+    @Override
+    public void syncBkAndMoney() {
+        syncBK();
+        syncBKMoney();
+        syncGN();
+        syncGNMoney();
+        syncDY();
+        syncDYMoney();
+    }
+
+    @Override
+    public void syncRelationCode(String code) {
+        //1. 查询当前所有的版块
+        List<StockBKStockInfo> allBkList = extCrawlerService.findRelationBkListByCode(code);
+        if (CollectionUtils.isEmpty(allBkList)) {
+            sleep(3);
+            allBkList = extCrawlerService.findRelationBkListByCode(code);
+            if (CollectionUtils.isEmpty(allBkList)) {
+                return;
+            }
+        }
+        Map<String, StockBKStockInfo> allBKCodeMap = allBkList.stream().collect(Collectors.toMap(StockBKStockInfo::getBkCode, n -> n));
+        //2. 查询数据库中的版块
+        List<StockBkStockDo> stockBkDoList = stockBkStockDomainService.listByStockCode(code, null);
+
+        Map<String, StockBkStockDo> dbStockCodeMap = stockBkDoList.stream().collect(Collectors.toMap(StockBkStockDo::getBkCode, n -> n));
+        //3. 进行比对， 找出 添加的，修改的 和删除的
+
+        List<StockBkStockDo> addStockDoList = new ArrayList<>();
+        List<Integer> deleteStockIdList = new ArrayList<>();
+        //4. 分别进行处理。
+        for (StockBKStockInfo stockBKStockInfo : allBkList) {
+            if (!dbStockCodeMap.containsKey(stockBKStockInfo.getBkCode())) {
+                StockBkStockDo stockBkDo = new StockBkStockDo();
+                stockBkDo.setStockCode(stockBKStockInfo.getStockCode());
+                stockBkDo.setBkCode(stockBKStockInfo.getBkCode());
+                addStockDoList.add(stockBkDo);
+            }
+        }
+
+        // 处理删除的
+        dbStockCodeMap.entrySet().forEach(
+                n -> {
+                    StockBkStockDo stockBKDo = n.getValue();
+                    if (!allBKCodeMap.containsKey(stockBKDo.getBkCode())) {
+                        deleteStockIdList.add(stockBKDo.getId());
+                    }
+                }
+        );
+        //接下来，进行插入和修改相关操作.
+        stockBkStockDomainService.removeByIds(deleteStockIdList);
+        stockBkStockDomainService.saveBatch(addStockDoList);
 
 
     }

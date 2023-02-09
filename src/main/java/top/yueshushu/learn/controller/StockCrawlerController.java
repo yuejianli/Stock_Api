@@ -9,11 +9,15 @@ import org.springframework.web.bind.annotation.RestController;
 import top.yueshushu.learn.annotation.AuthToken;
 import top.yueshushu.learn.business.StockCrawlerBusiness;
 import top.yueshushu.learn.common.ResultCode;
+import top.yueshushu.learn.crawler.entity.DBStockInfo;
+import top.yueshushu.learn.crawler.entity.StockBKStockInfo;
+import top.yueshushu.learn.enumtype.DBStockType;
 import top.yueshushu.learn.mode.info.StockShowInfo;
 import top.yueshushu.learn.mode.ro.StockRo;
 import top.yueshushu.learn.response.OutputResult;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @Description: 股票爬虫的Controller
@@ -65,7 +69,7 @@ public class StockCrawlerController {
     @PostMapping("/stockHistoryAsync")
     @AuthToken
     public OutputResult<String> stockHistoryAsync(@RequestBody StockRo stockRo) {
-        if (!StringUtils.hasText(stockRo.getCode())){
+        if (!StringUtils.hasText(stockRo.getCode())) {
             return OutputResult.buildAlert(
                     ResultCode.STOCK_CODE_IS_EMPTY
             );
@@ -73,5 +77,37 @@ public class StockCrawlerController {
         //设置 是股票同步
         stockRo.setExchange(1);
         return stockCrawlerBusiness.stockHistoryAsync(stockRo);
+    }
+
+    @ApiOperation("查询所有的打版股票信息")
+    @PostMapping("/dbList")
+    @AuthToken
+    public OutputResult<List<DBStockInfo>> dbList(@RequestBody StockRo stockRo) {
+        DBStockType dbStockType = DBStockType.getStockType(stockRo.getType());
+        if (null == dbStockType) {
+            return OutputResult.buildAlert(ResultCode.STOCK_TYPE_IS_EMPTY);
+        }
+        return stockCrawlerBusiness.dbList(dbStockType);
+    }
+
+    @ApiOperation("查询所有的将要打版股票信息  大于9.5% ")
+    @PostMapping("/willDbList")
+    @AuthToken
+    public OutputResult<List<DBStockInfo>> willDbList(@RequestBody StockRo stockRo) {
+        DBStockType dbStockType = DBStockType.getStockType(stockRo.getType());
+        if (null == dbStockType) {
+            return OutputResult.buildAlert(ResultCode.STOCK_TYPE_IS_EMPTY);
+        }
+        return stockCrawlerBusiness.willDbList(dbStockType);
+    }
+
+    @ApiOperation("查询股票关联的版块信息")
+    @PostMapping("/listRelationBk")
+    @AuthToken
+    public OutputResult<List<StockBKStockInfo>> listRelationBk(@RequestBody StockRo stockRo) {
+        if (!StringUtils.hasText(stockRo.getCode())) {
+            return OutputResult.buildAlert(ResultCode.STOCK_CODE_IS_EMPTY);
+        }
+        return stockCrawlerBusiness.listRelationBk(stockRo.getCode());
     }
 }

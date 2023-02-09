@@ -362,10 +362,17 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
                     break;
                 }
                 case STOCK_BK: {
-                    bkBusiness.syncBK();
-                    bkBusiness.syncBKMoney();
-                    bkBusiness.syncGN();
-                    bkBusiness.syncGNMoney();
+                    bkBusiness.syncBkAndMoney();
+
+                    // 获取所有的自选股票
+                    List<String> codeList = stockSelectedService.findCodeList(null);
+                    if (CollectionUtils.isEmpty(codeList)) {
+                        break;
+                    }
+                    for (String code : codeList) {
+                        bkBusiness.syncRelationCode(code);
+                    }
+
                     break;
                 }
                 case DB_STOCK_TRADE: {

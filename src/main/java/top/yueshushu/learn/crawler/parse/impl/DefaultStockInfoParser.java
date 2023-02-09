@@ -4,10 +4,7 @@ import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.stereotype.Component;
-import top.yueshushu.learn.crawler.entity.BKInfo;
-import top.yueshushu.learn.crawler.entity.BKMoneyInfo;
-import top.yueshushu.learn.crawler.entity.DBStockInfo;
-import top.yueshushu.learn.crawler.entity.DownloadStockInfo;
+import top.yueshushu.learn.crawler.entity.*;
 import top.yueshushu.learn.crawler.parse.StockInfoParser;
 import top.yueshushu.learn.enumtype.DBStockType;
 import top.yueshushu.learn.enumtype.StockCodeType;
@@ -141,6 +138,29 @@ public class DefaultStockInfoParser implements StockInfoParser {
                             result.add(dbStockInfo);
                         }
                     }
+                }
+        );
+        return result;
+    }
+
+    @Override
+    public List<StockBKStockInfo> parseBkStockList(String content, String code) {
+        //将内容转换成json
+        JSONObject jsonObject = JSONObject.parseObject(content);
+        //获取里面的data.diff 内容，是个列表对象
+        JSONArray jsonArray = jsonObject.getJSONObject("data").getJSONArray("diff");
+        //处理内容
+        List<StockBKStockInfo> result = new ArrayList<>(32);
+        jsonArray.stream().forEach(
+                n -> {
+                    JSONObject tempObject = JSONObject.parseObject(n.toString());
+
+                    StockBKStockInfo stockBKStockInfo = new StockBKStockInfo();
+                    stockBKStockInfo.setStockCode(code);
+                    stockBKStockInfo.setAmplitude(tempObject.getInteger("f3"));
+                    stockBKStockInfo.setBkCode(tempObject.getString("f12"));
+                    stockBKStockInfo.setBkName(tempObject.getString("f14"));
+                    result.add(stockBKStockInfo);
                 }
         );
         return result;

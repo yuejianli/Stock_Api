@@ -12,10 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import top.yueshushu.learn.crawler.crawler.CrawlerService;
 import top.yueshushu.learn.crawler.crawler.ExtCrawlerService;
-import top.yueshushu.learn.crawler.entity.BKInfo;
-import top.yueshushu.learn.crawler.entity.BKMoneyInfo;
-import top.yueshushu.learn.crawler.entity.DBStockInfo;
-import top.yueshushu.learn.crawler.entity.HotStockInfo;
+import top.yueshushu.learn.crawler.entity.*;
 import top.yueshushu.learn.enumtype.DBStockType;
 
 import javax.annotation.Resource;
@@ -133,7 +130,7 @@ public class StockExtendTest {
 
     @Test
     public void bkTodayMoneyListTest() {
-        List<BKMoneyInfo> allBkList = extCrawlerService.findTodayBKMoneyList();
+        List<BKMoneyInfo> allBkList = extCrawlerService.findTodayBkMoneyList();
         log.info(">>> 获取今日版块注入资金列表: {}", allBkList.get(0));
     }
 
@@ -142,6 +139,31 @@ public class StockExtendTest {
     public void gnListTest() {
         List<BKInfo> allBkList = extCrawlerService.findAllGnList();
         log.info(">>> 获取所有的 概念列表: {}", allBkList);
+    }
+
+    @Test
+    public void gnTodayMoneyListTest() {
+        List<BKMoneyInfo> allBkList = extCrawlerService.findTodayGnMoneyList();
+        log.info(">>> 获取概念块注入资金列表: {}", allBkList.get(0));
+    }
+
+    @Test
+    public void dyListTest() {
+        List<BKInfo> allBkList = extCrawlerService.findAllDyList();
+        log.info(">>> 获取所有的 地域列表: {}", allBkList);
+    }
+
+    @Test
+    public void dyTodayMoneyListTest() {
+        List<BKMoneyInfo> allBkList = extCrawlerService.findTodayDyMoneyList();
+        log.info(">>> 获取 地域块注入资金列表: {}", allBkList.get(0));
+    }
+
+
+    @Test
+    public void stockBkStockTest() {
+        List<StockBKStockInfo> allBkList = extCrawlerService.findRelationBkListByCode("002415");
+        log.info(">>> 获取 版块信息: {}", allBkList);
     }
 
 

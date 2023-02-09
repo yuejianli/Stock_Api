@@ -49,6 +49,25 @@ public class ExtendProperties implements Serializable {
 
 
     /**
+     * 查询地域列表
+     */
+    @Value("${extend.dyList}")
+    private String dyListUrl;
+
+    /**
+     * 地域主力资金今日注入
+     */
+    @Value("${extend.todayDyPlatMoney}")
+    private String todayDyPlatMoneyUrl;
+
+    /**
+     * 股票与股票版块同步概念
+     */
+    @Value("${extend.stockBkStock}")
+    private String stockBkStockUrl;
+
+
+    /**
      * 打版的股票url
      */
     @Value("${extend.db_stock_url}")

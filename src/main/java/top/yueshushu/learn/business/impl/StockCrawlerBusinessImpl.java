@@ -3,12 +3,17 @@ package top.yueshushu.learn.business.impl;
 
 import org.springframework.stereotype.Service;
 import top.yueshushu.learn.business.StockCrawlerBusiness;
+import top.yueshushu.learn.crawler.crawler.ExtCrawlerService;
+import top.yueshushu.learn.crawler.entity.DBStockInfo;
+import top.yueshushu.learn.crawler.entity.StockBKStockInfo;
+import top.yueshushu.learn.enumtype.DBStockType;
 import top.yueshushu.learn.mode.info.StockShowInfo;
 import top.yueshushu.learn.mode.ro.StockRo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.service.StockCrawlerService;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @Description 爬虫编排层
@@ -20,6 +25,8 @@ import javax.annotation.Resource;
 public class StockCrawlerBusinessImpl implements StockCrawlerBusiness {
     @Resource
     private StockCrawlerService stockCrawlerService;
+    @Resource
+    private ExtCrawlerService extCrawlerService;
 
     @Override
     public OutputResult<StockShowInfo> getStockInfo(StockRo stockRo) {
@@ -44,5 +51,20 @@ public class StockCrawlerBusinessImpl implements StockCrawlerBusiness {
     @Override
     public void updateCodePrice(String code) {
         stockCrawlerService.updateCodePrice(code);
+    }
+
+    @Override
+    public OutputResult<List<DBStockInfo>> dbList(DBStockType dbStockType) {
+        return OutputResult.buildSucc(extCrawlerService.findDbStock(dbStockType));
+    }
+
+    @Override
+    public OutputResult<List<DBStockInfo>> willDbList(DBStockType dbStockType) {
+        return OutputResult.buildSucc(extCrawlerService.findWillDbStockList(dbStockType));
+    }
+
+    @Override
+    public OutputResult<List<StockBKStockInfo>> listRelationBk(String code) {
+        return OutputResult.buildSucc(extCrawlerService.findRelationBkListByCode(code));
     }
 }

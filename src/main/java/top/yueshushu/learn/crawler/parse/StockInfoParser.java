@@ -1,8 +1,5 @@
 package top.yueshushu.learn.crawler.parse;
-import top.yueshushu.learn.crawler.entity.BKInfo;
-import top.yueshushu.learn.crawler.entity.BKMoneyInfo;
-import top.yueshushu.learn.crawler.entity.DBStockInfo;
-import top.yueshushu.learn.crawler.entity.DownloadStockInfo;
+import top.yueshushu.learn.crawler.entity.*;
 import top.yueshushu.learn.enumtype.DBStockType;
 
 import java.util.Collections;
@@ -33,6 +30,10 @@ public interface StockInfoParser {
     }
 
     default List<DBStockInfo> parseDbStockInfoList(String content, DBStockType dbStockType) {
+        return Collections.EMPTY_LIST;
+    }
+
+    default List<StockBKStockInfo> parseBkStockList(String content, String code) {
         return Collections.EMPTY_LIST;
     }
 }

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import top.yueshushu.learn.business.BKBusiness;
 import top.yueshushu.learn.business.StockSelectedBusiness;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.entity.Stock;
@@ -41,6 +42,8 @@ public class StockSelectedBusinessImpl implements StockSelectedBusiness {
     private DateHelper dateHelper;
     @Resource
     private StockCacheService stockCacheService;
+    @Resource
+    private BKBusiness bkBusiness;
 
     @Override
     public OutputResult listSelected(StockSelectedRo stockSelectedRo) {
@@ -74,6 +77,10 @@ public class StockSelectedBusinessImpl implements StockSelectedBusiness {
                 stockSelectedRo, stock.getName()
         );
         stockSelectedService.syncCodeInfo(stockSelectedRo.getStockCode());
+
+        // 同步概念
+        bkBusiness.syncRelationCode(stockSelectedRo.getStockCode());
+
         // 处理缓存信息
         return OutputResult.buildSucc(
                 ResultCode.SUCCESS
