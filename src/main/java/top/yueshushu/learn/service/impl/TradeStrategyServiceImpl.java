@@ -7,24 +7,31 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import top.yueshushu.learn.business.BuyBusiness;
 import top.yueshushu.learn.business.RevokeBusiness;
-import top.yueshushu.learn.business.SellBusiness;
+import top.yueshushu.learn.crawler.crawler.ExtCrawlerService;
+import top.yueshushu.learn.crawler.entity.DBStockInfo;
 import top.yueshushu.learn.domain.TradeRuleDo;
 import top.yueshushu.learn.domainservice.StockSelectedDomainService;
 import top.yueshushu.learn.domainservice.TradeRuleDomainService;
 import top.yueshushu.learn.entity.Stock;
 import top.yueshushu.learn.entity.TradeEntrust;
 import top.yueshushu.learn.entity.TradeRuleCondition;
+import top.yueshushu.learn.enumtype.DBStockType;
 import top.yueshushu.learn.enumtype.EntrustType;
 import top.yueshushu.learn.enumtype.RuleConditionType;
 import top.yueshushu.learn.mode.dto.TradeRuleStockQueryDto;
 import top.yueshushu.learn.mode.ro.BuyRo;
 import top.yueshushu.learn.mode.ro.RevokeRo;
-import top.yueshushu.learn.service.*;
+import top.yueshushu.learn.service.TradeEntrustService;
+import top.yueshushu.learn.service.TradeRuleConditionService;
+import top.yueshushu.learn.service.TradeRuleStockService;
+import top.yueshushu.learn.service.TradeStrategyService;
 import top.yueshushu.learn.service.cache.StockCacheService;
 import top.yueshushu.learn.strategy.bs.base.BaseStrategyHandler;
 import top.yueshushu.learn.strategy.bs.model.TradeStockRuleDto;
+import top.yueshushu.learn.util.BigDecimalUtil;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -44,13 +51,7 @@ public class TradeStrategyServiceImpl implements TradeStrategyService {
     @Resource
     private StockSelectedDomainService stockSelectedDomainService;
     @Resource
-    private BuyBusiness buyBusiness;
-    @Resource
-    private SellBusiness sellBusiness;
-    @Resource
     private StockCacheService stockCacheService;
-    @Resource
-    private ConfigService configService;
     @Resource
     private TradeEntrustService tradeEntrustService;
     @Resource
@@ -61,6 +62,10 @@ public class TradeStrategyServiceImpl implements TradeStrategyService {
     private TradeRuleDomainService tradeRuleDomainService;
     @Resource
     private TradeRuleConditionService tradeRuleConditionService;
+    @Resource
+    private ExtCrawlerService extCrawlerService;
+    @Resource
+    private BuyBusiness buyBusiness;
 
     @Override
     public void mockEntrustXxlJob(BuyRo buyRo) {
@@ -162,5 +167,54 @@ public class TradeStrategyServiceImpl implements TradeStrategyService {
             revokeRo.setEntrustType(EntrustType.AUTO.getCode());
             revokeBusiness.revoke(revokeRo);
         }
+    }
+
+    @Override
+    public void mockDbEntrustXxlJob(BuyRo buyRo, DBStockType stockType) {
+        // 查询出将要涨停的记录信息
+        List<DBStockInfo> willDbStockList = extCrawlerService.findWillDbStockList(stockType);
+        if (CollectionUtils.isEmpty(willDbStockList)) {
+            return;
+        }
+
+        //2. 根据行业,版块等进行筛选操作.
+
+        List<DBStockInfo> filterStockList = filterDBStockList(willDbStockList);
+
+        if (CollectionUtils.isEmpty(filterStockList)) {
+            return;
+        }
+
+        for (DBStockInfo dbStockInfo : filterStockList) {
+            if (stockCacheService.getTodayBuyDBSurplusNum(buyRo.getUserId(), buyRo.getMockType(), null) <= 0) {
+                continue;
+            }
+            BuyRo tempBuyRo = new BuyRo();
+            tempBuyRo.setUserId(buyRo.getUserId());
+            tempBuyRo.setMockType(buyRo.getMockType());
+            tempBuyRo.setCode(dbStockInfo.getCode());
+            tempBuyRo.setAmount(calcBuyAmount(dbStockInfo));
+            tempBuyRo.setName(dbStockInfo.getName());
+            tempBuyRo.setPrice(BigDecimalUtil.convertTwo(new BigDecimal(dbStockInfo.getLimitPrice() / 100.00)));
+            tempBuyRo.setEntrustType(EntrustType.AUTO.getCode());
+            stockCacheService.reduceTodayBuyDBSurplusNum(buyRo.getUserId(), buyRo.getMockType(), null);
+            // 进行交易
+            buyBusiness.buy(tempBuyRo);
+        }
+
+
+    }
+
+    /**
+     * 计算买入的股数
+     *
+     * @param dbStockInfo 股票涨停信息
+     */
+    private Integer calcBuyAmount(DBStockInfo dbStockInfo) {
+        return 100;
+    }
+
+    private List<DBStockInfo> filterDBStockList(List<DBStockInfo> willDbStockList) {
+        return willDbStockList;
     }
 }

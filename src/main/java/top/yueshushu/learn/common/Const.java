@@ -37,6 +37,7 @@ public class Const {
     public static final String STOCK_TODAY_SELL_PRICE = CACHE_PRIVATE_KEY_PREFIX + "today_sell:";
 
     public static final String STOCK_TODAY_BUY_NUM = CACHE_PRIVATE_KEY_PREFIX + "today_buy_num:";
+    public static final String STOCK_TODAY_BUY_DB_NUM = CACHE_PRIVATE_KEY_PREFIX + "today_buy_db_num:";
     public static final String STOCK_TODAY_SELL_NUM = CACHE_PRIVATE_KEY_PREFIX + "today_sell_num:";
 
 

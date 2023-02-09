@@ -19,6 +19,7 @@ import top.yueshushu.learn.service.ConfigService;
 import top.yueshushu.learn.util.PageUtil;
 
 import javax.annotation.Resource;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -186,5 +187,14 @@ public class ConfigServiceImpl implements ConfigService {
                 Optional.ofNullable(configVo.getCodeValue())
                         .orElse("20")
         );
+    }
+
+    @Override
+    public List<Integer> listEnableUserId(ConfigCodeType configCodeType) {
+        if (null == configCodeType) {
+            return Collections.emptyList();
+        }
+        List<ConfigDo> configDoList = configDomainService.listEnableByCode(configCodeType.getCode());
+        return configDoList.stream().map(ConfigDo::getUserId).collect(Collectors.toList());
     }
 }

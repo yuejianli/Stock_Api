@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import top.yueshushu.learn.domain.ConfigDo;
 import top.yueshushu.learn.domainservice.ConfigDomainService;
+import top.yueshushu.learn.enumtype.DataFlagType;
 import top.yueshushu.learn.mapper.ConfigDoMapper;
 
 import java.util.List;
@@ -31,11 +32,19 @@ public class ConfigDomainServiceImpl extends ServiceImpl<ConfigDoMapper, ConfigD
 
     @Override
     public ConfigDo getByUserIdAndCode(Integer userId, String code) {
-        List<ConfigDo> configDoList = findByUserIdAndCode(userId,code);
-        if (CollectionUtils.isEmpty(configDoList)){
+        List<ConfigDo> configDoList = findByUserIdAndCode(userId, code);
+        if (CollectionUtils.isEmpty(configDoList)) {
             return null;
         }
-        return  configDoList.get(0);
+        return configDoList.get(0);
+    }
+
+    @Override
+    public List<ConfigDo> listEnableByCode(String code) {
+        return this.lambdaQuery()
+                .eq(code != null, ConfigDo::getCode, code)
+                .eq(ConfigDo::getCodeValue, DataFlagType.NORMAL.getCode() + "")
+                .list();
     }
 
 

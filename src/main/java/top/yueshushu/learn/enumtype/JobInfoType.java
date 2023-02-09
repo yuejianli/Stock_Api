@@ -26,6 +26,7 @@ public enum JobInfoType {
     AUTO_LOGIN("autoLogin", "自动登录"),
     STOCK_BK("stockBk", "股票版块"),
     STOCK_PRICE_SAVE("stockPriceSave", "股票价格每分钟保存"),
+    DB_STOCK_TRADE("dbStockTrade", "股票打版买入"),
     ;
 
     private String code;

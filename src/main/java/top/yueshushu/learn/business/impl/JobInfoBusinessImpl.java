@@ -126,7 +126,7 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
             return OutputResult.buildAlert(ResultCode.JOB_ID_NOT_EXIST);
         }
         //是获取股票实时价格的任务，并且是自动运行。 非时间，不执行。
-        if (JobInfoType.STOCK_PRICE.equals(jobInfoType) && EntrustType.AUTO.getCode().equals(triggerType)) {
+        if ((JobInfoType.STOCK_PRICE.equals(jobInfoType) || JobInfoType.DB_STOCK_TRADE.equals(jobInfoType)) && EntrustType.AUTO.getCode().equals(triggerType)) {
             if (!MyDateUtil.isWorkingTime() || !dateHelper.isWorkingDay(DateUtil.date())) {
                 return OutputResult.buildSucc();
             }
@@ -366,6 +366,32 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
                     bkBusiness.syncBKMoney();
                     bkBusiness.syncGN();
                     bkBusiness.syncGNMoney();
+                    break;
+                }
+                case DB_STOCK_TRADE: {
+                    // 1. 查询出所有支持打版的用户编号。
+                    List<Integer> userIdList = configService.listEnableUserId(ConfigCodeType.DB_ENABLE);
+                    // 2. 查询出对应的类型信息
+                    if (!CollectionUtils.isEmpty(userIdList)) {
+                        for (Integer userId : userIdList) {
+                            Long todayBuyDBSurplusNum = stockCacheService.getTodayBuyDBSurplusNum(userId, MockType.MOCK.getCode(), null);
+                            if (todayBuyDBSurplusNum <= 0) {
+                                continue;
+                            }
+
+                            ConfigVo configVo = configService.getConfigByCode(userId, ConfigCodeType.DB_STOCK_TYPE.getCode());
+                            // 获取类型
+                            DBStockType stockType = DBStockType.getStockType(Integer.parseInt(configVo.getCodeValue()));
+                            if (stockType != null) {
+                                BuyRo buyRo = new BuyRo();
+                                buyRo.setUserId(userId);
+                                buyRo.setMockType(MockType.MOCK.getCode());
+                                tradeStrategyService.mockDbEntrustXxlJob(buyRo, stockType);
+                            }
+                        }
+                    }
+
+                    break;
                 }
                 default: {
                     break;

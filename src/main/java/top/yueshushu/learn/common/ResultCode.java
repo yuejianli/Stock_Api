@@ -89,6 +89,8 @@ public class ResultCode {
     public static final ResultCode HISTORY_END_DAY_NUM =
             new ResultCode(true, 10012008, "结束的天不能为空");
 
+    public static final ResultCode STOCK_TYPE_IS_EMPTY =
+            new ResultCode(true, 10012009, "请选择类型");
     /**
      * 股票自选提示信息：  100 13 （编排）+ 001 (三位随机)
      */

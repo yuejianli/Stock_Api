@@ -6,11 +6,15 @@ import com.alibaba.fastjson.JSONObject;
 import org.springframework.stereotype.Component;
 import top.yueshushu.learn.crawler.entity.BKInfo;
 import top.yueshushu.learn.crawler.entity.BKMoneyInfo;
+import top.yueshushu.learn.crawler.entity.DBStockInfo;
 import top.yueshushu.learn.crawler.entity.DownloadStockInfo;
 import top.yueshushu.learn.crawler.parse.StockInfoParser;
+import top.yueshushu.learn.enumtype.DBStockType;
+import top.yueshushu.learn.enumtype.StockCodeType;
 import top.yueshushu.learn.util.StockUtil;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -48,6 +52,7 @@ public class DefaultStockInfoParser implements StockInfoParser {
         );
         return result;
     }
+
 
     @Override
     public List<BKInfo> parseBkInfoList(String content) {
@@ -101,6 +106,41 @@ public class DefaultStockInfoParser implements StockInfoParser {
                     bkMoneyInfo.setTodayMainInflowCode(tempObject.getString("f205"));
                     bkMoneyInfo.setTodayMainInflowName(tempObject.getString("f204"));
                     result.add(bkMoneyInfo);
+                }
+        );
+        return result;
+    }
+
+    @Override
+    public List<DBStockInfo> parseDbStockInfoList(String content, DBStockType dbStockType) {
+        if (dbStockType == null) {
+            return Collections.emptyList();
+        }
+        //将内容转换成json
+        JSONObject jsonObject = JSONObject.parseObject(content);
+        //获取里面的data.diff 内容，是个列表对象
+        JSONArray jsonArray = jsonObject.getJSONObject("data").getJSONArray("diff");
+        //处理内容
+        List<DBStockInfo> result = new ArrayList<>(32);
+        jsonArray.stream().forEach(
+                n -> {
+                    JSONObject tempObject = JSONObject.parseObject(n.toString());
+                    // 获取股票的编码
+                    String code = tempObject.getString("f12");
+                    // 获取股票的类型
+                    StockCodeType typeByStockCode = StockCodeType.getTypeByStockCode(code);
+                    if (typeByStockCode != null) {
+                        // 类型是否包含此信息.
+                        if (dbStockType.contains(typeByStockCode)) {
+                            DBStockInfo dbStockInfo = new DBStockInfo();
+                            dbStockInfo.setCode(code);
+                            dbStockInfo.setAmplitude(tempObject.getInteger("f3"));
+                            dbStockInfo.setName(tempObject.getString("f14"));
+                            dbStockInfo.setLimitPrice(tempObject.getInteger("f350"));
+                            dbStockInfo.setNowPrice(tempObject.getInteger("f2"));
+                            result.add(dbStockInfo);
+                        }
+                    }
                 }
         );
         return result;

@@ -279,6 +279,28 @@ public class StockCacheServiceImpl implements StockCacheService {
     }
 
     @Override
+    public void reduceTodayBuyDBSurplusNum(Integer userId, Integer mockType, String code) {
+        code = StringUtils.hasText(code) ? code : "000000";
+        redisUtil.increment(Const.STOCK_TODAY_BUY_DB_NUM + mockType + ":" + userId + ":" + code, -1);
+    }
+
+    @Override
+    public Long getTodayBuyDBSurplusNum(Integer userId, Integer mockType, String code) {
+        code = StringUtils.hasText(code) ? code : "000000";
+        String key = Const.STOCK_TODAY_BUY_DB_NUM + mockType + ":" + userId + ":" + code;
+        Object o = redisUtil.get(key);
+        if (!ObjectUtils.isEmpty(o)) {
+            return Long.valueOf(o.toString());
+        }
+        // 如果没有，则获取后设置.
+        ConfigVo configInfo = configService.getConfigByCode(userId, ConfigCodeType.DB_BUY_NUM.getCode());
+        long buyNum = Long.valueOf(configInfo.getCodeValue());
+        // 存储。
+        redisUtil.set(key, buyNum, Const.STOCK_TODAY_PRICE_EXPIRE_TIME);
+        return buyNum;
+    }
+
+    @Override
     public TradePositionHistoryCache getLastTradePositionByCode(Integer userId, Integer mockType, String code) {
         String key = Const.POSITION_HISTORY + userId + "_" + mockType + ":" + code;
         TradePositionHistoryCache positionHistoryDo = redisUtil.get(key);

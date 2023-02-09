@@ -2,7 +2,10 @@ package top.yueshushu.learn.crawler.crawler;
 
 import top.yueshushu.learn.crawler.entity.BKInfo;
 import top.yueshushu.learn.crawler.entity.BKMoneyInfo;
+import top.yueshushu.learn.crawler.entity.DBStockInfo;
+import top.yueshushu.learn.enumtype.DBStockType;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -33,4 +36,18 @@ public interface ExtCrawlerService {
      * 查询概念今日版块注入集合
      */
     List<BKMoneyInfo> findTodayGnMoneyList();
+
+
+    /**
+     * 查询打版的股票集合
+     *
+     * @return 获取股票的全量列表信息
+     */
+    default List<DBStockInfo> findDbStock(DBStockType dbStockType) {
+        return Collections.EMPTY_LIST;
+    }
+
+    default List<DBStockInfo> findWillDbStockList(DBStockType dbStockType) {
+        return Collections.EMPTY_LIST;
+    }
 }

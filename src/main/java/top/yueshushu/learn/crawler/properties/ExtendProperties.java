@@ -46,4 +46,13 @@ public class ExtendProperties implements Serializable {
      */
     @Value("${extend.todayGnPlatMoney}")
     private String todayGnPlatMoneyUrl;
+
+
+    /**
+     * 打版的股票url
+     */
+    @Value("${extend.db_stock_url}")
+    private String dbStockUrl;
+
+
 }

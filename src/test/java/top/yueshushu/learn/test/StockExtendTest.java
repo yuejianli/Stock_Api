@@ -14,7 +14,9 @@ import top.yueshushu.learn.crawler.crawler.CrawlerService;
 import top.yueshushu.learn.crawler.crawler.ExtCrawlerService;
 import top.yueshushu.learn.crawler.entity.BKInfo;
 import top.yueshushu.learn.crawler.entity.BKMoneyInfo;
+import top.yueshushu.learn.crawler.entity.DBStockInfo;
 import top.yueshushu.learn.crawler.entity.HotStockInfo;
+import top.yueshushu.learn.enumtype.DBStockType;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -140,5 +142,25 @@ public class StockExtendTest {
     public void gnListTest() {
         List<BKInfo> allBkList = extCrawlerService.findAllGnList();
         log.info(">>> 获取所有的 概念列表: {}", allBkList);
+    }
+
+
+    @Test
+    public void dbListTest() {
+
+        for (DBStockType dbStockType : DBStockType.values()) {
+            if (DBStockType.BJ.equals(dbStockType)) {
+                continue;
+            }
+            List<DBStockInfo> allBkList = extCrawlerService.findDbStock(dbStockType);
+            List<DBStockInfo> dbStockInfos = allBkList.subList(0, 10);
+            log.info(">>> 获取所有的 {} 列表: {}", dbStockType.getDesc(), dbStockInfos);
+        }
+    }
+
+    @Test
+    public void willDbListTest() {
+        List<DBStockInfo> allBkList = extCrawlerService.findWillDbStockList(DBStockType.SH_SZ);
+        log.info(">>> 获取 将要打板列表: {}", allBkList);
     }
 }

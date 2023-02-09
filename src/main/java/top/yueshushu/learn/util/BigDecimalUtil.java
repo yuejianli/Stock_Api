@@ -95,6 +95,11 @@ public class BigDecimalUtil {
         return bigDecimal.setScale(4, BigDecimal.ROUND_HALF_UP);
     }
 
+    public static BigDecimal convertTwo(BigDecimal bigDecimal) {
+        //转换成四位小数
+        return bigDecimal.setScale(2, BigDecimal.ROUND_HALF_UP);
+    }
+
     /**
      * 两个数相加
      *
@@ -102,9 +107,9 @@ public class BigDecimalUtil {
      * @param bigDecimal2
      * @return
      */
-    public static BigDecimal addBigDecimal(BigDecimal bigDecimal1,BigDecimal bigDecimal2){
-        Assert.notNull(bigDecimal1,"格式化的源 bigDecimal1 不能为空");
-        Assert.notNull(bigDecimal2,"格式化的源 bigDecimal2 不能为空");
+    public static BigDecimal addBigDecimal(BigDecimal bigDecimal1, BigDecimal bigDecimal2) {
+        Assert.notNull(bigDecimal1, "格式化的源 bigDecimal1 不能为空");
+        Assert.notNull(bigDecimal2, "格式化的源 bigDecimal2 不能为空");
         return convertFour(bigDecimal1.add(bigDecimal2));
     }
     /**

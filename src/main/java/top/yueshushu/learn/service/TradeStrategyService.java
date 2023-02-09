@@ -1,5 +1,6 @@
 package top.yueshushu.learn.service;
 
+import top.yueshushu.learn.enumtype.DBStockType;
 import top.yueshushu.learn.mode.ro.BuyRo;
 
 /**
@@ -29,4 +30,13 @@ public interface TradeStrategyService {
      * @date 2022/6/1 13:51
      */
     void revokeEntrustJob(Integer userId, Integer mockType);
+
+    /**
+     * 交易策略打版处理
+     *
+     * @param buyRo     买入对象
+     * @param stockType 类型
+     */
+    void mockDbEntrustXxlJob(BuyRo buyRo, DBStockType stockType);
+
 }

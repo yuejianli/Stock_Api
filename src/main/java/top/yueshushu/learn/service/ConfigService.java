@@ -2,10 +2,10 @@ package top.yueshushu.learn.service;
 
 import top.yueshushu.learn.enumtype.ConfigCodeType;
 import top.yueshushu.learn.mode.ro.ConfigRo;
-import top.yueshushu.learn.domain.ConfigDo;
-import com.baomidou.mybatisplus.extension.service.IService;
 import top.yueshushu.learn.mode.vo.ConfigVo;
 import top.yueshushu.learn.response.OutputResult;
+
+import java.util.List;
 
 /**
  * <p>
@@ -54,8 +54,16 @@ public interface ConfigService {
 
     /**
      * 获取该用户配置的最大自选数据
+     *
      * @param userId 用户id
      * @return 返回配置的最大用户数量
      */
     int getMaxSelectedNumByUserId(Integer userId);
+
+    /**
+     * 获取启用的用户编号信息
+     *
+     * @param configCodeType
+     */
+    List<Integer> listEnableUserId(ConfigCodeType configCodeType);
 }

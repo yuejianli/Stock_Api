@@ -203,7 +203,6 @@ public interface StockCacheService {
      */
     Long getTodayBuySurplusNum(Integer userId, Integer mockType, String code);
 
-
     /**
      * 减少该股票的可卖次数
      *
@@ -221,6 +220,25 @@ public interface StockCacheService {
      * @param code     股票代码
      */
     Long getTodaySellSurplusNum(Integer userId, Integer mockType, String code);
+
+
+    /**
+     * 减少该股票 今日打版 可买次数
+     *
+     * @param userId   用户编号
+     * @param mockType 类型
+     * @param code     股票代码
+     */
+    void reduceTodayBuyDBSurplusNum(Integer userId, Integer mockType, String code);
+
+    /**
+     * 获取今日打版可买次数
+     *
+     * @param userId   用户编号
+     * @param mockType 类型
+     * @param code     股票代码
+     */
+    Long getTodayBuyDBSurplusNum(Integer userId, Integer mockType, String code);
 
 
     /**

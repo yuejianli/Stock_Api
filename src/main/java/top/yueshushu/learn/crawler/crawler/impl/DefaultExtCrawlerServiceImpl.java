@@ -8,14 +8,17 @@ import org.springframework.web.client.RestTemplate;
 import top.yueshushu.learn.crawler.crawler.ExtCrawlerService;
 import top.yueshushu.learn.crawler.entity.BKInfo;
 import top.yueshushu.learn.crawler.entity.BKMoneyInfo;
+import top.yueshushu.learn.crawler.entity.DBStockInfo;
 import top.yueshushu.learn.crawler.parse.StockInfoParser;
 import top.yueshushu.learn.crawler.properties.ExtendProperties;
 import top.yueshushu.learn.enumtype.BKType;
+import top.yueshushu.learn.enumtype.DBStockType;
 
 import javax.annotation.Resource;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 默认的扩展程序
@@ -111,5 +114,25 @@ public class DefaultExtCrawlerServiceImpl implements ExtCrawlerService {
             log.error("获取版块列表出错", e);
             return Collections.emptyList();
         }
+    }
+
+    @Override
+    public List<DBStockInfo> findDbStock(DBStockType dbStockType) {
+        //处理，拼接成信息
+        String url = MessageFormat.format(extendProperties.getDbStockUrl(), "f3,f12,f14,f350");
+        try {
+            //获取内容
+            String content = restTemplate.getForObject(url, String.class);
+            //将内容进行转换，解析
+            return stockInfoParser.parseDbStockInfoList(content, dbStockType);
+        } catch (Exception e) {
+            log.error("获取股票打版列表出错", e);
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public List<DBStockInfo> findWillDbStockList(DBStockType dbStockType) {
+        return findDbStock(dbStockType).stream().filter(n -> n.getAmplitude() > 950).collect(Collectors.toList());
     }
 }
