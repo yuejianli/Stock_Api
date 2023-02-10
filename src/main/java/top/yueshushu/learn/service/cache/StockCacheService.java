@@ -5,6 +5,7 @@ import top.yueshushu.learn.entity.Stock;
 import top.yueshushu.learn.entity.TradePositionHistoryCache;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @Description 股票的的缓存信息
@@ -286,4 +287,24 @@ public interface StockCacheService {
      */
     void clearStockInfo();
 
+
+    /**
+     * 设置昨天涨停股票编码集合
+     */
+    void setYesZtCodeList(List<String> codeList);
+
+    /**
+     * 获取缓存中昨天涨停的股票信息
+     */
+    List<String> getYesZtCodeList();
+
+    /**
+     * 设置今日涨停股票编码集合
+     */
+    void setTodayZtCodeList(List<String> codeList);
+
+    /**
+     * 获取缓存中今日涨停的股票信息
+     */
+    List<String> getTodayZtCodeList();
 }

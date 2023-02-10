@@ -33,6 +33,7 @@ import top.yueshushu.learn.util.RedisUtil;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -385,5 +386,25 @@ public class StockCacheServiceImpl implements StockCacheService {
     public void clearStockInfo() {
         // 清除缓存， 是一个 map 形式。
         redisUtil.delByKey(Const.CACHE_STOCK_INFO);
+    }
+
+    @Override
+    public void setYesZtCodeList(List<String> codeList) {
+        redisUtil.leftPushAll(Const.STOCK_YES_ZT_CODE, codeList);
+    }
+
+    @Override
+    public List<String> getYesZtCodeList() {
+        return (List<String>) redisUtil.range(Const.STOCK_YES_ZT_CODE);
+    }
+
+    @Override
+    public void setTodayZtCodeList(List<String> codeList) {
+        redisUtil.leftPushAll(Const.STOCK_TODAY_ZT_CODE, codeList);
+    }
+
+    @Override
+    public List<String> getTodayZtCodeList() {
+        return (List<String>) redisUtil.range(Const.STOCK_TODAY_ZT_CODE);
     }
 }

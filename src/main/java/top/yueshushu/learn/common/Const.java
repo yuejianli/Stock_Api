@@ -28,6 +28,8 @@ public class Const {
     public static final String STOCK_YES_OPENING_PRICE = CACHE_PUBLIC_KEY_PREFIX + "yes:opening:";
     public static final String STOCK_YES_HIGH_PRICE = CACHE_PUBLIC_KEY_PREFIX + "yes:high:";
     public static final String STOCK_YES_LOWEST_PRICE = CACHE_PUBLIC_KEY_PREFIX + "yes:lowest:";
+    public static final String STOCK_YES_ZT_CODE = CACHE_PUBLIC_KEY_PREFIX + "yes:zt";
+    public static final String STOCK_TODAY_ZT_CODE = CACHE_PUBLIC_KEY_PREFIX + "today:zt";
 
 
     public static final String STOCK_LAST_BUY_PRICE = CACHE_PRIVATE_KEY_PREFIX + "last_buy:";

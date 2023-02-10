@@ -12,6 +12,7 @@ import top.yueshushu.learn.enumtype.DBStockType;
 import top.yueshushu.learn.enumtype.StockCodeType;
 import top.yueshushu.learn.enumtype.StockPoolType;
 import top.yueshushu.learn.enumtype.message.VelocityTemplateType;
+import top.yueshushu.learn.message.dingtalk.DingTalkService;
 import top.yueshushu.learn.message.email.EmailService;
 import top.yueshushu.learn.message.weixin.service.WeChatService;
 import top.yueshushu.learn.service.cache.StockCacheService;
@@ -19,6 +20,7 @@ import top.yueshushu.learn.util.MyDateUtil;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 用途描述
@@ -37,6 +39,8 @@ public class StockPoolBusinessImpl implements StockPoolBusiness {
     private ExtCrawlerService extCrawlerService;
     @Resource
     private EmailService emailService;
+    @Resource
+    private DingTalkService dingTalkService;
 
     @Override
     public void handlerPool(Date date) {
@@ -53,6 +57,15 @@ public class StockPoolBusinessImpl implements StockPoolBusiness {
             poolList = filterStockList(poolList, DBStockType.SH_SZ);
             // 获取所有的 股票编号和密码组装的信息
             dataMap.put("qcCodeList", poolList);
+
+            poolList = extCrawlerService.findPoolByType(StockPoolType.ZT, date);
+            if (!CollectionUtils.isEmpty(poolList)) {
+                poolList = filterStockList(poolList, DBStockType.SH_SZ);
+                // 获取 codeList
+                List<String> codeList = poolList.stream().map(StockPoolInfo::getCode).collect(Collectors.toList());
+                stockCacheService.setTodayZtCodeList(codeList);
+            }
+
         } else {
             // 非交易时间，是分析时间的话，发送信息.
             List<StockPoolInfo> poolList = extCrawlerService.findPoolByType(StockPoolType.ZT, date);
@@ -60,6 +73,10 @@ public class StockPoolBusinessImpl implements StockPoolBusiness {
                 poolList = filterStockList(poolList, DBStockType.SH_SZ);
                 // 获取所有的 股票编号和密码组装的信息
                 dataMap.put("ztCodeList", poolList);
+
+                // 获取 codeList
+                List<String> codeList = poolList.stream().map(StockPoolInfo::getCode).collect(Collectors.toList());
+                stockCacheService.setYesZtCodeList(codeList);
             }
             poolList = extCrawlerService.findPoolByType(StockPoolType.DT, date);
             if (!CollectionUtils.isEmpty(poolList)) {
@@ -78,6 +95,7 @@ public class StockPoolBusinessImpl implements StockPoolBusiness {
         if (dataMap.size() > 3) {
             String velocityContent = emailService.getVelocityContent(VelocityTemplateType.POOL, dataMap);
             weChatService.sendTextMessage(1, velocityContent);
+            dingTalkService.sendTextMessage(null, velocityContent);
         }
     }
 
