@@ -18,8 +18,6 @@ public enum ConfigCodeType {
     TODAY_BUY_NUM("todayBuyNum", "今天买入交易次数"),
     TODAY_SELL_NUM("todaySellNum", "今天卖出交易次数"),
     DB_ENABLE("dbEnable", "是否启用打板交易"),
-    DB_STOCK_TYPE("dbStockType", "打板的股票类型"),
-    DB_BUY_NUM("dbBuyNum", "打板买入次数"),
     ;
 
     private String code;

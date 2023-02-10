@@ -15,24 +15,27 @@ import top.yueshushu.learn.mode.vo.TradeRuleVo;
 public interface TradeRuleAssembler {
     /**
      * 交易规则 domain 转换成实体entity
-     * @param TradeRuleDo 交易规则 Do
+     *
+     * @param tradeRuleDo 交易规则 Do
      * @return 交易规则 domain 转换成实体entity
      */
-    TradeRule doToEntity(TradeRuleDo TradeRuleDo);
+    TradeRule doToEntity(TradeRuleDo tradeRuleDo);
 
     /**
      * 交易规则 entity 转换成 domain
-     * @param TradeRule 交易规则
+     *
+     * @param tradeRule 交易规则
      * @return 交易规则 entity 转换成 domain
      */
-    TradeRuleDo entityToDo(TradeRule TradeRule);
+    TradeRuleDo entityToDo(TradeRule tradeRule);
 
     /**
      * 交易规则 entity 转换成 vo
-     * @param TradeRule 交易规则
+     *
+     * @param tradeRule 交易规则
      * @return 交易规则 entity 转换成 vo
      */
-    TradeRuleVo entityToVo(TradeRule TradeRule);
+    TradeRuleVo entityToVo(TradeRule tradeRule);
 
     /**
      * 交易规则 ro 转换成实体entity

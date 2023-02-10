@@ -37,6 +37,7 @@ public class TradeRuleDomainServiceImpl extends ServiceImpl<TradeRuleDoMapper, T
                 .eq(tradeRuleStockQueryDto.getMockType() != null, TradeRuleDo::getMockType, tradeRuleStockQueryDto.getMockType())
                 .eq(tradeRuleStockQueryDto.getRuleType() != null, TradeRuleDo::getRuleType, tradeRuleStockQueryDto.getRuleType())
                 .eq(tradeRuleStockQueryDto.getRuleId() != null, TradeRuleDo::getId, tradeRuleStockQueryDto.getRuleId())
+                .eq(tradeRuleStockQueryDto.getStatus() != null, TradeRuleDo::getStatus, tradeRuleStockQueryDto.getStatus())
                 .in(!CollectionUtils.isEmpty(tradeRuleStockQueryDto.getRuleIdList()), TradeRuleDo::getId, tradeRuleStockQueryDto.getRuleIdList())
                 .eq(tradeRuleStockQueryDto.getRuleConditionId() != null, TradeRuleDo::getConditionId, tradeRuleStockQueryDto.getRuleConditionId())
                 .orderByDesc(TradeRuleDo::getUpdateTime).list();

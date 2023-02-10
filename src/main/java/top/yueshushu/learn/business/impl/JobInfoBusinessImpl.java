@@ -11,6 +11,8 @@ import top.yueshushu.learn.business.*;
 import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.domain.JobInfoDo;
+import top.yueshushu.learn.domain.TradeRuleDbDo;
+import top.yueshushu.learn.domainservice.TradeRuleDbDomainService;
 import top.yueshushu.learn.entity.JobInfo;
 import top.yueshushu.learn.enumtype.*;
 import top.yueshushu.learn.helper.DateHelper;
@@ -92,6 +94,8 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
     @Resource
     private DingTalkService dingTalkService;
     @Resource
+    private TradeRuleDbDomainService tradeRuleDbDomainService;
+    @Resource
     private BKBusiness bkBusiness;
     @SuppressWarnings("all")
     @Resource(name = Const.ASYNC_SERVICE_EXECUTOR_BEAN_NAME)
@@ -127,7 +131,7 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
         }
         //是获取股票实时价格的任务，并且是自动运行。 非时间，不执行。
         if ((JobInfoType.STOCK_PRICE.equals(jobInfoType) || JobInfoType.DB_STOCK_TRADE.equals(jobInfoType)) && EntrustType.AUTO.getCode().equals(triggerType)) {
-            if (!MyDateUtil.isWorkingTime() || !dateHelper.isWorkingDay(DateUtil.date())) {
+            if (!MyDateUtil.isDealTime() || !dateHelper.isWorkingDay(DateUtil.date())) {
                 return OutputResult.buildSucc();
             }
         }
@@ -363,7 +367,6 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
                 }
                 case STOCK_BK: {
                     bkBusiness.syncBkAndMoney();
-
                     // 获取所有的自选股票
                     List<String> codeList = stockSelectedService.findCodeList(null);
                     if (CollectionUtils.isEmpty(codeList)) {
@@ -378,21 +381,25 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
                 case DB_STOCK_TRADE: {
                     // 1. 查询出所有支持打版的用户编号。
                     List<Integer> userIdList = configService.listEnableUserId(ConfigCodeType.DB_ENABLE);
+                    Integer mockType = MockType.MOCK.getCode();
                     // 2. 查询出对应的类型信息
                     if (!CollectionUtils.isEmpty(userIdList)) {
                         for (Integer userId : userIdList) {
-                            Long todayBuyDBSurplusNum = stockCacheService.getTodayBuyDBSurplusNum(userId, MockType.MOCK.getCode(), null);
+                            Long todayBuyDBSurplusNum = stockCacheService.getTodayBuyDBSurplusNum(userId, mockType, null);
                             if (todayBuyDBSurplusNum <= 0) {
                                 continue;
                             }
+                            TradeRuleDbDo tradeRuleDbDo = tradeRuleDbDomainService.getByQuery(userId, mockType);
 
-                            ConfigVo configVo = configService.getConfigByCode(userId, ConfigCodeType.DB_STOCK_TYPE.getCode());
+                            if (null == tradeRuleDbDo) {
+                                continue;
+                            }
                             // 获取类型
-                            DBStockType stockType = DBStockType.getStockType(Integer.parseInt(configVo.getCodeValue()));
+                            DBStockType stockType = DBStockType.getStockType(tradeRuleDbDo.getCodeType());
                             if (stockType != null) {
                                 BuyRo buyRo = new BuyRo();
                                 buyRo.setUserId(userId);
-                                buyRo.setMockType(MockType.MOCK.getCode());
+                                buyRo.setMockType(mockType);
                                 tradeStrategyService.mockDbEntrustXxlJob(buyRo, stockType);
                             }
                         }

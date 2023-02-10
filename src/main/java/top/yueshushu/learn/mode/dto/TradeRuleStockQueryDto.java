@@ -26,6 +26,8 @@ public class TradeRuleStockQueryDto implements Serializable {
     private Integer ruleType;
     @ApiModelProperty("是否是模拟的")
     private Integer mockType;
+    @ApiModelProperty("状态")
+    private Integer status;
     @ApiModelProperty("股票编码")
     private String stockCode;
     @ApiModelProperty("规则条件Id")

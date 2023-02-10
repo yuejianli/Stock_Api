@@ -187,6 +187,8 @@ public class ResultCode {
             new ResultCode(true, 10018004, "交易规则条件关键字已存在");
     public static final ResultCode RULE_CONDITION_USE =
             new ResultCode(true, 10018005, "交易规则条件已经被规则使用了,请先解除绑定关系");
+    public static final ResultCode RULE_DB_ONE =
+            new ResultCode(true, 10018006, "每一个用户只能有一个打版规则");
     /**
      * 持仓信息 100 19（编排）+ 001 (三位随机)
      */

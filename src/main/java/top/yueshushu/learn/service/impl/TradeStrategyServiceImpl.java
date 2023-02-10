@@ -16,6 +16,7 @@ import top.yueshushu.learn.entity.Stock;
 import top.yueshushu.learn.entity.TradeEntrust;
 import top.yueshushu.learn.entity.TradeRuleCondition;
 import top.yueshushu.learn.enumtype.DBStockType;
+import top.yueshushu.learn.enumtype.DataFlagType;
 import top.yueshushu.learn.enumtype.EntrustType;
 import top.yueshushu.learn.enumtype.RuleConditionType;
 import top.yueshushu.learn.mode.dto.TradeRuleStockQueryDto;
@@ -108,6 +109,7 @@ public class TradeStrategyServiceImpl implements TradeStrategyService {
         tradeRuleStockQueryDto.setRuleIdList(allRuleIdList);
         tradeRuleStockQueryDto.setMockType(buyRo.getMockType());
         tradeRuleStockQueryDto.setUserId(buyRo.getUserId());
+        tradeRuleStockQueryDto.setStatus(DataFlagType.NORMAL.getCode());
         List<TradeRuleDo> tradeRuleDoList = tradeRuleDomainService.listByQuery(tradeRuleStockQueryDto);
         // 转换成对应的 Map
         Map<Integer, TradeRuleDo> tradeRuleIdMap = tradeRuleDoList.stream().collect(Collectors.toMap(TradeRuleDo::getId, n -> n));
@@ -178,7 +180,6 @@ public class TradeStrategyServiceImpl implements TradeStrategyService {
         }
 
         //2. 根据行业,版块等进行筛选操作.
-
         List<DBStockInfo> filterStockList = filterDBStockList(willDbStockList);
 
         if (CollectionUtils.isEmpty(filterStockList)) {

@@ -12,9 +12,11 @@ import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.domain.JobInfoDo;
 import top.yueshushu.learn.domain.TradeDealDo;
 import top.yueshushu.learn.domain.TradePositionHistoryDo;
+import top.yueshushu.learn.domain.TradeRuleDbDo;
 import top.yueshushu.learn.domainservice.JobInfoDomainService;
 import top.yueshushu.learn.domainservice.TradeDealDomainService;
 import top.yueshushu.learn.domainservice.TradePositionHistoryDomainService;
+import top.yueshushu.learn.domainservice.TradeRuleDbDomainService;
 import top.yueshushu.learn.entity.Stock;
 import top.yueshushu.learn.entity.StockHistory;
 import top.yueshushu.learn.entity.TradePositionHistoryCache;
@@ -57,6 +59,8 @@ public class StockCacheServiceImpl implements StockCacheService {
     private TradeDealDomainService tradeDealDomainService;
     @Resource
     private ConfigService configService;
+    @Resource
+    private TradeRuleDbDomainService tradeRuleDbDomainService;
 
     @Override
     public void setNowCachePrice(String code, BigDecimal price) {
@@ -292,9 +296,13 @@ public class StockCacheServiceImpl implements StockCacheService {
         if (!ObjectUtils.isEmpty(o)) {
             return Long.valueOf(o.toString());
         }
-        // 如果没有，则获取后设置.
-        ConfigVo configInfo = configService.getConfigByCode(userId, ConfigCodeType.DB_BUY_NUM.getCode());
-        long buyNum = Long.valueOf(configInfo.getCodeValue());
+
+        TradeRuleDbDo tradeRuleDbDo = tradeRuleDbDomainService.getByQuery(userId, mockType);
+
+        long buyNum = 0;
+        if (null != tradeRuleDbDo) {
+            buyNum = tradeRuleDbDo.getBuyNum();
+        }
         // 存储。
         redisUtil.set(key, buyNum, Const.STOCK_TODAY_PRICE_EXPIRE_TIME);
         return buyNum;

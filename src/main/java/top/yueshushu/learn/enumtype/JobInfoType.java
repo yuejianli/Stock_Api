@@ -27,6 +27,7 @@ public enum JobInfoType {
     STOCK_BK("stockBk", "股票版块"),
     STOCK_PRICE_SAVE("stockPriceSave", "股票价格每分钟保存"),
     DB_STOCK_TRADE("dbStockTrade", "股票打版买入"),
+    STOCK_POOL("stockPool", "股票池处理"),
     ;
 
     private String code;

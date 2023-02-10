@@ -17,9 +17,9 @@ import top.yueshushu.learn.enumtype.DBStockType;
 
 import javax.annotation.Resource;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 默认的扩展程序
@@ -195,6 +195,30 @@ public class DefaultExtCrawlerServiceImpl implements ExtCrawlerService {
 
     @Override
     public List<DBStockInfo> findWillDbStockList(DBStockType dbStockType) {
-        return findDbStock(dbStockType).stream().filter(n -> n.getAmplitude() > 950).collect(Collectors.toList());
+        // 获取将要涨停的股票.
+        List<DBStockInfo> dbStockList = findDbStock(dbStockType);
+        List<DBStockInfo> result = new ArrayList<>();
+
+        for (DBStockInfo dbStockInfo : dbStockList) {
+
+            int amplitude = getAmplitude(dbStockInfo);
+
+            if (dbStockInfo.getAmplitude() > amplitude) {
+                result.add(dbStockInfo);
+            }
+
+
+        }
+        return result;
+    }
+
+    private int getAmplitude(DBStockInfo dbStockInfo) {
+        if (dbStockInfo.getName().contains("ST")) {
+            return 475;
+        } else if (dbStockInfo.getCode().startsWith("30")) {
+            return 1900;
+        } else {
+            return 950;
+        }
     }
 }

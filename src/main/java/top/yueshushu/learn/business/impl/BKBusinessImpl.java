@@ -60,6 +60,7 @@ public class BKBusinessImpl implements BKBusiness {
     @Resource
     private StockBkStockDomainService stockBkStockDomainService;
 
+
     @Override
     public void syncBK() {
         handlerBK(BKType.BK);
@@ -383,7 +384,6 @@ public class BKBusinessImpl implements BKBusiness {
 
 
     }
-
 
     /**
      * 将历史数据转换成 图表数据

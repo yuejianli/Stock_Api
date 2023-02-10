@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.yueshushu.learn.mapper.TradeRuleDbMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="top.yueshushu.learn.domain.TradeRuleDbDo">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="code_type" property="codeType" />
+        <result column="buy_num" property="buyNum" />
+        <result column="buy_param" property="buyParam" />
+        <result column="buy_stock_code" property="buyStockCode" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="user_id" property="userId" />
+        <result column="mock_type" property="mockType" />
+        <result column="flag" property="flag" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, name, code_type, buy_num, buy_param, buy_stock_code, create_time, update_time, user_id, mock_type, flag
+    </sql>
+
+</mapper>
