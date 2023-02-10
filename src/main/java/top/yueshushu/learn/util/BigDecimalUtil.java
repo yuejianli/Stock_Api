@@ -100,6 +100,11 @@ public class BigDecimalUtil {
         return bigDecimal.setScale(2, BigDecimal.ROUND_HALF_UP);
     }
 
+    public static BigDecimal convertZero(BigDecimal bigDecimal) {
+        //转换成四位小数
+        return bigDecimal.setScale(0, BigDecimal.ROUND_HALF_UP);
+    }
+
     /**
      * 两个数相加
      *

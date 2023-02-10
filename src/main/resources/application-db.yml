@@ -1,0 +1,41 @@
+# 配置 Mysql 需要修改的常量
+MYSQL_HOST: ${SERVER_IP}:3306
+MYSQL_USERNAME: ENC(3k5hWjexw22lBdEHjZfJ2chP3zFk42R//LoCx9MunnyzsbzgC3bdg+REUOtUYtw+)
+MYSQL_PASSWORD: ENC(zTUmHjQhZgtFr+6C2uLqT9540T+WFlIorFvwPU2Vc3ycXCqKI3j51AoGfyMPoBjt)
+
+# 配置 Druid 的用户名和密码
+DRUID_USERNAME: yuejianli
+DRUID_PASSWORD: ENC(1gDhO2RSRp5O4Y7E/lC0rfnX3U6MaZO/dvvmVCMAi8XgINr6KlWqM9pDTSo5yfGu)
+
+# 配置Redis 的信息:
+REDIS_HOST: ${SERVER_IP}
+REDIS_PORT: 6379
+REDIS_PASSWORD: ENC(xk3HYxfgbamIHi05v6YMbkHwVNyPqWQ4TQHNzHqnmV0OGK2eKtG90u2Hi9FTiTLG)
+REDIS_DATABASE: 8
+
+# 引入 数据库的相关配置
+spring:
+  # 配置数据库
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_HOST}/stock?serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=UTF-8&useSSL=false&allowMultiQueries=true&allowPublicKeyRetrieval=true
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
+    type: com.alibaba.druid.pool.DruidDataSource
+    initialSize: 100
+    maxActive: 100
+    minIdle: 100
+  # 配置Redis的使用
+  redis:
+    database: ${REDIS_DATABASE}
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT}
+    password: ${REDIS_PASSWORD}
+    # 超时时间  5000毫秒
+    timeout: 5000
+    # 连接池 lettuce 的配置
+    lettuce:
+      pool:
+        max-active: 100
+        min-idle: 10
+        max-wait: 100000

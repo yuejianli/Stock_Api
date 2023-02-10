@@ -86,22 +86,27 @@ public class EmailServiceImpl implements EmailService {
 	}
 	
 	@Override
-	public boolean sendVelocityMail(String[] toArr, String subject, VelocityTemplateType velocityTemplateType, Map<String, Object> dataMap) {
-		try {
-			String velocityMailText = getVelocityMailText(velocityTemplateType, dataMap);
-			// log.info(">>>得到信息:{}", velocityMailText);
-			return sendHtmlMail(toArr, subject, velocityMailText);
-		} catch (Exception ex) {
+    public boolean sendVelocityMail(String[] toArr, String subject, VelocityTemplateType velocityTemplateType, Map<String, Object> dataMap) {
+        try {
+            String velocityMailText = getVelocityMailText(velocityTemplateType, dataMap);
+            // log.info(">>>得到信息:{}", velocityMailText);
+            return sendHtmlMail(toArr, subject, velocityMailText);
+        } catch (Exception ex) {
             log.error(">>>componentAndSendReqeust email type {}  is error,", velocityTemplateType.getCode(), ex);
-			return false;
-		}
-	}
-	
-	private String getVelocityMailText(VelocityTemplateType velocityTemplateType, Map<String, Object> dataMap) {
-		VelocityContext velocityContext = new VelocityContext(dataMap);
-		StringWriter writer = new StringWriter();
-		String templateLocation = "stock_" + velocityTemplateType.getCode() + ".vm";
-		velocityEngine.mergeTemplate(templateLocation, "UTF-8", velocityContext, writer);
-		return writer.toString();
-	}
+            return false;
+        }
+    }
+
+    @Override
+    public String getVelocityContent(VelocityTemplateType velocityTemplateType, Map<String, Object> dataMap) {
+        return getVelocityMailText(velocityTemplateType, dataMap);
+    }
+
+    private String getVelocityMailText(VelocityTemplateType velocityTemplateType, Map<String, Object> dataMap) {
+        VelocityContext velocityContext = new VelocityContext(dataMap);
+        StringWriter writer = new StringWriter();
+        String templateLocation = "stock_" + velocityTemplateType.getCode() + ".vm";
+        velocityEngine.mergeTemplate(templateLocation, "UTF-8", velocityContext, writer);
+        return writer.toString();
+    }
 }

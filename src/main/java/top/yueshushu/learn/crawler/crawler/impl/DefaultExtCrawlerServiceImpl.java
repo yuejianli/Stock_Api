@@ -1,24 +1,25 @@
 package top.yueshushu.learn.crawler.crawler.impl;
 
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 import top.yueshushu.learn.crawler.crawler.ExtCrawlerService;
-import top.yueshushu.learn.crawler.entity.BKInfo;
-import top.yueshushu.learn.crawler.entity.BKMoneyInfo;
-import top.yueshushu.learn.crawler.entity.DBStockInfo;
-import top.yueshushu.learn.crawler.entity.StockBKStockInfo;
+import top.yueshushu.learn.crawler.entity.*;
 import top.yueshushu.learn.crawler.parse.StockInfoParser;
 import top.yueshushu.learn.crawler.properties.ExtendProperties;
 import top.yueshushu.learn.enumtype.BKType;
 import top.yueshushu.learn.enumtype.DBStockType;
+import top.yueshushu.learn.enumtype.StockPoolType;
 
 import javax.annotation.Resource;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -34,6 +35,7 @@ public class DefaultExtCrawlerServiceImpl implements ExtCrawlerService {
     public static final String CB_GN = "jQuery1123011794716360084134_1675835544241";
     public static final String CB_DY = "jQuery112306068289769579489_1675942226362";
     public static final String CB_STOCK_BK = "jQuery35104923822815685899_1675941795109";
+    public static final String CB_POOL = "callbackdata3383558";
     @Resource
     private CloseableHttpClient httpClient;
     @Resource
@@ -220,5 +222,63 @@ public class DefaultExtCrawlerServiceImpl implements ExtCrawlerService {
         } else {
             return 950;
         }
+    }
+
+    @Override
+    public List<StockPoolInfo> findPoolByType(StockPoolType stockPoolType, Date currentDate) {
+        if (null == stockPoolType) {
+            return Collections.emptyList();
+        }
+        // 进行处理和解析
+        if (null == currentDate) {
+            currentDate = DateUtil.date();
+        }
+        //根据不同的类型，获取相应的 url
+        String url = getRealUrlByPoolType(stockPoolType, currentDate);
+        try {
+            //获取内容
+            String content = restTemplate.getForObject(url, String.class);
+            content = content.substring(CB_POOL.length() + 1);
+            content = content.substring(0, content.length() - 2);
+            return stockInfoParser.parsePoolInfoList(content, stockPoolType, currentDate);
+        } catch (Exception e) {
+            log.error("获取 股票池 {} 列表出错", stockPoolType.getDesc(), e);
+            return Collections.emptyList();
+        }
+    }
+
+    private String getRealUrlByPoolType(StockPoolType stockPoolType, Date currentDate) {
+        String url = "";
+        switch (stockPoolType) {
+            case ZT: {
+                url = extendProperties.getZtTopicUrl();
+                break;
+            }
+            case DT: {
+                url = extendProperties.getDtTopicUrl();
+                break;
+            }
+            case YES_ZT: {
+                url = extendProperties.getYesZtTopicUrl();
+                break;
+            }
+            case QS: {
+                url = extendProperties.getQsTopicUrl();
+                break;
+            }
+            case CX: {
+                url = extendProperties.getCxTopicUrl();
+                break;
+            }
+            case ZB: {
+                url = extendProperties.getZbTopicUrl();
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+        String date = DateUtil.format(currentDate, DatePattern.PURE_DATE_PATTERN);
+        return MessageFormat.format(url, CB_POOL, date);
     }
 }

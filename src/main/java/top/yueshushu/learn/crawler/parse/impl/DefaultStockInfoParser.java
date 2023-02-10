@@ -1,19 +1,23 @@
 package top.yueshushu.learn.crawler.parse.impl;
 
+import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import top.yueshushu.learn.crawler.entity.*;
 import top.yueshushu.learn.crawler.parse.StockInfoParser;
 import top.yueshushu.learn.enumtype.DBStockType;
 import top.yueshushu.learn.enumtype.StockCodeType;
+import top.yueshushu.learn.enumtype.StockPoolQsMessage;
+import top.yueshushu.learn.enumtype.StockPoolType;
+import top.yueshushu.learn.util.BigDecimalUtil;
+import top.yueshushu.learn.util.MyDateUtil;
 import top.yueshushu.learn.util.StockUtil;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.math.BigDecimal;
+import java.util.*;
 
 /**
  * 股票转换信息实现
@@ -161,6 +165,74 @@ public class DefaultStockInfoParser implements StockInfoParser {
                     stockBKStockInfo.setBkCode(tempObject.getString("f12"));
                     stockBKStockInfo.setBkName(tempObject.getString("f14"));
                     result.add(stockBKStockInfo);
+                }
+        );
+        return result;
+    }
+
+    @Override
+    public List<StockPoolInfo> parsePoolInfoList(String content, StockPoolType stockPoolType, Date currentDate) {
+        //将内容转换成json
+        JSONObject jsonObject = JSONObject.parseObject(content);
+        //获取里面的data.diff 内容，是个列表对象
+        JSONArray jsonArray = jsonObject.getJSONObject("data").getJSONArray("pool");
+        //处理内容
+        List<StockPoolInfo> result = new ArrayList<>(32);
+        String dateStr = DateUtil.format(currentDate, DatePattern.PURE_DATE_PATTERN);
+        jsonArray.stream().forEach(
+                n -> {
+                    JSONObject tempObject = JSONObject.parseObject(n.toString());
+                    StockPoolInfo stockPoolInfo = new StockPoolInfo();
+                    stockPoolInfo.setCode(tempObject.getString("c"));
+                    stockPoolInfo.setName(tempObject.getString("n"));
+                    stockPoolInfo.setCurrDate(currentDate);
+                    stockPoolInfo.setStockPoolType(stockPoolType);
+                    stockPoolInfo.setNowPrice(BigDecimalUtil.convertTwo(new BigDecimal(tempObject.getInteger("p") / 1000.00)));
+                    stockPoolInfo.setAmplitude(BigDecimalUtil.convertTwo(new BigDecimal(tempObject.getString("zdp"))));
+                    stockPoolInfo.setTradingValue(new BigDecimal("0"));
+                    stockPoolInfo.setFloatMarket(BigDecimalUtil.convertZero(new BigDecimal(tempObject.getString("ltsz"))));
+                    stockPoolInfo.setTotalMarket(BigDecimalUtil.convertTwo(new BigDecimal(tempObject.getString("tshare"))));
+                    stockPoolInfo.setChangingProportion(BigDecimalUtil.convertTwo(new BigDecimal(tempObject.getString("hs"))));
+                    stockPoolInfo.setSealingMoney(StringUtils.hasText(tempObject.getString("fund")) ? BigDecimalUtil.convertZero(new BigDecimal(tempObject.getString("fund"))) : null);
+                    stockPoolInfo.setStartTime(MyDateUtil.convertToTodayDate(dateStr, tempObject.getString("fbt")));
+                    stockPoolInfo.setEndTime(MyDateUtil.convertToTodayDate(dateStr, tempObject.getString("lbt")));
+                    stockPoolInfo.setZbCount(tempObject.getInteger("zbc"));
+                    stockPoolInfo.setLbCount(tempObject.getInteger("lbc"));
+                    stockPoolInfo.setBkName(tempObject.getString("hybk"));
+                    String zttJContent = tempObject.getString("zttj");
+                    if (StringUtils.hasText(zttJContent)) {
+                        // 转换成 Map
+                        JSONObject tempZttjObject = JSONObject.parseObject(zttJContent);
+                        stockPoolInfo.setStatCount(tempZttjObject.getInteger("ct"));
+                        stockPoolInfo.setStatDay(tempZttjObject.getInteger("days"));
+                    }
+                    switch (stockPoolType) {
+                        case DT: {
+                            stockPoolInfo.setDays(tempObject.getInteger("days"));
+                            stockPoolInfo.setOcCount(tempObject.getInteger("oc"));
+                            break;
+                        }
+                        case YES_ZT: {
+                            stockPoolInfo.setZfProportion(BigDecimalUtil.convertTwo(new BigDecimal(tempObject.getString("zf"))));
+                            break;
+                        }
+                        case QS: {
+                            stockPoolInfo.setNg(tempObject.getInteger("nh"));
+                            stockPoolInfo.setLb(BigDecimalUtil.convertTwo(new BigDecimal(tempObject.getString("lb"))));
+                            stockPoolInfo.setReason(Optional.ofNullable(StockPoolQsMessage.getPoolQsType(tempObject.getInteger("cc"))).map(cc -> cc.getDesc()).orElse(""));
+                            break;
+                        }
+                        case CX: {
+                            stockPoolInfo.setOds(tempObject.getInteger("ods"));
+                            stockPoolInfo.setStartDate(MyDateUtil.convertDateNum(tempObject.getString("ipod")));
+                            stockPoolInfo.setOpenDate(MyDateUtil.convertDateNum(tempObject.getString("od")));
+                            break;
+                        }
+                        default: {
+                            break;
+                        }
+                    }
+                    result.add(stockPoolInfo);
                 }
         );
         return result;

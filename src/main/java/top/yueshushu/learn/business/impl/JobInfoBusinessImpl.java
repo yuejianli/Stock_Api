@@ -96,6 +96,8 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
     @Resource
     private TradeRuleDbDomainService tradeRuleDbDomainService;
     @Resource
+    private StockPoolBusiness stockPoolBusiness;
+    @Resource
     private BKBusiness bkBusiness;
     @SuppressWarnings("all")
     @Resource(name = Const.ASYNC_SERVICE_EXECUTOR_BEAN_NAME)
@@ -405,6 +407,10 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
                         }
                     }
 
+                    break;
+                }
+                case STOCK_POOL: {
+                    stockPoolBusiness.handlerPool(DateUtil.date());
                     break;
                 }
                 default: {

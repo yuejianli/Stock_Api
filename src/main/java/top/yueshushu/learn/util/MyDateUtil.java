@@ -117,14 +117,24 @@ public class MyDateUtil {
 
     public static void main(String[] args) {
         // System.out.println(after15Hour());
-        System.out.println(convertToTodayDate(null, "112201"));
+        //  System.out.println(convertToTodayDate(null, "2500"));
+        System.out.println(convertDateNum("20220210"));
     }
 
     public static Date convertToTodayDate(String dateStr, String timeStr) {
+        if (StringUtils.hasText(timeStr)) {
+            while (timeStr.length() < 6) {
+                timeStr = "0" + timeStr;
+            }
+        }
         // String --> LocalDate
         LocalDate localDate = StringUtils.hasText(dateStr) ? LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("yyyyMMdd")) : LocalDate.now();
         // String --> LocalTime
         LocalTime localTime = StringUtils.hasText(timeStr) ? LocalTime.parse(timeStr, DateTimeFormatter.ofPattern("HHmmss")) : LocalTime.now();
         return Date.from(LocalDateTime.of(localDate, localTime).atZone(ZoneId.systemDefault()).toInstant());
+    }
+
+    public static String convertDateNum(String date) {
+        return date.substring(0, 4) + "-" + date.substring(4, 6) + "-" + date.substring(6, 8);
     }
 }

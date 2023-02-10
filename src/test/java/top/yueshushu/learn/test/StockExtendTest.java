@@ -10,10 +10,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import top.yueshushu.learn.business.StockPoolBusiness;
 import top.yueshushu.learn.crawler.crawler.CrawlerService;
 import top.yueshushu.learn.crawler.crawler.ExtCrawlerService;
 import top.yueshushu.learn.crawler.entity.*;
 import top.yueshushu.learn.enumtype.DBStockType;
+import top.yueshushu.learn.enumtype.StockPoolType;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -37,6 +39,8 @@ public class StockExtendTest {
     private CrawlerService crawlerService;
     @Resource
     private ExtCrawlerService extCrawlerService;
+    @Resource
+    private StockPoolBusiness stockPoolBusiness;
 
     @Test
     public void hotMapTest() {
@@ -185,4 +189,21 @@ public class StockExtendTest {
         List<DBStockInfo> allBkList = extCrawlerService.findWillDbStockList(DBStockType.SH_SZ);
         log.info(">>> 获取 将要打板列表: {}", allBkList);
     }
+
+    @Test
+    public void findPoolByTypeTest() {
+
+        for (StockPoolType stockPoolType : StockPoolType.values()) {
+            List<StockPoolInfo> poolTypeList = extCrawlerService.findPoolByType(stockPoolType, DateUtil.date());
+
+            List<StockPoolInfo> stockPoolInfos = poolTypeList.subList(0, 2);
+            log.info(">>> 获取 {} 列表: {}", stockPoolType.getDesc(), stockPoolInfos);
+        }
+    }
+
+    @Test
+    public void poolTest() {
+        stockPoolBusiness.handlerPool(DateUtil.date());
+    }
+
 }

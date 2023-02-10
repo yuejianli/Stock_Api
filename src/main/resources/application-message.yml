@@ -1,0 +1,44 @@
+# 钉钉配置信息
+dingtalk:
+  robot:
+    webhook: Xxxx
+spring:
+  # 配置发送邮件# 配置发送邮件
+  mail:
+    host: smtp.qq.com # smtp.qq.com 对应的ip
+    username: 2048146495@qq.com
+    password: ENC(c07QVoS4Sv9u/zlrwEJaLty37vNkW5Nwc3NGEbomI+mP64xRGS2ly3nRja4Btee/ujd+7w+V/3tpD1CKBydVQQ==)
+    port: 465
+    default-encoding: utf-8
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          ssl:
+            enable: true
+            socketFactory:
+              port: 465
+              class: javax.net.ssl.SSLSocketFactory
+  velocity:
+    FILE_RESOURCE_LOADER_PATH: src/main/resources/templates
+# 微信发送的配置信息
+weixin:
+  corpId: ENC(5NynxYfBMsJQellJS1hVS+g7jCOaCqDOhqIftIDeaf0R1xmLBYsrD0nZPgOYa1r413IaYAtFz1+FCJz0Lah8YA==)
+  coprsecret: ENC(VgGGFEP4B8Azohzz69QBTlRLZ/GnXAZrdydxo/M3lzE004LbRBPX0c1Nt9YBHVoPxV5Xgc69+t1Dx9YrTLcnp7era8il0zCzoYaBg1EQyew=)
+  agentId: 1000003
+# 天行接口使用
+tianxing:
+  key1: bdea38f89ed9d2f98f626225ffe453f4
+  key2: 682b53e4b8e13c01a94200c5815c49e4
+ocr:
+  service: chaojiyingOcrService
+  path: /usr/app/ocr/
+  third:
+    chaojiying:
+      user: yueshushu
+      pass: abc123
+      softid: 0f1aad8b4659e731c672f3024e89b5cd

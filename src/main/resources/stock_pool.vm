@@ -1,0 +1,43 @@
+#if(${qcCodeList})
+    ${currTime}  强势股信息:
+    ${line}
+#end
+#if(${qcCodeList})
+    #foreach($stockInfo in ${qcCodeList})
+        ${stockInfo.code}   ${stockInfo.name}   ${stockInfo.amplitude}%    ${line}
+    #end
+#end
+
+#if(${ztCodeList})
+    ${currDate}  今日涨停股票:
+    ${line}
+#end
+#if(${ztCodeList})
+    #foreach($stockInfo in ${ztCodeList})
+        ${stockInfo.code}   ${stockInfo.name}   ${stockInfo.statCount}/${stockInfo.statDay}    ${line}
+    #end
+#end
+
+#if(${dtCodeList})
+    ${currDate}  今日跌停股票:
+    ${line}
+#end
+#if(${dtCodeList})
+    #foreach($stockInfo in ${dtCodeList})
+        ${stockInfo.code}   ${stockInfo.name}   ${stockInfo.days}    ${line}
+    #end
+#end
+
+#if(${cxCodeList})
+    ${currDate}  今日次新股票:
+    ${line}
+#end
+#if(${cxCodeList})
+    #foreach($stockInfo in ${cxCodeList})
+        ${stockInfo.code}   ${stockInfo.name}   ${stockInfo.amplitude}%    ${line}
+    #end
+#end
+
+${line}
+系统邮件(请勿回复) | 打个广告，抖音/视频号 搜索 岳叔叔教你背古诗
+${line}

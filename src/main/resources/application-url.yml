@@ -1,0 +1,73 @@
+# 调用东财的接口频率，间隔时长
+emSecSecurityServerUrl: http://127.0.0.1:18888/api/verifyUserInfo?
+# 跳转到某个页面
+login:
+  noLoginUrl: https://www.yueshushu.top/Stock/login.html
+easyMoney:
+  second: 300
+# 默认的查询接口配置
+default:
+  # 展示今天的股票信息
+  show_day_url: https://hq.sinajs.cn/list={0}
+  # 展示所有的股票信息
+  all_stock_url: >
+    https://20.push2.eastmoney.com/api/qt/clist/get?pn=1&pz=10000000&np=1&fid=f3&fields={0}&fs=m:0+t:6,m:0+t:13,m:0+t:80,m:1+t:2,m:1+t:23,b:MK0021,b:MK0022,b:MK0023,b:MK0024
+  # 查询这个股票的历史信息
+  stock_history_url: >
+    http://push2his.eastmoney.com/api/qt/stock/kline/get?
+    fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61
+    &klt=101&fqt=1&secid={}&beg={}&end={}
+  stock_history_download_url: "http://quotes.money.163.com/service/chddata.html?code={0}&start={1}&end={2}\
+  &fields=TCLOSE;HIGH;LOW;TOPEN;LCLOSE;CHG;PCHG;TURNOVER;VOTURNOVER;VATURNOVER;TCAP;MCAP"
+  #k线图
+  min_url: http://image.sinajs.cn/newchart/min/n/{0}.gif
+  daily_url: http://image.sinajs.cn/newchart/daily/n/{0}.gif
+  weekly_url: http://image.sinajs.cn/newchart/weekly/n/{0}.gif
+  monthly_url: http://image.sinajs.cn/newchart/monthly/n/{0}.gif
+  # 东方财富的最近一个交易日的数据
+  easy_money_history_url: "https://20.push2.eastmoney.com/api/qt/clist/get?pn=1&pz=10000000&np=1&fid=f3&fields=f2,f3,\
+                             f4,f5,f6,f12,f14,f15,f16,f17,f18&fs=m:0+t:6,m:0+t:13,m:0+t:80,m:0+t:81+s:2048,m:1+t:2,\
+                             m:1+t:23,b:MK0021,\
+                             b:MK0022,b:MK0023,b:MK0024%22"
+  tx_money_history_url: http://qt.gtimg.cn?q={0}
+#扩展配置
+extend:
+  # 热点图
+  hotmap: https://26d3254z77.zicp.fun/queryinfo?time={0}
+  # 版块列表
+  bkList: "https://push2.eastmoney.com/api/qt/clist/get?cb={0}&pn=1&pz=500&po=1&np=1&fields=f12,f13,f14,f62\
+  &fid=f62&fs=m:90+t:2&ut=b2884a393a59ad64002292a3e90d46a5&_=1675339693635"
+  # 主力资金版块注入
+  todayPlatMoney: "https://push2.eastmoney.com/api/qt/clist/get?cb={0}&fid=f62&po=1&pz=150&pn=1&np=1\
+  &fltt=2&invt=2&ut=b2884a393a59ad64002292a3e90d46a5&fs=m:90+t:2&fields=f12,f14,f2,f3,f62,f184,f66,f69,f72,f75,f78,f81,f84,f87,f204,f205,f124,f1,f13"
+  # 概念
+  gnList: "https://push2.eastmoney.com/api/qt/clist/get?cb={0}&pn=1&pz=800&po=1&np=1&fields=f12,f13,f14,f62\
+  &fid=f62&fs=m:90+t:3&ut=b2884a393a59ad64002292a3e90d46a5&_=1675835544245"
+  # 概念资金版块注入
+  todayGnPlatMoney: "https://push2.eastmoney.com/api/qt/clist/get?cb={0}&fid=f62&po=1&pz=800&pn=1&np=1\
+  &fltt=2&invt=2&ut=b2884a393a59ad64002292a3e90d46a5&fs=m:90+t:3&fields=f12,f14,f2,f3,f62,f184,f66,f69,f72,f75,f78,f81,f84,f87,f204,f205,f124,f1,f13"
+  # 打版的数据url
+  db_stock_url: "https://20.push2.eastmoney.com/api/qt/clist/get?pn=1&pz=10000000&np=1&fid=f3&fields={0}\
+  &fs=m:0+t:6,m:0+t:13,m:0+t:80,m:1+t:2,m:1+t:23,b:MK0021,b:MK0022,b:MK0023,b:MK0024"
+  # 查询地域
+  dyList: "https://push2.eastmoney.com/api/qt/clist/get?cb={0}&pn=1\
+  &pz=500&po=1&np=1&fields=f12,f14&fid=f62&fs=m:90+t:1&ut=b2884a393a59ad64002292a3e90d46a5&_=1675942226364"
+  # 查询地域流向
+  todayDyPlatMoney: "https://push2.eastmoney.com/api/qt/clist/get?cb={0}&fid=f62&po=1&pz=50&pn=1&np=1\
+  &fltt=2&invt=2&ut=b2884a393a59ad64002292a3e90d46a5&fs=m:90+t:1&fields=f12,f14,f2,f3,f62,f184,f66,f69,f72,f75,f78,f81,f84,f87,f204,f205,f124,f1,f13"
+  # stock 与版块关联
+  stockBkStock: "https://push2.eastmoney.com/api/qt/slist/get?cb={0}&ut=6d2ffaa6a585d612eda28417681d58fb\
+  &fields=f3,f12,f14&fid=f3&pi=0&pz=4&po=1&secid={1}&spt=3&invt=2&fltt=1&np=1&_=1675941795121"
+  # 股票池子
+  ztTopic: "http://push2ex.eastmoney.com/getTopicZTPool?cb={0}&ut=7eea3edcaed734bea9cbfc24409ed989\
+  &dpt=wz.ztzt&Pageindex=0&pagesize=50&sort=fbt:asc&date={1}&_=1676009121451"
+  dtTopic: "http://push2ex.eastmoney.com/getTopicDTPool?cb={0}&ut=7eea3edcaed734bea9cbfc24409ed989\
+  &dpt=wz.ztzt&Pageindex=0&pagesize=50&sort=fund:asc&date={1}&_=1676009429587"
+  yesZtTopic: "http://push2ex.eastmoney.com/getYesterdayZTPool?cb={0}&ut=7eea3edcaed734bea9cbfc24409ed989\
+  &dpt=wz.ztzt&Pageindex=0&pagesize=50&sort=zs:desc&date={1}}&_=1676009121471"
+  qsTopic: "http://push2ex.eastmoney.com/getTopicQSPool?cb={0}&ut=7eea3edcaed734bea9cbfc24409ed989\
+  &dpt=wz.ztzt&Pageindex=0&pagesize=50&sort=zdp:desc&date={1}&_=1676009121477"
+  cxTopic: "http://push2ex.eastmoney.com/getTopicCXPooll?cb={0}&ut=7eea3edcaed734bea9cbfc24409ed989\
+  &dpt=wz.ztzt&Pageindex=0&pagesize=50&sort=ods:asc&date={1}&_=1676009121487"
+  zbTopic: "http://push2ex.eastmoney.com/getTopicZBPool?cb={0}&ut=7eea3edcaed734bea9cbfc24409ed989\
+  &dpt=wz.ztzt&Pageindex=0&pagesize=50&sort=fbt:asc&date={1}&_=1676009429581"

@@ -1,12 +1,11 @@
 package top.yueshushu.learn.crawler.crawler;
 
-import top.yueshushu.learn.crawler.entity.BKInfo;
-import top.yueshushu.learn.crawler.entity.BKMoneyInfo;
-import top.yueshushu.learn.crawler.entity.DBStockInfo;
-import top.yueshushu.learn.crawler.entity.StockBKStockInfo;
+import top.yueshushu.learn.crawler.entity.*;
 import top.yueshushu.learn.enumtype.DBStockType;
+import top.yueshushu.learn.enumtype.StockPoolType;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -65,6 +64,11 @@ public interface ExtCrawlerService {
     }
 
     default List<DBStockInfo> findWillDbStockList(DBStockType dbStockType) {
+        return Collections.EMPTY_LIST;
+    }
+
+
+    default List<StockPoolInfo> findPoolByType(StockPoolType stockPoolType, Date currentDate) {
         return Collections.EMPTY_LIST;
     }
 }

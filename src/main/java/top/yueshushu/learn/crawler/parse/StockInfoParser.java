@@ -1,8 +1,10 @@
 package top.yueshushu.learn.crawler.parse;
 import top.yueshushu.learn.crawler.entity.*;
 import top.yueshushu.learn.enumtype.DBStockType;
+import top.yueshushu.learn.enumtype.StockPoolType;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -34,6 +36,10 @@ public interface StockInfoParser {
     }
 
     default List<StockBKStockInfo> parseBkStockList(String content, String code) {
+        return Collections.EMPTY_LIST;
+    }
+
+    default List<StockPoolInfo> parsePoolInfoList(String content, StockPoolType stockPoolType, Date currentDate) {
         return Collections.EMPTY_LIST;
     }
 }

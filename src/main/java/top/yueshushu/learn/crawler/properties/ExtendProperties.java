@@ -74,4 +74,41 @@ public class ExtendProperties implements Serializable {
     private String dbStockUrl;
 
 
+    /**
+     * 涨停的池子股票
+     */
+    @Value("${extend.ztTopic}")
+    private String ztTopicUrl;
+
+    /**
+     * 跌停的池子股票
+     */
+    @Value("${extend.dtTopic}")
+    private String dtTopicUrl;
+
+    /**
+     * 昨日涨停的池子股票
+     */
+    @Value("${extend.yesZtTopic}")
+    private String yesZtTopicUrl;
+
+
+    /**
+     * 强势的池子股票
+     */
+    @Value("${extend.qsTopic}")
+    private String qsTopicUrl;
+
+
+    /**
+     * 次新的池子股票
+     */
+    @Value("${extend.cxTopic}")
+    private String cxTopicUrl;
+
+    /**
+     * 炸板的池子股票
+     */
+    @Value("${extend.zbTopic}")
+    private String zbTopicUrl;
 }

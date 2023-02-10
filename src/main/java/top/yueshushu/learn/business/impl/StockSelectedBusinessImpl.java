@@ -72,15 +72,18 @@ public class StockSelectedBusinessImpl implements StockSelectedBusiness {
         if (!addValidateResult.getSuccess()) {
             return addValidateResult;
         }
+
+        // 查询一下 目前的自选记录表
+        List<String> codeList = stockSelectedService.findCodeList(null);
         //获取到股票的名称，进行添加到股票自选对象里面.
         stockSelectedService.add(
                 stockSelectedRo, stock.getName()
         );
-        stockSelectedService.syncCodeInfo(stockSelectedRo.getStockCode());
-
-        // 同步概念
-        bkBusiness.syncRelationCode(stockSelectedRo.getStockCode());
-
+        if (!CollectionUtils.isEmpty(codeList) && !codeList.contains(stockSelectedRo.getStockCode())) {
+            stockSelectedService.syncCodeInfo(stockSelectedRo.getStockCode());
+            // 同步概念
+            bkBusiness.syncRelationCode(stockSelectedRo.getStockCode());
+        }
         // 处理缓存信息
         return OutputResult.buildSucc(
                 ResultCode.SUCCESS

@@ -1,8 +1,8 @@
 package top.yueshushu.learn.message.email;
 
-import java.util.Map;
-
 import top.yueshushu.learn.enumtype.message.VelocityTemplateType;
+
+import java.util.Map;
 
 /**
  * 邮件发送的接口信息
@@ -29,7 +29,7 @@ public interface EmailService {
 	 * @param content 发送的内容 ,html 形式
 	 */
 	boolean sendHtmlMail(String[] toArr, String subject, String content);
-	
+
 	/**
 	 * 发送邮件 velocity 模板邮件
 	 *
@@ -39,4 +39,13 @@ public interface EmailService {
 	 * @param dataMap              发送模板邮件填充数据
 	 */
 	boolean sendVelocityMail(String[] toArr, String subject, VelocityTemplateType velocityTemplateType, Map<String, Object> dataMap);
+
+
+	/**
+	 * 获取 velocity 模板邮件内容
+	 *
+	 * @param velocityTemplateType 邮件类型
+	 * @param dataMap              发送模板邮件填充数据
+	 */
+	String getVelocityContent(VelocityTemplateType velocityTemplateType, Map<String, Object> dataMap);
 }

@@ -353,6 +353,7 @@ public class StockSelectedServiceImpl implements StockSelectedService {
             resultCodeList.addAll(haveSelectedCodeList);
         }
 
+        List<String> haveExistCodeList = findCodeList(null);
 
         for (String code : stockCodeList) {
             // 根据股票的编码，获取相应的股票记录信息
@@ -368,7 +369,9 @@ public class StockSelectedServiceImpl implements StockSelectedService {
 
             resultCodeList.add(code);
             executor.submit(() -> {
-                syncCodeInfo(code);
+                if (!haveExistCodeList.contains(code)) {
+                    syncCodeInfo(code);
+                }
             });
         }
         return resultCodeList;

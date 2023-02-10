@@ -1,0 +1,68 @@
+# 配置 swagger 的用户名和密码
+SWAGGER_USERNAME: admin
+SWAGGER_PASSWORD: ENC(oNEYdaPhQJloQiYdM2lecPtjcIVgJW6Jj08nzIYy6IpMtvM0v6mgqOdJ3XQDlCuX)
+server:
+  undertow:
+    buffer-size: 1024
+    direct-buffers: true
+  #设置头的大小
+  max-http-header-size: 102400
+# 指定目录
+uploadFilePath: /usr/app
+# 引入 数据库的相关配置
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  # 配置 json
+  jackson:
+    #参数意义：
+    #JsonInclude.Include.ALWAYS       默认
+    #JsonInclude.Include.NON_DEFAULT   属性为默认值不序列化
+    #JsonInclude.Include.NON_EMPTY     属性为 空（””） 或者为 NULL 都不序列化
+    #JsonInclude.Include.NON_NULL      属性为NULL  不序列化
+    default-property-inclusion: ALWAYS
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss
+#整合mybatis时使用的。   去掉整合 MyBatis的配置信息
+mybatis-plus:
+  # 配置 mapper文件的位置
+  mapper-locations: classpath:mybatis/mapper/**/*.xml
+  # 配置日志
+  configuration:
+    map-underscore-to-camel-case: true #  配置数据库表的列别名设置
+    # 关闭mybatis一级缓存，防止事务和缓存同时打开引起的查询异常
+    local-cache-scope: STATEMENT
+    #查看mybatis的SQL, 线上服务器关闭
+    # log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      logic-delete-field: flag   # 逻辑删除的字段
+      logic-not-delete-value: 1  # 正常状态下，该字段的值
+      logic-delete-value: 0      # 删除后，该字段的值
+      table-underline: true # 驼峰方式转换
+#分页插件
+pagehelper:
+  helperDialect: mysql
+  reasonable: true
+  supportMethodsArguments: true
+  params: count=countSql
+# 配置token生成
+jwt:
+  key: "saaa-ihrm"
+  ttl: "3600000"
+#配置 swagger
+swagger:
+  show: true
+  production: false
+  basic:
+    enable: true
+    username: ${SWAGGER_USERNAME}
+    password: ${SWAGGER_PASSWORD}
+# 支持上传文件
+multipart:
+  enabled: true
+# 配置文件加密设置
+# 指定bean
+jasypt:
+  encryptor:
+    bean: CodeEncrypBean

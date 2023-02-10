@@ -12,6 +12,7 @@ import org.springframework.util.Assert;
 public enum VelocityTemplateType {
     TEST("test", "测试邮箱"),
     TEN10("ten5", "自选股票十个交易日内涨跌记录"),
+    POOL("pool", "股票池信息"),
     ;
 
     private String code;
