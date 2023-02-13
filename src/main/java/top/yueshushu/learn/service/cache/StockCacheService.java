@@ -307,4 +307,23 @@ public interface StockCacheService {
      * 获取缓存中今日涨停的股票信息
      */
     List<String> getTodayZtCodeList();
+
+
+    /**
+     * 添加今日打板买入的股票
+     *
+     * @param userId   用户编号
+     * @param mockType 类型
+     * @param code     股票代码
+     */
+    void addTodayDBCode(Integer userId, Integer mockType, String code);
+
+    /**
+     * 获取今日打板买入的股票
+     *
+     * @param userId   用户编号
+     * @param mockType 类型
+     */
+    List<String> getTodayDBCodeList(Integer userId, Integer mockType);
+
 }

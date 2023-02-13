@@ -180,7 +180,7 @@ public class TradeStrategyServiceImpl implements TradeStrategyService {
         }
 
         //2. 根据行业,版块等进行筛选操作.
-        List<DBStockInfo> filterStockList = filterDBStockList(willDbStockList);
+        List<DBStockInfo> filterStockList = filterDBStockList(willDbStockList, buyRo.getUserId(), buyRo.getMockType());
 
         if (CollectionUtils.isEmpty(filterStockList)) {
             return;
@@ -199,6 +199,7 @@ public class TradeStrategyServiceImpl implements TradeStrategyService {
             tempBuyRo.setPrice(BigDecimalUtil.convertTwo(new BigDecimal(dbStockInfo.getLimitPrice() / 100.00)));
             tempBuyRo.setEntrustType(EntrustType.AUTO.getCode());
             stockCacheService.reduceTodayBuyDBSurplusNum(buyRo.getUserId(), buyRo.getMockType(), null);
+            stockCacheService.addTodayDBCode(buyRo.getUserId(), buyRo.getMockType(), dbStockInfo.getCode());
             // 进行交易
             buyBusiness.buy(tempBuyRo);
         }
@@ -215,7 +216,27 @@ public class TradeStrategyServiceImpl implements TradeStrategyService {
         return 100;
     }
 
-    private List<DBStockInfo> filterDBStockList(List<DBStockInfo> willDbStockList) {
-        return willDbStockList;
+    private List<DBStockInfo> filterDBStockList(List<DBStockInfo> willDbStockList, Integer userId, Integer mockType) {
+        // 进行筛选.
+        List<DBStockInfo> result = new ArrayList<>();
+        for (DBStockInfo dbStockInfo : willDbStockList) {
+            // 如果是 ST, 则去掉.
+            if (dbStockInfo.getName().contains("ST")) {
+                continue;
+            }
+            // 如果是昨天涨停的，不买入。
+            List<String> yesZtCodeList = stockCacheService.getYesZtCodeList();
+            if (yesZtCodeList.contains(dbStockInfo.getCode())) {
+                continue;
+            }
+            //如果是今天打板买入的，则不再进行买入。
+            List<String> todayDBCodeList = stockCacheService.getTodayDBCodeList(userId, mockType);
+            if (todayDBCodeList.contains(dbStockInfo.getCode())) {
+                continue;
+            }
+            result.add(dbStockInfo);
+        }
+
+        return result;
     }
 }

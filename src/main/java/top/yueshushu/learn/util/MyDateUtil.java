@@ -26,6 +26,9 @@ public class MyDateUtil {
     private static LocalTime AFTERNOON_START_TIME = LocalTime.parse("13:00:00");
     private static LocalTime AFTERNOON_END_TIME = LocalTime.parse("15:00:05");
 
+    private static LocalTime EVENING_START_TIME = LocalTime.parse("21:30:00");
+    private static LocalTime EVENING_END_TIME = LocalTime.parse("21:59:59");
+
     /**
      * 当前时间是否在下午3点之后
      *
@@ -113,6 +116,17 @@ public class MyDateUtil {
      */
     public static boolean isDealTime() {
         return isDealMorning() || isAfternoon();
+    }
+
+    /**
+     * 是否是在晚上 9点半到 10点之间
+     */
+    public static boolean isEveningStat() {
+        LocalTime now = LocalTime.now();
+        if (now.isAfter(EVENING_START_TIME) && now.isBefore(EVENING_END_TIME)) {
+            return true;
+        }
+        return false;
     }
 
     public static void main(String[] args) {

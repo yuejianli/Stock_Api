@@ -30,6 +30,7 @@ public class Const {
     public static final String STOCK_YES_LOWEST_PRICE = CACHE_PUBLIC_KEY_PREFIX + "yes:lowest:";
     public static final String STOCK_YES_ZT_CODE = CACHE_PUBLIC_KEY_PREFIX + "yes:zt";
     public static final String STOCK_TODAY_ZT_CODE = CACHE_PUBLIC_KEY_PREFIX + "today:zt";
+    public static final String STOCK_TODAY_QS_CODE = CACHE_PUBLIC_KEY_PREFIX + "today:qs";
 
 
     public static final String STOCK_LAST_BUY_PRICE = CACHE_PRIVATE_KEY_PREFIX + "last_buy:";
@@ -41,6 +42,8 @@ public class Const {
     public static final String STOCK_TODAY_BUY_NUM = CACHE_PRIVATE_KEY_PREFIX + "today_buy_num:";
     public static final String STOCK_TODAY_BUY_DB_NUM = CACHE_PRIVATE_KEY_PREFIX + "today_buy_db_num:";
     public static final String STOCK_TODAY_SELL_NUM = CACHE_PRIVATE_KEY_PREFIX + "today_sell_num:";
+
+    public static final String STOCK_TODAY_DB_CODE = CACHE_PRIVATE_KEY_PREFIX + "today_db:";
 
 
     public static final String X_REAL_IP = "x-real-ip";

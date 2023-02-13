@@ -33,6 +33,7 @@ import top.yueshushu.learn.util.RedisUtil;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -406,5 +407,21 @@ public class StockCacheServiceImpl implements StockCacheService {
     @Override
     public List<String> getTodayZtCodeList() {
         return (List<String>) redisUtil.range(Const.STOCK_TODAY_ZT_CODE);
+    }
+
+    @Override
+    public void addTodayDBCode(Integer userId, Integer mockType, String code) {
+        String key = Const.STOCK_TODAY_DB_CODE + userId + "_" + mockType;
+        redisUtil.leftPush(key, code);
+    }
+
+    @Override
+    public List<String> getTodayDBCodeList(Integer userId, Integer mockType) {
+        String key = Const.STOCK_TODAY_DB_CODE + userId + "_" + mockType;
+        Object range = redisUtil.range(key);
+        if (ObjectUtils.isEmpty(range)) {
+            return Collections.emptyList();
+        }
+        return (List<String>) range;
     }
 }

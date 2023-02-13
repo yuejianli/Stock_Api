@@ -60,14 +60,14 @@ extend:
   &fields=f3,f12,f14&fid=f3&pi=0&pz=4&po=1&secid={1}&spt=3&invt=2&fltt=1&np=1&_=1675941795121"
   # 股票池子
   ztTopic: "http://push2ex.eastmoney.com/getTopicZTPool?cb={0}&ut=7eea3edcaed734bea9cbfc24409ed989\
-  &dpt=wz.ztzt&Pageindex=0&pagesize=50&sort=fbt:asc&date={1}&_=1676009121451"
+  &dpt=wz.ztzt&Pageindex=0&pagesize=80&sort=fbt:asc&date={1}&_=1676009121451"
   dtTopic: "http://push2ex.eastmoney.com/getTopicDTPool?cb={0}&ut=7eea3edcaed734bea9cbfc24409ed989\
-  &dpt=wz.ztzt&Pageindex=0&pagesize=50&sort=fund:asc&date={1}&_=1676009429587"
+  &dpt=wz.ztzt&Pageindex=0&pagesize=80&sort=fund:asc&date={1}&_=1676009429587"
   yesZtTopic: "http://push2ex.eastmoney.com/getYesterdayZTPool?cb={0}&ut=7eea3edcaed734bea9cbfc24409ed989\
-  &dpt=wz.ztzt&Pageindex=0&pagesize=50&sort=zs:desc&date={1}}&_=1676009121471"
+  &dpt=wz.ztzt&Pageindex=0&pagesize=80&sort=zs:desc&date={1}}&_=1676009121471"
   qsTopic: "http://push2ex.eastmoney.com/getTopicQSPool?cb={0}&ut=7eea3edcaed734bea9cbfc24409ed989\
-  &dpt=wz.ztzt&Pageindex=0&pagesize=50&sort=zdp:desc&date={1}&_=1676009121477"
+  &dpt=wz.ztzt&Pageindex=0&pagesize=80&sort=zdp:desc&date={1}&_=1676009121477"
   cxTopic: "http://push2ex.eastmoney.com/getTopicCXPooll?cb={0}&ut=7eea3edcaed734bea9cbfc24409ed989\
-  &dpt=wz.ztzt&Pageindex=0&pagesize=50&sort=ods:asc&date={1}&_=1676009121487"
+  &dpt=wz.ztzt&Pageindex=0&pagesize=80&sort=ods:asc&date={1}&_=1676009121487"
   zbTopic: "http://push2ex.eastmoney.com/getTopicZBPool?cb={0}&ut=7eea3edcaed734bea9cbfc24409ed989\
-  &dpt=wz.ztzt&Pageindex=0&pagesize=50&sort=fbt:asc&date={1}&_=1676009429581"
+  &dpt=wz.ztzt&Pageindex=0&pagesize=80&sort=fbt:asc&date={1}&_=1676009429581"

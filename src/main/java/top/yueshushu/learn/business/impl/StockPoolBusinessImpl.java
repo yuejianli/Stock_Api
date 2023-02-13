@@ -5,7 +5,9 @@ import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 import top.yueshushu.learn.business.StockPoolBusiness;
+import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.crawler.crawler.ExtCrawlerService;
 import top.yueshushu.learn.crawler.entity.StockPoolInfo;
 import top.yueshushu.learn.enumtype.DBStockType;
@@ -17,6 +19,7 @@ import top.yueshushu.learn.message.email.EmailService;
 import top.yueshushu.learn.message.weixin.service.WeChatService;
 import top.yueshushu.learn.service.cache.StockCacheService;
 import top.yueshushu.learn.util.MyDateUtil;
+import top.yueshushu.learn.util.RedisUtil;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -41,6 +44,8 @@ public class StockPoolBusinessImpl implements StockPoolBusiness {
     private EmailService emailService;
     @Resource
     private DingTalkService dingTalkService;
+    @Resource
+    private RedisUtil redisUtil;
 
     @Override
     public void handlerPool(Date date) {
@@ -49,7 +54,7 @@ public class StockPoolBusinessImpl implements StockPoolBusiness {
         dataMap.put("currTime", DateUtil.now());
         dataMap.put("currDate", DateUtil.format(DateUtil.date(), DatePattern.NORM_DATE_PATTERN));
         //1. 交易时间的话，只发送强势股。
-        if (MyDateUtil.isDealTime()) {
+        if (!MyDateUtil.isEveningStat()) {
             List<StockPoolInfo> poolList = extCrawlerService.findPoolByType(StockPoolType.QS, date);
             if (CollectionUtils.isEmpty(poolList)) {
                 return;
@@ -57,7 +62,6 @@ public class StockPoolBusinessImpl implements StockPoolBusiness {
             poolList = filterStockList(poolList, DBStockType.SH_SZ);
             // 获取所有的 股票编号和密码组装的信息
             dataMap.put("qcCodeList", poolList);
-
             poolList = extCrawlerService.findPoolByType(StockPoolType.ZT, date);
             if (!CollectionUtils.isEmpty(poolList)) {
                 poolList = filterStockList(poolList, DBStockType.SH_SZ);
@@ -73,7 +77,6 @@ public class StockPoolBusinessImpl implements StockPoolBusiness {
                 poolList = filterStockList(poolList, DBStockType.SH_SZ);
                 // 获取所有的 股票编号和密码组装的信息
                 dataMap.put("ztCodeList", poolList);
-
                 // 获取 codeList
                 List<String> codeList = poolList.stream().map(StockPoolInfo::getCode).collect(Collectors.toList());
                 stockCacheService.setYesZtCodeList(codeList);
@@ -106,11 +109,22 @@ public class StockPoolBusinessImpl implements StockPoolBusiness {
         if (null == dbStockType) {
             return poolList;
         }
+        String key = Const.STOCK_TODAY_QS_CODE;
+        // 获取到今日的已经发送的强势股票
+        Object qsRangeList = redisUtil.sMembers(key);
+        Set<String> codeList;
+        if (ObjectUtils.isEmpty(qsRangeList)) {
+            codeList = Collections.emptySet();
+        } else {
+            codeList = (Set<String>) qsRangeList;
+        }
         List<StockPoolInfo> result = new ArrayList<>();
-
         for (StockPoolInfo stockPoolInfo : poolList) {
             StockCodeType typeByStockCode = StockCodeType.getTypeByStockCode(stockPoolInfo.getCode());
             if (null == typeByStockCode) {
+                continue;
+            }
+            if (codeList.contains(stockPoolInfo.getCode())) {
                 continue;
             }
             if (!dbStockType.contains(typeByStockCode)) {
@@ -118,6 +132,10 @@ public class StockPoolBusinessImpl implements StockPoolBusiness {
             }
             // 放置进去
             result.add(stockPoolInfo);
+        }
+        Set<String> addCodeList = result.stream().map(StockPoolInfo::getCode).collect(Collectors.toSet());
+        if (!CollectionUtils.isEmpty(addCodeList)) {
+            redisUtil.sAdd(key, addCodeList.toArray(new String[]{}));
         }
         return result;
     }

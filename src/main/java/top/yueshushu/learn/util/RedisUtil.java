@@ -1341,23 +1341,6 @@ public class RedisUtil {
             return false;
         }
     }
-
-    /**
-     * 功能描述: 单个往Set 里面添加元素
-     *
-     * @param key   redis键值
-     * @param value 要放置的值
-     * @return
-     */
-    public boolean sAdd(String key, Object value) {
-        try {
-            redisTemplate.opsForSet().add(key, value);
-            return true;
-        } catch (Exception e) {
-            log.error("发生异常", e);
-            return false;
-        }
-    }
     /*******5.1 添加放置操作结束******/
     /*******5.2 查询操作开始******/
     /**

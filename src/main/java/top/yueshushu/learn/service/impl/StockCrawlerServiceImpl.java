@@ -36,6 +36,7 @@ import top.yueshushu.learn.service.StockCrawlerService;
 import top.yueshushu.learn.service.UserService;
 import top.yueshushu.learn.service.cache.StockCacheService;
 import top.yueshushu.learn.util.BigDecimalUtil;
+import top.yueshushu.learn.util.RedisUtil;
 import top.yueshushu.learn.util.StockUtil;
 
 import javax.annotation.Resource;
@@ -75,6 +76,8 @@ public class StockCrawlerServiceImpl implements StockCrawlerService {
     private WeChatService weChatService;
     @Resource
     private DingTalkService dingTalkService;
+    @Resource
+    private RedisUtil redisUtil;
 
     @Override
     public OutputResult<StockShowInfo> getStockInfo(StockRo stockRo) {
@@ -194,6 +197,8 @@ public class StockCrawlerServiceImpl implements StockCrawlerService {
     public void updateAllStock() {
         // 先将昨天的最近的记录清理一下。
         stockCacheService.cleanLastTradePositionHistory();
+        redisUtil.remove(Const.STOCK_TODAY_QS_CODE);
+        redisUtil.deleteByPrefix(Const.STOCK_TODAY_DB_CODE);
         //重置计数器
         Const.PRICE_COUNTER = 0;
         //1. 查询当前所有的股票信息

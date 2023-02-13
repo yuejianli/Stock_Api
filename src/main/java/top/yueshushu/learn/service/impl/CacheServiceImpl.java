@@ -74,7 +74,7 @@ public class CacheServiceImpl implements CacheService {
         if (type == 0){
             return Const.CACHE_PUBLIC_KEY_PREFIX;
         }else{
-            return Const.CACHE_PRIVATE_KEY_PREFIX + userId + ":";
+            return Const.CACHE_PUBLIC_KEY_PREFIX;
         }
     }
 
