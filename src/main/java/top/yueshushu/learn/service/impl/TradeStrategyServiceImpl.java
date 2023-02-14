@@ -9,8 +9,10 @@ import top.yueshushu.learn.business.BuyBusiness;
 import top.yueshushu.learn.business.RevokeBusiness;
 import top.yueshushu.learn.crawler.crawler.ExtCrawlerService;
 import top.yueshushu.learn.crawler.entity.DBStockInfo;
+import top.yueshushu.learn.domain.TradeRuleDbDo;
 import top.yueshushu.learn.domain.TradeRuleDo;
 import top.yueshushu.learn.domainservice.StockSelectedDomainService;
+import top.yueshushu.learn.domainservice.TradeRuleDbDomainService;
 import top.yueshushu.learn.domainservice.TradeRuleDomainService;
 import top.yueshushu.learn.entity.Stock;
 import top.yueshushu.learn.entity.TradeEntrust;
@@ -67,6 +69,8 @@ public class TradeStrategyServiceImpl implements TradeStrategyService {
     private ExtCrawlerService extCrawlerService;
     @Resource
     private BuyBusiness buyBusiness;
+    @Resource
+    private TradeRuleDbDomainService tradeRuleDbDomainService;
 
     @Override
     public void mockEntrustXxlJob(BuyRo buyRo) {
@@ -89,13 +93,9 @@ public class TradeStrategyServiceImpl implements TradeStrategyService {
             }
             canBSStockList.add(code);
         }
-
-
         if (CollectionUtils.isEmpty(canBSStockList)) {
             return;
         }
-
-
         //2. 对每一个股票进行处理， 获取相应的规则。   如果没有规则，则不自动委托。
         Map<String, List<Integer>> stockRelationRuleIdMap = tradeRuleStockService.listRuleIdByCode(canBSStockList);
         if (CollectionUtils.isEmpty(stockRelationRuleIdMap)) {
@@ -173,19 +173,22 @@ public class TradeStrategyServiceImpl implements TradeStrategyService {
 
     @Override
     public void mockDbEntrustXxlJob(BuyRo buyRo, DBStockType stockType) {
+        TradeRuleDbDo tradeRuleDbDo = tradeRuleDbDomainService.getByQuery(buyRo.getUserId(), buyRo.getMockType());
+        if (null == tradeRuleDbDo) {
+            return;
+        }
+
         // 查询出将要涨停的记录信息
         List<DBStockInfo> willDbStockList = extCrawlerService.findWillDbStockList(stockType);
         if (CollectionUtils.isEmpty(willDbStockList)) {
             return;
         }
-
         //2. 根据行业,版块等进行筛选操作.
         List<DBStockInfo> filterStockList = filterDBStockList(willDbStockList, buyRo.getUserId(), buyRo.getMockType());
 
         if (CollectionUtils.isEmpty(filterStockList)) {
             return;
         }
-
         for (DBStockInfo dbStockInfo : filterStockList) {
             if (stockCacheService.getTodayBuyDBSurplusNum(buyRo.getUserId(), buyRo.getMockType(), null) <= 0) {
                 continue;
@@ -194,7 +197,7 @@ public class TradeStrategyServiceImpl implements TradeStrategyService {
             tempBuyRo.setUserId(buyRo.getUserId());
             tempBuyRo.setMockType(buyRo.getMockType());
             tempBuyRo.setCode(dbStockInfo.getCode());
-            tempBuyRo.setAmount(calcBuyAmount(dbStockInfo));
+            tempBuyRo.setAmount(calcBuyAmount(dbStockInfo, tradeRuleDbDo));
             tempBuyRo.setName(dbStockInfo.getName());
             tempBuyRo.setPrice(BigDecimalUtil.convertTwo(new BigDecimal(dbStockInfo.getLimitPrice() / 100.00)));
             tempBuyRo.setEntrustType(EntrustType.AUTO.getCode());
@@ -212,8 +215,8 @@ public class TradeStrategyServiceImpl implements TradeStrategyService {
      *
      * @param dbStockInfo 股票涨停信息
      */
-    private Integer calcBuyAmount(DBStockInfo dbStockInfo) {
-        return 100;
+    private Integer calcBuyAmount(DBStockInfo dbStockInfo, TradeRuleDbDo tradeRuleDbDo) {
+        return tradeRuleDbDo.getBuyNum();
     }
 
     private List<DBStockInfo> filterDBStockList(List<DBStockInfo> willDbStockList, Integer userId, Integer mockType) {

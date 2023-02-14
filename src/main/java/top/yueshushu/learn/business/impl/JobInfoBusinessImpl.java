@@ -174,7 +174,7 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
                     break;
                 }
                 case STOCK_PRICE: {
-                    if (isEndStockPriceTime()) {
+                    if (isEndStockPriceTime() || isEndStockMorningTime()) {
                         // 进行休眠30 s, 使 查询股票的价格时间 在3点之后。
                         sleepTime(30000);
                     }

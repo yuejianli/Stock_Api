@@ -176,6 +176,9 @@ public class DefaultStockInfoParser implements StockInfoParser {
         JSONObject jsonObject = JSONObject.parseObject(content);
         //获取里面的data.diff 内容，是个列表对象
         JSONArray jsonArray = jsonObject.getJSONObject("data").getJSONArray("pool");
+        if (jsonArray.size() <= 0) {
+            return Collections.emptyList();
+        }
         //处理内容
         List<StockPoolInfo> result = new ArrayList<>(32);
         String dateStr = DateUtil.format(currentDate, DatePattern.PURE_DATE_PATTERN);

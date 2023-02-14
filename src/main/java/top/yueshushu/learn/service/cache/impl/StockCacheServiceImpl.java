@@ -391,6 +391,7 @@ public class StockCacheServiceImpl implements StockCacheService {
 
     @Override
     public void setYesZtCodeList(List<String> codeList) {
+        redisUtil.delByKey(Const.STOCK_YES_ZT_CODE);
         redisUtil.leftPushAll(Const.STOCK_YES_ZT_CODE, codeList);
     }
 
@@ -401,6 +402,7 @@ public class StockCacheServiceImpl implements StockCacheService {
 
     @Override
     public void setTodayZtCodeList(List<String> codeList) {
+        redisUtil.delByKey(Const.STOCK_TODAY_ZT_CODE);
         redisUtil.leftPushAll(Const.STOCK_TODAY_ZT_CODE, codeList);
     }
 

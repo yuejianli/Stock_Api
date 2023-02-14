@@ -4,7 +4,7 @@
 #end
 #if(${qcCodeList})
     #foreach($stockInfo in ${qcCodeList})
-        ${stockInfo.code}   ${stockInfo.name}   ${stockInfo.amplitude}%    ${line}
+        ${stockInfo.code}   ${stockInfo.name}  ${stockInfo.bkName}  ${stockInfo.amplitude}%    ${line}
     #end
 #end
 
@@ -14,7 +14,7 @@
 #end
 #if(${ztCodeList})
     #foreach($stockInfo in ${ztCodeList})
-        ${stockInfo.code}   ${stockInfo.name}   ${stockInfo.statCount}/${stockInfo.statDay}    ${line}
+        ${stockInfo.code}   ${stockInfo.name}  ${stockInfo.bkName}  ${stockInfo.statCount}/${stockInfo.statDay}    ${line}
     #end
 #end
 
@@ -24,7 +24,7 @@
 #end
 #if(${dtCodeList})
     #foreach($stockInfo in ${dtCodeList})
-        ${stockInfo.code}   ${stockInfo.name}   ${stockInfo.days}    ${line}
+        ${stockInfo.code}   ${stockInfo.name}   ${stockInfo.bkName}  ${stockInfo.days}    ${line}
     #end
 #end
 
@@ -34,7 +34,7 @@
 #end
 #if(${cxCodeList})
     #foreach($stockInfo in ${cxCodeList})
-        ${stockInfo.code}   ${stockInfo.name}   ${stockInfo.amplitude}%    ${line}
+        ${stockInfo.code}   ${stockInfo.name}  ${stockInfo.bkName}  ${stockInfo.amplitude}%    ${line}
     #end
 #end
 

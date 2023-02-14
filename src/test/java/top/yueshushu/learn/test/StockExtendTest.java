@@ -206,4 +206,10 @@ public class StockExtendTest {
         stockPoolBusiness.handlerPool(DateUtil.date());
     }
 
+    @Test
+    public void poolTypeTest() {
+        List<StockPoolInfo> poolList = extCrawlerService.findPoolByType(StockPoolType.QS, DateUtil.date());
+        log.info(" 类型信息: {}", poolList.get(0));
+    }
+
 }
