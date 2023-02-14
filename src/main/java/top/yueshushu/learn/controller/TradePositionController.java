@@ -3,6 +3,7 @@ package top.yueshushu.learn.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -60,13 +61,14 @@ public class TradePositionController extends BaseController{
 
         TradePositionShowVo tradePositionShowVo = new TradePositionShowVo();
         tradePositionShowVo.setDateList(data);
-
         BigDecimal todayMoneySum = new BigDecimal(0);
-        for (TradePositionVo tradePositionVo : data) {
-            todayMoneySum = BigDecimalUtil.addBigDecimal(
-                    todayMoneySum,
-                    Optional.ofNullable(tradePositionVo.getTodayMoney()).orElse(BigDecimal.ZERO)
-            );
+        if (!CollectionUtils.isEmpty(data)) {
+            for (TradePositionVo tradePositionVo : data) {
+                todayMoneySum = BigDecimalUtil.addBigDecimal(
+                        todayMoneySum,
+                        Optional.ofNullable(tradePositionVo.getTodayMoney()).orElse(BigDecimal.ZERO)
+                );
+            }
         }
         tradePositionShowVo.setTodayMoney(todayMoneySum);
         return OutputResult.buildSucc(tradePositionShowVo);

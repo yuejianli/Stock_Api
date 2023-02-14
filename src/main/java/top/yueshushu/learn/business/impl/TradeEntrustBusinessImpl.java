@@ -51,7 +51,7 @@ public class TradeEntrustBusinessImpl implements TradeEntrustBusiness {
         //获取到最新的持仓信息，更新到相应的数据库中.
         List<TradeEntrustVo> tradePositionVoList = outputResult.getData();
         // 将数据保存下来
-        tradeCacheService.buildRealEasyMoneyCache(TradeRealValueType.TRADE_ENTRUST, tradeEntrustRo.getUserId(), tradePositionVoList);
+        tradeCacheService.buildRealEasyMoneyCache(TradeRealValueType.TRADE_ENTRUST, tradeEntrustRo.getUserId(), tradePositionVoList, null);
         return outputResult;
     }
 

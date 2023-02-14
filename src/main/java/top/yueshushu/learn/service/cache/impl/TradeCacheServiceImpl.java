@@ -31,8 +31,8 @@ public class TradeCacheServiceImpl implements TradeCacheService {
     }
 
     @Override
-    public void buildRealEasyMoneyCache(TradeRealValueType tradeRealValueType, Integer userId, Object value) {
-        redisUtil.set(buildCacheKey(tradeRealValueType, userId), value, easyMoneySecond, TimeUnit.SECONDS);
+    public void buildRealEasyMoneyCache(TradeRealValueType tradeRealValueType, Integer userId, Object value, Integer seconds) {
+        redisUtil.set(buildCacheKey(tradeRealValueType, userId), value, Optional.ofNullable(seconds).orElse(easyMoneySecond), TimeUnit.SECONDS);
     }
 
     @Override

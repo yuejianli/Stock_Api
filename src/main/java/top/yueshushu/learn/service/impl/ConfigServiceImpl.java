@@ -144,8 +144,8 @@ public class ConfigServiceImpl implements ConfigService {
             ConfigDo addConfigDo = new ConfigDo();
             BeanUtils.copyProperties(configDo, addConfigDo);
             addConfigDo.setId(null);
-            addConfigDo.setCodeValue(configDo.getCodeValue());
-            addConfigDo.setName(configDo.getName());
+            addConfigDo.setCodeValue(configRo.getCodeValue());
+            addConfigDo.setName(configRo.getName());
             addConfigDo.setCreateTime(DateUtil.date());
             addConfigDo.setUserId(configRo.getUserId());
             configDomainService.save(addConfigDo);

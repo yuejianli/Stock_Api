@@ -32,6 +32,7 @@ public class ConfigController extends BaseController {
 
     @PostMapping("/list")
     @ApiOperation("查询配置参数")
+    @AuthToken
     public OutputResult list(@RequestBody ConfigRo configRo) {
         configRo.setUserId(getUserId());
         return configBusiness.listConfig(configRo);

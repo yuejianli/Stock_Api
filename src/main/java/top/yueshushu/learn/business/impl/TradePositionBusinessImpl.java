@@ -103,7 +103,7 @@ public class TradePositionBusinessImpl implements TradePositionBusiness {
             //获取到最新的持仓信息，更新到相应的数据库中.
             tradePositionVoList = outputResult.getData();
             // 将数据保存下来
-            tradeCacheService.buildRealEasyMoneyCache(TradeRealValueType.TRADE_POSITION, tradePositionRo.getUserId(), tradePositionVoList);
+            tradeCacheService.buildRealEasyMoneyCache(TradeRealValueType.TRADE_POSITION, tradePositionRo.getUserId(), tradePositionVoList, null);
         }
         fillSelectedStockList(tradePositionRo, tradePositionVoList);
         return OutputResult.buildSucc(tradePositionVoList);

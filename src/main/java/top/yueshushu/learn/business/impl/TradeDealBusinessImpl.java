@@ -51,7 +51,7 @@ public class TradeDealBusinessImpl implements TradeDealBusiness {
         //获取到最新的持仓信息，更新到相应的数据库中.
         List<TradeDealVo> tradeDealVoList = outputResult.getData();
         // 将数据保存下来
-        tradeCacheService.buildRealEasyMoneyCache(TradeRealValueType.TRADE_DEAL, tradeDealRo.getUserId(), tradeDealVoList);
+        tradeCacheService.buildRealEasyMoneyCache(TradeRealValueType.TRADE_DEAL, tradeDealRo.getUserId(), tradeDealVoList, null);
         return outputResult;
     }
 

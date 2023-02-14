@@ -266,7 +266,7 @@ public class TradeEntrustServiceImpl implements TradeEntrustService {
             tradeEntrustVo.setTotalMoney(buyMoney);
             tradeEntrustVoList.add(tradeEntrustVo);
         }
-        tradeCacheService.buildRealEasyMoneyCache(TradeRealValueType.TRADE_ENTRUST_HISTORY, tradeEntrustRo.getUserId(), tradeEntrustVoList);
+        tradeCacheService.buildRealEasyMoneyCache(TradeRealValueType.TRADE_ENTRUST_HISTORY, tradeEntrustRo.getUserId(), tradeEntrustVoList, null);
         return tradeEntrustVoList;
     }
 

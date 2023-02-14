@@ -206,10 +206,10 @@ public abstract class BaseStrategyHandler<I extends BaseStrategyInput, R extends
         if (ConditionType.LT.getCode().equals(tradeStockRuleDto.getConditionType())) {
             if (RuleValueType.MONEY.getCode().equals(tradeStockRuleDto.getRuleValueType())) {
                 // 是金额.
-                result = BigDecimalUtil.subBigDecimal(originPrice, tradeStockRuleDto.getRuleValue());
+                result = BigDecimalUtil.addBigDecimal(originPrice, tradeStockRuleDto.getRuleValue());
             } else if (RuleValueType.PROPORTION.getCode().equals(tradeStockRuleDto.getRuleValueType())) {
                 // 是比例.
-                result = BigDecimalUtil.subBigDecimal(originPrice,
+                result = BigDecimalUtil.addBigDecimal(originPrice,
                         BigDecimalUtil.toBigDecimal(originPrice,
                                 BigDecimalUtil.divByHundred(tradeStockRuleDto.getRuleValue())));
             }
@@ -229,10 +229,10 @@ public abstract class BaseStrategyHandler<I extends BaseStrategyInput, R extends
         if (ConditionType.LT.getCode().equals(tradeStockRuleDto.getConditionType())) {
             if (RuleValueType.MONEY.getCode().equals(tradeStockRuleDto.getTradeValueType())) {
                 // 是金额.
-                result = BigDecimalUtil.subBigDecimal(result, tradeStockRuleDto.getTradePrice());
+                result = BigDecimalUtil.addBigDecimal(result, tradeStockRuleDto.getTradePrice());
             } else if (RuleValueType.PROPORTION.getCode().equals(tradeStockRuleDto.getTradeValueType())) {
                 // 是金额.
-                result = BigDecimalUtil.subBigDecimal(result,
+                result = BigDecimalUtil.addBigDecimal(result,
                         BigDecimalUtil.toBigDecimal(originPrice,
                                 BigDecimalUtil.divByHundred(tradeStockRuleDto.getRuleValue())));
             }

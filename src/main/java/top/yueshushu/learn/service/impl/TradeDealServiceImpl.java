@@ -195,7 +195,7 @@ public class TradeDealServiceImpl implements TradeDealService {
             );
             tradeDealVoList.add(tradeDealVo);
         }
-        tradeCacheService.buildRealEasyMoneyCache(TradeRealValueType.TRADE_DEAL_HISTORY, tradeDealRo.getUserId(), tradeDealVoList);
+        tradeCacheService.buildRealEasyMoneyCache(TradeRealValueType.TRADE_DEAL_HISTORY, tradeDealRo.getUserId(), tradeDealVoList, null);
         return tradeDealVoList;
     }
 
@@ -228,6 +228,9 @@ public class TradeDealServiceImpl implements TradeDealService {
         TradeDealRo tradeDealRo = new TradeDealRo();
         tradeDealRo.setUserId(userId);
         List<TradeDealVo> tradeDealVoList = realList(tradeDealRo).getData();
+
+        // 将数据保存下来
+        tradeCacheService.buildRealEasyMoneyCache(TradeRealValueType.TRADE_DEAL, tradeDealRo.getUserId(), tradeDealVoList, 36000);
         syncRealDealByUserId(userId, tradeDealVoList);
     }
 

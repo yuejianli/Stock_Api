@@ -20,9 +20,10 @@ public interface TradeCacheService {
     /**
      * 保存缓存信息
      *
-     * @param userId 用户编号
+     * @param userId  用户编号
+     * @param seconds 保存的秒数， 如果没有，则用默认的。
      */
-    void buildRealEasyMoneyCache(TradeRealValueType tradeRealValueType, Integer userId, Object value);
+    void buildRealEasyMoneyCache(TradeRealValueType tradeRealValueType, Integer userId, Object value, Integer seconds);
 
 
     /**

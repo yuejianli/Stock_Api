@@ -33,27 +33,27 @@ public class StrategyTest {
         tradeStockRuleDto.setRuleType(1);
         tradeStockRuleDto.setConditionType(ConditionType.LT.getCode());
         tradeStockRuleDto.setRuleValueType(RuleValueType.MONEY.getCode());
-        tradeStockRuleDto.setRuleValue(new BigDecimal("1"));
+        tradeStockRuleDto.setRuleValue(new BigDecimal("-1"));
         tradeStockRuleDto.setTradeValueType(RuleValueType.MONEY.getCode());
         tradeStockRuleDto.setTradePrice(new BigDecimal("0"));
         BigDecimal price = null;
         price = lastBuyPriceBuyHandler.getPrice(tradeStockRuleDto, originPrice);
         log.info(">>> 金额 ，为 1,0 时 新值是: {}", price);
 
-        tradeStockRuleDto.setTradePrice(new BigDecimal("1"));
+        tradeStockRuleDto.setTradePrice(new BigDecimal("-1"));
         price = lastBuyPriceBuyHandler.getPrice(tradeStockRuleDto, originPrice);
         log.info(">>> 金额 ，为 1,1 时 新值是: {}", price);
 
         tradeStockRuleDto.setRuleValueType(RuleValueType.PROPORTION.getCode());
-        tradeStockRuleDto.setRuleValue(new BigDecimal("2"));
-        tradeStockRuleDto.setTradePrice(new BigDecimal("3"));
+        tradeStockRuleDto.setRuleValue(new BigDecimal("-2"));
+        tradeStockRuleDto.setTradePrice(new BigDecimal("-3"));
         price = lastBuyPriceBuyHandler.getPrice(tradeStockRuleDto, originPrice);
         log.info(">>> 比例 ，为 1,1 时 新值是: {}", price);
 
 
         tradeStockRuleDto.setRuleValueType(RuleValueType.PROPORTION.getCode());
-        tradeStockRuleDto.setRuleValue(new BigDecimal("2"));
-        tradeStockRuleDto.setTradePrice(new BigDecimal("2"));
+        tradeStockRuleDto.setRuleValue(new BigDecimal("-2"));
+        tradeStockRuleDto.setTradePrice(new BigDecimal("-2"));
         price = lastBuyPriceBuyHandler.getPrice(tradeStockRuleDto, originPrice);
         log.info(">>> 比例 ，为 1,0 时 新值是: {}", price);
     }

@@ -55,7 +55,7 @@ public class TradeMoneyBusinessImpl implements TradeMoneyBusiness {
 //        TradeMoney tradeMoney = tradeMoneyAssembler.voToEntity(tradeMoneyVo);
 //        //进行更新
 //       tradeMoneyService.updateMoney(tradeMoney);
-        tradeCacheService.buildRealEasyMoneyCache(TradeRealValueType.TRADE_MONEY, tradeMoneyRo.getUserId(), tradeMoneyVoOutputResult.getData());
+        tradeCacheService.buildRealEasyMoneyCache(TradeRealValueType.TRADE_MONEY, tradeMoneyRo.getUserId(), tradeMoneyVoOutputResult.getData(), null);
         return tradeMoneyVoOutputResult;
     }
 
