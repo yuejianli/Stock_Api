@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import com.alibaba.fastjson.JSON;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -18,10 +19,7 @@ import top.yueshushu.learn.util.BigDecimalUtil;
 import java.io.File;
 import java.io.InputStream;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * @ClassName:DefaultDailyTradingInfoParse
@@ -31,6 +29,7 @@ import java.util.List;
  * @Version 1.0
  **/
 @Service("defaultDailyTradingInfoParse")
+@Slf4j
 public class DefaultDailyTradingInfoParse implements DailyTradingInfoParse {
 
     public static final String TX_NO_MATCH_RESULT = "v_pv_none_match";
@@ -141,7 +140,12 @@ public class DefaultDailyTradingInfoParse implements DailyTradingInfoParse {
             if (!StringUtils.hasText(codeHistoryContent)) {
                 continue;
             }
-            result.add(singleTxMoneyHistoryParse(codeHistoryContent, beforeLastWorking));
+            TxStockHistoryInfo txStockHistoryInfo = singleTxMoneyHistoryParse(codeHistoryContent, beforeLastWorking);
+            if (null != txStockHistoryInfo.getClosingPrice()) {
+                result.add(txStockHistoryInfo);
+            } else {
+                log.info(" 股票 {} ,名称 {} 退市了", txStockHistoryInfo.getCode(), txStockHistoryInfo.getName());
+            }
         }
         return result;
     }
@@ -235,11 +239,12 @@ public class DefaultDailyTradingInfoParse implements DailyTradingInfoParse {
 
         // 对字符串进行拆分，按照 ~
         String[] splitArr = codeHistoryContent.split("\\~");
-
-
         result.setCode(splitArr[2]);
         result.setCurrDate(DateUtil.format(beforeLastWorking, Const.SIMPLE_DATE_FORMAT));
         result.setName(splitArr[1]);
+        if (!StringUtils.hasText(splitArr[38]) && !StringUtils.hasText(splitArr[39])) {
+            return result;
+        }
         result.setClosingPrice(BigDecimalUtil.toBigDecimal(splitArr[3]));
         result.setHighestPrice(BigDecimalUtil.toBigDecimal(splitArr[41]));
         result.setLowestPrice(BigDecimalUtil.toBigDecimal(splitArr[42]));
@@ -250,17 +255,18 @@ public class DefaultDailyTradingInfoParse implements DailyTradingInfoParse {
         result.setAmplitudeProportion(BigDecimalUtil.toBigDecimal(splitArr[32]));
         // 175.76/64869/1129392874  最新价/成交量（手）/成交额（元）
         result.setTradingVolume(Long.parseLong(splitArr[36]) * 100);
-        result.setTradingValue(BigDecimalUtil.toBigDecimal(splitArr[37]));
+        result.setTradingValue(BigDecimalUtil.toBigDecimalIfNull(splitArr[37]));
+        ;
 
         // 扩展的几个
-        result.setOutDish(Integer.parseInt(splitArr[7]));
-        result.setInnerDish(Integer.parseInt(splitArr[8]));
-        result.setChangingProportion(BigDecimalUtil.toBigDecimal(splitArr[38]));
-        result.setThan(BigDecimalUtil.toBigDecimal(splitArr[49]));
-        result.setAvgPrice(BigDecimalUtil.toBigDecimal(splitArr[51]));
-        result.setStaticPriceRatio(BigDecimalUtil.toBigDecimal(splitArr[53]));
-        result.setDynamicPriceRatio(BigDecimalUtil.toBigDecimal(splitArr[52]));
-        result.setTtmPriceRatio(BigDecimalUtil.toBigDecimal(splitArr[39]));
+        result.setOutDish(Integer.parseInt(Optional.ofNullable(splitArr[7]).orElse("0")));
+        result.setInnerDish(Integer.parseInt(Optional.ofNullable(splitArr[8]).orElse("0")));
+        result.setChangingProportion(BigDecimalUtil.toBigDecimalIfNull(splitArr[38]));
+        result.setThan(BigDecimalUtil.toBigDecimalIfNull(splitArr[49]));
+        result.setAvgPrice(BigDecimalUtil.toBigDecimalIfNull(splitArr[51]));
+        result.setStaticPriceRatio(BigDecimalUtil.toBigDecimalIfNull(splitArr[53]));
+        result.setDynamicPriceRatio(BigDecimalUtil.toBigDecimalIfNull(splitArr[52]));
+        result.setTtmPriceRatio(BigDecimalUtil.toBigDecimalIfNull(splitArr[39]));
 
         result.setBuyHand(calcBuyHand(splitArr));
         result.setSellHand(calcSellHand(splitArr));

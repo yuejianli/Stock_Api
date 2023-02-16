@@ -1,6 +1,7 @@
 package top.yueshushu.learn.util;
 
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -133,21 +134,38 @@ public class BigDecimalUtil {
      * @param str
      * @return
      */
-    public static BigDecimal toBigDecimal(String str){
-        Assert.notNull(str,"格式化源 str 不能为空");
-        BigDecimal bigDecimal=new BigDecimal(str);
-        return bigDecimal.setScale(4,BigDecimal.ROUND_HALF_UP);
+    public static BigDecimal toBigDecimal(String str) {
+        Assert.notNull(str, "格式化源 str 不能为空");
+        BigDecimal bigDecimal = new BigDecimal(str);
+        return bigDecimal.setScale(4, BigDecimal.ROUND_HALF_UP);
     }
+
     /**
      * 转换，成四位小数的 BigDecimal
+     *
+     * @param str
+     * @return
+     */
+    public static BigDecimal toBigDecimalIfNull(String str) {
+        if (!StringUtils.hasText(str)) {
+            return BigDecimal.ZERO;
+        }
+        BigDecimal bigDecimal = new BigDecimal(str);
+        return bigDecimal.setScale(4, BigDecimal.ROUND_HALF_UP);
+    }
+
+    /**
+     * 转换，成四位小数的 BigDecimal
+     *
      * @param value
      * @return
      */
-    public static BigDecimal toBigDecimal(Double value){
-        Assert.notNull(value,"格式化源 value 不能为空");
-        BigDecimal bigDecimal=BigDecimal.valueOf(value);
-        return bigDecimal.setScale(4,BigDecimal.ROUND_HALF_UP);
+    public static BigDecimal toBigDecimal(Double value) {
+        Assert.notNull(value, "格式化源 value 不能为空");
+        BigDecimal bigDecimal = BigDecimal.valueOf(value);
+        return bigDecimal.setScale(4, BigDecimal.ROUND_HALF_UP);
     }
+
     /**
      * 计算两个字符串的数字，相乘后得到的新值。
      * @param value1 值2

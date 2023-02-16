@@ -55,6 +55,9 @@ public class TradeUserServiceImpl implements TradeUserService {
         if (null == tradeUser) {
             return OutputResult.buildFail(ResultCode.TRADE_USER_NO_RELATION);
         }
+        if (!StringUtils.hasText(tradeUser.getAccount())) {
+            return OutputResult.buildFail(ResultCode.TRADE_USER_NO_CONFIG);
+        }
         //关联的用户
         String oldPassword = tradeUser.getPassword();
         String oldAccount = tradeUser.getAccount();

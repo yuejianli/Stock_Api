@@ -156,6 +156,9 @@ public class CrawlerStockHistoryServiceImpl implements CrawlerStockHistoryServic
             //处理读取数据
             List<TxStockHistoryInfo> txStockHistoryInfoList = crawlerService.parseTxMoneyYesHistory(fullCodeList,
                     beforeLastWorking);
+            if (CollectionUtils.isEmpty(txStockHistoryInfoList)) {
+                return OutputResult.buildSucc(ResultCode.STOCK_HIS_ASYNC_SUCCESS);
+            }
             // 上一个交易日的数据查询出来了。 进行同步
             List<StockHistoryDo> stockHistoryDoList = new ArrayList<>();
 
