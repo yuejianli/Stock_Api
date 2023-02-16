@@ -34,6 +34,7 @@ public class TradeEntrust implements Serializable {
     private BigDecimal totalMoney;
     private Integer userId;
     private Integer entrustType;
+    private Integer dbType;
     private Integer mockType;
     private Integer flag;
 }

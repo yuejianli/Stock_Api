@@ -92,6 +92,13 @@ public class TradeDealDo implements Serializable {
     @TableField("entrust_type")
     private Integer entrustType;
 
+
+    /**
+     * 打板的类型 1为打板 0为普通
+     */
+    @TableField("db_type")
+    private Integer dbType;
+
     /**
      * 关联用户
      */

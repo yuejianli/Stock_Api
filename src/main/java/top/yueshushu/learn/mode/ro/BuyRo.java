@@ -26,4 +26,6 @@ public class BuyRo extends TradeRo {
     private BigDecimal price;
     @ApiModelProperty("委托方式 1手动,0自动")
     private Integer entrustType;
+    @ApiModelProperty("是否是打板买入")
+    private Integer dbBuy = 0;
 }

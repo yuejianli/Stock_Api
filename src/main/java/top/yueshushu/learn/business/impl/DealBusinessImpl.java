@@ -107,8 +107,13 @@ public class DealBusinessImpl implements DealBusiness {
             //获取信息
             BigDecimal price = stockCacheService.getNowCachePrice(code);
             if(price.compareTo(SystemConst.DEFAULT_DEAL_PRICE)<=0){
-                //没有从缓存里面获取到价格
-                return ;
+                if (tradeEntrustDo.getDbType() == null || tradeEntrustDo.getDbType() == 0) {
+                    //没有从缓存里面获取到价格
+                    return;
+                } else {
+                    // 设置成涨停价， 不放置在 redis 缓存中了。
+                    price = tradeEntrustDo.getEntrustPrice();
+                }
             }
             if(DealType.BUY.getCode().equals(tradeEntrustDo.getDealType())){
                 //买的时候，  当前价格 < 买入价格，则成交.

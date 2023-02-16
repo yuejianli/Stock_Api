@@ -83,6 +83,7 @@ public class TradeDealServiceImpl implements TradeDealService {
         );
         tradeDealDo.setEntrustCode(tradeEntrustDo.getEntrustCode());
         tradeDealDo.setEntrustType(tradeEntrustDo.getEntrustType());
+        tradeDealDo.setDbType(tradeEntrustDo.getDbType());
         tradeDealDo.setUserId(tradeEntrustDo.getUserId());
         tradeDealDo.setMockType(tradeEntrustDo.getMockType());
         tradeDealDo.setFlag(DataFlagType.NORMAL.getCode());

@@ -29,6 +29,7 @@ import top.yueshushu.learn.util.BigDecimalUtil;
 import top.yueshushu.learn.util.StockUtil;
 
 import javax.annotation.Resource;
+import java.util.Optional;
 
 /**
  * 委托卖出
@@ -116,6 +117,7 @@ public class SellBusinessImpl implements SellBusiness {
         );
         tradeEntrustDo.setUserId(sellRo.getUserId());
         tradeEntrustDo.setEntrustType(sellRo.getEntrustType());
+        tradeEntrustDo.setDbType(Optional.ofNullable(sellRo.getDbBuy()).orElse(0));
         tradeEntrustDo.setMockType(sellRo.getMockType());
         tradeEntrustDo.setFlag(DataFlagType.NORMAL.getCode());
         //放入一条记录到委托信息里面.

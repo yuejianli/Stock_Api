@@ -30,6 +30,7 @@ import top.yueshushu.learn.util.StockUtil;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.Optional;
 
 /**
  * @Description 委托买入编排处理
@@ -145,6 +146,7 @@ public class BuyBusinessImpl implements BuyBusiness {
         tradeEntrustDo.setTotalMoney(buyMoney);
         tradeEntrustDo.setUserId(buyRo.getUserId());
         tradeEntrustDo.setEntrustType(buyRo.getEntrustType());
+        tradeEntrustDo.setDbType(Optional.ofNullable(buyRo.getDbBuy()).orElse(0));
         tradeEntrustDo.setMockType(buyRo.getMockType());
         tradeEntrustDo.setFlag(DataFlagType.NORMAL.getCode());
         //放入一条记录到委托信息里面.

@@ -40,6 +40,8 @@ public class TradeDealVo implements Serializable {
     private String entrustCode;
     @ApiModelProperty("委托方式 1 手动 0 自动")
     private Integer entrustType;
+    @ApiModelProperty("打板的类型 1为打板 0为普通")
+    private Integer dbType;
     @ApiModelProperty("关联用户")
     private Integer userId;
     @ApiModelProperty("类型 1为虚拟 0为正式")

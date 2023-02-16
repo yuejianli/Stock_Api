@@ -1,5 +1,6 @@
 package top.yueshushu.learn.service.impl;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -21,6 +22,7 @@ import top.yueshushu.learn.enumtype.DBStockType;
 import top.yueshushu.learn.enumtype.DataFlagType;
 import top.yueshushu.learn.enumtype.EntrustType;
 import top.yueshushu.learn.enumtype.RuleConditionType;
+import top.yueshushu.learn.message.weixin.service.WeChatService;
 import top.yueshushu.learn.mode.dto.TradeRuleStockQueryDto;
 import top.yueshushu.learn.mode.ro.BuyRo;
 import top.yueshushu.learn.mode.ro.RevokeRo;
@@ -35,6 +37,7 @@ import top.yueshushu.learn.util.BigDecimalUtil;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -71,6 +74,8 @@ public class TradeStrategyServiceImpl implements TradeStrategyService {
     private BuyBusiness buyBusiness;
     @Resource
     private TradeRuleDbDomainService tradeRuleDbDomainService;
+    @Resource
+    private WeChatService weChatService;
 
     @Override
     public void mockEntrustXxlJob(BuyRo buyRo) {
@@ -201,9 +206,18 @@ public class TradeStrategyServiceImpl implements TradeStrategyService {
             tempBuyRo.setName(dbStockInfo.getName());
             tempBuyRo.setPrice(BigDecimalUtil.convertTwo(new BigDecimal(dbStockInfo.getLimitPrice() / 100.00)));
             tempBuyRo.setEntrustType(EntrustType.AUTO.getCode());
+            tempBuyRo.setDbBuy(1);
             stockCacheService.reduceTodayBuyDBSurplusNum(buyRo.getUserId(), buyRo.getMockType(), null);
             stockCacheService.addTodayDBCode(buyRo.getUserId(), buyRo.getMockType(), dbStockInfo.getCode());
             // 进行交易
+            String message = MessageFormat.format(
+                    "打板买入提醒: 委托时间:{0},股票 {1},名称{2},买入{3}股，价格是:{4},花费金额:{5}",
+                    DateUtil.now(),
+                    tempBuyRo.getCode(), tempBuyRo.getName(),
+                    tempBuyRo.getAmount(), tempBuyRo.getPrice(),
+                    BigDecimalUtil.toBigDecimal(new BigDecimal(tempBuyRo.getAmount()), tempBuyRo.getPrice())
+            );
+            weChatService.sendTextMessage(tradeRuleDbDo.getUserId(), message);
             buyBusiness.buy(tempBuyRo);
         }
 
@@ -216,7 +230,18 @@ public class TradeStrategyServiceImpl implements TradeStrategyService {
      * @param dbStockInfo 股票涨停信息
      */
     private Integer calcBuyAmount(DBStockInfo dbStockInfo, TradeRuleDbDo tradeRuleDbDo) {
-        return tradeRuleDbDo.getBuyNum();
+        // 价格 *100 了
+        if (dbStockInfo.getLimitPrice() < 100) {
+            return 10000;
+        } else if (dbStockInfo.getLimitPrice() < 1000) {
+            return 1000;
+        } else if (dbStockInfo.getLimitPrice() < 5000) {
+            return 200;
+        } else if (dbStockInfo.getLimitPrice() < 10000) {
+            return 100;
+        } else {
+            return 100;
+        }
     }
 
     private List<DBStockInfo> filterDBStockList(List<DBStockInfo> willDbStockList, Integer userId, Integer mockType) {

@@ -51,6 +51,8 @@ public class TradeEntrustVo implements Serializable {
     private BigDecimal totalMoney;
     @ApiModelProperty("委托方式 1 手动 0 自动")
     private Integer entrustType;
+    @ApiModelProperty("是否是打板 1为打板 0为普通")
+    private Integer dbType;
     @ApiModelProperty("类型 1为虚拟 0为正式")
     private Integer mockType;
     @ApiModelProperty("用户编号")

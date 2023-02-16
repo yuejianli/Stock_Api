@@ -177,6 +177,7 @@ public abstract class BaseStrategyHandler<I extends BaseStrategyInput, R extends
         mockBuyRo.setAmount(tradeStockRuleDto.getTradeNum());
         mockBuyRo.setName(tradeStockRuleDto.getStockName());
         mockBuyRo.setPrice(currentPrice);
+        mockBuyRo.setDbBuy(0);
         mockBuyRo.setEntrustType(EntrustType.AUTO.getCode());
         return mockBuyRo;
     }
@@ -192,6 +193,7 @@ public abstract class BaseStrategyHandler<I extends BaseStrategyInput, R extends
         sellRo.setName(tradeStockRuleDto.getStockName());
         sellRo.setPrice(currentPrice);
         sellRo.setEntrustType(EntrustType.AUTO.getCode());
+        sellRo.setDbBuy(0);
         return sellRo;
     }
 

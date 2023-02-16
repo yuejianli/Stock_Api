@@ -123,6 +123,11 @@ public class TradeEntrustDo implements Serializable {
     private Integer entrustType;
 
     /**
+     * 打板的类型 1为打板 0为普通
+     */
+    @TableField("db_type")
+    private Integer dbType;
+    /**
      * 类型 1为虚拟 0为正式
      */
     @TableField("mock_type")

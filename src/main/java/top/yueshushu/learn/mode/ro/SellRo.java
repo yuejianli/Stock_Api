@@ -26,4 +26,6 @@ public class SellRo extends TradeRo {
     private BigDecimal price;
     @ApiModelProperty("委托方式 1手动,0自动")
     private Integer entrustType;
+    @ApiModelProperty("是否是打板卖出，即涨停卖出")
+    private Integer dbBuy = 0;
 }

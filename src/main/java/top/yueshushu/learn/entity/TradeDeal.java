@@ -1,5 +1,4 @@
 package top.yueshushu.learn.entity;
-
 import lombok.Data;
 
 import java.io.Serializable;
@@ -29,6 +28,7 @@ public class TradeDeal implements Serializable {
     private String dealCode;
     private String entrustCode;
     private Integer entrustType;
+    private Integer dbType;
     private Integer userId;
     private Integer mockType;
     private Integer flag;
