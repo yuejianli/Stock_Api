@@ -1,5 +1,6 @@
 package top.yueshushu.learn.test;
 
+import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -10,12 +11,16 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.util.CollectionUtils;
 import top.yueshushu.learn.business.StockPoolBusiness;
 import top.yueshushu.learn.crawler.crawler.CrawlerService;
 import top.yueshushu.learn.crawler.crawler.ExtCrawlerService;
 import top.yueshushu.learn.crawler.entity.*;
 import top.yueshushu.learn.enumtype.DBStockType;
+import top.yueshushu.learn.enumtype.StockCodeType;
 import top.yueshushu.learn.enumtype.StockPoolType;
+import top.yueshushu.learn.helper.DateHelper;
+import top.yueshushu.learn.service.StockPoolHistoryService;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -41,6 +46,10 @@ public class StockExtendTest {
     private ExtCrawlerService extCrawlerService;
     @Resource
     private StockPoolBusiness stockPoolBusiness;
+    @Resource
+    private StockPoolHistoryService stockPoolHistoryService;
+    @Resource
+    private DateHelper dateHelper;
 
     @Test
     public void hotMapTest() {
@@ -210,6 +219,59 @@ public class StockExtendTest {
     public void poolTypeTest() {
         List<StockPoolInfo> poolList = extCrawlerService.findPoolByType(StockPoolType.QS, DateUtil.date());
         log.info(" 类型信息: {}", poolList.get(0));
+    }
+
+    @Test
+    public void poolTypeSaveTest() {
+        // 对日期进行处理.
+        Date startDate = DateUtil.parse("2023-01-01 21:40:00");
+        Date endDate = DateUtil.parse("2023-02-16");
+
+        // 对日期进行处理.
+        for (int i = 0; i <= 100; i++) {
+            DateTime dateTime = DateUtil.offsetDay(startDate, i);
+            if (dateTime.after(endDate)) {
+                continue;
+            }
+            if (!dateHelper.isWorkingDay(dateTime)) {
+                continue;
+            }
+            // 获取数据
+            for (StockPoolType stockPoolType : StockPoolType.values()) {
+                if (StockPoolType.YES_ZT.equals(stockPoolType)) {
+                    continue;
+                }
+                // 查询出数据
+                List<StockPoolInfo> poolDtList = extCrawlerService.findPoolByType(stockPoolType, dateTime);
+                if (!CollectionUtils.isEmpty(poolDtList)) {
+                    poolDtList = filterStockList(poolDtList, DBStockType.SH_SZ, null);
+                    stockPoolHistoryService.savePoolHistory(poolDtList);
+                }
+            }
+        }
+    }
+
+    /**
+     * 过滤股票信息
+     */
+    private List<StockPoolInfo> filterStockList(List<StockPoolInfo> poolList, DBStockType dbStockType,
+                                                StockPoolType stockPoolType) {
+        if (null == dbStockType) {
+            return poolList;
+        }
+        List<StockPoolInfo> result = new ArrayList<>();
+        for (StockPoolInfo stockPoolInfo : poolList) {
+            StockCodeType typeByStockCode = StockCodeType.getTypeByStockCode(stockPoolInfo.getCode());
+            if (null == typeByStockCode) {
+                continue;
+            }
+            if (!dbStockType.contains(typeByStockCode)) {
+                continue;
+            }
+            // 放置进去
+            result.add(stockPoolInfo);
+        }
+        return result;
     }
 
 }

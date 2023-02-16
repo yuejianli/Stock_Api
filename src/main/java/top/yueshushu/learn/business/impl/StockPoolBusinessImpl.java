@@ -17,6 +17,7 @@ import top.yueshushu.learn.enumtype.message.VelocityTemplateType;
 import top.yueshushu.learn.message.dingtalk.DingTalkService;
 import top.yueshushu.learn.message.email.EmailService;
 import top.yueshushu.learn.message.weixin.service.WeChatService;
+import top.yueshushu.learn.service.StockPoolHistoryService;
 import top.yueshushu.learn.service.cache.StockCacheService;
 import top.yueshushu.learn.util.MyDateUtil;
 import top.yueshushu.learn.util.RedisUtil;
@@ -46,6 +47,8 @@ public class StockPoolBusinessImpl implements StockPoolBusiness {
     private DingTalkService dingTalkService;
     @Resource
     private RedisUtil redisUtil;
+    @Resource
+    private StockPoolHistoryService stockPoolHistoryService;
 
     @Override
     public void handlerPool(Date date) {
@@ -80,6 +83,7 @@ public class StockPoolBusinessImpl implements StockPoolBusiness {
             List<StockPoolInfo> poolZtList = extCrawlerService.findPoolByType(StockPoolType.ZT, date);
             if (!CollectionUtils.isEmpty(poolZtList)) {
                 poolZtList = filterStockList(poolZtList, DBStockType.SH_SZ, null);
+                stockPoolHistoryService.savePoolHistory(poolZtList);
                 // 获取所有的 股票编号和密码组装的信息
                 dataMap.put("ztCodeList", poolZtList);
                 // 获取 codeList
@@ -89,14 +93,27 @@ public class StockPoolBusinessImpl implements StockPoolBusiness {
             List<StockPoolInfo> poolDtList = extCrawlerService.findPoolByType(StockPoolType.DT, date);
             if (!CollectionUtils.isEmpty(poolDtList)) {
                 poolDtList = filterStockList(poolDtList, DBStockType.SH_SZ, null);
+                stockPoolHistoryService.savePoolHistory(poolDtList);
                 // 获取所有的 股票编号和密码组装的信息
                 dataMap.put("dtCodeList", poolDtList);
             }
             List<StockPoolInfo> poolCxList = extCrawlerService.findPoolByType(StockPoolType.CX, date);
             if (!CollectionUtils.isEmpty(poolCxList)) {
                 poolCxList = filterStockList(poolCxList, DBStockType.SH_SZ, null);
+                stockPoolHistoryService.savePoolHistory(poolCxList);
                 // 获取所有的 股票编号和密码组装的信息
                 dataMap.put("cxCodeList", poolCxList);
+            }
+            List<StockPoolInfo> poolQsList = extCrawlerService.findPoolByType(StockPoolType.QS, date);
+            if (!CollectionUtils.isEmpty(poolQsList)) {
+                poolQsList = filterStockList(poolQsList, DBStockType.SH_SZ, null);
+                stockPoolHistoryService.savePoolHistory(poolQsList);
+            }
+
+            List<StockPoolInfo> poolZbList = extCrawlerService.findPoolByType(StockPoolType.ZB, date);
+            if (!CollectionUtils.isEmpty(poolZbList)) {
+                poolZbList = filterStockList(poolZbList, DBStockType.SH_SZ, null);
+                stockPoolHistoryService.savePoolHistory(poolZbList);
             }
         }
 

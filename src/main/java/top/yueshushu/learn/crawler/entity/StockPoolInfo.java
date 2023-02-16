@@ -19,6 +19,7 @@ public class StockPoolInfo implements Serializable {
     private String name;
     private Date currDate;
     private StockPoolType stockPoolType;
+    private Integer type;
     /**
      * @param nowPrice 最新价
      * @param amplitude 涨跌幅度

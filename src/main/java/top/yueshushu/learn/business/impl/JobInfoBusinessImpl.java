@@ -410,7 +410,9 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
                     break;
                 }
                 case STOCK_POOL: {
-                    stockPoolBusiness.handlerPool(DateUtil.date());
+                    if (dateHelper.isWorkingDay(DateUtil.date())) {
+                        stockPoolBusiness.handlerPool(DateUtil.date());
+                    }
                     break;
                 }
                 default: {

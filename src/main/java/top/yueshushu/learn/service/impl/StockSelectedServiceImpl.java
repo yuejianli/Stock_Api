@@ -2,6 +2,7 @@ package top.yueshushu.learn.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.date.TimeInterval;
 import cn.hutool.core.util.ArrayUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.pagehelper.Page;
@@ -19,12 +20,15 @@ import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.crawler.service.CrawlerStockHistoryService;
 import top.yueshushu.learn.domain.StockPriceHistoryDo;
 import top.yueshushu.learn.domain.StockSelectedDo;
+import top.yueshushu.learn.domainservice.StockDomainService;
 import top.yueshushu.learn.domainservice.StockPriceHistoryDomainService;
 import top.yueshushu.learn.domainservice.StockSelectedDomainService;
 import top.yueshushu.learn.entity.Stock;
 import top.yueshushu.learn.entity.StockHistory;
 import top.yueshushu.learn.entity.StockSelected;
+import top.yueshushu.learn.enumtype.DBStockType;
 import top.yueshushu.learn.enumtype.DataFlagType;
+import top.yueshushu.learn.enumtype.StockCodeType;
 import top.yueshushu.learn.enumtype.SyncStockHistoryType;
 import top.yueshushu.learn.mode.dto.StockPriceCacheDto;
 import top.yueshushu.learn.mode.ro.IdRo;
@@ -77,6 +81,8 @@ public class StockSelectedServiceImpl implements StockSelectedService {
     private CrawlerStockHistoryService crawlerStockHistoryService;
     @Resource
     private StockPriceHistoryDomainService stockPriceHistoryDomainService;
+    @Resource
+    private StockDomainService stockDomainService;
 
     @SuppressWarnings("all")
     @Resource(name = Const.ASYNC_SERVICE_EXECUTOR_BEAN_NAME)
@@ -449,8 +455,8 @@ public class StockSelectedServiceImpl implements StockSelectedService {
     @Override
     public void syncDayHistory() {
         //查询出所有的自选表里面的股票记录信息
-        //List<String> codeList = stockSelectedDomainService.findCodeList(null);
-        //for (String code : codeList) {
+        //List<String> codeSelectedList = stockSelectedDomainService.findCodeList(null);
+        //for (String code : codeSelectedList) {
         //    //对股票进行同步
         //    StockRo stockRo = new StockRo();
         //    stockRo.setType(
@@ -472,11 +478,61 @@ public class StockSelectedServiceImpl implements StockSelectedService {
         //            stockRo
         //    );
         //}
+        List<String> codeSelectedList = syncSelectedCodeHistory(stockSelectedDomainService.findCodeList(null));
+        syncShAndSZCodeHistory(codeSelectedList, DBStockType.SH_SZ);
 
-        List<String> codeList = stockSelectedDomainService.findCodeList(null);
-        // 15点之前
-        crawlerStockHistoryService.txMoneyTodayStockHistory(codeList, stockService.listFullCode(codeList));
+
     }
+
+    private List<String> syncSelectedCodeHistory(List<String> codeList) {
+        List<String> resultCodeList = codeList;
+        // 15点之前
+        executor.submit(
+                () -> {
+                    crawlerStockHistoryService.txMoneyTodayStockHistory(resultCodeList, stockService.listFullCode(resultCodeList));
+                    try {
+                        TimeUnit.MILLISECONDS.sleep(200);
+                    } catch (Exception e) {
+                    }
+                }
+        );
+        return resultCodeList;
+    }
+
+    private void syncShAndSZCodeHistory(List<String> codeSelectedList, DBStockType dbStockType) {
+        //1. 查询出所有的股票和对应的股票 full code 列表
+        List<String> allCodeList = stockDomainService.listAllCode();
+        // 对股票 编码进行筛选
+        List<String> filterCodeList = new ArrayList<>();
+        for (String allCode : allCodeList) {
+            if (codeSelectedList.contains(allCode)) {
+                continue;
+            }
+            StockCodeType typeByStockCode = StockCodeType.getTypeByStockCode(allCode);
+            if (null == typeByStockCode) {
+                continue;
+            }
+            if (!dbStockType.contains(typeByStockCode)) {
+                continue;
+            }
+            filterCodeList.add(allCode);
+        }
+        if (CollectionUtils.isEmpty(filterCodeList)) {
+            return;
+        }
+        // 对股票进行分组处理.
+        int size = filterCodeList.size();
+        TimeInterval timeInterval = DateUtil.timer();
+        log.info("开始同步全量的股票价格数据，共需要同步{}条", size);
+        //进行分批保存, 最多是 20*99,不到2K条
+        int BATCH_NUMBER = 20;
+        for (int i = 0; i < size; i = i + BATCH_NUMBER) {
+            int maxIndex = Math.min(i + BATCH_NUMBER, size);
+            syncSelectedCodeHistory(filterCodeList.subList(i, maxIndex));
+        }
+        log.info("总同步时间是:" + timeInterval.interval());
+    }
+
     @Override
     public void cacheClosePrice() {
         ////查询出所有的自选表里面的股票记录信息

@@ -5,6 +5,7 @@ import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import top.yueshushu.learn.crawler.entity.*;
 import top.yueshushu.learn.crawler.parse.StockInfoParser;
@@ -174,8 +175,13 @@ public class DefaultStockInfoParser implements StockInfoParser {
     public List<StockPoolInfo> parsePoolInfoList(String content, StockPoolType stockPoolType, Date currentDate) {
         //将内容转换成json
         JSONObject jsonObject = JSONObject.parseObject(content);
+
+        JSONObject data = jsonObject.getJSONObject("data");
+        if (ObjectUtils.isEmpty(data)) {
+            return Collections.emptyList();
+        }
         //获取里面的data.diff 内容，是个列表对象
-        JSONArray jsonArray = jsonObject.getJSONObject("data").getJSONArray("pool");
+        JSONArray jsonArray = data.getJSONArray("pool");
         if (jsonArray.size() <= 0) {
             return Collections.emptyList();
         }
@@ -190,6 +196,7 @@ public class DefaultStockInfoParser implements StockInfoParser {
                     stockPoolInfo.setName(tempObject.getString("n"));
                     stockPoolInfo.setCurrDate(currentDate);
                     stockPoolInfo.setStockPoolType(stockPoolType);
+                    stockPoolInfo.setType(stockPoolType.getCode());
                     stockPoolInfo.setNowPrice(BigDecimalUtil.convertTwo(new BigDecimal(tempObject.getInteger("p") / 1000.00)));
                     stockPoolInfo.setAmplitude(BigDecimalUtil.convertTwo(new BigDecimal(tempObject.getString("zdp"))));
                     stockPoolInfo.setTradingValue(new BigDecimal("0"));
