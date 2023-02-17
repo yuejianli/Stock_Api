@@ -32,18 +32,26 @@ public class DefaultStockInfoParser implements StockInfoParser {
         //将内容转换成json
         JSONObject jsonObject = JSONObject.parseObject(content);
         //获取里面的data.diff 内容，是个列表对象
-        JSONArray jsonArray = jsonObject.getJSONObject("data").getJSONArray("diff");
+        JSONObject data = jsonObject.getJSONObject("data");
+        if (ObjectUtils.isEmpty(data)) {
+            return Collections.emptyList();
+        }
+        //获取里面的data.diff 内容，是个列表对象
+        JSONArray jsonArray = data.getJSONArray("diff");
+        if (jsonArray.size() <= 0) {
+            return Collections.emptyList();
+        }
         //处理内容
         List<DownloadStockInfo> result = new ArrayList<>(32);
-        jsonArray.stream().forEach(
-                n->{
+        jsonArray.forEach(
+                n -> {
                     JSONObject tempObject = JSONObject.parseObject(n.toString());
                     DownloadStockInfo downloadStockInfo = new DownloadStockInfo();
                     downloadStockInfo.setCode(tempObject.getString("f12"));
                     downloadStockInfo.setName(tempObject.getString("f14"));
 
                     //处理类型  1为上海   0为深圳
-                    int type=tempObject.getInteger("f13");
+                    int type = tempObject.getInteger("f13");
                     //进行处理
                     downloadStockInfo.setExchange(type);
                     //设置股票的全称
@@ -61,10 +69,18 @@ public class DefaultStockInfoParser implements StockInfoParser {
         //将内容转换成json
         JSONObject jsonObject = JSONObject.parseObject(content);
         //获取里面的data.diff 内容，是个列表对象
-        JSONArray jsonArray = jsonObject.getJSONObject("data").getJSONArray("diff");
+        JSONObject data = jsonObject.getJSONObject("data");
+        if (ObjectUtils.isEmpty(data)) {
+            return Collections.emptyList();
+        }
+        //获取里面的data.diff 内容，是个列表对象
+        JSONArray jsonArray = data.getJSONArray("diff");
+        if (jsonArray.size() <= 0) {
+            return Collections.emptyList();
+        }
         //处理内容
         List<BKInfo> result = new ArrayList<>(32);
-        jsonArray.stream().forEach(
+        jsonArray.forEach(
                 n -> {
                     JSONObject tempObject = JSONObject.parseObject(n.toString());
                     BKInfo bkInfo = new BKInfo();
@@ -81,19 +97,29 @@ public class DefaultStockInfoParser implements StockInfoParser {
         //将内容转换成json
         JSONObject jsonObject = JSONObject.parseObject(content);
         //获取里面的data.diff 内容，是个列表对象
-        JSONArray jsonArray = jsonObject.getJSONObject("data").getJSONArray("diff");
+        JSONObject data = jsonObject.getJSONObject("data");
+        if (ObjectUtils.isEmpty(data)) {
+            return Collections.emptyList();
+        }
+        //获取里面的data.diff 内容，是个列表对象
+        JSONArray jsonArray = data.getJSONArray("diff");
+        if (jsonArray.size() <= 0) {
+            return Collections.emptyList();
+        }
         //处理内容
         Date now = DateUtil.date();
+        String dateStr = DateUtil.format(now, DatePattern.NORM_DATE_PATTERN);
         List<BKMoneyInfo> result = new ArrayList<>(32);
-        jsonArray.stream().forEach(
+        jsonArray.forEach(
                 n -> {
                     JSONObject tempObject = JSONObject.parseObject(n.toString());
                     BKMoneyInfo bkMoneyInfo = new BKMoneyInfo();
                     bkMoneyInfo.setBkCode(tempObject.getString("f12"));
                     bkMoneyInfo.setBkName(tempObject.getString("f14"));
                     bkMoneyInfo.setCurrentDate(now);
+                    bkMoneyInfo.setCurrentDateStr(dateStr);
                     bkMoneyInfo.setBkNowPrice(tempObject.getString("f2"));
-                    bkMoneyInfo.setBkNowProportion(tempObject.getString("f13"));
+                    bkMoneyInfo.setBkNowProportion(tempObject.getString("f3"));
                     bkMoneyInfo.setMarket(tempObject.getInteger("f13"));
                     bkMoneyInfo.setTodayMainInflow(tempObject.getString("f62"));
                     bkMoneyInfo.setTodayMainInflowProportion(tempObject.getString("f184"));
@@ -121,10 +147,18 @@ public class DefaultStockInfoParser implements StockInfoParser {
         //将内容转换成json
         JSONObject jsonObject = JSONObject.parseObject(content);
         //获取里面的data.diff 内容，是个列表对象
-        JSONArray jsonArray = jsonObject.getJSONObject("data").getJSONArray("diff");
+        JSONObject data = jsonObject.getJSONObject("data");
+        if (ObjectUtils.isEmpty(data)) {
+            return Collections.emptyList();
+        }
+        //获取里面的data.diff 内容，是个列表对象
+        JSONArray jsonArray = data.getJSONArray("diff");
+        if (jsonArray.size() <= 0) {
+            return Collections.emptyList();
+        }
         //处理内容
         List<DBStockInfo> result = new ArrayList<>(32);
-        jsonArray.stream().forEach(
+        jsonArray.forEach(
                 n -> {
                     JSONObject tempObject = JSONObject.parseObject(n.toString());
                     // 获取股票的编码
@@ -153,10 +187,18 @@ public class DefaultStockInfoParser implements StockInfoParser {
         //将内容转换成json
         JSONObject jsonObject = JSONObject.parseObject(content);
         //获取里面的data.diff 内容，是个列表对象
-        JSONArray jsonArray = jsonObject.getJSONObject("data").getJSONArray("diff");
+        JSONObject data = jsonObject.getJSONObject("data");
+        if (ObjectUtils.isEmpty(data)) {
+            return Collections.emptyList();
+        }
+        //获取里面的data.diff 内容，是个列表对象
+        JSONArray jsonArray = data.getJSONArray("diff");
+        if (jsonArray.size() <= 0) {
+            return Collections.emptyList();
+        }
         //处理内容
         List<StockBKStockInfo> result = new ArrayList<>(32);
-        jsonArray.stream().forEach(
+        jsonArray.forEach(
                 n -> {
                     JSONObject tempObject = JSONObject.parseObject(n.toString());
 
@@ -188,7 +230,7 @@ public class DefaultStockInfoParser implements StockInfoParser {
         //处理内容
         List<StockPoolInfo> result = new ArrayList<>(32);
         String dateStr = DateUtil.format(currentDate, DatePattern.PURE_DATE_PATTERN);
-        jsonArray.stream().forEach(
+        jsonArray.forEach(
                 n -> {
                     JSONObject tempObject = JSONObject.parseObject(n.toString());
                     StockPoolInfo stockPoolInfo = new StockPoolInfo();
@@ -197,7 +239,7 @@ public class DefaultStockInfoParser implements StockInfoParser {
                     stockPoolInfo.setCurrDate(currentDate);
                     stockPoolInfo.setStockPoolType(stockPoolType);
                     stockPoolInfo.setType(stockPoolType.getCode());
-                    stockPoolInfo.setNowPrice(BigDecimalUtil.convertTwo(new BigDecimal(tempObject.getInteger("p") / 1000.00)));
+                    stockPoolInfo.setNowPrice(BigDecimalUtil.convertTwo(BigDecimal.valueOf(tempObject.getInteger("p") / 1000.00)));
                     stockPoolInfo.setAmplitude(BigDecimalUtil.convertTwo(new BigDecimal(tempObject.getString("zdp"))));
                     stockPoolInfo.setTradingValue(new BigDecimal("0"));
                     stockPoolInfo.setFloatMarket(BigDecimalUtil.convertZero(new BigDecimal(tempObject.getString("ltsz"))));
@@ -243,6 +285,59 @@ public class DefaultStockInfoParser implements StockInfoParser {
                         }
                     }
                     result.add(stockPoolInfo);
+                }
+        );
+        return result;
+    }
+
+    @Override
+    public List<BKMoneyInfo> parseTodayBKMoneyHistoryInfoList(String content) {
+        //将内容转换成json
+        JSONObject jsonObject = JSONObject.parseObject(content);
+        //获取里面的data.diff 内容，是个列表对象
+        JSONObject data = jsonObject.getJSONObject("data");
+        if (ObjectUtils.isEmpty(data)) {
+            return Collections.emptyList();
+        }
+        String code = data.getString("code");
+        String name = data.getString("name");
+        Integer market = data.getInteger("market");
+        //获取里面的data.diff 内容，是个列表对象
+        JSONArray jsonArray = data.getJSONArray("klines");
+        if (jsonArray.size() <= 0) {
+            return Collections.emptyList();
+        }
+        //处理内容
+        List<BKMoneyInfo> result = new ArrayList<>(32);
+        jsonArray.forEach(
+                n -> {
+                    String singleContent = n.toString();
+                    if (StringUtils.hasText(singleContent)) {
+                        // 转换成 数组
+                        String[] splitArr = singleContent.split("\\,");
+                        BKMoneyInfo bkMoneyInfo = new BKMoneyInfo();
+                        bkMoneyInfo.setBkCode(code);
+                        bkMoneyInfo.setBkName(name);
+                        bkMoneyInfo.setCurrentDate(DateUtil.parse(splitArr[0], DatePattern.NORM_DATE_PATTERN));
+                        bkMoneyInfo.setCurrentDateStr(DateUtil.format(bkMoneyInfo.getCurrentDate(), DatePattern.NORM_DATE_PATTERN));
+                        bkMoneyInfo.setBkNowPrice(splitArr[11]);
+                        bkMoneyInfo.setBkNowProportion(splitArr[12]);
+                        bkMoneyInfo.setMarket(market);
+                        bkMoneyInfo.setTodayMainInflow(splitArr[1]);
+                        bkMoneyInfo.setTodayMainInflowProportion(splitArr[6]);
+                        bkMoneyInfo.setTodaySuperInflow(splitArr[5]);
+                        bkMoneyInfo.setTodaySuperInflowProportion(splitArr[10]);
+                        bkMoneyInfo.setTodayMoreInflow(splitArr[4]);
+                        bkMoneyInfo.setTodayMoreInflowProportion(splitArr[9]);
+                        bkMoneyInfo.setTodayMiddleInflow(splitArr[3]);
+                        bkMoneyInfo.setTodayMiddleInflowProportion(splitArr[8]);
+                        bkMoneyInfo.setTodaySmallInflow(splitArr[2]);
+                        bkMoneyInfo.setTodaySmallInflowProportion(splitArr[7]);
+                        bkMoneyInfo.setTodayMainInflowCode(null);
+                        bkMoneyInfo.setTodayMainInflowName(null);
+                        result.add(bkMoneyInfo);
+
+                    }
                 }
         );
         return result;

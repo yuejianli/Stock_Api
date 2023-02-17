@@ -61,6 +61,12 @@ public class ExtendProperties implements Serializable {
     private String todayDyPlatMoneyUrl;
 
     /**
+     * 版块历史资金注入同步
+     */
+    @Value("${extend.asyncBkMoney}")
+    private String asyncBkMoneyUrl;
+
+    /**
      * 股票与股票版块同步概念
      */
     @Value("${extend.stockBkStock}")

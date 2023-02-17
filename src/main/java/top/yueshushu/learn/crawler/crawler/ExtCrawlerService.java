@@ -1,6 +1,7 @@
 package top.yueshushu.learn.crawler.crawler;
 
 import top.yueshushu.learn.crawler.entity.*;
+import top.yueshushu.learn.enumtype.BKType;
 import top.yueshushu.learn.enumtype.DBStockType;
 import top.yueshushu.learn.enumtype.StockPoolType;
 
@@ -46,6 +47,15 @@ public interface ExtCrawlerService {
      * 查询地域今日版块注入集合
      */
     List<BKMoneyInfo> findTodayDyMoneyList();
+
+    /**
+     * 查询地域今日版块注入集合
+     *
+     * @param size   数量
+     * @param secid  版块标识
+     * @param bkType
+     */
+    List<BKMoneyInfo> findHistoryBkMoneyList(Integer size, String secid, BKType bkType);
 
     /**
      * 根据股票编码查询关联的概念信息

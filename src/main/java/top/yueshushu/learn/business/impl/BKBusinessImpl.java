@@ -1,6 +1,8 @@
 package top.yueshushu.learn.business.impl;
 
+import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,10 +33,7 @@ import top.yueshushu.learn.util.BigDecimalUtil;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -187,6 +186,43 @@ public class BKBusinessImpl implements BKBusiness {
             }
         }
         return Collections.emptyList();
+    }
+
+    @Override
+    public OutputResult<List<BKMoneyInfo>> getMoneyHistoryInfoByCode(StockBKMoneyStatRo stockBKMoneyStatRo) {
+        // 根据版块编码 获取信息.
+        String bkCode = stockBKMoneyStatRo.getBkCode();
+        StockBkDo stockBkDo = stockBkService.selectByCode(bkCode);
+        if (stockBkDo == null) {
+            return OutputResult.buildAlert(ResultCode.BK_CODE_NOT_EXIST);
+        }
+        Date startDate = DateUtil.parse(stockBKMoneyStatRo.getStartDate(), DatePattern.NORM_DATE_PATTERN);
+        Date endDate = DateUtil.date();
+        long subDay = DateUtil.between(startDate, endDate, DateUnit.DAY);
+
+        String secid = "90." + bkCode;
+        BKType bkType = BKType.getType(stockBkDo.getType());
+
+        List<BKMoneyInfo> historyBkMoneyList = extCrawlerService.findHistoryBkMoneyList((int) subDay, secid, bkType);
+
+        if (CollectionUtils.isEmpty(historyBkMoneyList)) {
+            return OutputResult.buildAlert(ResultCode.ALERT);
+        }
+        // 如果同步的话，进行处理数据。
+        if (stockBKMoneyStatRo.isAsync()) {
+            List<BKMoneyInfo> asyncResultList = new ArrayList<>();
+            // 看是否有数据， 没有的话，则添加.
+            List<StockBkMoneyHistoryDo> existResultList = stockBkMoneyHistoryService.getMoneyHistoryByCodeAndRangeDate(bkCode, startDate, endDate);
+            List<String> existDateList = existResultList.stream().map(n -> DateUtil.format(n.getCurrentDate(), DatePattern.NORM_DATE_PATTERN)).collect(Collectors.toList());
+            for (BKMoneyInfo bkMoneyInfo : historyBkMoneyList) {
+                if (!existDateList.contains(bkMoneyInfo.getCurrentDateStr())) {
+                    asyncResultList.add(bkMoneyInfo);
+                }
+            }
+            List<StockBkMoneyHistoryDo> stockBkMoneyHistoryDoList = stockBkMoneyHistoryAssembler.toDoList(asyncResultList);
+            stockBkMoneyHistoryService.saveBatch(stockBkMoneyHistoryDoList, 100);
+        }
+        return OutputResult.buildSucc(historyBkMoneyList);
     }
 
     private void handlerMoney(BKType bkType) {
@@ -384,7 +420,6 @@ public class BKBusinessImpl implements BKBusiness {
 
 
     }
-
     /**
      * 将历史数据转换成 图表数据
      *

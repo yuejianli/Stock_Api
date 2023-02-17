@@ -1,6 +1,5 @@
 package top.yueshushu.learn.service.impl;
 
-import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
@@ -11,6 +10,7 @@ import top.yueshushu.learn.mapper.StockBkMoneyHistoryMapper;
 import top.yueshushu.learn.service.StockBkMoneyHistoryService;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -28,12 +28,12 @@ public class StockBkMoneyHistoryServiceImpl extends ServiceImpl<StockBkMoneyHist
     private StockBkMoneyHistoryDomainService stockBkMoneyHistoryDomainService;
 
     @Override
-    public void deleteByDate(DateTime date, BKType bkType) {
+    public void deleteByDate(Date date, BKType bkType) {
         stockBkMoneyHistoryDomainService.deleteByDate(date, bkType == null ? null : bkType.getCode());
     }
 
     @Override
-    public List<StockBkMoneyHistoryDo> getMoneyHistoryByCodeAndRangeDate(String bkCode, DateTime startDate, DateTime endDate) {
+    public List<StockBkMoneyHistoryDo> getMoneyHistoryByCodeAndRangeDate(String bkCode, Date startDate, Date endDate) {
         //将开始日期变成 上一天的最后时刻
         startDate = DateUtil.endOfDay(
                 DateUtil.offsetDay(

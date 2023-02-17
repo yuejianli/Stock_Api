@@ -27,7 +27,7 @@ public enum BKType {
      * @param code
      * @return
      */
-    public static BKType getDealType(Integer code) {
+    public static BKType getType(Integer code) {
         Assert.notNull(code, "code编号不能为空");
         for (BKType configCodeType : BKType.values()) {
             if (configCodeType.code.equals(code)) {

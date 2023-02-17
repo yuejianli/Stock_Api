@@ -58,6 +58,9 @@ extend:
   # stock 与版块关联
   stockBkStock: "https://push2.eastmoney.com/api/qt/slist/get?cb={0}&ut=6d2ffaa6a585d612eda28417681d58fb\
   &fields=f3,f12,f14&fid=f3&pi=0&pz=4&po=1&secid={1}&spt=3&invt=2&fltt=1&np=1&_=1675941795121"
+  # 版块历史同步
+  asyncBkMoney: "https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get?cb={0}&lmt={1}&klt=101\
+  &fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63,f64,f65&ut=b2884a393a59ad64002292a3e90d46a5&secid={2}&_=1676594063939"
   # 股票池子
   ztTopic: "http://push2ex.eastmoney.com/getTopicZTPool?cb={0}&ut=7eea3edcaed734bea9cbfc24409ed989\
   &dpt=wz.ztzt&Pageindex=0&pagesize=80&sort=fbt:asc&date={1}&_=1676009121451"

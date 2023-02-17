@@ -68,8 +68,10 @@ public class StockPoolBusinessImpl implements StockPoolBusiness {
             if (!CollectionUtils.isEmpty(addCodeList)) {
                 redisUtil.sAdd(key, addCodeList.toArray(new String[]{}));
             }
-            // 获取所有的 股票编号和密码组装的信息
-            dataMap.put("qcCodeList", poolList);
+            if (!CollectionUtils.isEmpty(poolList)) {
+                // 获取所有的 股票编号和密码组装的信息
+                dataMap.put("qcCodeList", poolList);
+            }
             List<StockPoolInfo> poolZtList = extCrawlerService.findPoolByType(StockPoolType.ZT, date);
             if (!CollectionUtils.isEmpty(poolZtList)) {
                 poolZtList = filterStockList(poolZtList, DBStockType.SH_SZ, null);

@@ -1,9 +1,9 @@
 package top.yueshushu.learn.domainservice;
 
-import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.extension.service.IService;
 import top.yueshushu.learn.domain.StockBkMoneyHistoryDo;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -18,7 +18,7 @@ public interface StockBkMoneyHistoryDomainService extends IService<StockBkMoneyH
     /**
      * 删除之前的数据
      */
-    void deleteByDate(DateTime date, Integer type);
+    void deleteByDate(Date date, Integer type);
 
     /**
      * 根据版块编码和日期范围查询相应的数据
@@ -27,5 +27,5 @@ public interface StockBkMoneyHistoryDomainService extends IService<StockBkMoneyH
      * @param startDate 开始日期
      * @param endDate   线束日期
      */
-    List<StockBkMoneyHistoryDo> getMoneyHistoryByCodeAndRangeDate(String bkCode, DateTime startDate, DateTime endDate);
+    List<StockBkMoneyHistoryDo> getMoneyHistoryByCodeAndRangeDate(String bkCode, Date startDate, Date endDate);
 }

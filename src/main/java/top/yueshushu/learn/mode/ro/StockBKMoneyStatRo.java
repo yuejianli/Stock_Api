@@ -30,4 +30,8 @@ public class StockBKMoneyStatRo implements Serializable {
      * @param charPriceTypeList 版块资金选择的类型
      */
     private List<String> charBKTypeList;
+    /**
+     * 是否同步, 默认为不同步
+     */
+    private boolean async = false;
 }

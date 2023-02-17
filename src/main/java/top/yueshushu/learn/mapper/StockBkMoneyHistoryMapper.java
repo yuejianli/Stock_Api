@@ -1,10 +1,10 @@
 package top.yueshushu.learn.mapper;
 
-import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 import top.yueshushu.learn.domain.StockBkMoneyHistoryDo;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -21,9 +21,9 @@ public interface StockBkMoneyHistoryMapper extends BaseMapper<StockBkMoneyHistor
      *
      * @param currDate 当前日期
      */
-    void deleteByDate(@Param("currDate") DateTime currDate, @Param("type") Integer type);
+    void deleteByDate(@Param("currDate") Date currDate, @Param("type") Integer type);
 
     List<StockBkMoneyHistoryDo> listMoneyHistoryByCodeAndRangeDate(@Param("bkCode") String bkCode,
-                                                                   @Param("startDate") DateTime startDate,
-                                                                   @Param("endDate") DateTime endDate);
+                                                                   @Param("startDate") Date startDate,
+                                                                   @Param("endDate") Date endDate);
 }

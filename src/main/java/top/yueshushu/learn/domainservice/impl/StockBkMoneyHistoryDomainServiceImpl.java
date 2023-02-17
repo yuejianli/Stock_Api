@@ -1,6 +1,5 @@
 package top.yueshushu.learn.domainservice.impl;
 
-import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import top.yueshushu.learn.domain.StockBkMoneyHistoryDo;
@@ -8,6 +7,7 @@ import top.yueshushu.learn.domainservice.StockBkMoneyHistoryDomainService;
 import top.yueshushu.learn.mapper.StockBkMoneyHistoryMapper;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -25,12 +25,12 @@ public class StockBkMoneyHistoryDomainServiceImpl extends ServiceImpl<StockBkMon
     private StockBkMoneyHistoryMapper stockBkMoneyHistoryMapper;
 
     @Override
-    public void deleteByDate(DateTime date, Integer type) {
+    public void deleteByDate(Date date, Integer type) {
         stockBkMoneyHistoryMapper.deleteByDate(date, type);
     }
 
     @Override
-    public List<StockBkMoneyHistoryDo> getMoneyHistoryByCodeAndRangeDate(String bkCode, DateTime startDate, DateTime endDate) {
+    public List<StockBkMoneyHistoryDo> getMoneyHistoryByCodeAndRangeDate(String bkCode, Date startDate, Date endDate) {
         return stockBkMoneyHistoryMapper.listMoneyHistoryByCodeAndRangeDate(bkCode, startDate, endDate);
     }
 }

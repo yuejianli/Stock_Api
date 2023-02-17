@@ -36,6 +36,8 @@ public class DefaultExtCrawlerServiceImpl implements ExtCrawlerService {
     public static final String CB_DY = "jQuery112306068289769579489_1675942226362";
     public static final String CB_STOCK_BK = "jQuery35104923822815685899_1675941795109";
     public static final String CB_POOL = "callbackdata3383558";
+    // 版块同步历史时使用
+    public static final String CB_ASYNC_BK = "jQuery112306604961992080225_1676594063938";
     @Resource
     private CloseableHttpClient httpClient;
     @Resource
@@ -134,6 +136,13 @@ public class DefaultExtCrawlerServiceImpl implements ExtCrawlerService {
     }
 
     @Override
+    public List<BKMoneyInfo> findHistoryBkMoneyList(Integer size, String secid, BKType bkType) {
+        //处理，拼接成信息
+        String url = MessageFormat.format(extendProperties.getAsyncBkMoneyUrl(), CB_ASYNC_BK, size, secid);
+        return parseMoneyHistoryInfoList(url, bkType);
+    }
+
+    @Override
     public List<StockBKStockInfo> findRelationBkListByCode(String code) {
         // 对 code 进行处理
         int prefix = 0;
@@ -176,6 +185,29 @@ public class DefaultExtCrawlerServiceImpl implements ExtCrawlerService {
             return bkMoneyInfos;
         } catch (Exception e) {
             log.error("获取版块列表出错", e);
+            return Collections.emptyList();
+        }
+    }
+
+    private List<BKMoneyInfo> parseMoneyHistoryInfoList(String url, BKType bkType) {
+        try {
+            //获取内容
+            String content = restTemplate.getForObject(url, String.class);
+            //将内容进行转换，解析
+            String cb = CB_ASYNC_BK;
+            content = content.substring(cb.length() + 1);
+            content = content.substring(0, content.length() - 2);
+            List<BKMoneyInfo> bkMoneyInfos = stockInfoParser.parseTodayBKMoneyHistoryInfoList(content);
+            if (!CollectionUtils.isEmpty(bkMoneyInfos)) {
+                bkMoneyInfos.forEach(
+                        n -> {
+                            n.setType(bkType.getCode());
+                        }
+                );
+            }
+            return bkMoneyInfos;
+        } catch (Exception e) {
+            log.error("同步版块历史记录列表出错", e);
             return Collections.emptyList();
         }
     }

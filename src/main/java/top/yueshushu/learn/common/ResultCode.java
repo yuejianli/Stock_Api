@@ -266,6 +266,8 @@ public class ResultCode {
      */
     public static final ResultCode BK_CODE_IS_EMPTY =
             new ResultCode(true, 10022001, "版块编码不能为空");
+    public static final ResultCode BK_CODE_NOT_EXIST =
+            new ResultCode(true, 10022001, "版块编码不存在");
 
     private boolean success;
     private int code;

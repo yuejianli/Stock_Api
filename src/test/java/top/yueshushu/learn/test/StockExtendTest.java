@@ -12,6 +12,7 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.CollectionUtils;
+import top.yueshushu.learn.business.BKBusiness;
 import top.yueshushu.learn.business.StockPoolBusiness;
 import top.yueshushu.learn.crawler.crawler.CrawlerService;
 import top.yueshushu.learn.crawler.crawler.ExtCrawlerService;
@@ -20,6 +21,7 @@ import top.yueshushu.learn.enumtype.DBStockType;
 import top.yueshushu.learn.enumtype.StockCodeType;
 import top.yueshushu.learn.enumtype.StockPoolType;
 import top.yueshushu.learn.helper.DateHelper;
+import top.yueshushu.learn.mode.ro.StockBKMoneyStatRo;
 import top.yueshushu.learn.service.StockPoolHistoryService;
 
 import javax.annotation.Resource;
@@ -50,6 +52,8 @@ public class StockExtendTest {
     private StockPoolHistoryService stockPoolHistoryService;
     @Resource
     private DateHelper dateHelper;
+    @Resource
+    private BKBusiness bkBusiness;
 
     @Test
     public void hotMapTest() {
@@ -170,6 +174,16 @@ public class StockExtendTest {
     public void dyTodayMoneyListTest() {
         List<BKMoneyInfo> allBkList = extCrawlerService.findTodayDyMoneyList();
         log.info(">>> 获取 地域块注入资金列表: {}", allBkList.get(0));
+    }
+
+    @Test
+    public void findHistoryBkMoneyListTest() {
+        StockBKMoneyStatRo stockBKMoneyStatRo = new StockBKMoneyStatRo();
+        stockBKMoneyStatRo.setBkCode("BK0892");
+        stockBKMoneyStatRo.setStartDate("2023-01-01");
+        stockBKMoneyStatRo.setAsync(true);
+        List<BKMoneyInfo> allBkList = bkBusiness.getMoneyHistoryInfoByCode(stockBKMoneyStatRo).getData();
+        log.info(">>> 获取 日期注入资金列表: {}", allBkList.get(0));
     }
 
 

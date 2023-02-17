@@ -16,6 +16,7 @@ public class BKMoneyInfo implements Serializable {
     private String bkCode;
     private String bkName;
     private Date currentDate;
+    private String currentDateStr;
     private Integer type;
     /**
      * 最新价

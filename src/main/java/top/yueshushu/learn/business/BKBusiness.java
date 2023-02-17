@@ -63,6 +63,13 @@ public interface BKBusiness {
     List<BKMoneyInfo> crawlerMoneyInfoByType(BKType bkType);
 
 
+    /**
+     * 根据类型查询金额信息
+     *
+     * @param stockBKMoneyStatRo 版块信息
+     */
+    OutputResult<List<BKMoneyInfo>> getMoneyHistoryInfoByCode(StockBKMoneyStatRo stockBKMoneyStatRo);
+
     OutputResult<List<StockBKVo>> listBk();
 
     OutputResult<List<StockBKVo>> listGn();
