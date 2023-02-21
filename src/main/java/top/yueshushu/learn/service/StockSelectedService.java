@@ -94,9 +94,17 @@ public interface StockSelectedService {
 
     /**
      * 更新自选表里面的股票代码的价格
+     *
      * @param code 股票编码
      */
     void updateSelectedCodePrice(String code);
+
+    /**
+     * 更新股票指数信息
+     *
+     * @param type 指数类型
+     */
+    void updateStockIndexPrice(Integer type);
 
     /**
      * 编辑笔记

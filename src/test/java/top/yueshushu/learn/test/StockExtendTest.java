@@ -225,6 +225,13 @@ public class StockExtendTest {
     }
 
     @Test
+    public void findStockIndexTest() {
+        List<StockIndexInfo> stockIndexInfoList = extCrawlerService.findStockIndex();
+        log.info(">>> 获取 {}", stockIndexInfoList);
+    }
+
+
+    @Test
     public void poolTest() {
         stockPoolBusiness.handlerPool(DateUtil.date());
     }

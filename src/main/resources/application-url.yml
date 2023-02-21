@@ -74,3 +74,7 @@ extend:
   &dpt=wz.ztzt&Pageindex=0&pagesize=80&sort=ods:asc&date={1}&_=1676009121487"
   zbTopic: "http://push2ex.eastmoney.com/getTopicZBPool?cb={0}&ut=7eea3edcaed734bea9cbfc24409ed989\
   &dpt=wz.ztzt&Pageindex=0&pagesize=80&sort=fbt:asc&date={1}&_=1676009429581"
+  # 股票指数信息
+  stockIndex: "https://push2.eastmoney.com/api/qt/clist/get?pi=0&pz=10&po=1&np=1&fields=f1,f2,f3,f4,f12,f13,f14\
+  &fltt=2&invt=2&ut=433fd2d0e98eaf36ad3d5001f088614d&wbp2u=|0|0|0|web\
+  &fs=i:1.000001,i:0.399001,i:0.399006,i:1.000300&cb={0}&_=1676954612821"

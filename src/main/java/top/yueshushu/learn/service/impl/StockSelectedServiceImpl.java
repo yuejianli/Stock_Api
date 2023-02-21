@@ -17,6 +17,8 @@ import org.springframework.util.StringUtils;
 import top.yueshushu.learn.assembler.StockSelectedAssembler;
 import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.common.ResultCode;
+import top.yueshushu.learn.crawler.crawler.ExtCrawlerService;
+import top.yueshushu.learn.crawler.entity.StockIndexInfo;
 import top.yueshushu.learn.crawler.service.CrawlerStockHistoryService;
 import top.yueshushu.learn.domain.StockPriceHistoryDo;
 import top.yueshushu.learn.domain.StockSelectedDo;
@@ -83,6 +85,8 @@ public class StockSelectedServiceImpl implements StockSelectedService {
     private StockPriceHistoryDomainService stockPriceHistoryDomainService;
     @Resource
     private StockDomainService stockDomainService;
+    @Resource
+    private ExtCrawlerService extCrawlerService;
 
     @SuppressWarnings("all")
     @Resource(name = Const.ASYNC_SERVICE_EXECUTOR_BEAN_NAME)
@@ -322,13 +326,30 @@ public class StockSelectedServiceImpl implements StockSelectedService {
     }
 
     @Override
+    public void updateStockIndexPrice(Integer type) {
+        // 1. 查询出所有的信息.
+        List<StockIndexInfo> stockIndexList = extCrawlerService.findStockIndex();
+        // 如果不为空时，则进行筛选。
+        if (type != null) {
+            stockIndexList = stockIndexList.stream().filter(n -> type.equals(n.getType())).collect(Collectors.toList());
+        }
+        // 进行保存处理。 先删除之前的， 再进行重新设置。
+        if (CollectionUtils.isEmpty(stockIndexList)) {
+            return;
+        }
+        for (StockIndexInfo stockIndexInfo : stockIndexList) {
+            stockCacheService.updateStockIndex(stockIndexInfo);
+        }
+    }
+
+    @Override
     public OutputResult editNotes(StockSelectedRo stockSelectedRo) {
         StockSelected stockSelected = stockSelectedAssembler.doToEntity(
                 stockSelectedDomainService.getById(
                         stockSelectedRo.getId()
                 )
         );
-        if (stockSelected == null){
+        if (stockSelected == null) {
             return OutputResult.buildAlert(
                     ResultCode.STOCK_SELECTED_NO_RECORD
             );

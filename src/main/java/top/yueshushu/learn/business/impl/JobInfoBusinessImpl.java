@@ -103,10 +103,10 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
     @Resource(name = Const.ASYNC_SERVICE_EXECUTOR_BEAN_NAME)
     private AsyncTaskExecutor executor;
 
-    private LocalTime STOCK_PRICE_START_TIME = LocalTime.parse("14:59:00");
+    private LocalTime STOCK_PRICE_START_TIME = LocalTime.parse("14:59:49");
     private LocalTime STOCK_PRICE_END_TIME = LocalTime.parse("15:01:00");
 
-    private LocalTime STOCK_MORNING_START_TIME = LocalTime.parse("11:29:00");
+    private LocalTime STOCK_MORNING_START_TIME = LocalTime.parse("11:29:49");
     private LocalTime STOCK_MORNING_END_TIME = LocalTime.parse("11:31:00");
 
     @Override
@@ -133,7 +133,7 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
         }
         //是获取股票实时价格的任务，并且是自动运行。 非时间，不执行。
         if ((JobInfoType.STOCK_PRICE.equals(jobInfoType) || JobInfoType.DB_STOCK_TRADE.equals(jobInfoType)) && EntrustType.AUTO.getCode().equals(triggerType)) {
-            if (!MyDateUtil.isDealTime() || !dateHelper.isWorkingDay(DateUtil.date())) {
+            if (!MyDateUtil.isWorkingTime() || !dateHelper.isWorkingDay(DateUtil.date())) {
                 return OutputResult.buildSucc();
             }
         }
@@ -179,6 +179,7 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
                         sleepTime(30000);
                     }
                     stockSelectedService.updateSelectedCodePrice(null);
+                    stockSelectedService.updateStockIndexPrice(null);
                     break;
                 }
                 case STOCK_PRICE_SAVE: {
@@ -409,6 +410,7 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
 
                     break;
                 }
+                case STOCK_POOL_QS:
                 case STOCK_POOL: {
                     if (dateHelper.isWorkingDay(DateUtil.date())) {
                         stockPoolBusiness.handlerPool(DateUtil.date());

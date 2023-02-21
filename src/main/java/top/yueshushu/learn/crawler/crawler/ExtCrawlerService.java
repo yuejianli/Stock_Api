@@ -81,4 +81,8 @@ public interface ExtCrawlerService {
     default List<StockPoolInfo> findPoolByType(StockPoolType stockPoolType, Date currentDate) {
         return Collections.EMPTY_LIST;
     }
+
+    default List<StockIndexInfo> findStockIndex() {
+        return Collections.EMPTY_LIST;
+    }
 }

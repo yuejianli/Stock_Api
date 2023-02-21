@@ -117,4 +117,10 @@ public class ExtendProperties implements Serializable {
      */
     @Value("${extend.zbTopic}")
     private String zbTopicUrl;
+
+    /**
+     * 股票指数信息
+     */
+    @Value("${extend.stockIndex}")
+    private String stockIndexUrl;
 }

@@ -1,6 +1,7 @@
 package top.yueshushu.learn.service.cache;
 
 import cn.hutool.core.date.DateTime;
+import top.yueshushu.learn.crawler.entity.StockIndexInfo;
 import top.yueshushu.learn.entity.Stock;
 import top.yueshushu.learn.entity.TradePositionHistoryCache;
 
@@ -326,4 +327,10 @@ public interface StockCacheService {
      */
     List<String> getTodayDBCodeList(Integer userId, Integer mockType);
 
+    /**
+     * 更新股票指数信息
+     *
+     * @param stockIndexInfo 股票指数信息
+     */
+    void updateStockIndex(StockIndexInfo stockIndexInfo);
 }

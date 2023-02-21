@@ -74,4 +74,13 @@ public interface StockInfoParser {
     default List<BKMoneyInfo> parseTodayBKMoneyHistoryInfoList(String content) {
         return Collections.EMPTY_LIST;
     }
+
+    /**
+     * 解析股票指数信息
+     *
+     * @param content 内容
+     */
+    default List<StockIndexInfo> parseStockIndex(String content) {
+        return Collections.EMPTY_LIST;
+    }
 }

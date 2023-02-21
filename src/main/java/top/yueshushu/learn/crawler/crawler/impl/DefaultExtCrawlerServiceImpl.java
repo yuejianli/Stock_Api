@@ -38,6 +38,7 @@ public class DefaultExtCrawlerServiceImpl implements ExtCrawlerService {
     public static final String CB_POOL = "callbackdata3383558";
     // 版块同步历史时使用
     public static final String CB_ASYNC_BK = "jQuery112306604961992080225_1676594063938";
+    public static final String CB_STOCK_INDEX = "jQuery112405795797323925824_1676954612820";
     @Resource
     private CloseableHttpClient httpClient;
     @Resource
@@ -223,6 +224,23 @@ public class DefaultExtCrawlerServiceImpl implements ExtCrawlerService {
             return stockInfoParser.parseDbStockInfoList(content, dbStockType);
         } catch (Exception e) {
             log.error("获取股票打版列表出错", e);
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public List<StockIndexInfo> findStockIndex() {
+        try {
+            //获取内容
+            String url = MessageFormat.format(extendProperties.getStockIndexUrl(), CB_STOCK_INDEX);
+            String content = restTemplate.getForObject(url, String.class);
+            //将内容进行转换，解析
+            String cb = CB_STOCK_INDEX;
+            content = content.substring(cb.length() + 1);
+            content = content.substring(0, content.length() - 2);
+            return stockInfoParser.parseStockIndex(content);
+        } catch (Exception e) {
+            log.error("获取 股票指数列表出错", e);
             return Collections.emptyList();
         }
     }

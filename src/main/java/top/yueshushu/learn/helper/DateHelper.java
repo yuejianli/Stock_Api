@@ -55,13 +55,14 @@ public class DateHelper {
         }
         return null;
     }
+
     /**
      * 当前时间是否是工作日, 是为 true, 否则 为false
      *
      * @param currDate 指定的时间
      * @return 当前时间是否是工作日, 是为 true, 否则 为false
      */
-    public boolean isWorkingDay(DateTime currDate) {
+    public boolean isWorkingDay(Date currDate) {
         //1. 查询出当前年的全部的假期数据
         if (currDate == null) {
             currDate = DateUtil.date();
@@ -87,7 +88,7 @@ public class DateHelper {
      * @param date 日期处理
      * @return 验证一下，当前时间是否是股票交易的时间。
      */
-    public boolean isTradeTime(DateTime date) {
+    public boolean isTradeTime(Date date) {
         if (!isWorkingDay(date)) {
             return false;
         }
@@ -101,7 +102,7 @@ public class DateHelper {
      * @param date 当前日期
      * @return 当前日期是否在 9点半到11点之间
      */
-    public boolean between930To1130(DateTime date) {
+    public boolean between930To1130(Date date) {
 
         //组装一个下午3点的时间
         Calendar calendar = Calendar.getInstance();
@@ -125,7 +126,7 @@ public class DateHelper {
      * @param date 当前日期
      * @return 当前日期是否在 下午1点到下午 3点
      */
-    public boolean between13To15(DateTime date) {
+    public boolean between13To15(Date date) {
 
         //组装一个下午3点的时间
         Calendar calendar = Calendar.getInstance();

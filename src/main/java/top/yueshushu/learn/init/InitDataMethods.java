@@ -33,6 +33,12 @@ public class InitDataMethods {
     }
 
     @PostConstruct
+    public void removeJobInfoKey() {
+        redisUtil.deleteByPrefix(Const.JOB_INFO);
+        log.info(">>>> 移除定时任务 cron 缓存配置");
+    }
+
+    @PostConstruct
     public void initRsaKey() {
         try {
             // 如果没有公钥，私钥 才进行生成.

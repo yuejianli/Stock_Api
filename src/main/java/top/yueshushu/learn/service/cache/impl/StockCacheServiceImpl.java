@@ -9,6 +9,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import top.yueshushu.learn.assembler.TradePositionHistoryAssembler;
 import top.yueshushu.learn.common.Const;
+import top.yueshushu.learn.crawler.entity.StockIndexInfo;
 import top.yueshushu.learn.domain.JobInfoDo;
 import top.yueshushu.learn.domain.TradeDealDo;
 import top.yueshushu.learn.domain.TradePositionHistoryDo;
@@ -425,5 +426,11 @@ public class StockCacheServiceImpl implements StockCacheService {
             return Collections.emptyList();
         }
         return (List<String>) range;
+    }
+
+    @Override
+    public void updateStockIndex(StockIndexInfo stockIndexInfo) {
+        String key = Const.STOCK_PRICE + "zs_" + stockIndexInfo.getCode();
+        redisUtil.set(key, stockIndexInfo);
     }
 }

@@ -2,7 +2,6 @@ package top.yueshushu.learn.business.impl;
 
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateTime;
-import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -197,13 +196,20 @@ public class BKBusinessImpl implements BKBusiness {
             return OutputResult.buildAlert(ResultCode.BK_CODE_NOT_EXIST);
         }
         Date startDate = DateUtil.parse(stockBKMoneyStatRo.getStartDate(), DatePattern.NORM_DATE_PATTERN);
-        Date endDate = DateUtil.date();
-        long subDay = DateUtil.between(startDate, endDate, DateUnit.DAY);
-
+        Date endDate = DateUtil.endOfDay(DateUtil.date());
+        int size = 0;
+        //   long subDay = DateUtil.between(startDate, endDate, DateUnit.DAY);
+        while (endDate.after(startDate)) {
+            // startDate 进行加1
+            if (dateHelper.isWorkingDay(startDate)) {
+                size++;
+            }
+            startDate = DateUtil.offsetDay(startDate, 1);
+        }
         String secid = "90." + bkCode;
         BKType bkType = BKType.getType(stockBkDo.getType());
 
-        List<BKMoneyInfo> historyBkMoneyList = extCrawlerService.findHistoryBkMoneyList((int) subDay, secid, bkType);
+        List<BKMoneyInfo> historyBkMoneyList = extCrawlerService.findHistoryBkMoneyList(size, secid, bkType);
 
         if (CollectionUtils.isEmpty(historyBkMoneyList)) {
             return OutputResult.buildAlert(ResultCode.ALERT);

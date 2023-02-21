@@ -342,4 +342,54 @@ public class DefaultStockInfoParser implements StockInfoParser {
         );
         return result;
     }
+
+    @Override
+    public List<StockIndexInfo> parseStockIndex(String content) {
+        //将内容转换成json
+        JSONObject jsonObject = JSONObject.parseObject(content);
+        //获取里面的data.diff 内容，是个列表对象
+        JSONObject data = jsonObject.getJSONObject("data");
+        if (ObjectUtils.isEmpty(data)) {
+            return Collections.emptyList();
+        }
+        //获取里面的data.diff 内容，是个列表对象
+        JSONArray jsonArray = data.getJSONArray("diff");
+        if (jsonArray.size() <= 0) {
+            return Collections.emptyList();
+        }
+        //处理内容
+        List<StockIndexInfo> result = new ArrayList<>(6);
+        jsonArray.forEach(
+                n -> {
+                    JSONObject tempObject = JSONObject.parseObject(n.toString());
+
+                    StockIndexInfo stockIndexInfo = new StockIndexInfo();
+                    stockIndexInfo.setCode(tempObject.getString("f12"));
+                    stockIndexInfo.setName(tempObject.getString("f14"));
+                    stockIndexInfo.setNowPrice(tempObject.getString("f2"));
+                    stockIndexInfo.setNowProportion(tempObject.getString("f3") + "%");
+                    stockIndexInfo.setSubPrice(tempObject.getString("f4"));
+                    stockIndexInfo.setType(convertTypeByCode(stockIndexInfo.getCode()));
+                    result.add(stockIndexInfo);
+                }
+        );
+        return result;
+    }
+
+    private Integer convertTypeByCode(String code) {
+        switch (code) {
+            case "399001": {
+                return 2;
+            }
+            case "399006": {
+                return 3;
+            }
+            case "000300": {
+                return 4;
+            }
+            default: {
+                return 1;
+            }
+        }
+    }
 }
