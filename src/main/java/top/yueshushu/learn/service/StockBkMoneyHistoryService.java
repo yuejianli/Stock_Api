@@ -29,4 +29,13 @@ public interface StockBkMoneyHistoryService extends IService<StockBkMoneyHistory
      * @param endDate   线束日期
      */
     List<StockBkMoneyHistoryDo> getMoneyHistoryByCodeAndRangeDate(String bkCode, Date startDate, Date endDate);
+
+    /**
+     * 查询该日期下 版块的涨幅度排行榜
+     *
+     * @param date   日期
+     * @param bkType 类型
+     * @param topNum 数量
+     */
+    List<StockBkMoneyHistoryDo> listTopByDateOrderByProportionDesc(Date date, Integer bkType, int topNum);
 }

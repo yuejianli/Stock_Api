@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.domain.UserDo;
@@ -19,6 +20,8 @@ import top.yueshushu.learn.util.RedisUtil;
 
 import javax.annotation.Resource;
 import java.text.MessageFormat;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -45,15 +48,28 @@ public class WeChatService {
 	 * @return 通过微信企业号发送消息
 	 */
 	public String sendTextMessage(Integer userId, String content) {
-		UserDo userDo = userDomainService.getById(userId);
-		if (null == userDo) {
-			return null;
+		// 查询出所有的用户
+		List<Integer> userIdList = null;
+		if (null == userId) {
+			userIdList = userDomainService.listUseUserIds();
+		} else {
+			userIdList = Collections.singletonList(userId);
 		}
-		String wxUserId = userDo.getWxUserId();
-		if (!StringUtils.hasText(wxUserId)) {
-			return "";
+		if (CollectionUtils.isEmpty(userIdList)) {
+			return "发送失败";
 		}
-		return sendTextMessageBySign(wxUserId, content);
+		for (Integer tempUserId : userIdList) {
+			UserDo userDo = userDomainService.getById(tempUserId);
+			if (null == userDo) {
+				return null;
+			}
+			String wxUserId = userDo.getWxUserId();
+			if (!StringUtils.hasText(wxUserId)) {
+				continue;
+			}
+			sendTextMessageBySign(wxUserId, content);
+		}
+		return "发送成功";
 	}
 
 	public String sendTextMessageBySign(String wxUserId, String content) {

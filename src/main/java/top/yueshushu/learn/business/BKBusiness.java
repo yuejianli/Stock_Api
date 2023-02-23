@@ -8,6 +8,7 @@ import top.yueshushu.learn.mode.ro.StockBKMoneyStatRo;
 import top.yueshushu.learn.mode.vo.StockBKMoneyHistoryVo;
 import top.yueshushu.learn.mode.vo.StockBKVo;
 import top.yueshushu.learn.mode.vo.StockBkStockVo;
+import top.yueshushu.learn.mode.vo.StockBkTopVo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.response.PageResponse;
 
@@ -127,5 +128,7 @@ public interface BKBusiness {
      * @param stockBKMoneyStatRo 股票查询对象
      */
     OutputResult<PageResponse<StockBkStockVo>> listCodeBkInfo(StockBKMoneyStatRo stockBKMoneyStatRo);
+
+    OutputResult<List<StockBkTopVo>> listBkTop(StockBKMoneyStatRo stockBKMoneyStatRo);
 
 }

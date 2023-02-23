@@ -33,4 +33,9 @@ public class StockBkMoneyHistoryDomainServiceImpl extends ServiceImpl<StockBkMon
     public List<StockBkMoneyHistoryDo> getMoneyHistoryByCodeAndRangeDate(String bkCode, Date startDate, Date endDate) {
         return stockBkMoneyHistoryMapper.listMoneyHistoryByCodeAndRangeDate(bkCode, startDate, endDate);
     }
+
+    @Override
+    public List<StockBkMoneyHistoryDo> listTopByDateOrderByProportionDesc(Date date, Integer bkType, int topNum) {
+        return stockBkMoneyHistoryMapper.listTopByDateOrderByProportionDesc(date, bkType, topNum);
+    }
 }

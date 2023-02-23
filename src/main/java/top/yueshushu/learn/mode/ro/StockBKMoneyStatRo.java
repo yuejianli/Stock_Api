@@ -1,6 +1,7 @@
 package top.yueshushu.learn.mode.ro;
 
 import lombok.Data;
+import top.yueshushu.learn.enumtype.BKType;
 import top.yueshushu.learn.enumtype.DBStockType;
 import top.yueshushu.learn.response.PageRo;
 
@@ -40,4 +41,9 @@ public class StockBKMoneyStatRo extends PageRo implements Serializable {
     private String stockCode;
 
     private Integer dbStockType = DBStockType.SH_SZ.getCode();
+
+    /**
+     * 板块类型
+     */
+    private Integer bkType = BKType.BK.getCode();
 }

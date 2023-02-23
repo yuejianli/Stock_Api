@@ -26,4 +26,13 @@ public interface StockBkMoneyHistoryMapper extends BaseMapper<StockBkMoneyHistor
     List<StockBkMoneyHistoryDo> listMoneyHistoryByCodeAndRangeDate(@Param("bkCode") String bkCode,
                                                                    @Param("startDate") Date startDate,
                                                                    @Param("endDate") Date endDate);
+
+    /**
+     * 查询该日期下 版块的涨幅度排行榜
+     *
+     * @param date   日期
+     * @param bkType 类型
+     * @param topNum 数量
+     */
+    List<StockBkMoneyHistoryDo> listTopByDateOrderByProportionDesc(@Param("date") Date date, @Param("bkType") Integer bkType, @Param("topNum") int topNum);
 }

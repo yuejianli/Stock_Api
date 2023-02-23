@@ -29,9 +29,7 @@ import top.yueshushu.learn.enumtype.DBStockType;
 import top.yueshushu.learn.helper.DateHelper;
 import top.yueshushu.learn.mode.dto.StockBkCodeQueryDto;
 import top.yueshushu.learn.mode.ro.StockBKMoneyStatRo;
-import top.yueshushu.learn.mode.vo.StockBKMoneyHistoryVo;
-import top.yueshushu.learn.mode.vo.StockBKVo;
-import top.yueshushu.learn.mode.vo.StockBkStockVo;
+import top.yueshushu.learn.mode.vo.*;
 import top.yueshushu.learn.mode.vo.charinfo.LineSeriesVo;
 import top.yueshushu.learn.mode.vo.charinfo.LineVo;
 import top.yueshushu.learn.response.OutputResult;
@@ -212,14 +210,15 @@ public class BKBusinessImpl implements BKBusiness {
         }
         Date startDate = DateUtil.parse(stockBKMoneyStatRo.getStartDate(), DatePattern.NORM_DATE_PATTERN);
         Date endDate = DateUtil.endOfDay(DateUtil.date());
+        Date tempDate = DateUtil.parse(stockBKMoneyStatRo.getStartDate(), DatePattern.NORM_DATE_PATTERN);
         int size = 0;
         //   long subDay = DateUtil.between(startDate, endDate, DateUnit.DAY);
-        while (endDate.after(startDate)) {
+        while (endDate.after(tempDate)) {
             // startDate 进行加1
-            if (dateHelper.isWorkingDay(startDate)) {
+            if (dateHelper.isWorkingDay(tempDate)) {
                 size++;
             }
-            startDate = DateUtil.offsetDay(startDate, 1);
+            tempDate = DateUtil.offsetDay(tempDate, 1);
         }
         String secid = "90." + bkCode;
         BKType bkType = BKType.getType(stockBkDo.getType());
@@ -580,6 +579,52 @@ public class BKBusinessImpl implements BKBusiness {
             }
         }
         return OutputResult.buildSucc(new PageResponse<>(total, result));
+    }
+
+    @Override
+    public OutputResult<List<StockBkTopVo>> listBkTop(StockBKMoneyStatRo stockBKMoneyStatRo) {
+        //计算开始日期和结束日期相差多少天，就是后面的计算值.
+        DateTime startDateDate = DateUtil.parse(stockBKMoneyStatRo.getStartDate(), Const.SIMPLE_DATE_FORMAT);
+        DateTime endDateDate = DateUtil.parse(stockBKMoneyStatRo.getEndDate(), Const.SIMPLE_DATE_FORMAT);
+        //计算一下，相差多少天
+        long day = DateUtil.betweenDay(startDateDate, endDateDate, true);
+
+        List<Date> resultDateList = new ArrayList<>();
+        //进行计算
+        for (int i = 0; i <= day; i++) {
+            DateTime tempDate = DateUtil.offsetDay(endDateDate, -i);
+            if (dateHelper.isWorkingDay(tempDate)) {
+                resultDateList.add(tempDate);
+            }
+        }
+        // 如果为 null, 则返回
+        if (CollectionUtils.isEmpty(resultDateList)) {
+            return OutputResult.buildSucc(Collections.emptyList());
+        }
+
+        List<StockBkTopVo> result = new ArrayList<>();
+        for (Date date : resultDateList) {
+            StockBkTopVo stockBkTopVo = new StockBkTopVo();
+            stockBkTopVo.setCurrDate(DateUtil.format(date, Const.SIMPLE_DATE_FORMAT));
+            // 设置集合。
+            List<StockBkMoneyHistoryDo> stockBkMoneyHistoryDoList =
+                    stockBkMoneyHistoryService.listTopByDateOrderByProportionDesc(date, stockBKMoneyStatRo.getBkType(), 10);
+            if (!CollectionUtils.isEmpty(stockBkMoneyHistoryDoList)) {
+                List<StockBkTopDetailVo> detailList = stockBkMoneyHistoryDoList.stream().map(
+                        n -> {
+                            StockBkTopDetailVo stockBkTopDetailVo = new StockBkTopDetailVo();
+                            stockBkTopDetailVo.setBkCode(n.getBkCode());
+                            stockBkTopDetailVo.setBkName(n.getBkName());
+                            stockBkTopDetailVo.setBkNowProportion(n.getBkNowProportion());
+                            stockBkTopDetailVo.setType(n.getType());
+                            return stockBkTopDetailVo;
+                        }
+                ).collect(Collectors.toList());
+                stockBkTopVo.setDetailList(detailList);
+            }
+            result.add(stockBkTopVo);
+        }
+        return OutputResult.buildSucc(result);
     }
 
     private void asyncStockBkCodeList(List<String> filterCodeList) {

@@ -44,4 +44,9 @@ public class StockBkMoneyHistoryServiceImpl extends ServiceImpl<StockBkMoneyHist
         endDate = DateUtil.endOfDay(endDate);
         return stockBkMoneyHistoryDomainService.getMoneyHistoryByCodeAndRangeDate(bkCode, startDate, endDate);
     }
+
+    @Override
+    public List<StockBkMoneyHistoryDo> listTopByDateOrderByProportionDesc(Date date, Integer bkType, int topNum) {
+        return stockBkMoneyHistoryDomainService.listTopByDateOrderByProportionDesc(date, bkType, topNum);
+    }
 }

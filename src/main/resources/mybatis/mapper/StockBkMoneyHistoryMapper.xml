@@ -51,4 +51,12 @@
             and type = #{type}
         </if>
     </delete>
+
+    <select id="listTopByDateOrderByProportionDesc" resultMap="BaseResultMap">
+        select bk_code, bk_name, curr_date, type,bk_now_proportion from stock_bk_money_history t
+        where type = #{bkType}
+        and date_format(curr_date,'%Y%m%d') = date_format( #{date,jdbcType=TIMESTAMP},'%Y%m%d')
+        order by bk_now_proportion desc
+        limit #{topNum}
+    </select>
 </mapper>

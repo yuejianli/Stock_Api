@@ -122,7 +122,7 @@ public class StockPoolBusinessImpl implements StockPoolBusiness {
         if (dataMap.size() > 3) {
             String velocityContent = emailService.getVelocityContent(VelocityTemplateType.POOL, dataMap);
             weChatService.sendTextMessage(null, velocityContent);
-            dingTalkService.sendTextMessage(null, velocityContent);
+            // dingTalkService.sendTextMessage(null, velocityContent);
         }
     }
 
