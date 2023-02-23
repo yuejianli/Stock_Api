@@ -1,6 +1,8 @@
 package top.yueshushu.learn.mode.ro;
 
 import lombok.Data;
+import top.yueshushu.learn.enumtype.DBStockType;
+import top.yueshushu.learn.response.PageRo;
 
 import java.io.Serializable;
 import java.util.List;
@@ -13,7 +15,7 @@ import java.util.List;
  * @Version 1.0
  **/
 @Data
-public class StockBKMoneyStatRo implements Serializable {
+public class StockBKMoneyStatRo extends PageRo implements Serializable {
     /**
      * @param bkCode 版块的编码
      */
@@ -34,4 +36,8 @@ public class StockBKMoneyStatRo implements Serializable {
      * 是否同步, 默认为不同步
      */
     private boolean async = false;
+
+    private String stockCode;
+
+    private Integer dbStockType = DBStockType.SH_SZ.getCode();
 }

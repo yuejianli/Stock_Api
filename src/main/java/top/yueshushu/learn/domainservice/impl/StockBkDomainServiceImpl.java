@@ -2,6 +2,7 @@ package top.yueshushu.learn.domainservice.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import top.yueshushu.learn.domain.StockBkDo;
 import top.yueshushu.learn.domainservice.StockBkDomainService;
 import top.yueshushu.learn.enumtype.BKType;
@@ -30,9 +31,16 @@ public class StockBkDomainServiceImpl extends ServiceImpl<StockBkMapper, StockBk
     }
 
     @Override
-    public StockBkDo selectByCode(String code) {
+    public StockBkDo getByCode(String code) {
         return this.lambdaQuery()
                 .eq(StockBkDo::getCode, code)
                 .one();
+    }
+
+    @Override
+    public List<StockBkDo> listByCodes(List<String> bkCodeList) {
+        return this.lambdaQuery()
+                .in(!CollectionUtils.isEmpty(bkCodeList), StockBkDo::getCode, bkCodeList)
+                .list();
     }
 }

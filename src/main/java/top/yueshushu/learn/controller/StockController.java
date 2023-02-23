@@ -10,12 +10,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import top.yueshushu.learn.business.StockBusiness;
 import top.yueshushu.learn.common.ResultCode;
+import top.yueshushu.learn.enumtype.DBStockType;
 import top.yueshushu.learn.mode.info.StockInfo;
 import top.yueshushu.learn.mode.ro.StockRo;
+import top.yueshushu.learn.mode.vo.DistVo;
 import top.yueshushu.learn.mode.vo.StockVo;
 import top.yueshushu.learn.response.OutputResult;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>
@@ -46,6 +50,23 @@ public class StockController {
             );
         }
         return stockBusiness.getStockInfo(stockRo.getCode());
+    }
+
+    @PostMapping("/listDbType")
+    @ApiOperation("查询所有的股票类型信息")
+    public OutputResult<List<DistVo>> listDbType() {
+
+        DBStockType[] values = DBStockType.values();
+
+        List<DistVo> resultList = new ArrayList<>();
+
+        for (DBStockType dbStockType : values) {
+            DistVo distVo = new DistVo();
+            distVo.setCode(dbStockType.getCode() + "");
+            distVo.setName(dbStockType.getDesc());
+            resultList.add(distVo);
+        }
+        return OutputResult.buildSucc(resultList);
     }
 
 }

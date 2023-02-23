@@ -371,13 +371,13 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
                 case STOCK_BK: {
                     bkBusiness.syncBkAndMoney();
                     // 获取所有的自选股票
-                    List<String> codeList = stockSelectedService.findCodeList(null);
-                    if (CollectionUtils.isEmpty(codeList)) {
-                        break;
-                    }
-                    for (String code : codeList) {
-                        bkBusiness.syncRelationCode(code);
-                    }
+//                    List<String> codeList = stockSelectedService.findCodeList(null);
+//                    if (CollectionUtils.isEmpty(codeList)) {
+//                        break;
+//                    }
+//                    for (String code : codeList) {
+//                        bkBusiness.syncRelationCode(code);
+//                    }
 
                     break;
                 }

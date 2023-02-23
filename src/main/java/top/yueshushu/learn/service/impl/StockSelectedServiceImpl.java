@@ -30,7 +30,6 @@ import top.yueshushu.learn.entity.StockHistory;
 import top.yueshushu.learn.entity.StockSelected;
 import top.yueshushu.learn.enumtype.DBStockType;
 import top.yueshushu.learn.enumtype.DataFlagType;
-import top.yueshushu.learn.enumtype.StockCodeType;
 import top.yueshushu.learn.enumtype.SyncStockHistoryType;
 import top.yueshushu.learn.mode.dto.StockPriceCacheDto;
 import top.yueshushu.learn.mode.ro.IdRo;
@@ -522,18 +521,11 @@ public class StockSelectedServiceImpl implements StockSelectedService {
 
     private void syncShAndSZCodeHistory(List<String> codeSelectedList, DBStockType dbStockType) {
         //1. 查询出所有的股票和对应的股票 full code 列表
-        List<String> allCodeList = stockDomainService.listAllCode();
+        List<String> allCodeList = stockDomainService.listCodeByType(dbStockType);
         // 对股票 编码进行筛选
         List<String> filterCodeList = new ArrayList<>();
         for (String allCode : allCodeList) {
             if (codeSelectedList.contains(allCode)) {
-                continue;
-            }
-            StockCodeType typeByStockCode = StockCodeType.getTypeByStockCode(allCode);
-            if (null == typeByStockCode) {
-                continue;
-            }
-            if (!dbStockType.contains(typeByStockCode)) {
                 continue;
             }
             filterCodeList.add(allCode);

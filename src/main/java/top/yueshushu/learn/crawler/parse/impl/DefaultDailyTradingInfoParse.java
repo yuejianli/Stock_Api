@@ -7,6 +7,7 @@ import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.crawler.entity.StockHistoryCsvInfo;
@@ -20,6 +21,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @ClassName:DefaultDailyTradingInfoParse
@@ -50,6 +52,13 @@ public class DefaultDailyTradingInfoParse implements DailyTradingInfoParse {
         List<StockHistoryCsvInfo> stockHistoryCsvInfos = null;
         try {
             stockHistoryCsvInfos = MyCsvUtil.readFile(downloadFile, StockHistoryCsvInfo.class);
+
+            stockHistoryCsvInfos = stockHistoryCsvInfos.stream().filter(n -> StringUtils.hasText(n.getCode())).collect(Collectors.toList());
+
+            if (CollectionUtils.isEmpty(stockHistoryCsvInfos)) {
+                return stockHistoryCsvInfos;
+            }
+
             stockHistoryCsvInfos.stream().forEach(
                     n -> {
                         n.setCode(n.getCode().replace("'", ""));

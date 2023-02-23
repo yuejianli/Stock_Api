@@ -2,6 +2,7 @@ package top.yueshushu.learn.domainservice;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import top.yueshushu.learn.domain.StockDo;
+import top.yueshushu.learn.enumtype.DBStockType;
 
 import java.util.List;
 
@@ -38,6 +39,13 @@ public interface StockDomainService extends IService<StockDo> {
      * @return 查询所有的股票列表的编码集合
      */
     List<String> listAllCode();
+
+    /**
+     * 根据股票的类型,查询出所有的股票列表集合
+     *
+     * @param dbStockType 股票类型
+     */
+    List<String> listCodeByType(DBStockType dbStockType);
 
     /**
      * 根据股票 code 集合，查询对应的股票信息

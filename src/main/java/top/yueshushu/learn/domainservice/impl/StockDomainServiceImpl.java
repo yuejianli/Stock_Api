@@ -6,9 +6,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import top.yueshushu.learn.domain.StockDo;
 import top.yueshushu.learn.domainservice.StockDomainService;
+import top.yueshushu.learn.enumtype.DBStockType;
+import top.yueshushu.learn.enumtype.StockCodeType;
 import top.yueshushu.learn.mapper.StockDoMapper;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -53,6 +56,25 @@ public class StockDomainServiceImpl extends ServiceImpl<StockDoMapper, StockDo>
     @Override
     public List<String> listAllCode() {
         return stockDoMapper.listAllCode();
+    }
+
+    @Override
+    public List<String> listCodeByType(DBStockType dbStockType) {
+
+        List<String> allCodeList = listAllCode();
+        // 对股票 编码进行筛选
+        List<String> filterCodeList = new ArrayList<>();
+        for (String allCode : allCodeList) {
+            StockCodeType typeByStockCode = StockCodeType.getTypeByStockCode(allCode);
+            if (null == typeByStockCode) {
+                continue;
+            }
+            if (!dbStockType.contains(typeByStockCode)) {
+                continue;
+            }
+            filterCodeList.add(allCode);
+        }
+        return filterCodeList;
     }
 
     @Override

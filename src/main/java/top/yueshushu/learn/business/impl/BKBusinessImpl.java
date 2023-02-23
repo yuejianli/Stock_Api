@@ -3,7 +3,10 @@ package top.yueshushu.learn.business.impl;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import top.yueshushu.learn.assembler.StockBkMoneyHistoryAssembler;
@@ -17,18 +20,26 @@ import top.yueshushu.learn.crawler.entity.StockBKStockInfo;
 import top.yueshushu.learn.domain.StockBkDo;
 import top.yueshushu.learn.domain.StockBkMoneyHistoryDo;
 import top.yueshushu.learn.domain.StockBkStockDo;
+import top.yueshushu.learn.domain.StockDo;
 import top.yueshushu.learn.domainservice.StockBkStockDomainService;
+import top.yueshushu.learn.domainservice.StockDomainService;
 import top.yueshushu.learn.enumtype.BKCharMoneyType;
 import top.yueshushu.learn.enumtype.BKType;
+import top.yueshushu.learn.enumtype.DBStockType;
 import top.yueshushu.learn.helper.DateHelper;
+import top.yueshushu.learn.mode.dto.StockBkCodeQueryDto;
 import top.yueshushu.learn.mode.ro.StockBKMoneyStatRo;
+import top.yueshushu.learn.mode.vo.StockBKMoneyHistoryVo;
 import top.yueshushu.learn.mode.vo.StockBKVo;
+import top.yueshushu.learn.mode.vo.StockBkStockVo;
 import top.yueshushu.learn.mode.vo.charinfo.LineSeriesVo;
 import top.yueshushu.learn.mode.vo.charinfo.LineVo;
 import top.yueshushu.learn.response.OutputResult;
+import top.yueshushu.learn.response.PageResponse;
 import top.yueshushu.learn.service.StockBkMoneyHistoryService;
 import top.yueshushu.learn.service.StockBkService;
 import top.yueshushu.learn.util.BigDecimalUtil;
+import top.yueshushu.learn.util.PageUtil;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -57,7 +68,11 @@ public class BKBusinessImpl implements BKBusiness {
     private DateHelper dateHelper;
     @Resource
     private StockBkStockDomainService stockBkStockDomainService;
-
+    @Resource
+    private StockDomainService stockDomainService;
+    @SuppressWarnings("all")
+    @Resource(name = Const.ASYNC_SERVICE_EXECUTOR_BEAN_NAME)
+    private AsyncTaskExecutor executor;
 
     @Override
     public void syncBK() {
@@ -191,7 +206,7 @@ public class BKBusinessImpl implements BKBusiness {
     public OutputResult<List<BKMoneyInfo>> getMoneyHistoryInfoByCode(StockBKMoneyStatRo stockBKMoneyStatRo) {
         // 根据版块编码 获取信息.
         String bkCode = stockBKMoneyStatRo.getBkCode();
-        StockBkDo stockBkDo = stockBkService.selectByCode(bkCode);
+        StockBkDo stockBkDo = stockBkService.getByCode(bkCode);
         if (stockBkDo == null) {
             return OutputResult.buildAlert(ResultCode.BK_CODE_NOT_EXIST);
         }
@@ -293,7 +308,7 @@ public class BKBusinessImpl implements BKBusiness {
 
     @Override
     public OutputResult getCharStat(StockBKMoneyStatRo stockBKMoneyStatRo) {
-        StockBkDo stockBkDo = stockBkService.selectByCode(stockBKMoneyStatRo.getBkCode());
+        StockBkDo stockBkDo = stockBkService.getByCode(stockBKMoneyStatRo.getBkCode());
         if (stockBkDo == null) {
             return OutputResult.buildAlert(
                     ResultCode.BK_CODE_IS_EMPTY
@@ -348,6 +363,27 @@ public class BKBusinessImpl implements BKBusiness {
 
 
         return OutputResult.buildSucc(lineVo);
+    }
+
+    @Override
+    public OutputResult<PageResponse<StockBKMoneyHistoryVo>> findHistory(StockBKMoneyStatRo stockBKMoneyStatRo) {
+        StockBkDo stockBkDo = stockBkService.getByCode(stockBKMoneyStatRo.getBkCode());
+        if (stockBkDo == null) {
+            return OutputResult.buildAlert(
+                    ResultCode.BK_CODE_IS_EMPTY
+            );
+        }
+        DateTime startDateDate = DateUtil.parse(stockBKMoneyStatRo.getStartDate(), Const.SIMPLE_DATE_FORMAT);
+        DateTime endDateDate = DateUtil.parse(stockBKMoneyStatRo.getEndDate(), Const.SIMPLE_DATE_FORMAT);
+
+        Page<Object> pageInfo = PageHelper.startPage(stockBKMoneyStatRo.getPageNum(), stockBKMoneyStatRo.getPageSize());
+        List<StockBkMoneyHistoryDo> stockBkMoneyDoList = stockBkMoneyHistoryService.getMoneyHistoryByCodeAndRangeDate(
+                stockBKMoneyStatRo.getBkCode(),
+                startDateDate,
+                endDateDate
+        );
+        List<StockBKMoneyHistoryVo> voList = stockBkMoneyHistoryAssembler.toVoList(stockBkMoneyDoList);
+        return OutputResult.buildSucc(new PageResponse(pageInfo.getTotal(), voList));
     }
 
     @Override
@@ -423,9 +459,116 @@ public class BKBusinessImpl implements BKBusiness {
         //接下来，进行插入和修改相关操作.
         stockBkStockDomainService.removeByIds(deleteStockIdList);
         stockBkStockDomainService.saveBatch(addStockDoList);
-
-
     }
+
+    @Override
+    public OutputResult asyncStockBk(DBStockType dbStockType) {
+        //1. 查询出所有的股票
+        List<String> filterCodeList = stockDomainService.listCodeByType(dbStockType);
+        if (CollectionUtils.isEmpty(filterCodeList)) {
+            return OutputResult.buildAlert(ResultCode.STOCK_CODE_NO_EXIST);
+        }
+        executor.submit(
+                () -> {
+                    asyncStockBkCodeList(filterCodeList);
+                }
+        );
+        return OutputResult.buildSucc();
+    }
+
+    @Override
+    public OutputResult<PageResponse<StockBkStockVo>> listCodeBkInfo(StockBKMoneyStatRo stockBKMoneyStatRo) {
+        // 1. 查询出所有的有概念的股票集合.
+        List<String> stockCodeList = stockBkStockDomainService.listAllStockCodeByCode(stockBKMoneyStatRo.getStockCode());
+
+        if (CollectionUtils.isEmpty(stockCodeList)) {
+            return OutputResult.buildSucc(PageResponse.emptyPageResponse());
+        }
+        long total = stockCodeList.size();
+        // 对该集合进行分页处理.
+        List<String> pageCodeList = PageUtil.startPage(stockCodeList, stockBKMoneyStatRo.getPageNum(), stockBKMoneyStatRo.getPageSize());
+
+        StockBkCodeQueryDto stockBkCodeQueryDto = new StockBkCodeQueryDto();
+        stockBkCodeQueryDto.setStockCodeList(pageCodeList);
+
+        List<StockBkStockDo> stockBkStockDoList = stockBkStockDomainService.listByCondition(stockBkCodeQueryDto);
+
+        Map<String, List<StockBkStockDo>> codeGroupMap = stockBkStockDoList.stream().collect(Collectors.groupingBy(StockBkStockDo::getStockCode));
+
+        // 将集合进行分组.
+        List<String> bkCodeList = stockBkStockDoList.stream().map(StockBkStockDo::getBkCode).collect(Collectors.toList());
+        List<StockBkDo> stockBkDoList = stockBkService.listByCodes(bkCodeList);
+        Map<String, String> bkCodeNameMap = stockBkDoList.stream().collect(Collectors.toMap(StockBkDo::getCode, StockBkDo::getName));
+
+        List<StockDo> stockDoList = stockDomainService.listByCodes(pageCodeList);
+
+        Map<String, String> codeNameMap = stockDoList.stream().collect(Collectors.toMap(StockDo::getCode, StockDo::getName));
+
+
+        List<StockBkStockVo> result = new ArrayList<>(pageCodeList.size());
+        for (String code : pageCodeList) {
+            // 获取集合集合
+            StockBkStockVo stockBkStockVo = new StockBkStockVo();
+            stockBkStockVo.setCode(code);
+            stockBkStockVo.setName(codeNameMap.get(code));
+            List<StockBkStockDo> stockBkStockDoList1 = codeGroupMap.get(code);
+            if (CollectionUtils.isEmpty(stockBkStockDoList1)) {
+                result.add(stockBkStockVo);
+            } else {
+                // 不为空,则进行处理.
+                int size = stockBkStockDoList1.size();
+                if (size == 1) {
+                    stockBkStockVo.setBkCode1(stockBkStockDoList1.get(0).getBkCode());
+                    stockBkStockVo.setBkCodeName1(bkCodeNameMap.get(stockBkStockDoList1.get(0).getBkCode()));
+                } else if (size == 2) {
+                    stockBkStockVo.setBkCode1(stockBkStockDoList1.get(0).getBkCode());
+                    stockBkStockVo.setBkCodeName1(bkCodeNameMap.get(stockBkStockDoList1.get(0).getBkCode()));
+
+                    stockBkStockVo.setBkCode2(stockBkStockDoList1.get(1).getBkCode());
+                    stockBkStockVo.setBkCodeName2(bkCodeNameMap.get(stockBkStockDoList1.get(1).getBkCode()));
+                } else if (size == 3) {
+                    stockBkStockVo.setBkCode1(stockBkStockDoList1.get(0).getBkCode());
+                    stockBkStockVo.setBkCodeName1(bkCodeNameMap.get(stockBkStockDoList1.get(0).getBkCode()));
+
+                    stockBkStockVo.setBkCode2(stockBkStockDoList1.get(1).getBkCode());
+                    stockBkStockVo.setBkCodeName2(bkCodeNameMap.get(stockBkStockDoList1.get(1).getBkCode()));
+
+                    stockBkStockVo.setBkCode3(stockBkStockDoList1.get(2).getBkCode());
+                    stockBkStockVo.setBkCodeName3(bkCodeNameMap.get(stockBkStockDoList1.get(2).getBkCode()));
+                } else if (size >= 4) {
+                    stockBkStockVo.setBkCode1(stockBkStockDoList1.get(0).getBkCode());
+                    stockBkStockVo.setBkCodeName1(bkCodeNameMap.get(stockBkStockDoList1.get(0).getBkCode()));
+
+                    stockBkStockVo.setBkCode2(stockBkStockDoList1.get(1).getBkCode());
+                    stockBkStockVo.setBkCodeName2(bkCodeNameMap.get(stockBkStockDoList1.get(1).getBkCode()));
+
+                    stockBkStockVo.setBkCode3(stockBkStockDoList1.get(2).getBkCode());
+                    stockBkStockVo.setBkCodeName3(bkCodeNameMap.get(stockBkStockDoList1.get(2).getBkCode()));
+
+                    stockBkStockVo.setBkCode4(stockBkStockDoList1.get(3).getBkCode());
+                    stockBkStockVo.setBkCodeName4(bkCodeNameMap.get(stockBkStockDoList1.get(3).getBkCode()));
+                }
+                result.add(stockBkStockVo);
+            }
+        }
+        return OutputResult.buildSucc(new PageResponse<>(total, result));
+    }
+
+    private void asyncStockBkCodeList(List<String> filterCodeList) {
+        for (String code : filterCodeList) {
+            executor.submit(
+                    () -> {
+                        syncRelationCode(code);
+                        try {
+                            TimeUnit.MILLISECONDS.sleep(200);
+                        } catch (Exception e) {
+
+                        }
+                    }
+            );
+        }
+    }
+
     /**
      * 将历史数据转换成 图表数据
      *

@@ -27,5 +27,7 @@ public interface StockBkDomainService extends IService<StockBkDo> {
      *
      * @param code 版块编码
      */
-    StockBkDo selectByCode(String code);
+    StockBkDo getByCode(String code);
+
+    List<StockBkDo> listByCodes(List<String> bkCodeList);
 }

@@ -3,9 +3,13 @@ package top.yueshushu.learn.business;
 import top.yueshushu.learn.crawler.entity.BKInfo;
 import top.yueshushu.learn.crawler.entity.BKMoneyInfo;
 import top.yueshushu.learn.enumtype.BKType;
+import top.yueshushu.learn.enumtype.DBStockType;
 import top.yueshushu.learn.mode.ro.StockBKMoneyStatRo;
+import top.yueshushu.learn.mode.vo.StockBKMoneyHistoryVo;
 import top.yueshushu.learn.mode.vo.StockBKVo;
+import top.yueshushu.learn.mode.vo.StockBkStockVo;
 import top.yueshushu.learn.response.OutputResult;
+import top.yueshushu.learn.response.PageResponse;
 
 import java.util.List;
 
@@ -87,6 +91,13 @@ public interface BKBusiness {
     OutputResult getCharStat(StockBKMoneyStatRo stockBKMoneyStatRo);
 
     /**
+     * 查询历史记录信息
+     *
+     * @param stockBKMoneyStatRo 版块记录
+     */
+    OutputResult<PageResponse<StockBKMoneyHistoryVo>> findHistory(StockBKMoneyStatRo stockBKMoneyStatRo);
+
+    /**
      * 查询所有的版块资金类型
      */
     OutputResult<List<StockBKVo>> listMoneyType();
@@ -102,4 +113,19 @@ public interface BKBusiness {
      * @param code 股票编码
      */
     void syncRelationCode(String code);
+
+    /**
+     * 同步所有股票概念信息
+     *
+     * @param dbStockType 股票类型
+     */
+    OutputResult asyncStockBk(DBStockType dbStockType);
+
+    /**
+     * 根据股票编码 获取对应的股票信息
+     *
+     * @param stockBKMoneyStatRo 股票查询对象
+     */
+    OutputResult<PageResponse<StockBkStockVo>> listCodeBkInfo(StockBKMoneyStatRo stockBKMoneyStatRo);
+
 }

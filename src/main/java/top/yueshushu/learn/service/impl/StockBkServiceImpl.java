@@ -30,7 +30,12 @@ public class StockBkServiceImpl extends ServiceImpl<StockBkMapper, StockBkDo> im
     }
 
     @Override
-    public StockBkDo selectByCode(String code) {
-        return stockBkDomainService.selectByCode(code);
+    public StockBkDo getByCode(String code) {
+        return stockBkDomainService.getByCode(code);
+    }
+
+    @Override
+    public List<StockBkDo> listByCodes(List<String> bkCodeList) {
+        return stockBkDomainService.listByCodes(bkCodeList);
     }
 }

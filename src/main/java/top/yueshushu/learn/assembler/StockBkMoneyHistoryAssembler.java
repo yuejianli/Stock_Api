@@ -4,6 +4,7 @@ import org.mapstruct.Mapper;
 import top.yueshushu.learn.crawler.entity.BKMoneyInfo;
 import top.yueshushu.learn.domain.StockBkDo;
 import top.yueshushu.learn.domain.StockBkMoneyHistoryDo;
+import top.yueshushu.learn.mode.vo.StockBKMoneyHistoryVo;
 import top.yueshushu.learn.mode.vo.StockBKVo;
 
 import java.util.List;
@@ -24,4 +25,8 @@ public interface StockBkMoneyHistoryAssembler {
     StockBKVo bkVo(StockBkDo stockBkDo);
 
     List<StockBKVo> bkVoList(List<StockBkDo> stockBkDoList);
+
+    List<StockBKMoneyHistoryVo> toVoList(List<StockBkMoneyHistoryDo> stockBkMoneyDoList);
+
+    StockBKMoneyHistoryVo toVo(StockBkMoneyHistoryDo stockBkMoneyHistoryDo);
 }

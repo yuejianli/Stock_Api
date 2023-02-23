@@ -25,5 +25,12 @@ public interface StockBkService extends IService<StockBkDo> {
      *
      * @param code 版块编码
      */
-    StockBkDo selectByCode(String code);
+    StockBkDo getByCode(String code);
+
+    /**
+     * 根据版块编码列表查询版块的记录信息
+     *
+     * @param bkCodeList 版块编码列表
+     */
+    List<StockBkDo> listByCodes(List<String> bkCodeList);
 }
