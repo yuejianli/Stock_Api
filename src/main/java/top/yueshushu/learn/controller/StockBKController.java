@@ -16,6 +16,7 @@ import top.yueshushu.learn.enumtype.DBStockType;
 import top.yueshushu.learn.mode.ro.StockBKMoneyStatRo;
 import top.yueshushu.learn.mode.vo.StockBKVo;
 import top.yueshushu.learn.response.OutputResult;
+import top.yueshushu.learn.response.PageResponse;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -102,6 +103,10 @@ public class StockBKController {
     @PostMapping("/findHistory")
     @AuthToken
     public OutputResult findHistory(@RequestBody StockBKMoneyStatRo stockBKMoneyStatRo) {
+        if (!StringUtils.hasText(stockBKMoneyStatRo.getBkCode())) {
+            return OutputResult.buildSucc(PageResponse.emptyPageResponse());
+        }
+
         handlerDate(stockBKMoneyStatRo);
         return bkBusiness.findHistory(stockBKMoneyStatRo);
     }
