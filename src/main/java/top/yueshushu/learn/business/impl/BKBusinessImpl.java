@@ -210,16 +210,7 @@ public class BKBusinessImpl implements BKBusiness {
         }
         Date startDate = DateUtil.parse(stockBKMoneyStatRo.getStartDate(), DatePattern.NORM_DATE_PATTERN);
         Date endDate = DateUtil.endOfDay(DateUtil.date());
-        Date tempDate = DateUtil.parse(stockBKMoneyStatRo.getStartDate(), DatePattern.NORM_DATE_PATTERN);
-        int size = 0;
-        //   long subDay = DateUtil.between(startDate, endDate, DateUnit.DAY);
-        while (endDate.after(tempDate)) {
-            // startDate 进行加1
-            if (dateHelper.isWorkingDay(tempDate)) {
-                size++;
-            }
-            tempDate = DateUtil.offsetDay(tempDate, 1);
-        }
+        int size = dateHelper.betweenWorkDay(stockBKMoneyStatRo.getStartDate(), stockBKMoneyStatRo.getEndDate()).size();
         String secid = "90." + bkCode;
         BKType bkType = BKType.getType(stockBkDo.getType());
 
@@ -393,19 +384,19 @@ public class BKBusinessImpl implements BKBusiness {
     }
 
     @Override
-    public OutputResult<List<StockBKVo>> listMoneyType() {
+    public OutputResult<List<DistVo>> listMoneyType() {
 
         BKCharMoneyType[] values = BKCharMoneyType.values();
 
-        List<StockBKVo> result = new ArrayList<>(values.length);
+        List<DistVo> result = new ArrayList<>(values.length);
 
         for (BKCharMoneyType bkCharMoneyType : values) {
 
-            StockBKVo stockBKVo = new StockBKVo();
-            stockBKVo.setCode(bkCharMoneyType.getCode() + "");
-            stockBKVo.setName(bkCharMoneyType.getDesc());
+            DistVo distVo = new DistVo();
+            distVo.setCode(bkCharMoneyType.getCode() + "");
+            distVo.setName(bkCharMoneyType.getDesc());
 
-            result.add(stockBKVo);
+            result.add(distVo);
         }
 
         return OutputResult.buildSucc(result);

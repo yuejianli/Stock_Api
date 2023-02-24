@@ -1,6 +1,4 @@
 package top.yueshushu.learn.domainservice.impl;
-
-import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +26,7 @@ public class StockHistoryDomainServiceImpl extends ServiceImpl<StockHistoryDoMap
     private StockHistoryDoMapper stockHistoryDoMapper;
 
     @Override
-    public List<StockHistoryDo> listStockHistoryAndDate(String code, DateTime startDate, DateTime endDate) {
+    public List<StockHistoryDo> listStockHistoryAndDate(String code, Date startDate, Date endDate) {
         return stockHistoryDoMapper.listStockHistoryAndDateDesc(
                 code, startDate, endDate
         );
@@ -42,7 +40,7 @@ public class StockHistoryDomainServiceImpl extends ServiceImpl<StockHistoryDoMap
     }
 
     @Override
-    public List<StockHistoryDo> limit10Desc(String stockCode, DateTime lastDay) {
+    public List<StockHistoryDo> limit10Desc(String stockCode, Date lastDay) {
         return stockHistoryDoMapper.limit10Desc(stockCode, lastDay);
     }
 
@@ -54,16 +52,16 @@ public class StockHistoryDomainServiceImpl extends ServiceImpl<StockHistoryDoMap
     }
 
     @Override
-    public StockHistoryDo getRecentyHistoryBeforeDate(String code, DateTime endDate) {
+    public StockHistoryDo getRecentyHistoryBeforeDate(String code, Date endDate) {
         return stockHistoryDoMapper.getRecentyHistoryBeforeDate(
-                code,endDate
+                code, endDate
         );
     }
 
     @Override
-    public List<StockHistoryDo> listStockHistoryAndDateAsc(String code, DateTime startDate, DateTime endDate) {
+    public List<StockHistoryDo> listStockHistoryAndDateAsc(String code, Date startDate, Date endDate) {
         return stockHistoryDoMapper.listStockHistoryAndDateAsc(
-                code,startDate,endDate
+                code, startDate, endDate
         );
     }
 
@@ -101,7 +99,7 @@ public class StockHistoryDomainServiceImpl extends ServiceImpl<StockHistoryDoMap
     }
 
     @Override
-    public void deleteHasAsyncData(List<String> codeList, DateTime currentDate) {
+    public void deleteHasAsyncData(List<String> codeList, Date currentDate) {
         stockHistoryDoMapper.deleteHasAsyncData(codeList, currentDate);
     }
 

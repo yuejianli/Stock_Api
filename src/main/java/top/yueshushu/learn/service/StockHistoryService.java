@@ -1,6 +1,5 @@
 package top.yueshushu.learn.service;
 
-import cn.hutool.core.date.DateTime;
 import top.yueshushu.learn.entity.StockHistory;
 import top.yueshushu.learn.mode.dto.StockPriceCacheDto;
 import top.yueshushu.learn.mode.ro.StockDayStatRo;
@@ -51,7 +50,7 @@ public interface StockHistoryService{
      * @param lastDay   最大的日期天数
      * @return 查询最近十天的股票交易信息
      */
-    List<StockHistory> limit10Desc(String stockCode, DateTime lastDay);
+    List<StockHistory> limit10Desc(String stockCode, Date lastDay);
 
     /**
      * 根据股票的编码和当前日期获取对应的历史记录信息
@@ -60,24 +59,26 @@ public interface StockHistoryService{
      * @param currDate 股票记录日期
      * @return 根据股票的编码和当前日期获取对应的历史记录信息
      */
-    StockHistoryVo getVoByCodeAndCurrDate(String code, DateTime currDate);
+    StockHistoryVo getVoByCodeAndCurrDate(String code, Date currDate);
 
     /**
      * 根据股票的编码和日期，获取距离这一天最近的股票历史记录数据。
-     * @param code 股票编码
+     *
+     * @param code    股票编码
      * @param endDate 最近的记录日期
      * @return 根据股票的编码和日期，获取距离这一天最近的股票历史记录数据。
      */
-    StockHistoryVo getRecentyHistoryBeforeDate(String code, DateTime endDate);
+    StockHistoryVo getRecentyHistoryBeforeDate(String code, Date endDate);
 
     /**
      * 根据股票的编码和时间范围，获取这期间内的股票历史记录数据
-     * @param code 股票编码
+     *
+     * @param code      股票编码
      * @param startDate 开始时间
-     * @param endDate 结束时间
+     * @param endDate   结束时间
      * @return 根据股票的编码和时间范围，获取这期间内的股票历史记录数据
      */
-    List<StockHistoryVo> getStockHistoryByCodeAndRangeDate(String code, DateTime startDate, DateTime endDate);
+    List<StockHistoryVo> getStockHistoryByCodeAndRangeDate(String code, Date startDate, Date endDate);
 
     /**
      * 查询股票天范围内的历史记录信息

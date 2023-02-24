@@ -216,12 +216,17 @@ public class StockExtendTest {
     @Test
     public void findPoolByTypeTest() {
 
-        for (StockPoolType stockPoolType : StockPoolType.values()) {
-            List<StockPoolInfo> poolTypeList = extCrawlerService.findPoolByType(stockPoolType, DateUtil.date());
+//        for (StockPoolType stockPoolType : StockPoolType.values()) {
+//            List<StockPoolInfo> poolTypeList = extCrawlerService.findPoolByType(stockPoolType, DateUtil.date());
+//            log.info(">>>> 长度: {}",poolTypeList.size());
+//            List<StockPoolInfo> stockPoolInfos = poolTypeList.subList(0, 2);
+//            log.info(">>> 获取 {} 列表: {}", stockPoolType.getDesc(), stockPoolInfos);
+//        }
 
-            List<StockPoolInfo> stockPoolInfos = poolTypeList.subList(0, 2);
-            log.info(">>> 获取 {} 列表: {}", stockPoolType.getDesc(), stockPoolInfos);
-        }
+        List<StockPoolInfo> poolTypeList = extCrawlerService.findPoolByType(StockPoolType.YES_ZT, DateUtil.date());
+        log.info(">>>> 长度: {}", poolTypeList.size());
+        List<StockPoolInfo> stockPoolInfos = poolTypeList.subList(0, 2);
+        log.info(">>> 获取 {} 列表: {}", StockPoolType.YES_ZT.getDesc(), stockPoolInfos);
     }
 
     @Test

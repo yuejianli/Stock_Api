@@ -35,8 +35,8 @@ import top.yueshushu.learn.mode.vo.charinfo.LineSeriesVo;
 import top.yueshushu.learn.mode.vo.charinfo.LineVo;
 import top.yueshushu.learn.mode.vo.stock.StockWeekStatInfoVo;
 import top.yueshushu.learn.mode.vo.stock.StockWeekStatVo;
-import top.yueshushu.learn.mode.vo.ten10stat.HistoryTen10Vo;
-import top.yueshushu.learn.mode.vo.ten10stat.StockTen10Vo;
+import top.yueshushu.learn.mode.vo.ten10stat.HistoryRelationVo;
+import top.yueshushu.learn.mode.vo.ten10stat.StockRelationVo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.response.PageResponse;
 import top.yueshushu.learn.service.StockHistoryService;
@@ -223,7 +223,34 @@ public class StatBusinessImpl implements StatBusiness {
     }
 
     @Override
-    public OutputResult<PageResponse<StockTen10Vo>> getTenTradeData(StatTen10Ro statTen10Ro) {
+    public OutputResult<List<String>> getTradeDay(StockStatRo stockStatRo) {
+        handlerDate(stockStatRo);
+        // 总共是 size 个工作日。
+        List<String> dateList = dateHelper.betweenWorkDay(stockStatRo.getStartDate(), stockStatRo.getEndDate());
+        return OutputResult.buildSucc(dateList);
+    }
+
+    /**
+     * 处理日期
+     *
+     * @param stockStatRo 历史记录 日期对象调整
+     */
+    private void handlerDate(StockStatRo stockStatRo) {
+        Date now = DateUtil.date();
+        if (!StringUtils.hasText(stockStatRo.getEndDate())) {
+            Date endDate = DateUtil.offsetDay(now, 0);
+            stockStatRo.setEndDate(DateUtil.format(endDate, Const.SIMPLE_DATE_FORMAT));
+        }
+
+        if (!StringUtils.hasText(stockStatRo.getStartDate())) {
+            Date startDate = DateUtil.offsetDay(now, -13);
+            stockStatRo.setStartDate(DateUtil.format(startDate, Const.SIMPLE_DATE_FORMAT));
+        }
+    }
+
+
+    @Override
+    public OutputResult<PageResponse<StockRelationVo>> getTenTradeData(StatTen10Ro statTen10Ro) {
         // 先查询一下，分页，自选表信息.
         StockSelectedRo stockSelectedRo = new StockSelectedRo();
         stockSelectedRo.setUserId(statTen10Ro.getUserId());
@@ -236,8 +263,8 @@ public class StatBusinessImpl implements StatBusiness {
             return OutputResult.buildSucc(PageResponse.emptyPageResponse());
         }
         //处理信息
-        List<StockTen10Vo> stockTen10VoList = convertTen10VoBySelectedVo(stockSelectedVoList);
-        PageInfo pageInfo = new PageInfo<>(stockTen10VoList);
+        List<StockRelationVo> stockRelationVoList = convertTen10VoBySelectedVo(stockSelectedVoList);
+        PageInfo pageInfo = new PageInfo<>(stockRelationVoList);
         return OutputResult.buildSucc(new PageResponse<>(
                 stockSelectedResult.getData().getTotal(), pageInfo.getList()
         ));
@@ -259,14 +286,14 @@ public class StatBusinessImpl implements StatBusiness {
         statTen10Ro.setUserId(userId);
         statTen10Ro.setPageSize(30);
         statTen10Ro.setPageNum(1);
-        OutputResult<PageResponse<StockTen10Vo>> tenDataResult = getTenTradeData(statTen10Ro);
+        OutputResult<PageResponse<StockRelationVo>> tenDataResult = getTenTradeData(statTen10Ro);
         // 获取数据
-        List<StockTen10Vo> stockTen10List = tenDataResult.getData().getList();
-        List<StockTen10Vo> convertTen10VoList = stockTen10List.stream().map(
+        List<StockRelationVo> stockTen10List = tenDataResult.getData().getList();
+        List<StockRelationVo> convertTen10VoList = stockTen10List.stream().map(
                 n -> {
-                    StockTen10Vo last5DaVo = new StockTen10Vo();
-                    List<HistoryTen10Vo> historyTen10VoList = n.getTen10List();
-                    historyTen10VoList.forEach(
+                    StockRelationVo last5DaVo = new StockRelationVo();
+                    List<HistoryRelationVo> historyRelationVoList = n.getDetailList();
+                    historyRelationVoList.forEach(
                             vo -> {
                                 vo.setAmplitudeProportion(
                                         vo.getAmplitudeProportion().substring(0, vo.getAmplitudeProportion().length() - 2)
@@ -275,7 +302,7 @@ public class StatBusinessImpl implements StatBusiness {
                     );
                     last5DaVo.setCode(n.getCode());
                     last5DaVo.setName(n.getName().length() > 4 ? n.getName().substring(0, 4) : n.getName());
-                    last5DaVo.setTen10List(historyTen10VoList);
+                    last5DaVo.setDetailList(historyRelationVoList);
                     return last5DaVo;
                 }
         ).collect(Collectors.toList());
@@ -310,16 +337,16 @@ public class StatBusinessImpl implements StatBusiness {
      * @param stockSelectedVoList 股票自选信息
      * @return 将股票信息进行转换，转换成相应的涨跌信息
      */
-    private List<StockTen10Vo> convertTen10VoBySelectedVo(List<StockSelectedVo> stockSelectedVoList) {
-        List<StockTen10Vo> ten10VoList = Collections.synchronizedList(new ArrayList<>(stockSelectedVoList.size()));
+    private List<StockRelationVo> convertTen10VoBySelectedVo(List<StockSelectedVo> stockSelectedVoList) {
+        List<StockRelationVo> ten10VoList = Collections.synchronizedList(new ArrayList<>(stockSelectedVoList.size()));
         CountDownLatch countDownLatch = new CountDownLatch(stockSelectedVoList.size());
         // 股票信息展示
         for (StockSelectedVo stockSelectedVo : stockSelectedVoList) {
             executor.submit(
                     () -> {
                         try {
-                            StockTen10Vo stockTen10Vo = singleToTen10Vo(stockSelectedVo);
-                            ten10VoList.add(stockTen10Vo);
+                            StockRelationVo stockRelationVo = singleToTen10Vo(stockSelectedVo);
+                            ten10VoList.add(stockRelationVo);
                         } catch (Exception e) {
 
                         } finally {
@@ -333,8 +360,8 @@ public class StatBusinessImpl implements StatBusiness {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        List<StockTen10Vo> resultList =
-                ten10VoList.stream().sorted(Comparator.comparing(StockTen10Vo::getCode)).collect(Collectors.toList());
+        List<StockRelationVo> resultList =
+                ten10VoList.stream().sorted(Comparator.comparing(StockRelationVo::getCode)).collect(Collectors.toList());
         return resultList;
     }
 
@@ -344,10 +371,10 @@ public class StatBusinessImpl implements StatBusiness {
      * @param stockSelectedVo 股票自选信息
      * @return 返回最近10天的交易构建对象信息
      */
-    private StockTen10Vo singleToTen10Vo(StockSelectedVo stockSelectedVo) {
-        StockTen10Vo stockTen10Vo = new StockTen10Vo();
-        stockTen10Vo.setCode(stockSelectedVo.getStockCode());
-        stockTen10Vo.setName(stockSelectedVo.getStockName());
+    private StockRelationVo singleToTen10Vo(StockSelectedVo stockSelectedVo) {
+        StockRelationVo stockRelationVo = new StockRelationVo();
+        stockRelationVo.setCode(stockSelectedVo.getStockCode());
+        stockRelationVo.setName(stockSelectedVo.getStockName());
         // 查询该股票最近十天的交易记录对象。
         //获取最近的十天交易信息
         OutputResult<List<String>> tenTradeDayOutput = getTenTradeDay();
@@ -365,16 +392,16 @@ public class StatBusinessImpl implements StatBusiness {
                     currDateMap.put(currDate, n);
                 }
         );
-        List<HistoryTen10Vo> historyTen10VoList = new ArrayList<>(ten10DayList.size());
+        List<HistoryRelationVo> historyRelationVoList = new ArrayList<>(ten10DayList.size());
         int i = 0;
         for (String date : ten10DayList) {
-            HistoryTen10Vo historyTen10Vo = new HistoryTen10Vo();
-            historyTen10Vo.setCurrDate(date);
+            HistoryRelationVo historyRelationVo = new HistoryRelationVo();
+            historyRelationVo.setCurrDate(date);
             StockHistory tempStockHistory = currDateMap.get(date);
             i++;
             if (tempStockHistory == null) {
-                historyTen10Vo.setType(AmplitudeType.NODATA.getCode());
-                historyTen10Vo.setAmplitudeProportion("未同步");
+                historyRelationVo.setType(AmplitudeType.NODATA.getCode());
+                historyRelationVo.setAmplitudeProportion("未同步");
                 //如果是最后一次的话，需要用缓存里面的信息进行替换.
                 if (i == ten10DayList.size()) {
                     //最后的一个.
@@ -384,30 +411,32 @@ public class StatBusinessImpl implements StatBusiness {
                     if (yesterdayCloseCachePrice.compareTo(SystemConst.DEFAULT_EMPTY) == 1) {
                         //有昨天的值.
                         if (nowPrice.compareTo(yesterdayCloseCachePrice) == 1) {
-                            historyTen10Vo.setType(AmplitudeType.ROSE.getCode());
-                            historyTen10Vo.setAmplitudeProportion(BigDecimalUtil.divPattern(
+                            historyRelationVo.setType(AmplitudeType.ROSE.getCode());
+                            historyRelationVo.setAmplitudeProportion(BigDecimalUtil.divPattern(
                                     (BigDecimalUtil.subBigDecimal(nowPrice, yesterdayCloseCachePrice)), yesterdayCloseCachePrice));
                         } else {
-                            historyTen10Vo.setType(AmplitudeType.WANE.getCode());
-                            historyTen10Vo.setAmplitudeProportion("-" + BigDecimalUtil.divPattern(
+                            historyRelationVo.setType(AmplitudeType.WANE.getCode());
+                            historyRelationVo.setAmplitudeProportion("-" + BigDecimalUtil.divPattern(
                                     (BigDecimalUtil.subBigDecimal(yesterdayCloseCachePrice, nowPrice)), yesterdayCloseCachePrice));
                         }
+                        historyRelationVo.setClosePrice(BigDecimalUtil.toString(nowPrice));
                     }
                 }
             } else {
                 BigDecimal amplitudeProportion = tempStockHistory.getAmplitudeProportion();
                 if (amplitudeProportion.compareTo(SystemConst.DEFAULT_EMPTY) > 0) {
-                    historyTen10Vo.setType(AmplitudeType.ROSE.getCode());
+                    historyRelationVo.setType(AmplitudeType.ROSE.getCode());
                 } else {
-                    historyTen10Vo.setType(AmplitudeType.WANE.getCode());
+                    historyRelationVo.setType(AmplitudeType.WANE.getCode());
                 }
                 //转换成字符串
-                historyTen10Vo.setAmplitudeProportion(BigDecimalUtil.toString(amplitudeProportion));
+                historyRelationVo.setAmplitudeProportion(BigDecimalUtil.toString(amplitudeProportion));
+                historyRelationVo.setClosePrice(BigDecimalUtil.toString(tempStockHistory.getClosingPrice()));
             }
-            historyTen10VoList.add(historyTen10Vo);
+            historyRelationVoList.add(historyRelationVo);
         }
-        stockTen10Vo.setTen10List(historyTen10VoList);
-        return stockTen10Vo;
+        stockRelationVo.setDetailList(historyRelationVoList);
+        return stockRelationVo;
     }
 
     /**

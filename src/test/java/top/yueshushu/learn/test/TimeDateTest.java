@@ -10,6 +10,7 @@ import top.yueshushu.learn.business.JobInfoBusiness;
 import top.yueshushu.learn.helper.DateHelper;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * 日期测试
@@ -36,10 +37,15 @@ public class TimeDateTest {
 
     @Test
     public void execJob() throws Exception {
-
         jobInfoBusiness.handlerById(5);
-
-
         System.in.read();
+    }
+
+    @Test
+    public void betweenWorkDayTest() {
+        String startDate = "2023-02-01";
+        String endDate = "2023-02-24";
+        List<String> dateList = dateHelper.betweenWorkDay(startDate, endDate);
+        log.info(">>> 日期: {}", dateList);
     }
 }

@@ -1,6 +1,4 @@
 package top.yueshushu.learn.mapper;
-
-import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 import top.yueshushu.learn.domain.StockHistoryDo;
@@ -38,8 +36,8 @@ public interface StockHistoryDoMapper extends BaseMapper<StockHistoryDo> {
      * @return 查询股票的历史交易记录
      */
     List<StockHistoryDo> listStockHistoryAndDateDesc(@Param("code") String code,
-                                                     @Param("startDate") DateTime startDate,
-                                                     @Param("endDate") DateTime endDate);
+                                                     @Param("startDate") Date startDate,
+                                                     @Param("endDate") Date endDate);
 
     /**
      * 查询股票的历史交易记录,按照时间升序.
@@ -50,8 +48,8 @@ public interface StockHistoryDoMapper extends BaseMapper<StockHistoryDo> {
      * @return 查询股票的历史交易记录
      */
     List<StockHistoryDo> listStockHistoryAndDateAsc(@Param("code") String code,
-                                                    @Param("startDate") DateTime startDate,
-                                                    @Param("endDate") DateTime endDate);
+                                                    @Param("startDate") Date startDate,
+                                                    @Param("endDate") Date endDate);
 
     /**
      * 获取股票那一天的信息
@@ -80,7 +78,7 @@ public interface StockHistoryDoMapper extends BaseMapper<StockHistoryDo> {
      * @return 查询该股票最近十天的交易信息记录
      */
     List<StockHistoryDo> limit10Desc(@Param("code") String code,
-                                     @Param("currDate") DateTime currDate);
+                                     @Param("currDate") Date currDate);
 
     /**
      * 根据股票的编码和日期，获取距离这一天最近的股票历史记录数据。
@@ -89,7 +87,7 @@ public interface StockHistoryDoMapper extends BaseMapper<StockHistoryDo> {
      * @param endDate 最近的记录日期
      * @return 根据股票的编码和日期，获取距离这一天最近的股票历史记录数据。
      */
-    StockHistoryDo getRecentyHistoryBeforeDate(@Param("code") String code, @Param("endDate") DateTime endDate);
+    StockHistoryDo getRecentyHistoryBeforeDate(@Param("code") String code, @Param("endDate") Date endDate);
 
     /**
      * 查询天范围统计的历史记录对象
@@ -117,8 +115,8 @@ public interface StockHistoryDoMapper extends BaseMapper<StockHistoryDo> {
      * @param startDate 开始日期
      * @param endDate   结束日期
      */
-    List<String> listDate(@Param("code") String code, @Param("startDate") DateTime startDate,
-                          @Param("endDate") DateTime endDate);
+    List<String> listDate(@Param("code") String code, @Param("startDate") Date startDate,
+                          @Param("endDate") Date endDate);
 
     /**
      * 删除历史记录信息
@@ -126,7 +124,7 @@ public interface StockHistoryDoMapper extends BaseMapper<StockHistoryDo> {
      * @param codeList    股票编码集合
      * @param currentDate 要删除的日期
      */
-    void deleteHasAsyncData(@Param("codeList") List<String> codeList, @Param("currentDate") DateTime currentDate);
+    void deleteHasAsyncData(@Param("codeList") List<String> codeList, @Param("currentDate") Date currentDate);
 
     /**
      * 获取最大的日期信息

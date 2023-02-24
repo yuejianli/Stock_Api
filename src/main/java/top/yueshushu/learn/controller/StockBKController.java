@@ -14,6 +14,7 @@ import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.crawler.entity.BKMoneyInfo;
 import top.yueshushu.learn.enumtype.DBStockType;
 import top.yueshushu.learn.mode.ro.StockBKMoneyStatRo;
+import top.yueshushu.learn.mode.vo.DistVo;
 import top.yueshushu.learn.mode.vo.StockBKVo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.response.PageResponse;
@@ -60,7 +61,7 @@ public class StockBKController {
     @ApiOperation("查询所有的版块资金类型")
     @PostMapping("/listMoneyType")
     @AuthToken
-    public OutputResult<List<StockBKVo>> listMoneyType(@RequestBody StockBKMoneyStatRo stockBKMoneyStatRo) {
+    public OutputResult<List<DistVo>> listMoneyType(@RequestBody StockBKMoneyStatRo stockBKMoneyStatRo) {
         return bkBusiness.listMoneyType();
     }
 
@@ -141,7 +142,7 @@ public class StockBKController {
         }
 
         if (!StringUtils.hasText(stockBKMoneyStatRo.getStartDate())) {
-            Date startDate = DateUtil.offsetDay(now, -15);
+            Date startDate = DateUtil.offsetDay(now, -14);
             stockBKMoneyStatRo.setStartDate(DateUtil.format(startDate, Const.SIMPLE_DATE_FORMAT));
         }
     }

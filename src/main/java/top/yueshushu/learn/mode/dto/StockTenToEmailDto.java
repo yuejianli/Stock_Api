@@ -1,7 +1,7 @@
 package top.yueshushu.learn.mode.dto;
 
 import lombok.Data;
-import top.yueshushu.learn.mode.vo.ten10stat.StockTen10Vo;
+import top.yueshushu.learn.mode.vo.ten10stat.StockRelationVo;
 
 import java.io.Serializable;
 import java.util.List;
@@ -28,7 +28,7 @@ public class StockTenToEmailDto implements Serializable {
     /**
      * 最近10天的数据
      */
-    private List<StockTen10Vo> dataList;
+    private List<StockRelationVo> dataList;
     /**
      * 分隔符
      */

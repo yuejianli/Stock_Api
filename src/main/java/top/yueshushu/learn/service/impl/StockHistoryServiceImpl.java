@@ -1,6 +1,5 @@
 package top.yueshushu.learn.service.impl;
 
-import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -97,7 +96,7 @@ public class StockHistoryServiceImpl  implements StockHistoryService {
     }
 
     @Override
-    public StockHistoryVo getVoByCodeAndCurrDate(String code, DateTime currDate) {
+    public StockHistoryVo getVoByCodeAndCurrDate(String code, Date currDate) {
         return stockHistoryAssembler.entityToVo(
                 stockHistoryAssembler.doToEntity(
                         stockHistoryDomainService.getByCodeAndCurrDate(
@@ -108,7 +107,7 @@ public class StockHistoryServiceImpl  implements StockHistoryService {
     }
 
     @Override
-    public List<StockHistory> limit10Desc(String stockCode, DateTime lastDay) {
+    public List<StockHistory> limit10Desc(String stockCode, Date lastDay) {
         List<StockHistoryDo> stockHistoryDoList = stockHistoryDomainService.limit10Desc(stockCode, lastDay);
         if (CollectionUtils.isEmpty(stockHistoryDoList)) {
             return Collections.EMPTY_LIST;
@@ -123,7 +122,7 @@ public class StockHistoryServiceImpl  implements StockHistoryService {
     }
 
     @Override
-    public StockHistoryVo getRecentyHistoryBeforeDate(String code, DateTime endDate) {
+    public StockHistoryVo getRecentyHistoryBeforeDate(String code, Date endDate) {
         //将日期变成这一天的最后时刻
         endDate = DateUtil.endOfDay(endDate);
         return stockHistoryAssembler.entityToVo(
@@ -136,17 +135,17 @@ public class StockHistoryServiceImpl  implements StockHistoryService {
     }
 
     @Override
-    public List<StockHistoryVo> getStockHistoryByCodeAndRangeDate(String code, DateTime startDate, DateTime endDate) {
+    public List<StockHistoryVo> getStockHistoryByCodeAndRangeDate(String code, Date startDate, Date endDate) {
         //将开始日期变成 上一天的最后时刻
         startDate = DateUtil.endOfDay(
                 DateUtil.offsetDay(
-                        startDate,-1
+                        startDate, -1
                 )
         );
         //将结束日期变成这一天的最后时刻
         endDate = DateUtil.endOfDay(endDate);
-        List<StockHistoryDo> stockHistoryDoList= stockHistoryDomainService.listStockHistoryAndDateAsc(
-                code, startDate,endDate);
+        List<StockHistoryDo> stockHistoryDoList = stockHistoryDomainService.listStockHistoryAndDateAsc(
+                code, startDate, endDate);
 
         if (CollectionUtils.isEmpty(stockHistoryDoList)){
            return Collections.emptyList();

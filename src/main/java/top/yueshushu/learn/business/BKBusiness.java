@@ -5,10 +5,7 @@ import top.yueshushu.learn.crawler.entity.BKMoneyInfo;
 import top.yueshushu.learn.enumtype.BKType;
 import top.yueshushu.learn.enumtype.DBStockType;
 import top.yueshushu.learn.mode.ro.StockBKMoneyStatRo;
-import top.yueshushu.learn.mode.vo.StockBKMoneyHistoryVo;
-import top.yueshushu.learn.mode.vo.StockBKVo;
-import top.yueshushu.learn.mode.vo.StockBkStockVo;
-import top.yueshushu.learn.mode.vo.StockBkTopVo;
+import top.yueshushu.learn.mode.vo.*;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.response.PageResponse;
 
@@ -101,7 +98,7 @@ public interface BKBusiness {
     /**
      * 查询所有的版块资金类型
      */
-    OutputResult<List<StockBKVo>> listMoneyType();
+    OutputResult<List<DistVo>> listMoneyType();
 
     /**
      * 同步 版块,概念 和地域,及其今日的资金流动情况

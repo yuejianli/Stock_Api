@@ -283,21 +283,34 @@ public class DefaultExtCrawlerServiceImpl implements ExtCrawlerService {
         if (null == currentDate) {
             currentDate = DateUtil.date();
         }
-        //根据不同的类型，获取相应的 url
-        String url = getRealUrlByPoolType(stockPoolType, currentDate);
         try {
-            //获取内容
-            String content = restTemplate.getForObject(url, String.class);
-            content = content.substring(CB_POOL.length() + 1);
-            content = content.substring(0, content.length() - 2);
-            return stockInfoParser.parsePoolInfoList(content, stockPoolType, currentDate);
+
+            boolean stopSearch = false;
+            int page = 0;
+            List<StockPoolInfo> allResultList = new ArrayList<>();
+            do {
+                //根据不同的类型，获取相应的 url
+                String url = getRealUrlByPoolType(stockPoolType, currentDate, page);
+                //获取内容
+                String content = restTemplate.getForObject(url, String.class);
+                content = content.substring(CB_POOL.length() + 1);
+                content = content.substring(0, content.length() - 2);
+                List<StockPoolInfo> stockPoolInfos = stockInfoParser.parsePoolInfoList(content, stockPoolType, currentDate);
+                if (!CollectionUtils.isEmpty(stockPoolInfos)) {
+                    allResultList.addAll(stockPoolInfos);
+                    page++;
+                } else {
+                    stopSearch = true;
+                }
+            } while (!stopSearch);
+            return allResultList;
         } catch (Exception e) {
             log.error("获取 股票池 {} 列表出错", stockPoolType.getDesc(), e);
             return Collections.emptyList();
         }
     }
 
-    private String getRealUrlByPoolType(StockPoolType stockPoolType, Date currentDate) {
+    private String getRealUrlByPoolType(StockPoolType stockPoolType, Date currentDate, Integer page) {
         String url = "";
         switch (stockPoolType) {
             case ZT: {
@@ -329,6 +342,6 @@ public class DefaultExtCrawlerServiceImpl implements ExtCrawlerService {
             }
         }
         String date = DateUtil.format(currentDate, DatePattern.PURE_DATE_PATTERN);
-        return MessageFormat.format(url, CB_POOL, date);
+        return MessageFormat.format(url, CB_POOL, date, page);
     }
 }

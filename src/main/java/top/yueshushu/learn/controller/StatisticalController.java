@@ -55,6 +55,13 @@ public class StatisticalController extends BaseController {
         return statBusiness.getTenTradeDay();
     }
 
+    @ApiOperation("查询最近几天的交易日信息")
+    @PostMapping("/getTradeDay")
+    @AuthToken
+    public OutputResult getTradeDay(@RequestBody StockStatRo stockStatRo) {
+        return statBusiness.getTradeDay(stockStatRo);
+    }
+
     @ApiOperation("查询当前用户自选表里面最近十天的交易信息")
     @PostMapping("/getTenTradeData")
     @AuthToken

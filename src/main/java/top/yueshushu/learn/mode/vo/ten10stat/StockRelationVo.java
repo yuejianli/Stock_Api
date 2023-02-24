@@ -13,12 +13,12 @@ import java.util.List;
  * @Date 2022/6/5 7:35
  **/
 @Data
-@ApiModel("股票最近十天交易信息Vo")
-public class StockTen10Vo implements Serializable {
+@ApiModel("股票最近交易信息Vo")
+public class StockRelationVo implements Serializable {
     @ApiModelProperty("股票编码")
     private String code;
     @ApiModelProperty("股票名称")
     private String name;
     @ApiModelProperty("涨跌信息")
-    private List<HistoryTen10Vo> ten10List;
+    private List<HistoryRelationVo> detailList;
 }

@@ -1,15 +1,16 @@
 package top.yueshushu.learn.helper;
 
+import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.service.cache.HolidayCalendarCacheService;
 
 import javax.annotation.Resource;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @Description 日期帮助类
@@ -142,5 +143,51 @@ public class DateHelper {
         Date date15 = calendar.getTime();
 
         return date.before(date15) && date.after(date13);
+    }
+
+    /**
+     * 开始和结束日期之间，总共多少个工作日。
+     *
+     * @param startDateStr 开始日期
+     * @param endDateStr   结束日期
+     */
+    public List<String> betweenWorkDay(String startDateStr, String endDateStr) {
+        if (!(StringUtils.hasText(startDateStr) && StringUtils.hasText(endDateStr))) {
+            return Collections.emptyList();
+        }
+        Date startDate = DateUtil.parse(startDateStr);
+        Date endDate = DateUtil.endOfDay(DateUtil.parse(endDateStr, DatePattern.NORM_DATE_PATTERN));
+        List<Date> dateList = betweenWorkDay(startDate, endDate);
+        if (CollectionUtils.isEmpty(dateList)) {
+            return Collections.emptyList();
+        }
+        List<String> result = new ArrayList<>();
+        dateList.forEach(
+                n -> {
+                    result.add(DateUtil.format(n, Const.SIMPLE_DATE_FORMAT));
+                }
+        );
+        return result;
+    }
+
+    /**
+     * 开始和结束日期之间，总共多少个工作日。
+     *
+     * @param startDate 开始日期
+     * @param endDate   结束日期
+     */
+    public List<Date> betweenWorkDay(Date startDate, Date endDate) {
+        if (!(startDate != null && endDate != null)) {
+            return Collections.emptyList();
+        }
+        List<Date> result = new ArrayList<>();
+        while (endDate.after(startDate)) {
+            // startDate 进行加1
+            if (isWorkingDay(startDate)) {
+                result.add(DateUtil.beginOfDay(startDate));
+            }
+            startDate = DateUtil.offsetDay(startDate, 1);
+        }
+        return result;
     }
 }
