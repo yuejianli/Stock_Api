@@ -53,8 +53,8 @@
             #foreach($stockInfo in ${dataList})
                 <tr>
                     <td>${stockInfo.code} ${line} ${stockInfo.name}</td>
-                    #if(${stockInfo.ten10List})
-                        #foreach($ten10Vo in ${stockInfo.ten10List})
+                    #if(${stockInfo.detailList})
+                        #foreach($ten10Vo in ${stockInfo.detailList})
                             <td>
                                 #if(${ten10Vo.type} ==1)
                                     <span style="color:red;">↑ </span>
