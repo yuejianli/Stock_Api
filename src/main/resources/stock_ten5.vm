@@ -59,15 +59,15 @@
                                 #if(${ten10Vo.type} ==1)
                                     <span style="color:red;">↑ </span>
                                     ${line}
-                                    ${ten10Vo.amplitudeProportion}
+                                    <span style="color:red;">${ten10Vo.amplitudeProportion} </span>
                                 #elseif(${ten10Vo.type} ==-1)
                                     <span style="color:green;">↓ </span>
                                     ${line}
-                                    ${ten10Vo.amplitudeProportion}
+                                    <span style="color:green;">${ten10Vo.amplitudeProportion} </span>
                                 #elseif(${ten10Vo.type} ==0)
                                     <span style="color:#999999;">↑ </span>
                                     ${line}
-                                    ${ten10Vo.amplitudeProportion}
+                                    <span style="color:#999999;">${ten10Vo.amplitudeProportion} </span>
                                 #else
                                     <span style="color:pink;"> </span>
                                     ${line}

@@ -133,13 +133,13 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
         }
         //是获取股票实时价格的任务，并且是自动运行。 非时间，不执行。
         if ((JobInfoType.STOCK_PRICE.equals(jobInfoType) || JobInfoType.DB_STOCK_TRADE.equals(jobInfoType)) && EntrustType.AUTO.getCode().equals(triggerType)) {
-            if (!MyDateUtil.isWorkingTime() || !dateHelper.isWorkingDay(DateUtil.date())) {
+            if (!dateHelper.isWorkingDay(DateUtil.date()) || !MyDateUtil.isPriceTime()) {
                 return OutputResult.buildSucc();
             }
         }
         //是获取股票保存价格的任务，并且是自动运行。 非时间，不执行。
         if (JobInfoType.STOCK_PRICE_SAVE.equals(jobInfoType) && EntrustType.AUTO.getCode().equals(triggerType)) {
-            if (!MyDateUtil.isDealTime() || !dateHelper.isWorkingDay(DateUtil.date())) {
+            if (!dateHelper.isWorkingDay(DateUtil.date()) || !MyDateUtil.isDealTime()) {
                 return OutputResult.buildSucc();
             }
         }

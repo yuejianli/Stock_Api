@@ -20,6 +20,7 @@ import java.util.Date;
  **/
 public class MyDateUtil {
     private static LocalTime MORNING_START_TIME = LocalTime.parse("09:20:00");
+    private static LocalTime MORNING_PRICE_START_TIME = LocalTime.parse("09:15:00");
     private static LocalTime MORNING_START_DEAL_TIME = LocalTime.parse("09:30:00");
     private static LocalTime MORNING_END_TIME = LocalTime.parse("11:30:05");
 
@@ -77,6 +78,18 @@ public class MyDateUtil {
         return false;
     }
 
+
+    /**
+     * 是否是 9点 15到 11:30 的时间
+     */
+    public static boolean isPrice() {
+        LocalTime now = LocalTime.now();
+        if (now.isAfter(MORNING_PRICE_START_TIME) && now.isBefore(MORNING_END_TIME)) {
+            return true;
+        }
+        return false;
+    }
+
     /**
      * 是否是 9点 30 到 11:30 的时间
      */
@@ -107,6 +120,15 @@ public class MyDateUtil {
      */
     public static boolean isWorkingTime() {
         return isMorning() || isAfternoon();
+    }
+
+    /**
+     * 当前时间是否 9点20 到 15点之间
+     *
+     * @return
+     */
+    public static boolean isPriceTime() {
+        return isPrice() || isAfternoon();
     }
 
     /**
