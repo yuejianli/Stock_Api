@@ -70,10 +70,8 @@ public class StockHistoryServiceImpl  implements StockHistoryService {
                     );
                 }
         );
-
-        PageInfo pageInfo=new PageInfo<>(pageResultList);
         return OutputResult.buildSucc(new PageResponse<>(
-                pageGithubResult.getTotal(),pageInfo.getList()
+                pageGithubResult.getTotal(), pageResultList
         ));
     }
 

@@ -2,10 +2,8 @@ package top.yueshushu.learn.extension.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import top.yueshushu.learn.entity.TradeMethod;
 import top.yueshushu.learn.extension.assembler.ExtInterfaceAssembler;
 import top.yueshushu.learn.extension.domain.ExtInterfaceDo;
 import top.yueshushu.learn.extension.domainservice.ExtInterfaceDomainService;
@@ -47,8 +45,6 @@ public class ExtInterfaceServiceImpl implements ExtInterfaceService {
                     pageResultList.add(extInterfaceAssembler.doToEntity(n));
                 }
         );
-        PageInfo pageInfo = new PageInfo<>(pageResultList);
-        return OutputResult.buildSucc(new PageResponse<TradeMethod>(pageGithubResult.getTotal(),
-                pageInfo.getList()));
+        return OutputResult.buildSucc(new PageResponse<>(pageGithubResult.getTotal(), pageResultList));
     }
 }

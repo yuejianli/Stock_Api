@@ -2,7 +2,6 @@ package top.yueshushu.learn.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -62,9 +61,7 @@ public class StockServiceImpl implements StockService {
                     );
                 }
         );
-        PageInfo pageInfo=new PageInfo<StockVo>(pageResultList);
-        return OutputResult.buildSucc(new PageResponse<StockVo>(pageGithubResult.getTotal(),
-                pageInfo.getList()));
+        return OutputResult.buildSucc(new PageResponse<>(pageGithubResult.getTotal(), pageResultList));
     }
     @Override
     public Stock selectByCode(String code) {

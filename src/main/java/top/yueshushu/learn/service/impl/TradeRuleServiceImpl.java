@@ -3,7 +3,6 @@ package top.yueshushu.learn.service.impl;
 import cn.hutool.core.date.DateUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -68,9 +67,7 @@ public class TradeRuleServiceImpl implements TradeRuleService {
             return OutputResult.buildSucc(PageResponse.emptyPageResponse());
         }
         List<TradeRuleVo> pageResultList = convertVo(tradeRuleDoList);
-
-        PageInfo pageInfo = new PageInfo<>(pageResultList);
-        return OutputResult.buildSucc(new PageResponse<TradeRuleVo>(pageGithubResult.getTotal(), pageInfo.getList()));
+        return OutputResult.buildSucc(new PageResponse<>(pageGithubResult.getTotal(), pageResultList));
     }
 
     /**

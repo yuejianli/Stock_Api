@@ -1,7 +1,7 @@
 package top.yueshushu.learn.service.impl;
 
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.cache.annotation.CacheEvict;
@@ -43,7 +43,7 @@ public class HolidayCalendarServiceImpl implements HolidayCalendarService {
     private RestTemplate restTemplate;
     @Override
     public OutputResult listHoliday(HolidayRo holidayRo) {
-        PageHelper.startPage(holidayRo.getPageNum(),holidayRo.getPageSize());
+        Page<Object> pageInfo = PageHelper.startPage(holidayRo.getPageNum(), holidayRo.getPageSize());
         List<HolidayCalendarDo> holidayCalendarDoList = holidayCalendarDomainService.listByYear(holidayRo.getYear());
         if (CollectionUtils.isEmpty(holidayCalendarDoList)){
             return OutputResult.buildSucc(
@@ -63,9 +63,7 @@ public class HolidayCalendarServiceImpl implements HolidayCalendarService {
                     );
                 }
         );
-        PageInfo pageInfo=new PageInfo<>(pageResultList);
-        return OutputResult.buildSucc(new PageResponse<HolidayCalendarVo>(pageInfo.getTotal(),
-                pageInfo.getList()));
+        return OutputResult.buildSucc(new PageResponse<>(pageInfo.getTotal(), pageResultList));
 
 
     }

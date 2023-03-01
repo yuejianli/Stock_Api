@@ -65,7 +65,7 @@ public class CacheServiceImpl implements CacheService {
         }
         List<CacheVo> list = PageUtil.startPage(cacheVoList, cacheRo.getPageNum(),
                 cacheRo.getPageSize());
-        return OutputResult.buildSucc(new PageResponse<CacheVo>((long) cacheVoList.size(),
+        return OutputResult.buildSucc(new PageResponse<>((long) cacheVoList.size(),
                 list));
     }
 

@@ -3,7 +3,6 @@ package top.yueshushu.learn.service.impl;
 import cn.hutool.core.date.DateUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import top.yueshushu.learn.assembler.StockUpdateLogAssembler;
@@ -57,10 +56,6 @@ public class StockUpdateLogServiceImpl implements StockUpdateLogService {
                     );
                 }
         );
-
-        PageInfo<StockUpdateLogVo> pageInfo = new PageInfo<>(pageResultList);
-        return OutputResult.buildSucc(new PageResponse<>(
-                pageGithubResult.getTotal(),pageInfo.getList()
-        ));
+        return OutputResult.buildSucc(new PageResponse<>(pageGithubResult.getTotal(), pageResultList));
     }
 }

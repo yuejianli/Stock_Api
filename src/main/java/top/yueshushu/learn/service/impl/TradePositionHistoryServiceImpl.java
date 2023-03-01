@@ -1,19 +1,11 @@
 package top.yueshushu.learn.service.impl;
 
+import cn.hutool.core.date.DateUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
-
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.Resource;
-
-import cn.hutool.core.date.DateUtil;
-import lombok.extern.slf4j.Slf4j;
 import top.yueshushu.learn.assembler.TradePositionHistoryAssembler;
 import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.domain.TradePositionHistoryDo;
@@ -23,6 +15,10 @@ import top.yueshushu.learn.mode.vo.TradePositionHistoryVo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.response.PageResponse;
 import top.yueshushu.learn.service.TradePositionHistoryService;
+
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>
@@ -66,10 +62,6 @@ public class TradePositionHistoryServiceImpl implements TradePositionHistoryServ
                     );
                 }
         );
-
-        PageInfo pageInfo=new PageInfo<>(pageResultList);
-        return OutputResult.buildSucc(new PageResponse<>(
-                pageGithubResult.getTotal(),pageInfo.getList()
-        ));
+        return OutputResult.buildSucc(new PageResponse<>(pageGithubResult.getTotal(), pageResultList));
     }
 }

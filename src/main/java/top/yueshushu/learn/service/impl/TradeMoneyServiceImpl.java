@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import top.yueshushu.learn.api.TradeResultVo;
 import top.yueshushu.learn.api.request.GetAssetsRequest;
 import top.yueshushu.learn.api.response.GetAssetsResponse;
-import top.yueshushu.learn.api.responseparse.DataObjResponseParser;
 import top.yueshushu.learn.api.responseparse.ResponseParser;
 import top.yueshushu.learn.assembler.TradeMoneyAssembler;
 import top.yueshushu.learn.assembler.TradeMoneyHistoryAssembler;
@@ -51,8 +50,6 @@ import java.util.concurrent.TimeUnit;
 public class TradeMoneyServiceImpl implements TradeMoneyService {
     @Resource
     private TradeMoneyDomainService tradeMoneyDomainService;
-    @Resource
-    private DataObjResponseParser dataObjResponseParser;
     @Resource
     private TradeUtil tradeUtil;
     @Resource

@@ -1,8 +1,8 @@
 package top.yueshushu.learn.extension.service.impl;
 
 import cn.hutool.core.date.DateUtil;
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -16,7 +16,6 @@ import top.yueshushu.learn.extension.entity.ExtJobInfo;
 import top.yueshushu.learn.extension.model.ro.ExtJobInfoRo;
 import top.yueshushu.learn.extension.model.vo.ExtJobInfoVo;
 import top.yueshushu.learn.extension.service.ExtJobInfoService;
-import top.yueshushu.learn.mode.vo.JobInfoVo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.response.PageResponse;
 
@@ -40,7 +39,7 @@ public class ExtJobInfoServiceImpl implements ExtJobInfoService {
 
     @Override
     public OutputResult pageJob(ExtJobInfoRo extJobInfoRo) {
-        PageHelper.startPage(extJobInfoRo.getPageNum(), extJobInfoRo.getPageSize());
+        Page<Object> pageInfo = PageHelper.startPage(extJobInfoRo.getPageNum(), extJobInfoRo.getPageSize());
         List<ExtJobInfoDo> jobInfoList = extJobInfoDomainService.list();
         if (CollectionUtils.isEmpty(jobInfoList)) {
             return OutputResult.buildSucc(
@@ -53,8 +52,7 @@ public class ExtJobInfoServiceImpl implements ExtJobInfoService {
                     pageResultList.add(extJobInfoAssembler.entityToVo(extJobInfoAssembler.doToEntity(n)));
                 }
         );
-        PageInfo pageInfo = new PageInfo<>(pageResultList);
-        return OutputResult.buildSucc(new PageResponse<JobInfoVo>(pageInfo.getTotal(), pageInfo.getList()));
+        return OutputResult.buildSucc(new PageResponse<>(pageInfo.getTotal(), pageResultList));
 
     }
 

@@ -3,7 +3,6 @@ package top.yueshushu.learn.extension.service.impl;
 import cn.hutool.core.date.DateUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import top.yueshushu.learn.common.Const;
@@ -52,9 +51,7 @@ public class ExtCustomerServiceImpl implements ExtCustomerService {
                     pageResultList.add(extCustomerAssembler.entityToVo(extCustomerAssembler.doToEntity(n)));
                 }
         );
-        PageInfo pageInfo = new PageInfo<>(pageResultList);
-        return OutputResult.buildSucc(new PageResponse<>(pageGithubResult.getTotal(),
-                pageInfo.getList()));
+        return OutputResult.buildSucc(new PageResponse<>(pageGithubResult.getTotal(), pageResultList));
     }
 
     @Override

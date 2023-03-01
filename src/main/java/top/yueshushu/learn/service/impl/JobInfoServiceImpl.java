@@ -1,8 +1,8 @@
 package top.yueshushu.learn.service.impl;
 
 import cn.hutool.core.date.DateUtil;
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -38,7 +38,7 @@ public class JobInfoServiceImpl implements JobInfoService {
 
     @Override
     public OutputResult pageJob(JobInfoRo jobInfoRo) {
-        PageHelper.startPage(jobInfoRo.getPageNum(), jobInfoRo.getPageSize());
+        Page<Object> pageInfo = PageHelper.startPage(jobInfoRo.getPageNum(), jobInfoRo.getPageSize());
         List<JobInfoDo> jobInfoList = jobInfoDomainService.list();
         if (CollectionUtils.isEmpty(jobInfoList)) {
             return OutputResult.buildSucc(
@@ -51,8 +51,7 @@ public class JobInfoServiceImpl implements JobInfoService {
                     pageResultList.add(jobInfoAssembler.entityToVo(jobInfoAssembler.doToEntity(n)));
                 }
         );
-        PageInfo pageInfo = new PageInfo<>(pageResultList);
-        return OutputResult.buildSucc(new PageResponse<JobInfoVo>(pageInfo.getTotal(), pageInfo.getList()));
+        return OutputResult.buildSucc(new PageResponse<>(pageInfo.getTotal(), pageResultList));
 
     }
 
