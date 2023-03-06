@@ -166,16 +166,8 @@ public class ConfigServiceImpl implements ConfigService {
         if (null == configDo) {
             return OutputResult.buildAlert(ResultCode.CONFIG_ID_NO_EXIST);
         }
-        //获取对应的code信息
-        ConfigDo userConfigDo = configDomainService.getByUserIdAndCode(
-                configRo.getUserId(), configDo.getCode()
-        );
-        if (null == userConfigDo){
-            return OutputResult.buildAlert(ResultCode.CONFIG_IS_DEFAULT);
-        }
-        configDomainService.removeById(userConfigDo.getId());
-        //删除
-        return OutputResult.buildSucc();
+        configRo.setCodeValue(configDo.getCodeValue());
+        return update(configRo);
     }
 
     @Override

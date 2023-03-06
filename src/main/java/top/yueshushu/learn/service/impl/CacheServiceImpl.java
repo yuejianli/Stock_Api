@@ -3,6 +3,7 @@ package top.yueshushu.learn.service.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.mode.ro.CacheRo;
@@ -16,6 +17,7 @@ import top.yueshushu.learn.util.RedisUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @ClassName:CacheServiceImpl
@@ -33,40 +35,39 @@ public class CacheServiceImpl implements CacheService {
     @Override
     public OutputResult listCache(CacheRo cacheRo) {
         //如果没有关键字，就查询全部
-        String keyPrefix = getKeyPrefix(cacheRo.getUserId(),cacheRo.getType());
+        String keyPrefix = getKeyPrefix(cacheRo.getUserId(), cacheRo.getType());
         //如果有关键字匹配
         Set<String> keys = redisUtil.getKeys(keyPrefix + "*");
-        String keyword = cacheRo.getKey();
-        boolean isPattern = StringUtils.hasText(keyword) ? true : false;
+        if (CollectionUtils.isEmpty(keys)) {
+            return OutputResult.buildSucc(PageResponse.emptyPageResponse());
+        }
+        String keyword = cacheRo.getKeyword();
         //获取所有的key 信息
         List<CacheVo> cacheVoList = new ArrayList<>();
-        for (String key : keys) {
+
+        List<String> sortKeyList = keys.stream().sorted().collect(Collectors.toList());
+
+        for (String key : sortKeyList) {
             //如果有关键字，就匹配一下,截取后面的值信息.
             String subKey = key.substring(keyPrefix.length());
-            if (isPattern) {
-                //不包含的话，不查询
-                if (!subKey.contains(keyword)) {
-                    continue;
-                }
+            if (StringUtils.hasText(keyword) && !subKey.contains(keyword)) {
+                continue;
             }
             //获取相关的信息
-            try{
+            try {
                 String value = redisUtil.get(key).toString();
-
                 CacheVo cacheVo = new CacheVo();
                 cacheVo.setKey(subKey);
                 cacheVo.setValue(value);
                 cacheVoList.add(cacheVo);
-            }catch (Exception e){
-                log.error(">>>查询时，出现异常:",e);
+            } catch (Exception e) {
+                log.error(">>>查询时，出现异常:", e);
                 continue;
             }
-
         }
         List<CacheVo> list = PageUtil.startPage(cacheVoList, cacheRo.getPageNum(),
                 cacheRo.getPageSize());
-        return OutputResult.buildSucc(new PageResponse<>((long) cacheVoList.size(),
-                list));
+        return OutputResult.buildSucc(new PageResponse<>((long) cacheVoList.size(), list));
     }
 
     private String getKeyPrefix(Integer userId, Integer type) {
