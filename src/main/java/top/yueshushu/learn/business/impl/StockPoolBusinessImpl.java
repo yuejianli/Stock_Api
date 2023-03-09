@@ -113,6 +113,9 @@ public class StockPoolBusinessImpl implements StockPoolBusiness {
                 // 获取 codeList
                 List<String> codeList = poolZtList.stream().map(StockPoolInfo::getCode).collect(Collectors.toList());
                 stockCacheService.setYesZtCodeList(codeList);
+
+                String velocityContent = emailService.getVelocityContent(VelocityTemplateType.POOL, dataMap);
+                weChatService.sendTextMessage(null, velocityContent);
             }
             List<StockPoolInfo> poolDtList = extCrawlerService.findPoolByType(StockPoolType.DT, date);
             if (!CollectionUtils.isEmpty(poolDtList)) {
@@ -120,6 +123,10 @@ public class StockPoolBusinessImpl implements StockPoolBusiness {
                 stockPoolHistoryService.savePoolHistory(poolDtList);
                 // 获取所有的 股票编号和密码组装的信息
                 dataMap.put("dtCodeList", poolDtList);
+                dataMap.remove("ztCodeList");
+
+                String velocityContent = emailService.getVelocityContent(VelocityTemplateType.POOL, dataMap);
+                weChatService.sendTextMessage(null, velocityContent);
             }
             List<StockPoolInfo> poolCxList = extCrawlerService.findPoolByType(StockPoolType.CX, date);
             if (!CollectionUtils.isEmpty(poolCxList)) {
@@ -127,6 +134,12 @@ public class StockPoolBusinessImpl implements StockPoolBusiness {
                 stockPoolHistoryService.savePoolHistory(poolCxList);
                 // 获取所有的 股票编号和密码组装的信息
                 dataMap.put("cxCodeList", poolCxList);
+
+                dataMap.remove("ztCodeList");
+                dataMap.remove("dtCodeList");
+
+                String velocityContent = emailService.getVelocityContent(VelocityTemplateType.POOL, dataMap);
+                weChatService.sendTextMessage(null, velocityContent);
             }
             List<StockPoolInfo> poolQsList = extCrawlerService.findPoolByType(StockPoolType.QS, date);
             if (!CollectionUtils.isEmpty(poolQsList)) {

@@ -11,7 +11,7 @@
  Target Server Version : 80022
  File Encoding         : 65001
 
- Date: 19/10/2022 16:23:07
+ Date: 08/03/2023 17:54:30
 */
 
 SET NAMES utf8mb4;
@@ -32,7 +32,7 @@ CREATE TABLE `config`
     `flag`        int                                                    NULL DEFAULT NULL COMMENT '是否删除 1为正常 0为删除',
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 15
+  AUTO_INCREMENT = 34
   CHARACTER SET = utf8
   COLLATE = utf8_general_ci COMMENT = '全局性系统配置'
   ROW_FORMAT = Dynamic;
@@ -71,7 +71,7 @@ CREATE TABLE `ext_customer_job`
     `create_time`      timestamp(0) NULL DEFAULT NULL COMMENT '关联创建时间',
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 460
+  AUTO_INCREMENT = 470
   CHARACTER SET = utf8
   COLLATE = utf8_general_ci COMMENT = '扩展--用户关联任务匹配表'
   ROW_FORMAT = Dynamic;
@@ -174,7 +174,7 @@ CREATE TABLE `holiday_calendar`
     `date_type`    int  NULL DEFAULT NULL COMMENT '日期类型 1为交易日 2为周末 3为法定节假日',
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 63
+  AUTO_INCREMENT = 89
   CHARACTER SET = utf8
   COLLATE = utf8_general_ci COMMENT = '法定假期表(只写入法定的类型)'
   ROW_FORMAT = Dynamic;
@@ -203,7 +203,7 @@ CREATE TABLE `job_info`
     PRIMARY KEY (`id`) USING BTREE,
     UNIQUE INDEX `idx_job_info_1` (`code`) USING BTREE
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 13
+  AUTO_INCREMENT = 22
   CHARACTER SET = utf8
   COLLATE = utf8_general_ci
   ROW_FORMAT = Dynamic;
@@ -231,6 +231,27 @@ CREATE TABLE `menu`
   ROW_FORMAT = Dynamic;
 
 -- ----------------------------
+-- Table structure for reboot
+-- ----------------------------
+DROP TABLE IF EXISTS `reboot`;
+CREATE TABLE `reboot`
+(
+    `id`          int                                                     NOT NULL AUTO_INCREMENT COMMENT 'id编号',
+    `code`        varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL COMMENT '编码',
+    `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '描述信息',
+    `webhook`     varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+    `param`       varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '参数信息',
+    `status`      tinyint(1)                                              NOT NULL COMMENT '状态 1为启用 0为禁用',
+    `create_time` datetime(0)                                             NULL DEFAULT NULL COMMENT '创建时间',
+    `update_time` datetime(0)                                             NULL DEFAULT NULL COMMENT '更新时间',
+    PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB
+  AUTO_INCREMENT = 2
+  CHARACTER SET = utf8
+  COLLATE = utf8_general_ci
+  ROW_FORMAT = Dynamic;
+
+-- ----------------------------
 -- Table structure for role
 -- ----------------------------
 DROP TABLE IF EXISTS `role`;
@@ -244,7 +265,7 @@ CREATE TABLE `role`
     `flag`        int                                                     NULL DEFAULT NULL COMMENT '是否删除: 1为正常 0为删除',
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 2
+  AUTO_INCREMENT = 1
   CHARACTER SET = utf8
   COLLATE = utf8_general_ci COMMENT = '角色表'
   ROW_FORMAT = Dynamic;
@@ -284,9 +305,104 @@ CREATE TABLE `stock`
     INDEX `stock_code_IDX` (`code`) USING BTREE,
     INDEX `stock_full_code_IDX` (`full_code`) USING BTREE
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 16289
+  AUTO_INCREMENT = 16517
   CHARACTER SET = utf8
   COLLATE = utf8_general_ci COMMENT = '股票信息基本表'
+  ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for stock_big_deal
+-- ----------------------------
+DROP TABLE IF EXISTS `stock_big_deal`;
+CREATE TABLE `stock_big_deal`
+(
+    `id`             int                                                    NOT NULL AUTO_INCREMENT COMMENT '主键id',
+    `full_code`      varchar(8) CHARACTER SET utf8 COLLATE utf8_general_ci  NULL DEFAULT NULL COMMENT '股票全称编码',
+    `curr_date`      timestamp(0)                                           NULL DEFAULT NULL COMMENT '日期',
+    `tick_time`      varchar(15) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '时间',
+    `name`           varchar(80) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '股票名称',
+    `price`          decimal(6, 2)                                          NULL DEFAULT NULL COMMENT '股票价格',
+    `trading_volume` decimal(14, 2)                                         NULL DEFAULT NULL COMMENT '成交量(手)',
+    `trading_value`  decimal(18, 2)                                         NULL DEFAULT NULL COMMENT '成交金额',
+    `prev_price`     decimal(6, 2)                                          NULL DEFAULT NULL COMMENT '上一价格',
+    `kind`           char(1) CHARACTER SET utf8 COLLATE utf8_general_ci     NULL DEFAULT NULL COMMENT '种类',
+    PRIMARY KEY (`id`) USING BTREE,
+    INDEX `idx_stock_big_deal_1` (`full_code`, `curr_date`) USING BTREE
+) ENGINE = InnoDB
+  AUTO_INCREMENT = 3465
+  CHARACTER SET = utf8
+  COLLATE = utf8_general_ci COMMENT = '股票大单数据'
+  ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for stock_bk
+-- ----------------------------
+DROP TABLE IF EXISTS `stock_bk`;
+CREATE TABLE `stock_bk`
+(
+    `id`      int                                                    NOT NULL AUTO_INCREMENT COMMENT 'id',
+    `code`    varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '版块编码',
+    `name`    varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '版块名称',
+    `type`    int                                                    NULL DEFAULT 1 COMMENT '类型 1是版块 2是 概念 3是地域',
+    `hot_num` int                                                    NULL DEFAULT 0 COMMENT '热度',
+    PRIMARY KEY (`id`) USING BTREE,
+    INDEX `idx_stock_bk_1` (`code`) USING BTREE
+) ENGINE = InnoDB
+  AUTO_INCREMENT = 1439
+  CHARACTER SET = utf8
+  COLLATE = utf8_general_ci COMMENT = '股票版块信息'
+  ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for stock_bk_money_history
+-- ----------------------------
+DROP TABLE IF EXISTS `stock_bk_money_history`;
+CREATE TABLE `stock_bk_money_history`
+(
+    `id`                             int                                                     NOT NULL AUTO_INCREMENT COMMENT 'id编号',
+    `bk_code`                        varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci  NULL DEFAULT NULL COMMENT '版块编号',
+    `bk_name`                        varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci  NULL DEFAULT NULL COMMENT '版块名称',
+    `curr_date`                      timestamp(0)                                            NULL DEFAULT NULL COMMENT '当前日期',
+    `type`                           int                                                     NULL DEFAULT 1 COMMENT '类型 1是版块 2是 概念 3是地域',
+    `bk_now_price`                   decimal(10, 4)                                          NULL DEFAULT NULL COMMENT '最新价',
+    `bk_now_proportion`              varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci  NULL DEFAULT NULL COMMENT '版块涨跌比例',
+    `market`                         varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci  NULL DEFAULT NULL COMMENT '市场',
+    `today_main_inflow`              varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci  NULL DEFAULT NULL COMMENT '今日主力净注入净额',
+    `today_main_inflow_proportion`   varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci  NULL DEFAULT NULL COMMENT '今日主力净注入净额 占比',
+    `today_super_inflow`             varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci  NULL DEFAULT NULL COMMENT '今日 超大净注入净额',
+    `today_super_inflow_proportion`  varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci  NULL DEFAULT NULL COMMENT '今日 超大净注入净额 占比',
+    `today_more_inflow`              varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci  NULL DEFAULT NULL COMMENT '今日 大单净注入净额',
+    `today_more_inflow_proportion`   varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '今日 大单净注入净额 占比',
+    `today_middle_inflow`            varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '今日 中单净注入净额',
+    `today_middle_inflow_proportion` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '今日 中单净注入净额 占比',
+    `today_small_inflow`             varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '今日 小单净注入净额',
+    `today_small_inflow_proportion`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '今日 小单净注入净额 占比',
+    `today_main_inflow_code`         varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '今日主力净注入股票编码',
+    `today_main_inflow_name`         varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '今日主力净注入股票名称',
+    PRIMARY KEY (`id`) USING BTREE,
+    INDEX `idx_stock_bk_money_history_1` (`bk_code`, `curr_date`) USING BTREE
+) ENGINE = InnoDB
+  AUTO_INCREMENT = 12892
+  CHARACTER SET = utf8
+  COLLATE = utf8_general_ci COMMENT = '版块资金注入历史'
+  ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for stock_bk_stock
+-- ----------------------------
+DROP TABLE IF EXISTS `stock_bk_stock`;
+CREATE TABLE `stock_bk_stock`
+(
+    `id`         int                                                   NOT NULL AUTO_INCREMENT COMMENT 'id编号',
+    `stock_code` varchar(6) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '股票编号',
+    `bk_code`    varchar(8) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '版块编号',
+    PRIMARY KEY (`id`) USING BTREE,
+    INDEX `idx_stock_bk_stock_1` (`stock_code`) USING BTREE,
+    INDEX `idx_stock_bk_stock_2` (`bk_code`) USING BTREE
+) ENGINE = InnoDB
+  AUTO_INCREMENT = 19205
+  CHARACTER SET = utf8
+  COLLATE = utf8_general_ci COMMENT = '股票与股票版块关联表'
   ROW_FORMAT = Dynamic;
 
 -- ----------------------------
@@ -323,9 +439,48 @@ CREATE TABLE `stock_history`
     PRIMARY KEY (`id`) USING BTREE,
     UNIQUE INDEX `idx_stock_history_1` (`code`, `curr_date`) USING BTREE
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 20596
+  AUTO_INCREMENT = 73353
   CHARACTER SET = utf8
   COLLATE = utf8_general_ci COMMENT = '股票的历史交易记录表'
+  ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for stock_pool_history
+-- ----------------------------
+DROP TABLE IF EXISTS `stock_pool_history`;
+CREATE TABLE `stock_pool_history`
+(
+    `id`        int                                                     NOT NULL AUTO_INCREMENT COMMENT '主键编号',
+    `curr_date` timestamp(0)                                            NULL DEFAULT NULL COMMENT '当时日期',
+    `code`      varchar(6) CHARACTER SET utf8 COLLATE utf8_general_ci   NULL DEFAULT NULL COMMENT '股票编码',
+    `name`      varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '股票名称',
+    `type`      int                                                     NULL DEFAULT NULL COMMENT '类型 1 涨停 2 跌停 3 昨日涨停 4 强势 5 次新 6 炸板',
+    `amplitude` decimal(5, 3)                                           NULL DEFAULT NULL COMMENT '涨跌幅度',
+    PRIMARY KEY (`id`) USING BTREE,
+    INDEX `idx_stock_pool_history_1` (`curr_date`) USING BTREE,
+    INDEX `idx_stock_pool_history_2` (`code`) USING BTREE
+) ENGINE = InnoDB
+  AUTO_INCREMENT = 6712
+  CHARACTER SET = utf8
+  COLLATE = utf8_general_ci COMMENT = '股票池历史表'
+  ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for stock_price_history
+-- ----------------------------
+DROP TABLE IF EXISTS `stock_price_history`;
+CREATE TABLE `stock_price_history`
+(
+    `id`        int                                                   NOT NULL AUTO_INCREMENT COMMENT '主键编号',
+    `code`      varchar(6) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '股票编码',
+    `curr_time` timestamp(0)                                          NULL DEFAULT NULL COMMENT '时间',
+    `price`     decimal(10, 4)                                        NULL DEFAULT NULL COMMENT '价格',
+    PRIMARY KEY (`id`) USING BTREE,
+    INDEX `idx_stock_price_history_1` (`code`, `curr_time`) USING BTREE
+) ENGINE = InnoDB
+  AUTO_INCREMENT = 5012
+  CHARACTER SET = utf8
+  COLLATE = utf8_general_ci COMMENT = '股票的每分钟实时价格'
   ROW_FORMAT = Dynamic;
 
 -- ----------------------------
@@ -345,7 +500,7 @@ CREATE TABLE `stock_selected`
     `flag`        int                                                     NULL DEFAULT NULL COMMENT '1是正常0为删除',
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 34
+  AUTO_INCREMENT = 74
   CHARACTER SET = utf8
   COLLATE = utf8_general_ci COMMENT = '股票自选表,是用户自己选择的'
   ROW_FORMAT = Dynamic;
@@ -366,7 +521,7 @@ CREATE TABLE `stock_update_log`
     PRIMARY KEY (`id`) USING BTREE,
     INDEX `idx_stock_update_log_1` (`update_time`) USING BTREE
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 3183
+  AUTO_INCREMENT = 3770
   CHARACTER SET = utf8
   COLLATE = utf8_general_ci COMMENT = '股票修改记录表'
   ROW_FORMAT = Dynamic;
@@ -383,17 +538,18 @@ CREATE TABLE `trade_deal`
     `deal_date`    timestamp(0)                                            NULL DEFAULT NULL COMMENT '成交时间',
     `deal_type`    int                                                     NULL DEFAULT NULL COMMENT '成交类型 1为买 2为卖',
     `deal_num`     int                                                     NULL DEFAULT NULL COMMENT '成交数量',
-    `deal_price`   decimal(12, 4)                                          NULL DEFAULT NULL COMMENT '成交价格',
-    `deal_money`   decimal(12, 4)                                          NULL DEFAULT NULL COMMENT '成交金额',
+    `deal_price`   decimal(10, 4)                                          NULL DEFAULT NULL COMMENT '成交价格',
+    `deal_money`   decimal(10, 4)                                          NULL DEFAULT NULL COMMENT '成交金额',
     `deal_code`    varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci  NULL DEFAULT NULL COMMENT '成交编号',
     `entrust_code` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci  NULL DEFAULT NULL COMMENT '委托编号',
     `entrust_type` int                                                     NULL DEFAULT NULL COMMENT '成交方式 1为手动 0为自动',
+    `db_type`      int                                                     NULL DEFAULT 0 COMMENT '打板的类型 1为打板 0为普通',
     `user_id`      int                                                     NULL DEFAULT NULL COMMENT '关联用户',
     `mock_type`    int                                                     NULL DEFAULT NULL COMMENT '类型 1为虚拟 0为正式',
     `flag`         int                                                     NULL DEFAULT NULL COMMENT '类型 1为正常 0为删除',
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 263
+  AUTO_INCREMENT = 693
   CHARACTER SET = utf8
   COLLATE = utf8_general_ci COMMENT = '成交表'
   ROW_FORMAT = Dynamic;
@@ -410,9 +566,10 @@ CREATE TABLE `trade_entrust`
     `entrust_date`   timestamp(0)                                            NULL DEFAULT NULL COMMENT '交易时间',
     `deal_type`      int                                                     NULL DEFAULT NULL COMMENT '交易类型 1为买  2为卖',
     `entrust_num`    int                                                     NULL DEFAULT NULL COMMENT '交易数量',
-    `entrust_price`  decimal(12, 4)                                          NULL DEFAULT NULL COMMENT '交易价格',
+    `entrust_price`  decimal(10, 4)                                          NULL DEFAULT NULL COMMENT '交易价格',
     `entrust_status` int                                                     NULL DEFAULT NULL COMMENT '交易的状态 1 进行中 2 成交 3 撤回',
     `entrust_code`   varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci  NULL DEFAULT NULL COMMENT '委托编号',
+    `deal_code`      varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci  NULL DEFAULT NULL COMMENT '成交编号,如果成交的话',
     `use_money`      decimal(12, 4)                                          NULL DEFAULT NULL COMMENT '可用金额',
     `takeout_money`  decimal(12, 4)                                          NULL DEFAULT NULL COMMENT '可取金额',
     `entrust_money`  decimal(12, 4)                                          NULL DEFAULT NULL COMMENT '委托的交易费用',
@@ -420,12 +577,13 @@ CREATE TABLE `trade_entrust`
     `total_money`    decimal(12, 4)                                          NULL DEFAULT NULL COMMENT '总的交易费,包括手续费',
     `user_id`        int                                                     NULL DEFAULT NULL COMMENT '关联用户',
     `entrust_type`   int                                                     NULL DEFAULT NULL COMMENT '委托方式 1 手动 0 自动',
+    `db_type`        int UNSIGNED                                            NULL DEFAULT 0 COMMENT '打板的类型 1为打板 0为普通',
     `mock_type`      int                                                     NULL DEFAULT NULL COMMENT '类型 1为虚拟 0为正式',
     `flag`           int                                                     NULL DEFAULT NULL COMMENT '1正常 0 删除',
     PRIMARY KEY (`id`) USING BTREE,
     INDEX `entrust_entrust_date_IDX` (`entrust_date`) USING BTREE
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 306
+  AUTO_INCREMENT = 1301
   CHARACTER SET = utf8
   COLLATE = utf8_general_ci COMMENT = '委托表'
   ROW_FORMAT = Dynamic;
@@ -467,7 +625,7 @@ CREATE TABLE `trade_money`
     `mock_type`     int            NULL DEFAULT NULL COMMENT '虚拟类型 1为虚拟 0为真实',
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 3
+  AUTO_INCREMENT = 18
   CHARACTER SET = utf8
   COLLATE = utf8_general_ci COMMENT = '资金表'
   ROW_FORMAT = Dynamic;
@@ -489,7 +647,7 @@ CREATE TABLE `trade_money_history`
     `mock_type`     int            NULL DEFAULT NULL COMMENT '虚拟类型 1为虚拟 0为真实',
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 98
+  AUTO_INCREMENT = 455
   CHARACTER SET = utf8
   COLLATE = utf8_general_ci COMMENT = '资金历史表'
   ROW_FORMAT = Dynamic;
@@ -505,8 +663,8 @@ CREATE TABLE `trade_position`
     `name`             varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '股票的名称',
     `all_amount`       int                                                     NULL DEFAULT 0 COMMENT '总数量',
     `use_amount`       int                                                     NULL DEFAULT 0 COMMENT '可用数量',
-    `avg_price`        decimal(12, 4)                                          NULL DEFAULT NULL COMMENT '成本价',
-    `price`            decimal(12, 4)                                          NULL DEFAULT NULL COMMENT '当前价',
+    `avg_price`        decimal(8, 4)                                           NULL DEFAULT NULL COMMENT '成本价',
+    `price`            decimal(8, 4)                                           NULL DEFAULT NULL COMMENT '当前价',
     `all_money`        decimal(12, 4)                                          NULL DEFAULT NULL COMMENT '总的市值',
     `float_money`      decimal(12, 4)                                          NULL DEFAULT NULL COMMENT '浮动盈亏',
     `today_money`      decimal(12, 4)                                          NULL DEFAULT NULL COMMENT '今日浮动盈亏',
@@ -516,7 +674,7 @@ CREATE TABLE `trade_position`
     PRIMARY KEY (`id`) USING BTREE,
     INDEX `position_code_IDX` (`code`) USING BTREE
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 44
+  AUTO_INCREMENT = 398
   CHARACTER SET = utf8
   COLLATE = utf8_general_ci COMMENT = '我的持仓表'
   ROW_FORMAT = Dynamic;
@@ -533,8 +691,8 @@ CREATE TABLE `trade_position_history`
     `curr_date`        timestamp(0)                                            NULL DEFAULT NULL COMMENT '当前日期',
     `all_amount`       int                                                     NULL DEFAULT NULL COMMENT '总数量',
     `use_amount`       int                                                     NULL DEFAULT NULL COMMENT '可用数量',
-    `avg_price`        decimal(12, 4)                                          NULL DEFAULT NULL COMMENT '成本价',
-    `price`            decimal(12, 4)                                          NULL DEFAULT NULL COMMENT '当前价',
+    `avg_price`        decimal(8, 4)                                           NULL DEFAULT NULL COMMENT '成本价',
+    `price`            decimal(8, 4)                                           NULL DEFAULT NULL COMMENT '当前价',
     `all_money`        decimal(12, 4)                                          NULL DEFAULT NULL COMMENT '总的市值',
     `float_money`      decimal(12, 4)                                          NULL DEFAULT NULL COMMENT '浮动盈亏',
     `today_money`      decimal(12, 4)                                          NULL DEFAULT NULL COMMENT '今日盈亏金额',
@@ -544,7 +702,7 @@ CREATE TABLE `trade_position_history`
     PRIMARY KEY (`id`) USING BTREE,
     INDEX `trade_position_history_code_IDX` (`code`, `curr_date`) USING BTREE
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 182
+  AUTO_INCREMENT = 1446
   CHARACTER SET = utf8
   COLLATE = utf8_general_ci COMMENT = '我的持仓历史记录表'
   ROW_FORMAT = Dynamic;
@@ -557,7 +715,7 @@ CREATE TABLE `trade_rule`
 (
     `id`               int                                                     NOT NULL AUTO_INCREMENT COMMENT 'id主键',
     `name`             varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '规则名称',
-    `condition_code`   varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci  NULL DEFAULT NULL COMMENT '规则条件编号',
+    `condition_id`     int                                                     NULL DEFAULT NULL COMMENT '规则条件id',
     `condition_type`   int                                                     NULL DEFAULT NULL COMMENT '规则计算 1为小于 2为大于',
     `rule_value_type`  int                                                     NULL DEFAULT NULL COMMENT '比较类型 1为金额 2为比例',
     `rule_value`       decimal(12, 4)                                          NULL DEFAULT NULL COMMENT '规则对应值',
@@ -573,7 +731,7 @@ CREATE TABLE `trade_rule`
     `flag`             int                                                     NULL DEFAULT NULL COMMENT '类型 1为正常 0为删除',
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 9
+  AUTO_INCREMENT = 26
   CHARACTER SET = utf8
   COLLATE = utf8_general_ci COMMENT = '交易规则表'
   ROW_FORMAT = Dynamic;
@@ -593,9 +751,33 @@ CREATE TABLE `trade_rule_condition`
     `flag`        int                                                     NULL DEFAULT NULL COMMENT '是否删除 1为正常 0为删除',
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 6
+  AUTO_INCREMENT = 13
   CHARACTER SET = utf8
   COLLATE = utf8_general_ci COMMENT = '交易规则可使用的条件表'
+  ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for trade_rule_db
+-- ----------------------------
+DROP TABLE IF EXISTS `trade_rule_db`;
+CREATE TABLE `trade_rule_db`
+(
+    `id`             int                                                     NOT NULL COMMENT '主键',
+    `name`           varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci  NULL DEFAULT NULL COMMENT '名称',
+    `code_type`      int                                                     NULL DEFAULT NULL COMMENT '打板的股票类型',
+    `buy_num`        int                                                     NULL DEFAULT NULL COMMENT '每日最多买入次数',
+    `buy_param`      varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '买入的参数配置信息',
+    `buy_stock_code` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '已打板买入的股票列表',
+    `create_time`    timestamp(0)                                            NULL DEFAULT NULL COMMENT '创建时间',
+    `update_time`    timestamp(0)                                            NULL DEFAULT NULL COMMENT '更新时间',
+    `user_id`        int                                                     NULL DEFAULT NULL COMMENT '用户编号',
+    `mock_type`      int                                                     NULL DEFAULT NULL COMMENT '1为模拟0为实际',
+    `flag`           int                                                     NULL DEFAULT NULL COMMENT '类型 1为正常 0为删除',
+    PRIMARY KEY (`id`) USING BTREE,
+    INDEX `idx_trade_rule_db_1` (`user_id`, `mock_type`) USING BTREE
+) ENGINE = InnoDB
+  CHARACTER SET = utf8
+  COLLATE = utf8_general_ci COMMENT = '打板交易规则配置'
   ROW_FORMAT = Dynamic;
 
 -- ----------------------------
@@ -610,7 +792,7 @@ CREATE TABLE `trade_rule_stock`
     `create_time` timestamp(0)                                           NULL DEFAULT NULL COMMENT '创建时间',
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 44
+  AUTO_INCREMENT = 62
   CHARACTER SET = utf8
   COLLATE = utf8_general_ci COMMENT = '规则股票对应信息表'
   ROW_FORMAT = Dynamic;
@@ -633,7 +815,7 @@ CREATE TABLE `trade_user`
     `flag`           int                                                     NULL DEFAULT NULL COMMENT '是否删除 1为正常 0为删除',
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 3
+  AUTO_INCREMENT = 8
   CHARACTER SET = utf8
   COLLATE = utf8_general_ci COMMENT = '交易用户信息'
   ROW_FORMAT = Dynamic;
@@ -652,6 +834,8 @@ CREATE TABLE `user`
     `phone`           varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci  NULL DEFAULT NULL COMMENT '用户手机',
     `email`           varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci  NULL DEFAULT NULL COMMENT '用户的邮箱',
     `wx_user_id`      varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '用户的微信id,企业微信发送消息',
+    `ding_user_id`    varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '用户的标识',
+    `reboot_id`       int                                                     NULL DEFAULT NULL COMMENT '机器配置id',
     `create_time`     timestamp(0)                                            NULL DEFAULT NULL COMMENT '用户创建时间',
     `update_time`     timestamp(0)                                            NULL DEFAULT NULL COMMENT '用户修改时间',
     `last_login_time` timestamp(0)                                            NULL DEFAULT NULL COMMENT '最后登录时间',
@@ -660,7 +844,7 @@ CREATE TABLE `user`
     PRIMARY KEY (`id`) USING BTREE,
     INDEX `user_account_IDX` (`account`) USING BTREE
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 3
+  AUTO_INCREMENT = 11
   CHARACTER SET = utf8
   COLLATE = utf8_general_ci COMMENT = '登录用户表'
   ROW_FORMAT = Dynamic;
@@ -677,75 +861,9 @@ CREATE TABLE `user_role`
     `create_time` timestamp(0) NULL DEFAULT NULL COMMENT '添加权限时间',
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 3
+  AUTO_INCREMENT = 7
   CHARACTER SET = utf8
   COLLATE = utf8_general_ci COMMENT = '员工角色关联表'
   ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- View structure for v_stock_history
--- ----------------------------
-DROP VIEW IF EXISTS `v_stock_history`;
-CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `v_stock_history` AS
-select `t`.`code`                 AS `股票的编码`,
-       `t`.`name`                 AS `股票的名称`,
-       `t`.`curr_date`            AS `当天的日期不包括周六周天`,
-       `t`.`highest_price`        AS `最高价格`,
-       `t`.`lowest_price`         AS `最低价格`,
-       `t`.`closing_price`        AS `收盘价`,
-       `t`.`opening_price`        AS `开盘价`,
-       `t`.`yesClosing_price`     AS `前收盘`,
-       `t`.`amplitude`            AS `涨跌额`,
-       `t`.`amplitude_proportion` AS `涨跌幅`,
-       `t`.`trading_volume`       AS `成交量`,
-       `t`.`trading_value`        AS `成交金额`,
-       `t`.`out_dish`             AS `外盘数量`,
-       `t`.`inner_dish`           AS `内盘数量`,
-       `t`.`changing_proportion`  AS `换手率`,
-       `t`.`than`                 AS `量比`,
-       `t`.`avg_price`            AS `均价`,
-       `t`.`static_price_ratio`   AS `静态市盈率`,
-       `t`.`dynamic_price_ratio`  AS `动态市盈率`,
-       `t`.`ttm_price_ratio`      AS `TTM 市盈率`,
-       `t`.`buy_hand`             AS `买的 前五手`,
-       `t`.`sell_hand`            AS `卖的 前五手`,
-       `t`.`appoint_than`         AS `委比`
-from `stock_history` `t`
-where (`t`.`curr_date` > (now() - interval 7 day))
-order by `t`.`code`, `t`.`curr_date`;
-
--- ----------------------------
--- View structure for v_trade_money
--- ----------------------------
-DROP VIEW IF EXISTS `v_trade_money`;
-CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `v_trade_money` AS
-select `u`.`name`          AS `姓名`,
-       `m`.`total_money`   AS `总金额`,
-       `m`.`use_money`     AS `可用金额`,
-       `m`.`market_money`  AS `市值金额`,
-       `m`.`takeout_money` AS `可取金额`,
-       `m`.`profit_money`  AS `昨日盈亏金额`
-from (`trade_money` `m`
-         left join `user` `u` on ((`m`.`user_id` = `u`.`id`)))
-order by `m`.`user_id`;
-
--- ----------------------------
--- View structure for v_trade_position
--- ----------------------------
-DROP VIEW IF EXISTS `v_trade_position`;
-CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `v_trade_position` AS
-select `u`.`name`             AS `姓名`,
-       `p`.`code`             AS `股票编码`,
-       `p`.`name`             AS `股票名称`,
-       `p`.`all_amount`       AS `总数量`,
-       `p`.`use_amount`       AS `可用数量`,
-       `p`.`avg_price`        AS `持仓成本`,
-       `p`.`price`            AS `当前价格`,
-       `p`.`all_money`        AS `总的金额`,
-       `p`.`float_money`      AS `亏损金额`,
-       `p`.`float_proportion` AS `亏损比例`
-from (`trade_position` `p`
-         left join `user` `u` on ((`p`.`user_id` = `u`.`id`)))
-order by `p`.`user_id`;
 
 SET FOREIGN_KEY_CHECKS = 1;
