@@ -1,8 +1,10 @@
 package top.yueshushu.learn.response;
+
 import lombok.Data;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @ClassName:PageResponse
@@ -15,9 +17,9 @@ import java.util.List;
 public class PageResponse<T> {
     private Long total;
     private List<T> list;
-    public PageResponse(Long total,List<T> list){
-        this.total=total;
-        this.list=list;
+    public PageResponse(Long total,List<T> list) {
+        this.total = Optional.ofNullable(total).orElse(0L);
+        this.list = Optional.ofNullable(list).orElse(Collections.emptyList());
     }
     public static PageResponse emptyPageResponse(){
         return new PageResponse(0L,

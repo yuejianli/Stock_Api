@@ -42,10 +42,13 @@ public class BigDecimalUtil {
      * @return
      */
     public static String divPattern(BigDecimal bigDecimal1,BigDecimal bigDecimal2){
-        Assert.notNull(bigDecimal1,"格式化的源 bigDecimal1 不能为空");
-        Assert.notNull(bigDecimal2,"格式化的源 bigDecimal2 不能为空");
+        Assert.notNull(bigDecimal1, "格式化的源 bigDecimal1 不能为空");
+        Assert.notNull(bigDecimal2, "格式化的源 bigDecimal2 不能为空");
 
-        BigDecimal devide =bigDecimal1.divide(bigDecimal2,4, RoundingMode.HALF_UP);
+        if (bigDecimal2.compareTo(BigDecimal.ZERO) <= 0) {
+            return "";
+        }
+        BigDecimal devide = bigDecimal1.divide(bigDecimal2, 4, RoundingMode.HALF_UP);
         //将结果百分比
         NumberFormat percent = NumberFormat.getPercentInstance();
         percent.setMaximumFractionDigits(2);

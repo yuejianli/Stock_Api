@@ -101,7 +101,10 @@ public class StockPoolBusinessImpl implements StockPoolBusiness {
                 List<String> codeList = poolZtList.stream().map(StockPoolInfo::getCode).collect(Collectors.toList());
                 stockCacheService.setTodayZtCodeList(codeList);
             }
-
+            if (dataMap.size() > 3) {
+                String velocityContent = emailService.getVelocityContent(VelocityTemplateType.POOL, dataMap);
+                weChatService.sendTextMessage(null, velocityContent);
+            }
         } else {
             // 非交易时间，是分析时间的话，发送信息.
             List<StockPoolInfo> poolZtList = extCrawlerService.findPoolByType(StockPoolType.ZT, date);
@@ -152,11 +155,6 @@ public class StockPoolBusinessImpl implements StockPoolBusiness {
                 poolZbList = filterStockList(poolZbList, DBStockType.SH_SZ, null);
                 stockPoolHistoryService.savePoolHistory(poolZbList);
             }
-        }
-
-        if (dataMap.size() > 3) {
-            String velocityContent = emailService.getVelocityContent(VelocityTemplateType.POOL, dataMap);
-            weChatService.sendTextMessage(null, velocityContent);
         }
     }
 

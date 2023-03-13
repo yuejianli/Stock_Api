@@ -3,13 +3,10 @@ package top.yueshushu.learn.business.impl;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import top.yueshushu.learn.business.TradeRuleBusiness;
 import top.yueshushu.learn.business.TradeRuleStockBusiness;
 import top.yueshushu.learn.common.ResultCode;
-import top.yueshushu.learn.domain.TradeRuleDo;
 import top.yueshushu.learn.domain.TradeRuleStockDo;
 import top.yueshushu.learn.domainservice.TradeRuleStockDomainService;
 import top.yueshushu.learn.entity.TradeRule;
@@ -17,15 +14,16 @@ import top.yueshushu.learn.entity.TradeRuleStock;
 import top.yueshushu.learn.enumtype.DealType;
 import top.yueshushu.learn.mode.dto.StockRuleDto;
 import top.yueshushu.learn.mode.dto.TradeRuleStockQueryDto;
-import top.yueshushu.learn.mode.ro.TradeRuleRo;
 import top.yueshushu.learn.mode.ro.TradeRuleStockRo;
 import top.yueshushu.learn.mode.vo.StockRuleVo;
 import top.yueshushu.learn.mode.vo.StockSelectedVo;
 import top.yueshushu.learn.mode.vo.TradeRuleStockVo;
 import top.yueshushu.learn.response.OutputResult;
+import top.yueshushu.learn.response.PageResponse;
 import top.yueshushu.learn.service.StockSelectedService;
 import top.yueshushu.learn.service.TradeRuleService;
 import top.yueshushu.learn.service.TradeRuleStockService;
+import top.yueshushu.learn.util.PageUtil;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -149,7 +147,7 @@ public class TradeRuleStockBusinessImpl implements TradeRuleStockBusiness {
         List<StockSelectedVo> stockSelectedVoList =
                 stockSelectedService.listSelf(tradeRuleStockRo.getUserId(), tradeRuleStockRo.getKeyword());
         if(CollectionUtils.isEmpty(stockSelectedVoList)){
-            return OutputResult.buildSucc();
+            return OutputResult.buildSucc(PageResponse.emptyPageResponse());
         }
         //每一个股票，去查询对应的信息
         List<StockRuleVo> stockRuleVoList = new ArrayList<>();
@@ -187,6 +185,6 @@ public class TradeRuleStockBusinessImpl implements TradeRuleStockBusiness {
             //设置卖出的规则
             stockRuleVoList.add(stockRuleVo);
         }
-        return OutputResult.buildSucc(stockRuleVoList);
+        return PageUtil.pageResult(stockRuleVoList, tradeRuleStockRo.getPageNum(), tradeRuleStockRo.getPageSize());
     }
 }

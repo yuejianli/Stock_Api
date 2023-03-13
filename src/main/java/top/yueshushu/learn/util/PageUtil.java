@@ -3,7 +3,9 @@ package top.yueshushu.learn.util;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.response.PageResponse;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @ClassName:PageUtil
@@ -24,10 +26,10 @@ public class PageUtil {
      */
     public static List startPage(List list, Integer pageNum, Integer pageSize) {
         if(list == null){
-            return null;
+            return Collections.emptyList();
         }
         if(list.size() == 0){
-            return null;
+            return Collections.emptyList();
         }
         //记录总数
         Integer count = list.size();
@@ -54,7 +56,7 @@ public class PageUtil {
             toIndex = count;
         }
 
-        List pageList = list.subList(fromIndex, toIndex);
+        List pageList = Optional.of(list.subList(fromIndex, toIndex)).orElse(Collections.emptyList());
 
         return pageList;
     }
