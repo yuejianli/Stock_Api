@@ -99,7 +99,6 @@ public class CrawlerStockServiceImpl implements CrawlerStockService {
                 break;
             }
         }
-        log.info("成功获取当前的股票{} 的K线类型",stock.getCode(),kType.getDesc());
         return OutputResult.buildSucc(result);
     }
 
