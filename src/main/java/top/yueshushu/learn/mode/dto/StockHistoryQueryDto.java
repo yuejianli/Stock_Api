@@ -1,9 +1,10 @@
 package top.yueshushu.learn.mode.dto;
 
-import java.io.Serializable;
-
 import cn.hutool.core.date.DateTime;
 import lombok.Data;
+
+import java.io.Serializable;
+import java.util.List;
 
 /**
  * 股票历史记录查询
@@ -21,4 +22,5 @@ public class StockHistoryQueryDto implements Serializable {
     private Integer startDayNum ;
     private Integer endDayNum;
     private Integer month;
+    private List<Integer> weeks;
 }

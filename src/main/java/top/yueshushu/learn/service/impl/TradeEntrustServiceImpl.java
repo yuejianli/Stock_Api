@@ -181,25 +181,40 @@ public class TradeEntrustServiceImpl implements TradeEntrustService {
     }
 
     @Override
-    public OutputResult<List<TradeEntrustVo>> mockList(TradeEntrustRo tradeEntrustRo) {
+    public OutputResult<PageResponse<TradeEntrustVo>> mockList(TradeEntrustRo tradeEntrustRo) {
         DateTime now = DateUtil.date();
         //根据用户去查询信息
         TradeEntrustQueryDto tradeEntrustQueryDto = new TradeEntrustQueryDto();
         tradeEntrustQueryDto.setUserId(tradeEntrustRo.getUserId());
         tradeEntrustQueryDto.setMockType(tradeEntrustRo.getMockType());
         tradeEntrustQueryDto.setEntrustDate(now);
+        Page<Object> pageInfo = PageHelper.startPage(tradeEntrustRo.getPageNum(), tradeEntrustRo.getPageSize());
         List<TradeEntrustDo> tradeEntrustDoList = tradeEntrustDomainService.listByQuery(
                 tradeEntrustQueryDto
         );
-        if (CollectionUtils.isEmpty(tradeEntrustDoList)) {
-           return OutputResult.buildSucc(Collections.EMPTY_LIST);
-        }
         List<TradeEntrustVo> tradePositionVoList = tradeEntrustDoList.stream().map(
-                n-> tradeEntrustAssembler.entityToVo(tradeEntrustAssembler.doToEntity(n))
+                n -> tradeEntrustAssembler.entityToVo(tradeEntrustAssembler.doToEntity(n))
         ).collect(Collectors.toList());
-        return OutputResult.buildSucc(tradePositionVoList);
+        return OutputResult.buildSucc(new PageResponse<>(pageInfo.getTotal(), tradePositionVoList));
     }
 
+    @Override
+    public OutputResult<TradeEntrustVo> getInfoByCondition(TradeEntrustRo tradeEntrustRo) {
+        TradeEntrustQueryDto tradeEntrustQueryDto = new TradeEntrustQueryDto();
+        tradeEntrustQueryDto.setUserId(tradeEntrustRo.getUserId());
+        tradeEntrustQueryDto.setMockType(tradeEntrustRo.getMockType());
+        tradeEntrustQueryDto.setEntrustCode(tradeEntrustRo.getEntrustCode());
+        List<TradeEntrustDo> tradeEntrustDoList = tradeEntrustDomainService.listByQuery(
+                tradeEntrustQueryDto
+        );
+        List<TradeEntrustVo> tradePositionVoList = tradeEntrustDoList.stream().map(
+                n -> tradeEntrustAssembler.entityToVo(tradeEntrustAssembler.doToEntity(n))
+        ).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(tradePositionVoList)) {
+            return OutputResult.buildAlert(ResultCode.TRADE_ENTRUST_CODE_EMPTY);
+        }
+        return OutputResult.buildSucc(tradePositionVoList.get(0));
+    }
 
     /**********对历史记录的处理*************/
     /**
@@ -276,7 +291,6 @@ public class TradeEntrustServiceImpl implements TradeEntrustService {
         tradeEntrustRo.setUserId(userId);
         syncRealEntrustByUserId(userId, realHistoryList(tradeEntrustRo));
     }
-
     @Override
     public OutputResult<PageResponse<TradeEntrustVo>> mockHistoryList(TradeEntrustRo tradeEntrustRo) {
 

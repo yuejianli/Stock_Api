@@ -90,7 +90,6 @@ public class DefaultCrawlerServiceImpl implements CrawlerService {
         //处理，拼接成信息
         String url = MessageFormat.format(defaultProperties.getStockHistoryDownloadUrl(), code,
                 startDate, endDate);
-        log.info(">>>访问地址:" + url);
         try {
             //获取内容
             ResponseEntity<byte[]> forEntity = restTemplate.getForEntity(url, byte[].class);
@@ -125,7 +124,6 @@ public class DefaultCrawlerServiceImpl implements CrawlerService {
     public StockShowInfo getNowInfo(String fullCode) {
         //处理，拼接成信息
         String url = MessageFormat.format(defaultProperties.getShowDayUrl(), fullCode);
-        log.info(">>>访问地址:" + url);
         try {
             //获取内容
             Map<String, String> header = new HashMap<>();
@@ -143,7 +141,6 @@ public class DefaultCrawlerServiceImpl implements CrawlerService {
     public String getMinUrl(String code) {
         //处理，拼接成信息
         String url = MessageFormat.format(defaultProperties.getMinUrl(), code);
-        log.info(">>>小时访问地址:" + url);
         try {
             //获取内容
             byte[] btImg1 = ImageUtil.getImageFromNetByUrl(url);
@@ -160,7 +157,6 @@ public class DefaultCrawlerServiceImpl implements CrawlerService {
     public String getDayUrl(String code) {
         //处理，拼接成信息
         String url = MessageFormat.format(defaultProperties.getDailyUrl(), code);
-        log.info(">>>访问地址:" + url);
         try {
             //获取内容
             byte[] btImg1 = ImageUtil.getImageFromNetByUrl(url);
@@ -177,7 +173,6 @@ public class DefaultCrawlerServiceImpl implements CrawlerService {
     public String getWeekUrl(String code) {
         //处理，拼接成信息
         String url = MessageFormat.format(defaultProperties.getWeeklyUrl(), code);
-        log.info(">>>访问地址:" + url);
         try {
             //获取内容
             byte[] btImg1 = ImageUtil.getImageFromNetByUrl(url);
@@ -194,7 +189,6 @@ public class DefaultCrawlerServiceImpl implements CrawlerService {
     public String getMonthUrl(String code) {
         //处理，拼接成信息
         String url = MessageFormat.format(defaultProperties.getMonthlyUrl(), code);
-        log.info(">>>访问地址:" + url);
         try {
             //获取内容
             byte[] btImg1 = ImageUtil.getImageFromNetByUrl(url);

@@ -2,6 +2,7 @@ package top.yueshushu.learn.business;
 
 import top.yueshushu.learn.mode.ro.StatTen10Ro;
 import top.yueshushu.learn.mode.ro.StockStatRo;
+import top.yueshushu.learn.mode.vo.DistVo;
 import top.yueshushu.learn.mode.vo.ten10stat.StockRelationVo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.response.PageResponse;
@@ -51,4 +52,11 @@ public interface StatBusiness {
      * @param userId 用户编号
      */
     void ten5ToMail(Integer userId);
+
+    /**
+     * 查询股票历史支持的类型
+     */
+    OutputResult<List<DistVo>> listMoneyType();
+
+
 }

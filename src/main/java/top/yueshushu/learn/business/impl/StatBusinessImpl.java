@@ -18,7 +18,7 @@ import top.yueshushu.learn.entity.Stock;
 import top.yueshushu.learn.entity.StockHistory;
 import top.yueshushu.learn.entity.User;
 import top.yueshushu.learn.enumtype.AmplitudeType;
-import top.yueshushu.learn.enumtype.CharPriceType;
+import top.yueshushu.learn.enumtype.StockCharMoneyType;
 import top.yueshushu.learn.enumtype.WeekStatType;
 import top.yueshushu.learn.enumtype.message.VelocityTemplateType;
 import top.yueshushu.learn.helper.DateHelper;
@@ -29,6 +29,7 @@ import top.yueshushu.learn.mode.dto.StockTenToEmailDto;
 import top.yueshushu.learn.mode.ro.StatTen10Ro;
 import top.yueshushu.learn.mode.ro.StockSelectedRo;
 import top.yueshushu.learn.mode.ro.StockStatRo;
+import top.yueshushu.learn.mode.vo.DistVo;
 import top.yueshushu.learn.mode.vo.StockHistoryVo;
 import top.yueshushu.learn.mode.vo.StockSelectedVo;
 import top.yueshushu.learn.mode.vo.charinfo.LineSeriesVo;
@@ -155,16 +156,20 @@ public class StatBusinessImpl implements StatBusiness {
     @Override
     public OutputResult getCharStat(StockStatRo stockStatRo) {
         Stock stock = stockCacheService.selectByCode(stockStatRo.getCode());
-        if (stock == null){
+        if (stock == null) {
             return OutputResult.buildAlert(
                     ResultCode.STOCK_CODE_NO_EXIST
             );
         }
 
-        CharPriceType[] values = CharPriceType.values();
+        StockCharMoneyType[] values = StockCharMoneyType.values();
         List<String> legendList = new ArrayList<>();
-        for (CharPriceType charPriceType : values) {
-            legendList.add(charPriceType.getDesc());
+        if (CollectionUtils.isEmpty(stockStatRo.getCharStockTypeList())) {
+            for (StockCharMoneyType stockCharMoneyType : values) {
+                legendList.add(stockCharMoneyType.getDesc());
+            }
+        } else {
+            legendList.addAll(stockStatRo.getCharStockTypeList());
         }
         //获取范围
         List<String> xaxisData = new ArrayList<>();
@@ -197,7 +202,10 @@ public class StatBusinessImpl implements StatBusiness {
             return OutputResult.buildSucc(lineVo);
         }
         //进行处理.
-        List<LineSeriesVo> lineSeriesVoList = historyConvertLine(stockHistoryVoList);
+        List<LineSeriesVo> lineSeriesVoList = historyConvertLine(stockHistoryVoList, xaxisData.size());
+
+        // 进行过滤，按照类型进行过滤。
+        lineSeriesVoList = lineSeriesVoList.stream().filter(n -> legendList.contains(n.getName())).collect(Collectors.toList());
         lineVo.setSeries(lineSeriesVoList);
         return OutputResult.buildSucc(lineVo);
     }
@@ -331,6 +339,24 @@ public class StatBusinessImpl implements StatBusiness {
         }
     }
 
+    @Override
+    public OutputResult<List<DistVo>> listMoneyType() {
+        StockCharMoneyType[] values = StockCharMoneyType.values();
+
+        List<DistVo> result = new ArrayList<>(values.length);
+
+        for (StockCharMoneyType stockCharMoneyType : values) {
+
+            DistVo distVo = new DistVo();
+            distVo.setCode(stockCharMoneyType.getCode() + "");
+            distVo.setName(stockCharMoneyType.getDesc());
+
+            result.add(distVo);
+        }
+
+        return OutputResult.buildSucc(result);
+    }
+
     /**
      * 将股票信息进行转换，转换成相应的涨跌信息
      *
@@ -443,40 +469,96 @@ public class StatBusinessImpl implements StatBusiness {
      * 将历史数据转换成 图表数据
      *
      * @param stockHistoryVoList 历史数据
+     * @param size               长度大小
      * @return 将历史数据转换成 图表数据
      */
-    private List<LineSeriesVo> historyConvertLine(List<StockHistoryVo> stockHistoryVoList) {
+    private List<LineSeriesVo> historyConvertLine(List<StockHistoryVo> stockHistoryVoList, int size) {
         List<LineSeriesVo> result = new ArrayList<>();
 
+        // 开盘价
         LineSeriesVo openingPrice = new LineSeriesVo();
-        openingPrice.setName(CharPriceType.OPENINGPRICE.getDesc());
-        LineSeriesVo closingPrice=new LineSeriesVo();
-        closingPrice.setName(CharPriceType.CLOSINGPRICE.getDesc());
-        LineSeriesVo highestPrice=new LineSeriesVo();
-        highestPrice.setName(CharPriceType.HIGHESTPRICE.getDesc());
-        LineSeriesVo lowestPrice=new LineSeriesVo();
-        lowestPrice.setName(CharPriceType.LOWESTPRICE.getDesc());
-        LineSeriesVo amplitudeproportion=new LineSeriesVo();
-        amplitudeproportion.setName(CharPriceType.AMPLITUDEPROPORTION.getDesc());
+        openingPrice.setName(StockCharMoneyType.OPENING_PRICE.getDesc());
 
-        LineSeriesVo amplitude=new LineSeriesVo();
-        amplitude.setName(CharPriceType.AMPLITUDE.getDesc());
+        LineSeriesVo closingPrice = new LineSeriesVo();
+        closingPrice.setName(StockCharMoneyType.CLOSING_PRICE.getDesc());
+
+        // 最高价
+        LineSeriesVo highestPrice = new LineSeriesVo();
+        highestPrice.setName(StockCharMoneyType.HIGHEST_PRICE.getDesc());
+
+        LineSeriesVo lowestPrice = new LineSeriesVo();
+        lowestPrice.setName(StockCharMoneyType.LOWEST_PRICE.getDesc());
+
+        // 涨幅度比例
+
+        LineSeriesVo amplitudeProportion = new LineSeriesVo();
+        amplitudeProportion.setName(StockCharMoneyType.AMPLITUDE_PROPORTION.getDesc());
+
+        // 成交量
+        LineSeriesVo tradingVolume = new LineSeriesVo();
+        tradingVolume.setName(StockCharMoneyType.TRADING_VOLUME.getDesc());
+
+
+        // 换手率
+
+        LineSeriesVo changingProportion = new LineSeriesVo();
+        changingProportion.setName(StockCharMoneyType.CHANGING_PROPORTION.getDesc());
+
+        LineSeriesVo than = new LineSeriesVo();
+        than.setName(StockCharMoneyType.THAN.getDesc());
+
+
+        // 平均价格
+
+        LineSeriesVo avgPrice = new LineSeriesVo();
+        avgPrice.setName(StockCharMoneyType.AVG_PRICE.getDesc());
+
 
         //处理信息
-        for(StockHistoryVo stockHistoryVo:stockHistoryVoList){
+        for (StockHistoryVo stockHistoryVo : stockHistoryVoList) {
             openingPrice.getData().add(BigDecimalUtil.toDouble(stockHistoryVo.getOpeningPrice()));
             closingPrice.getData().add(BigDecimalUtil.toDouble(stockHistoryVo.getClosingPrice()));
             highestPrice.getData().add(BigDecimalUtil.toDouble(stockHistoryVo.getHighestPrice()));
             lowestPrice.getData().add(BigDecimalUtil.toDouble(stockHistoryVo.getLowestPrice()));
-            amplitudeproportion.getData().add(BigDecimalUtil.toDouble(stockHistoryVo.getAmplitudeProportion()));
-            amplitude.getData().add(BigDecimalUtil.toDouble(stockHistoryVo.getAmplitude()));
+            amplitudeProportion.getData().add(BigDecimalUtil.toDouble(stockHistoryVo.getAmplitudeProportion()));
+            tradingVolume.getData().add(BigDecimalUtil.toDouble(stockHistoryVo.getTradingVolume()));
+            changingProportion.getData().add(BigDecimalUtil.toDouble(stockHistoryVo.getChangingProportion()));
+            than.getData().add(BigDecimalUtil.toDouble(stockHistoryVo.getThan()));
+            avgPrice.getData().add(BigDecimalUtil.toDouble(stockHistoryVo.getAvgPrice()));
         }
+
+        // 长度不够的话，补 0
+        if (openingPrice.getData().size() < size) {
+            // 进行补 0 的操作.
+            int subSize = size - openingPrice.getData().size();
+
+            List<Double> subSizeList = new ArrayList<>(subSize);
+
+            for (int i = 0; i < subSize; i++) {
+                subSizeList.add(BigDecimal.ZERO.doubleValue());
+            }
+
+            openingPrice.getData().addAll(0, subSizeList);
+            closingPrice.getData().addAll(0, subSizeList);
+            highestPrice.getData().addAll(0, subSizeList);
+            lowestPrice.getData().addAll(0, subSizeList);
+            amplitudeProportion.getData().addAll(0, subSizeList);
+            tradingVolume.getData().addAll(0, subSizeList);
+            changingProportion.getData().addAll(0, subSizeList);
+            than.getData().addAll(0, subSizeList);
+            avgPrice.getData().addAll(0, subSizeList);
+        }
+
         result.add(openingPrice);
         result.add(closingPrice);
         result.add(highestPrice);
         result.add(lowestPrice);
-        result.add(amplitudeproportion);
-        result.add(amplitude);
+        result.add(amplitudeProportion);
+        result.add(tradingVolume);
+        result.add(changingProportion);
+        result.add(than);
+        result.add(avgPrice);
+
         return result;
     }
 

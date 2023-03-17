@@ -129,6 +129,14 @@ public class StockBKController {
         return bkBusiness.listBkTop(stockBKMoneyStatRo);
     }
 
+    @ApiOperation("查询股票的版块涨跌记录信息")
+    @PostMapping("/listBkTopNew")
+    @AuthToken
+    public OutputResult listBkTopNew(@RequestBody StockBKMoneyStatRo stockBKMoneyStatRo) {
+        handlerDate(stockBKMoneyStatRo);
+        return bkBusiness.listBkTopNew(stockBKMoneyStatRo);
+    }
+
     /**
      * 处理日期
      *

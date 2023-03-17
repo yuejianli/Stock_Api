@@ -38,7 +38,10 @@ import top.yueshushu.learn.util.ThreadLocalUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -132,23 +135,22 @@ public class TradeDealServiceImpl implements TradeDealService {
         }
         return OutputResult.buildSucc(tradeDealVoList);
     }
+
     @Override
-    public OutputResult mockList(TradeDealRo tradeDealRo) {
+    public OutputResult<PageResponse<TradeDealVo>> mockList(TradeDealRo tradeDealRo) {
         Date now = DateUtil.date();
         DateTime beginNow = DateUtil.beginOfDay(now);
         TradeDealQueryDto tradeDealQueryDto = new TradeDealQueryDto();
         tradeDealQueryDto.setUserId(tradeDealRo.getUserId());
         tradeDealQueryDto.setMockType(tradeDealRo.getMockType());
         tradeDealQueryDto.setDealDate(beginNow);
+        Page<Object> page = PageHelper.startPage(tradeDealRo.getPageNum(), tradeDealRo.getPageSize());
         //根据用户去查询信息
         List<TradeDealDo> tradeDealDoList = tradeDealDomainService.listByQuery(tradeDealQueryDto);
-        if (CollectionUtils.isEmpty(tradeDealDoList)) {
-            return OutputResult.buildSucc(Collections.emptyList());
-        }
         List<TradeDealVo> tradeDealVoList = tradeDealDoList.stream().map(
                 n-> tradeDealAssembler.entityToVo(tradeDealAssembler.doToEntity(n))
         ).collect(Collectors.toList());
-        return OutputResult.buildSucc(tradeDealVoList);
+        return OutputResult.buildSucc(new PageResponse<>(page.getTotal(), tradeDealVoList));
     }
 
 

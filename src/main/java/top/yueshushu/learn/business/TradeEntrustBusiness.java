@@ -22,7 +22,7 @@ public interface TradeEntrustBusiness {
      * @param tradeEntrustRo 委托对象
      * @return 查询虚拟的今日委托信息
      */
-    OutputResult<List<TradeEntrustVo>> mockList(TradeEntrustRo tradeEntrustRo);
+    OutputResult<PageResponse<TradeEntrustVo>> mockList(TradeEntrustRo tradeEntrustRo);
 
     /**
      * 查询真实的今日委托信息
@@ -47,4 +47,11 @@ public interface TradeEntrustBusiness {
      * @return 查询真实的历史委托信息
      */
     OutputResult<PageResponse<TradeEntrustVo>> realHistoryList(TradeEntrustRo tradeEntrustRo);
+
+    /**
+     * 根据条件查询委托单信息
+     *
+     * @param tradeEntrustRo 查询条件
+     */
+    OutputResult<TradeEntrustVo> getInfoByCondition(TradeEntrustRo tradeEntrustRo);
 }

@@ -411,38 +411,36 @@ CREATE TABLE `stock_bk_stock`
 DROP TABLE IF EXISTS `stock_history`;
 CREATE TABLE `stock_history`
 (
-    `id`                   int                                                    NOT NULL AUTO_INCREMENT COMMENT 'id自增',
-    `code`                 varchar(6) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL COMMENT '股票的编码',
-    `name`                 varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '股票的名称',
-    `curr_date`            timestamp(0)                                           NULL DEFAULT NULL COMMENT '当天的日期不包括周六周天',
-    `highest_price`        decimal(7, 2)                                          NULL DEFAULT NULL COMMENT '最高价格',
-    `lowest_price`         decimal(7, 2)                                          NULL DEFAULT NULL COMMENT '最低价格',
-    `closing_price`        decimal(7, 2)                                          NULL DEFAULT NULL COMMENT '收盘价',
-    `opening_price`        decimal(7, 2)                                          NULL DEFAULT NULL COMMENT '开盘价',
-    `yesClosing_price`     decimal(7, 2)                                          NULL DEFAULT NULL COMMENT '前收盘',
-    `amplitude`            decimal(6, 2)                                          NULL DEFAULT NULL COMMENT '涨跌额',
-    `amplitude_proportion` decimal(5, 2)                                          NULL DEFAULT NULL COMMENT '涨跌幅',
-    `trading_volume`       decimal(18, 0)                                         NULL DEFAULT NULL COMMENT '成交量',
-    `trading_value`        decimal(18, 2)                                         NULL DEFAULT NULL COMMENT '成交金额',
-    `out_dish`             int                                                    NULL DEFAULT NULL COMMENT '外盘数量',
-    `inner_dish`           int                                                    NULL DEFAULT NULL COMMENT '内盘数量',
-    `changing_proportion`  decimal(7, 2)                                          NULL DEFAULT NULL COMMENT '换手率',
-    `than`                 decimal(7, 2)                                          NULL DEFAULT NULL COMMENT '量比',
-    `avg_price`            decimal(7, 2)                                          NULL DEFAULT NULL COMMENT '均价',
-    `static_price_ratio`   decimal(7, 3)                                          NULL DEFAULT NULL COMMENT '静态市盈率',
-    `dynamic_price_ratio`  decimal(7, 3)                                          NULL DEFAULT NULL COMMENT '动态市盈率',
-    `ttm_price_ratio`      decimal(7, 3)                                          NULL DEFAULT NULL COMMENT 'TTM 市盈率',
-    `buy_hand`             int                                                    NULL DEFAULT NULL COMMENT '买的 前五手',
-    `sell_hand`            int                                                    NULL DEFAULT NULL COMMENT '卖的 前五手',
-    `appoint_than`         varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '委比',
-    `flag`                 tinyint(1)                                             NULL DEFAULT 1 COMMENT '1为正常 0为删除',
-    PRIMARY KEY (`id`) USING BTREE,
-    UNIQUE INDEX `idx_stock_history_1` (`code`, `curr_date`) USING BTREE
+    `id`                   int         NOT NULL AUTO_INCREMENT COMMENT 'id自增',
+    `code`                 varchar(6)  NOT NULL COMMENT '股票的编码',
+    `name`                 varchar(50) NOT NULL COMMENT '股票的名称',
+    `curr_date`            timestamp   NULL                                       DEFAULT NULL COMMENT '当天的日期不包括周六周天',
+    `highest_price`        decimal(18, 2)                                         DEFAULT NULL COMMENT '最高价格',
+    `lowest_price`         decimal(18, 2)                                         DEFAULT NULL COMMENT '最低价格',
+    `closing_price`        decimal(18, 2)                                         DEFAULT NULL COMMENT '收盘价',
+    `opening_price`        decimal(18, 2)                                         DEFAULT NULL COMMENT '开盘价',
+    `yesClosing_price`     decimal(18, 2)                                         DEFAULT NULL COMMENT '前收盘',
+    `amplitude`            decimal(18, 2)                                         DEFAULT NULL COMMENT '涨跌额',
+    `amplitude_proportion` decimal(18, 2)                                         DEFAULT NULL COMMENT '涨跌幅',
+    `trading_volume`       decimal(18, 0)                                         DEFAULT NULL COMMENT '成交量',
+    `trading_value`        decimal(18, 2)                                         DEFAULT NULL COMMENT '成交金额',
+    `out_dish`             int                                                    DEFAULT NULL COMMENT '外盘数量',
+    `inner_dish`           int                                                    DEFAULT NULL COMMENT '内盘数量',
+    `changing_proportion`  decimal(18, 2)                                         DEFAULT NULL COMMENT '换手率',
+    `than`                 decimal(18, 2)                                         DEFAULT NULL COMMENT '量比',
+    `avg_price`            decimal(18, 2)                                         DEFAULT NULL COMMENT '均价',
+    `static_price_ratio`   decimal(18, 3)                                         DEFAULT NULL COMMENT '静态市盈率',
+    `dynamic_price_ratio`  decimal(18, 3)                                         DEFAULT NULL COMMENT '动态市盈率',
+    `ttm_price_ratio`      decimal(18, 3)                                         DEFAULT NULL COMMENT 'TTM 市盈率',
+    `buy_hand`             int                                                    DEFAULT NULL COMMENT '买的 前五手',
+    `sell_hand`            int                                                    DEFAULT NULL COMMENT '卖的 前五手',
+    `appoint_than`         varchar(18) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '委比',
+    `flag`                 tinyint(1)                                             DEFAULT '1' COMMENT '1为正常 0为删除',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `idx_stock_history_1` (`code`, `curr_date`)
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 73353
-  CHARACTER SET = utf8
-  COLLATE = utf8_general_ci COMMENT = '股票的历史交易记录表'
-  ROW_FORMAT = Dynamic;
+  AUTO_INCREMENT = 98086
+  DEFAULT CHARSET = utf8 COMMENT ='股票的历史交易记录表';
 
 -- ----------------------------
 -- Table structure for stock_pool_history

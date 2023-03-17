@@ -33,7 +33,7 @@ public class TradeDealBusinessImpl implements TradeDealBusiness {
     private TradeCacheService tradeCacheService;
 
     @Override
-    public OutputResult<List<TradeDealVo>> mockList(TradeDealRo tradeDealRo) {
+    public OutputResult<PageResponse<TradeDealVo>> mockList(TradeDealRo tradeDealRo) {
         return tradeDealService.mockList(tradeDealRo);
     }
 

@@ -519,57 +519,72 @@ public class BKBusinessImpl implements BKBusiness {
                     StockBkDo stockBkDo = bkCodeNameMap.get(stockBkStockDoList1.get(0).getBkCode());
                     stockBkStockVo.setBkCodeName1(stockBkDo.getName());
                     stockBkStockVo.setBkCodeType1(stockBkDo.getType());
+                    stockBkStockVo.setBkContent1(convertContent(stockBkDo.getCode(), stockBkDo.getName()));
                 } else if (size == 2) {
                     stockBkStockVo.setBkCode1(stockBkStockDoList1.get(0).getBkCode());
                     StockBkDo stockBkDo = bkCodeNameMap.get(stockBkStockDoList1.get(0).getBkCode());
                     stockBkStockVo.setBkCodeName1(stockBkDo.getName());
                     stockBkStockVo.setBkCodeType1(stockBkDo.getType());
+                    stockBkStockVo.setBkContent1(convertContent(stockBkDo.getCode(), stockBkDo.getName()));
 
                     stockBkStockVo.setBkCode2(stockBkStockDoList1.get(1).getBkCode());
                     StockBkDo stockBkDo2 = bkCodeNameMap.get(stockBkStockDoList1.get(1).getBkCode());
                     stockBkStockVo.setBkCodeName2(stockBkDo2.getName());
                     stockBkStockVo.setBkCodeType2(stockBkDo2.getType());
+                    stockBkStockVo.setBkContent2(convertContent(stockBkDo2.getCode(), stockBkDo2.getName()));
                 } else if (size == 3) {
                     stockBkStockVo.setBkCode1(stockBkStockDoList1.get(0).getBkCode());
                     StockBkDo stockBkDo = bkCodeNameMap.get(stockBkStockDoList1.get(0).getBkCode());
                     stockBkStockVo.setBkCodeName1(stockBkDo.getName());
                     stockBkStockVo.setBkCodeType1(stockBkDo.getType());
+                    stockBkStockVo.setBkContent1(convertContent(stockBkDo.getCode(), stockBkDo.getName()));
 
                     stockBkStockVo.setBkCode2(stockBkStockDoList1.get(1).getBkCode());
                     StockBkDo stockBkDo2 = bkCodeNameMap.get(stockBkStockDoList1.get(1).getBkCode());
                     stockBkStockVo.setBkCodeName2(stockBkDo2.getName());
                     stockBkStockVo.setBkCodeType2(stockBkDo2.getType());
+                    stockBkStockVo.setBkContent2(convertContent(stockBkDo2.getCode(), stockBkDo2.getName()));
 
                     stockBkStockVo.setBkCode3(stockBkStockDoList1.get(2).getBkCode());
                     StockBkDo stockBkDo3 = bkCodeNameMap.get(stockBkStockDoList1.get(2).getBkCode());
                     stockBkStockVo.setBkCodeName3(stockBkDo3.getName());
                     stockBkStockVo.setBkCodeType3(stockBkDo3.getType());
+                    stockBkStockVo.setBkContent3(convertContent(stockBkDo3.getCode(), stockBkDo3.getName()));
 
                 } else if (size >= 4) {
                     stockBkStockVo.setBkCode1(stockBkStockDoList1.get(0).getBkCode());
                     StockBkDo stockBkDo = bkCodeNameMap.get(stockBkStockDoList1.get(0).getBkCode());
                     stockBkStockVo.setBkCodeName1(stockBkDo.getName());
                     stockBkStockVo.setBkCodeType1(stockBkDo.getType());
+                    stockBkStockVo.setBkContent1(convertContent(stockBkDo.getCode(), stockBkDo.getName()));
 
                     stockBkStockVo.setBkCode2(stockBkStockDoList1.get(1).getBkCode());
                     StockBkDo stockBkDo2 = bkCodeNameMap.get(stockBkStockDoList1.get(1).getBkCode());
                     stockBkStockVo.setBkCodeName2(stockBkDo2.getName());
                     stockBkStockVo.setBkCodeType2(stockBkDo2.getType());
+                    stockBkStockVo.setBkContent2(convertContent(stockBkDo2.getCode(), stockBkDo2.getName()));
 
                     stockBkStockVo.setBkCode3(stockBkStockDoList1.get(2).getBkCode());
                     StockBkDo stockBkDo3 = bkCodeNameMap.get(stockBkStockDoList1.get(2).getBkCode());
                     stockBkStockVo.setBkCodeName3(stockBkDo3.getName());
                     stockBkStockVo.setBkCodeType3(stockBkDo3.getType());
+                    stockBkStockVo.setBkContent3(convertContent(stockBkDo3.getCode(), stockBkDo3.getName()));
+
 
                     stockBkStockVo.setBkCode4(stockBkStockDoList1.get(3).getBkCode());
                     StockBkDo stockBkDo4 = bkCodeNameMap.get(stockBkStockDoList1.get(3).getBkCode());
                     stockBkStockVo.setBkCodeName4(stockBkDo4.getName());
                     stockBkStockVo.setBkCodeType4(stockBkDo4.getType());
+                    stockBkStockVo.setBkContent4(convertContent(stockBkDo4.getCode(), stockBkDo4.getName()));
                 }
                 result.add(stockBkStockVo);
             }
         }
         return OutputResult.buildSucc(new PageResponse<>(total, result));
+    }
+
+    private String convertContent(String code, String name) {
+        return code + "( " + name + " )";
     }
 
     @Override
@@ -616,6 +631,54 @@ public class BKBusinessImpl implements BKBusiness {
             result.add(stockBkTopVo);
         }
         return OutputResult.buildSucc(result);
+    }
+
+    @Override
+    public OutputResult listBkTopNew(StockBKMoneyStatRo stockBKMoneyStatRo) {
+        //计算开始日期和结束日期相差多少天，就是后面的计算值.
+        DateTime startDateDate = DateUtil.parse(stockBKMoneyStatRo.getStartDate(), Const.SIMPLE_DATE_FORMAT);
+        DateTime endDateDate = DateUtil.parse(stockBKMoneyStatRo.getEndDate(), Const.SIMPLE_DATE_FORMAT);
+        //计算一下，相差多少天
+        long day = DateUtil.betweenDay(startDateDate, endDateDate, true);
+
+        List<Date> resultDateList = new ArrayList<>();
+        //进行计算
+        for (int i = 0; i <= day; i++) {
+            DateTime tempDate = DateUtil.offsetDay(endDateDate, -i);
+            if (dateHelper.isWorkingDay(tempDate)) {
+                resultDateList.add(tempDate);
+            }
+        }
+        // 如果为 null, 则返回
+        if (CollectionUtils.isEmpty(resultDateList)) {
+            return OutputResult.buildSucc(Collections.emptyList());
+        }
+        List<StockBkTopDetailVo> allList = new ArrayList<>();
+        for (Date date : resultDateList) {
+            String currDate = DateUtil.format(date, Const.SIMPLE_DATE_FORMAT);
+            // 设置集合。
+            List<StockBkMoneyHistoryDo> stockBkMoneyHistoryDoList =
+                    stockBkMoneyHistoryService.listTopByDateOrderByProportionDesc(date, stockBKMoneyStatRo.getBkType(), 10);
+            if (!CollectionUtils.isEmpty(stockBkMoneyHistoryDoList)) {
+                List<StockBkTopDetailVo> detailList = stockBkMoneyHistoryDoList.stream().map(
+                        n -> {
+                            StockBkTopDetailVo stockBkTopDetailVo = new StockBkTopDetailVo();
+                            stockBkTopDetailVo.setBkCode(n.getBkCode());
+                            stockBkTopDetailVo.setBkName(n.getBkName());
+                            stockBkTopDetailVo.setBkNowProportion(n.getBkNowProportion());
+                            stockBkTopDetailVo.setType(n.getType());
+                            stockBkTopDetailVo.setCurrDate(currDate);
+                            return stockBkTopDetailVo;
+                        }
+                ).collect(Collectors.toList());
+                allList.addAll(detailList);
+            }
+        }
+        // 如果为空，则返回空集合。
+        if (CollectionUtils.isEmpty(allList)) {
+            return OutputResult.buildSucc(PageResponse.emptyPageResponse());
+        }
+        return PageUtil.pageResult(allList, stockBKMoneyStatRo.getPageNum(), stockBKMoneyStatRo.getPageSize());
     }
 
     private void asyncStockBkCodeList(List<String> filterCodeList) {

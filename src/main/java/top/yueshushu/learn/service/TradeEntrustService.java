@@ -32,7 +32,7 @@ public interface TradeEntrustService {
      * @param tradeEntrustRo 委托对象
      * @return 查询虚拟的今日委托信息
      */
-    OutputResult<List<TradeEntrustVo>> mockList(TradeEntrustRo tradeEntrustRo);
+    OutputResult<PageResponse<TradeEntrustVo>> mockList(TradeEntrustRo tradeEntrustRo);
 
     /**
      * 查询真实的今日委托信息
@@ -71,4 +71,11 @@ public interface TradeEntrustService {
      * @param mockType 类型
      */
     void syncEasyMoneyToDB(Integer userId, MockType mockType);
+
+    /**
+     * 根据条件，查询委托单信息
+     *
+     * @param tradeEntrustRo 查询委托单条件
+     */
+    OutputResult<TradeEntrustVo> getInfoByCondition(TradeEntrustRo tradeEntrustRo);
 }

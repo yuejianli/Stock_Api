@@ -16,4 +16,5 @@ public class StockBkTopDetailVo implements Serializable {
     private String bkName;
     private String bkNowProportion;
     private Integer type;
+    private String currDate;
 }

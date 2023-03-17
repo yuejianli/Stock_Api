@@ -60,7 +60,7 @@ public class TradePositionController extends BaseController{
         }
 
         TradePositionShowVo tradePositionShowVo = new TradePositionShowVo();
-        tradePositionShowVo.setDateList(data);
+        tradePositionShowVo.setDataList(data);
         BigDecimal todayMoneySum = new BigDecimal(0);
         if (!CollectionUtils.isEmpty(data)) {
             for (TradePositionVo tradePositionVo : data) {
@@ -71,6 +71,7 @@ public class TradePositionController extends BaseController{
             }
         }
         tradePositionShowVo.setTodayMoney(todayMoneySum);
+        tradePositionShowVo.setTotal(data.size());
         return OutputResult.buildSucc(tradePositionShowVo);
     }
 

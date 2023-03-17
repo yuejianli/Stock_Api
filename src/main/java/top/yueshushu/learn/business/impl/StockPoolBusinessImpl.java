@@ -185,7 +185,7 @@ public class StockPoolBusinessImpl implements StockPoolBusiness {
     public OutputResult<PageResponse<StockRelationVo>> listPool(StockPoolRo stockPoolRo) {
         // 1. 查询出对应的股票列表
         StockPoolQueryDto stockPoolQueryDto = stockPoolHistoryAssembler.roToDto(stockPoolRo);
-        int daySize = dateHelper.betweenWorkDay(stockPoolRo.getStartDate(), stockPoolRo.getEndDate()).size();
+        List<String> dateRangeList = dateHelper.betweenWorkDay(stockPoolRo.getStartDate(), stockPoolRo.getEndDate());
         Map<String, List<String>> codeDateMap = stockPoolHistoryService.listStockCodeByCondition(stockPoolQueryDto);
         List<String> codeList = ListUtil.toList(codeDateMap.keySet());
         if (CollectionUtils.isEmpty(codeList)) {
@@ -203,40 +203,53 @@ public class StockPoolBusinessImpl implements StockPoolBusiness {
             StockRelationVo stockRelationVo = new StockRelationVo();
             stockRelationVo.setCode(stockCode);
             List<StockHistoryVo> stockHistoryByCodeAndRangeDateList = stockHistoryService.getStockHistoryByCodeAndRangeDate(stockCode, startDate, endDate);
-            if (!CollectionUtils.isEmpty(stockHistoryByCodeAndRangeDateList)) {
-                stockRelationVo.setName(stockHistoryByCodeAndRangeDateList.get(0).getName());
-                List<String> dateList = codeDateMap.get(stockCode);
-                // 判断一下 长度
-                List<HistoryRelationVo> detailList = new ArrayList<>();
-                if (stockHistoryByCodeAndRangeDateList.size() < daySize) {
-                    detailList.add(new HistoryRelationVo());
+            // 进行转换， 换成日期进行处理。
+            Map<String, StockHistoryVo> voMap = convertMap(stockHistoryByCodeAndRangeDateList);
+            // 判断一下 长度
+            List<HistoryRelationVo> detailList = new ArrayList<>();
+            for (String date : dateRangeList) {
+                StockHistoryVo stockHistoryVo = voMap.get(date);
+                HistoryRelationVo historyRelationVo = new HistoryRelationVo();
+                historyRelationVo.setCurrDate(date);
+                if (null == stockHistoryVo) {
+                    detailList.add(historyRelationVo);
+                } else {
+                    int type;
+                    stockRelationVo.setName(stockHistoryByCodeAndRangeDateList.get(0).getName());
+                    if (stockHistoryVo.getAmplitudeProportion().compareTo(SystemConst.DEFAULT_EMPTY) > 0) {
+                        type = AmplitudeType.ROSE.getCode();
+                    } else {
+                        type = AmplitudeType.WANE.getCode();
+                    }
+                    List<String> dateList = codeDateMap.get(stockCode);
+                    if (dateList.contains(date)) {
+                        historyRelationVo.setSign(1);
+                    }
+                    historyRelationVo.setType(type);
+                    historyRelationVo.setAmplitudeProportion(BigDecimalUtil.toString(stockHistoryVo.getAmplitudeProportion()));
+                    historyRelationVo.setClosePrice(BigDecimalUtil.toString(stockHistoryVo.getClosingPrice()));
+                    detailList.add(historyRelationVo);
                 }
-                stockHistoryByCodeAndRangeDateList.forEach(
-                        n -> {
-                            HistoryRelationVo historyRelationVo = new HistoryRelationVo();
-                            int type;
-                            if (n.getAmplitudeProportion().compareTo(SystemConst.DEFAULT_EMPTY) > 0) {
-                                type = AmplitudeType.ROSE.getCode();
-                            } else {
-                                type = AmplitudeType.WANE.getCode();
-                            }
-                            String currDate = DateUtil.format(n.getCurrDate(), Const.SIMPLE_DATE_FORMAT);
-                            historyRelationVo.setCurrDate(currDate);
-                            if (dateList.contains(currDate)) {
-                                historyRelationVo.setSign(1);
-                            }
-                            historyRelationVo.setType(type);
-                            historyRelationVo.setAmplitudeProportion(BigDecimalUtil.toString(n.getAmplitudeProportion()));
-                            historyRelationVo.setClosePrice(BigDecimalUtil.toString(n.getClosingPrice()));
-                            detailList.add(historyRelationVo);
-                        }
-                );
-                stockRelationVo.setDetailList(detailList);
             }
-            result.add(stockRelationVo);
+            stockRelationVo.setDetailList(detailList);
+            if (!CollectionUtils.isEmpty(stockRelationVo.getDetailList())) {
+                result.add(stockRelationVo);
+            }
         }
         //4. 组装成分页，返回数据。
         return OutputResult.buildSucc(new PageResponse<>((long) codeList.size(), result));
+    }
+
+    private Map<String, StockHistoryVo> convertMap(List<StockHistoryVo> stockHistoryByCodeAndRangeDateList) {
+        if (CollectionUtils.isEmpty(stockHistoryByCodeAndRangeDateList)) {
+            return Collections.emptyMap();
+        }
+
+        Map<String, StockHistoryVo> result = new HashMap<>(stockHistoryByCodeAndRangeDateList.size(), 1.0f);
+        stockHistoryByCodeAndRangeDateList.forEach(n -> {
+            result.put(DateUtil.format(n.getCurrDate(), Const.SIMPLE_DATE_FORMAT), n);
+        });
+        return result;
     }
 
     /**

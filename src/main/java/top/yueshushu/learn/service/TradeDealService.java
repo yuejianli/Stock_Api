@@ -27,10 +27,11 @@ public interface TradeDealService {
 
     /**
      * 查询虚拟的今日成交信息
+     *
      * @param tradeDealRo 成交对象
      * @return 查询虚拟的今日成交信息
      */
-    OutputResult mockList(TradeDealRo tradeDealRo);
+    OutputResult<PageResponse<TradeDealVo>> mockList(TradeDealRo tradeDealRo);
 
     /**
      * 查询真实的今日成交信息

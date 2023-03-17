@@ -234,6 +234,10 @@ public class ResultCode {
     public static final ResultCode REAL_REVOKE_ERROR =
             new ResultCode(true, 10019017, "调用接口撤销股票委托失败");
 
+    public static final ResultCode TRADE_ENTRUST_CODE_EMPTY =
+            new ResultCode(true, 10019018, "传入的委托编号不正确");
+
+
     public static final ResultCode STOCK_ASYNC_NO_CHANGE =
             new ResultCode(false, 20010007, "股票信息未发生改变");
     public static final ResultCode STOCK_ASYNC_NO_START_DATE =

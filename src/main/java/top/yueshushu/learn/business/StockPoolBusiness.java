@@ -35,4 +35,5 @@ public interface StockPoolBusiness {
      * @param stockPoolRo 股票池
      */
     OutputResult<PageResponse<StockRelationVo>> listPool(StockPoolRo stockPoolRo);
+
 }

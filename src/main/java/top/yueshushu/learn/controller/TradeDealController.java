@@ -11,9 +11,12 @@ import top.yueshushu.learn.business.TradeDealBusiness;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.enumtype.MockType;
 import top.yueshushu.learn.mode.ro.TradeDealRo;
+import top.yueshushu.learn.mode.vo.TradeDealVo;
 import top.yueshushu.learn.response.OutputResult;
+import top.yueshushu.learn.util.PageUtil;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * <p>
@@ -38,14 +41,15 @@ public class TradeDealController extends BaseController{
             return OutputResult.buildFail(ResultCode.TRADE_MOCK_TYPE_IS_EMPTY);
         }
         MockType mockType = MockType.getMockType(tradeDealRo.getMockType());
-        if (mockType == null){
+        if (mockType == null) {
             return OutputResult.buildFail(ResultCode.TRADE_MOCK_TYPE_NOT_EXIST);
         }
 
-        if (MockType.MOCK.equals(mockType)){
+        if (MockType.MOCK.equals(mockType)) {
             return tradeDealBusiness.mockList(tradeDealRo);
         }
-        return tradeDealBusiness.realList(tradeDealRo);
+        OutputResult<List<TradeDealVo>> listOutputResult = tradeDealBusiness.realList(tradeDealRo);
+        return PageUtil.pageResult(listOutputResult.getData(), tradeDealRo.getPageNum(), tradeDealRo.getPageSize());
     }
     @PostMapping("/history")
     @ApiOperation("查询历史成交")

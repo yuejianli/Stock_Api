@@ -16,6 +16,7 @@ import top.yueshushu.learn.util.RedisUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -55,7 +56,10 @@ public class CacheServiceImpl implements CacheService {
             }
             //获取相关的信息
             try {
-                String value = redisUtil.get(key).toString();
+                String value = Optional.ofNullable(redisUtil.get(key)).map(n -> n.toString()).orElse(null);
+                if (null == value) {
+                    continue;
+                }
                 CacheVo cacheVo = new CacheVo();
                 cacheVo.setKey(subKey);
                 cacheVo.setValue(value);
@@ -65,6 +69,9 @@ public class CacheServiceImpl implements CacheService {
                 continue;
             }
         }
+        if (CollectionUtils.isEmpty(cacheVoList)) {
+            return OutputResult.buildSucc(PageResponse.emptyPageResponse());
+        }
         List<CacheVo> list = PageUtil.startPage(cacheVoList, cacheRo.getPageNum(),
                 cacheRo.getPageSize());
         return OutputResult.buildSucc(new PageResponse<>((long) cacheVoList.size(), list));
@@ -73,7 +80,7 @@ public class CacheServiceImpl implements CacheService {
     private String getKeyPrefix(Integer userId, Integer type) {
         //查询的是公共的
         if (type == 0){
-            return Const.CACHE_PUBLIC_KEY_PREFIX;
+            return Const.STOCK_PRICE;
         }else{
             return Const.CACHE_PUBLIC_KEY_PREFIX;
         }

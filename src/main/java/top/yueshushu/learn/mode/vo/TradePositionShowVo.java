@@ -14,6 +14,7 @@ import java.util.List;
  */
 @Data
 public class TradePositionShowVo implements Serializable {
-    private List<TradePositionVo> dateList;
+    private List<TradePositionVo> dataList;
     private BigDecimal todayMoney;
+    private Integer total;
 }

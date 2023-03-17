@@ -45,7 +45,11 @@ public class DefaultDailyTradingInfoParse implements DailyTradingInfoParse {
         if (!(uploadFilePath.endsWith("/") || uploadFilePath.endsWith("\\"))) {
             uploadFilePath = uploadFilePath + File.separator;
         }
+        uploadFilePath = uploadFilePath + "csv" + File.separator;
         File downloadFile = new File(uploadFilePath + fileName + ".csv");
+        if (downloadFile.exists()) {
+            downloadFile.mkdirs();
+        }
         //将数据保存到文件里面
         FileUtil.writeFromStream(inputStream, downloadFile);
         //将文件写入进去

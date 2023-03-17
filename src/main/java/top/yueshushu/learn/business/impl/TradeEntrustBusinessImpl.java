@@ -33,7 +33,7 @@ public class TradeEntrustBusinessImpl implements TradeEntrustBusiness {
     private TradeCacheService tradeCacheService;
 
     @Override
-    public OutputResult<List<TradeEntrustVo>> mockList(TradeEntrustRo tradeEntrustRo) {
+    public OutputResult<PageResponse<TradeEntrustVo>> mockList(TradeEntrustRo tradeEntrustRo) {
         return tradeEntrustService.mockList(tradeEntrustRo);
     }
 
@@ -67,5 +67,10 @@ public class TradeEntrustBusinessImpl implements TradeEntrustBusiness {
             return OutputResult.buildSucc(PageResponse.emptyPageResponse());
         }
         return PageUtil.pageResult(tradeEntrustVoList, tradeEntrustRo.getPageNum(), tradeEntrustRo.getPageSize());
+    }
+
+    @Override
+    public OutputResult<TradeEntrustVo> getInfoByCondition(TradeEntrustRo tradeEntrustRo) {
+        return tradeEntrustService.getInfoByCondition(tradeEntrustRo);
     }
 }

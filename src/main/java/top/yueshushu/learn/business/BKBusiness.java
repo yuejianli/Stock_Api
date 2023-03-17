@@ -128,4 +128,7 @@ public interface BKBusiness {
 
     OutputResult<List<StockBkTopVo>> listBkTop(StockBKMoneyStatRo stockBKMoneyStatRo);
 
+    OutputResult listBkTopNew(StockBKMoneyStatRo stockBKMoneyStatRo);
+
+
 }

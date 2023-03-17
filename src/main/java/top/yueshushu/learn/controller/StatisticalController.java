@@ -11,9 +11,11 @@ import top.yueshushu.learn.business.StatBusiness;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.mode.ro.StatTen10Ro;
 import top.yueshushu.learn.mode.ro.StockStatRo;
+import top.yueshushu.learn.mode.vo.DistVo;
 import top.yueshushu.learn.response.OutputResult;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @Description 统计股票的情况
@@ -36,6 +38,13 @@ public class StatisticalController extends BaseController {
             return OutputResult.buildAlert(ResultCode.STOCK_CODE_IS_EMPTY);
         }
         return statBusiness.getWeekStat(stockStatRo);
+    }
+
+    @ApiOperation("查询所有的股票资金类型")
+    @PostMapping("/listMoneyType")
+    @AuthToken
+    public OutputResult<List<DistVo>> listMoneyType(@RequestBody StockStatRo stockStatRo) {
+        return statBusiness.listMoneyType();
     }
 
     @ApiOperation("股票图形统计信息")

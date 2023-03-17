@@ -181,7 +181,10 @@ public class CrawlerStockHistoryServiceImpl implements CrawlerStockHistoryServic
                 stockHistoryDomainService.deleteHasAsyncData(codeList, beforeLastWorking);
             }
 
-            stockHistoryDomainService.saveBatch(stockHistoryDoList, 50);
+            boolean saveFlag = stockHistoryDomainService.saveBatch(stockHistoryDoList);
+            if (!saveFlag) {
+                log.error("保存股票历史记录失败,请及时进行处理 {}", codeList);
+            }
             return OutputResult.buildSucc(ResultCode.STOCK_HIS_ASYNC_SUCCESS);
         } catch (Exception e) {
             return OutputResult.buildFail(e.getMessage());

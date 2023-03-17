@@ -46,8 +46,6 @@ public class StockPoolController {
         handlerDate(stockPoolRo);
         return stockPoolBusiness.listPool(stockPoolRo);
     }
-
-
     /**
      * 处理日期
      *

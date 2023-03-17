@@ -1,10 +1,7 @@
 package top.yueshushu.learn.service.impl;
 
-import top.yueshushu.learn.domain.RoleMenuDo;
-import top.yueshushu.learn.mapper.RoleMenuMapper;
-import top.yueshushu.learn.service.RoleMenuService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
+import top.yueshushu.learn.service.RoleMenuService;
 
 /**
  * <p>
@@ -15,6 +12,6 @@ import org.springframework.stereotype.Service;
  * @since 2022-01-02
  */
 @Service
-public class RoleMenuServiceImpl extends ServiceImpl<RoleMenuMapper, RoleMenuDo> implements RoleMenuService {
+public class RoleMenuServiceImpl implements RoleMenuService {
 
 }

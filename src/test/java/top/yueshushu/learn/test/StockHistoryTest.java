@@ -31,7 +31,23 @@ public class StockHistoryTest {
     @Test
     public void txStockTest() {
         List<Object> codeList = Arrays.asList(
-                600843, 600844, 600845, 600846, 600847, 600848, 600849, 600850, 600851, 600852, 600853, 600854, 600855, 600856, 600857, 600858, 600859, 600860, 600861, 600862
+                "000972", "000973", "000975",
+                "000976", "000977", "000978",
+                "000979", "000980", "000981",
+                "000982", "000983", "000985",
+                "000987",
+                "000988", "000989", "000990",
+                "000993", "000995", "000996",
+                "000997"
+        );
+        List<String> resultCodeList = codeList.stream().map(n -> String.valueOf(n)).collect(Collectors.toList());
+        crawlerStockHistoryService.txMoneyTodayStockHistory(resultCodeList, stockService.listFullCode(resultCodeList));
+    }
+
+    @Test
+    public void txStock2Test() {
+        List<Object> codeList = Arrays.asList(
+                "000995", "000996", "000997"
         );
         List<String> resultCodeList = codeList.stream().map(n -> String.valueOf(n)).collect(Collectors.toList());
         crawlerStockHistoryService.txMoneyTodayStockHistory(resultCodeList, stockService.listFullCode(resultCodeList));

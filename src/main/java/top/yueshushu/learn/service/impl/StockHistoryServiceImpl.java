@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -185,11 +186,16 @@ public class StockHistoryServiceImpl  implements StockHistoryService {
                 stockDayStatRo.getEndDayNum()
         );
         stockHistoryQueryDto.setMonth(stockDayStatRo.getMonth());
-    
+        // 对 weeks 进行处理， 用于处理 周这种情况信息.
+        if (!CollectionUtils.isEmpty(stockDayStatRo.getWeeks())) {
+            List<Integer> newWeeks = stockDayStatRo.getWeeks().stream().map(n -> Integer.valueOf(n) + 1).collect(Collectors.toList());
+            stockHistoryQueryDto.setWeeks(newWeeks);
+        }
+
         Page<Object> pageGithubResult = PageHelper.startPage(stockDayStatRo.getPageNum(), stockDayStatRo.getPageSize());
-    
+
         List<StockHistoryDo> stockHistoryDoList = stockHistoryDomainService.listDayRange(stockHistoryQueryDto);
-    
+
         if (CollectionUtils.isEmpty(stockHistoryDoList)) {
             return OutputResult.buildSucc(
                     PageResponse.emptyPageResponse()

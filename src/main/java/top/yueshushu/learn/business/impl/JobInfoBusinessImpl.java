@@ -16,7 +16,6 @@ import top.yueshushu.learn.domainservice.TradeRuleDbDomainService;
 import top.yueshushu.learn.entity.JobInfo;
 import top.yueshushu.learn.enumtype.*;
 import top.yueshushu.learn.helper.DateHelper;
-import top.yueshushu.learn.message.dingtalk.DingTalkService;
 import top.yueshushu.learn.message.weixin.service.WeChatService;
 import top.yueshushu.learn.mode.ro.BuyRo;
 import top.yueshushu.learn.mode.ro.DealRo;
@@ -92,7 +91,7 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
     @Resource
     private AutoLoginBusiness autoLoginBusiness;
     @Resource
-    private DingTalkService dingTalkService;
+    private PriceImageBusiness priceImageBusiness;
     @Resource
     private TradeRuleDbDomainService tradeRuleDbDomainService;
     @Resource
@@ -421,6 +420,14 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
                         stockPoolBusiness.handlerPool(DateUtil.date());
                     }
                     break;
+                }
+                case PRICE_IMAGE: {
+                    if (!dateHelper.isWorkingDay(DateUtil.date()) || !MyDateUtil.after15Hour()) {
+                        return OutputResult.buildSucc();
+                    }
+                    // 处理一下图片保存信息。
+                    priceImageBusiness.batchSavePriceImage(null, true);
+
                 }
                 default: {
                     break;

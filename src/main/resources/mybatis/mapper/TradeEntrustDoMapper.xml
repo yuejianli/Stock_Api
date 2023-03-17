@@ -46,6 +46,12 @@
         <if test="tradeEntrustQueryDto.entrustStatus != null">
             and entrust_status =#{tradeEntrustQueryDto.entrustStatus}
         </if>
+        <if test="tradeEntrustQueryDto.code != null and tradeEntrustQueryDto.code != ''">
+            and code =#{tradeEntrustQueryDto.code}
+        </if>
+        <if test="tradeEntrustQueryDto.entrustCode != null and tradeEntrustQueryDto.entrustCode != ''">
+            and entrust_code =#{tradeEntrustQueryDto.entrustCode}
+        </if>
         order by entrust_date desc
     </select>
     <delete id="deleteToDayByQuery">

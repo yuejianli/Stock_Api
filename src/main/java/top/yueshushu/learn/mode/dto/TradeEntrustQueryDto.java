@@ -17,6 +17,7 @@ public class TradeEntrustQueryDto {
     private DateTime entrustDate;
     private Integer entrustStatus;
     private String code;
+    private String entrustCode;
     /**
      * 开始委托时间
      */

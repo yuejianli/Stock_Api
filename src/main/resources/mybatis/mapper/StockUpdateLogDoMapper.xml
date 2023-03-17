@@ -14,7 +14,7 @@
         select t.id,t.code,t.name,t.exchange,t.full_code,t.update_time,t.update_type from stock_update_log t
         <where>
             <if test="code != null and code != ''">
-                and t.code=#{code}
+                and t.code like concat('%',concat(#{code},'%'))
             </if>
             <if test="startDate!=null">
                 and date_format(update_time,'%Y%m%d') &gt;=date_format( #{startDate,jdbcType=TIMESTAMP},'%Y%m%d')

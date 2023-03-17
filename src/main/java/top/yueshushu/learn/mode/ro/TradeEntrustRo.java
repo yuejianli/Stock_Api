@@ -20,4 +20,8 @@ public class TradeEntrustRo extends TradeRo {
     private String startDate;
     @ApiModelProperty("状态集合")
     private List<Integer> statusList;
+    @ApiModelProperty("委托单编号")
+    private String entrustCode;
+    @ApiModelProperty("委托单id")
+    private String id;
 }

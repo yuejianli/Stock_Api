@@ -4,6 +4,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import top.yueshushu.learn.response.PageRo;
 
+import java.util.List;
+
 /**
  * @ClassName:StockRo
  * @Description 股票的相关ro
@@ -35,9 +37,13 @@ public class StockDayStatRo extends PageRo {
      * 开始的天数字
      */
     private Integer startDayNum;
-    
+
     /**
      * 结束的天数字
      */
     private Integer endDayNum;
+    /**
+     * 星期几的集合。
+     */
+    private List<String> weeks;
 }

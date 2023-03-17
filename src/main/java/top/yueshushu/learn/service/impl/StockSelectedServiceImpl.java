@@ -106,8 +106,9 @@ public class StockSelectedServiceImpl implements StockSelectedService {
             stockSelected = new StockSelected();
             stockSelected.setStockCode(stockSelectedRo.getStockCode());
             stockSelected.setStockName(
-                   stockName
+                    stockName
             );
+            stockSelected.setNotes(stockSelectedRo.getNotes());
             stockSelected.setUserId(stockSelectedRo.getUserId());
             stockSelected.setCreateTime(DateUtil.date());
             stockSelected.setStatus(DataFlagType.NORMAL.getCode());
@@ -123,6 +124,7 @@ public class StockSelectedServiceImpl implements StockSelectedService {
                     stockSelectedRo.getStockCode());
             stockSelected.setCreateTime(DateUtil.date());
             stockSelected.setStatus(DataFlagType.NORMAL.getCode());
+            stockSelected.setNotes(stockSelectedRo.getNotes());
             //进行更新
             stockSelectedDomainService.updateById(
                     stockSelectedAssembler.entityToDo(
@@ -499,7 +501,7 @@ public class StockSelectedServiceImpl implements StockSelectedService {
         //    );
         //}
         List<String> codeSelectedList = syncSelectedCodeHistory(stockSelectedDomainService.findCodeList(null));
-        syncShAndSZCodeHistory(codeSelectedList, DBStockType.SH_SZ);
+        syncShAndSZCodeHistory(codeSelectedList, DBStockType.SH_SZ_CY);
 
 
     }

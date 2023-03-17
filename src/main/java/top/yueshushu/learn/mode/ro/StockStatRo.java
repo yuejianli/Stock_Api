@@ -30,7 +30,7 @@ public class StockStatRo {
      */
     private String endDate;
     /**
-     * @param charPriceTypeList 股票的图表选择的类型
+     * @param charStockTypeList 选择的类型
      */
-    private List<Integer> charPriceTypeList;
+    private List<String> charStockTypeList;
 }
