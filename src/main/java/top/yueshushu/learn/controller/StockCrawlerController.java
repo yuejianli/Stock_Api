@@ -64,7 +64,7 @@ public class StockCrawlerController {
     @ApiOperation("同步股票的K线图")
     @PostMapping("/saveStockKline")
     public OutputResult saveStockKline(@RequestBody StockRo stockRo) {
-        if (!CollectionUtils.isEmpty(stockRo.getCodes())) {
+        if (CollectionUtils.isEmpty(stockRo.getCodes())) {
             return OutputResult.buildAlert(
                     ResultCode.STOCK_CODE_IS_EMPTY
             );
