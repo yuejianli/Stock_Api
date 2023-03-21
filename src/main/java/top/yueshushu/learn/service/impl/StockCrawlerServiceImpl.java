@@ -207,12 +207,10 @@ public class StockCrawlerServiceImpl implements StockCrawlerService {
         Map<String, StockDo> dbStockCodeMap = dbAllStockList.stream().collect(Collectors.toMap(StockDo::getCode, n -> n));
         //爬虫查询，目前的股票列表记录.
         List<DownloadStockInfo> webStockList = crawlerService.getStockList();
-        List<String> webStockCodeList = webStockList.stream().map(DownloadStockInfo::getCode).collect(Collectors.toList());
         log.info(">>> 查询当前网络系统上，共存在的股票条数为:{}", webStockList.size());
 
         List<StockDo> addStockDoList = new ArrayList<>();
         List<StockDo> updateStockDoList = new ArrayList<>();
-        List<Integer> deleteStockIdList = new ArrayList<>();
 
         List<StockUpdateLogDo> stockUpdateLogDoList = new ArrayList<>();
         // 股票更新历史记录
@@ -237,7 +235,7 @@ public class StockCrawlerServiceImpl implements StockCrawlerService {
                 String oldName = updateStockDo.getName();
                 //更新名称.
                 updateStockDo.setName(downloadStockInfo.getName());
-
+                updateStockDo.setCanUse(downloadStockInfo.getCanUse());
                 boolean newStockFlag = false;
                 if (downloadStockInfo.getName().startsWith("N")) {
                     newStockFlag = true;
@@ -263,27 +261,7 @@ public class StockCrawlerServiceImpl implements StockCrawlerService {
                 stockUpdateLogDoList.add(stockUpdateLogDo);
             }
         }
-        // 处理删除的
-        dbStockCodeMap.entrySet().forEach(
-                n -> {
-                    StockDo dbStockDo = n.getValue();
-                    if (!webStockCodeList.contains(dbStockDo.getCode())) {
-                        //不包含，如果被删除了
-                        log.info(">>>>>删除股票:{}", dbStockDo);
-                        deleteStockIdList.add(dbStockDo.getId());
 
-                        //处理日志记录
-                        StockUpdateLogDo stockUpdateLogDo = stockUpdateLogAssembler.stockEntityToDo(dbStockDo);
-                        stockUpdateLogDo.setUpdateTime(now);
-                        //id为空，避免使用的是股票编码的id
-                        stockUpdateLogDo.setId(null);
-                        stockUpdateLogDo.setUpdateType(StockUpdateType.DELISTING.getCode());
-                        stockUpdateLogDoList.add(stockUpdateLogDo);
-                    }
-                }
-        );
-        //接下来，进行插入和修改相关操作.
-        stockDomainService.removeByIds(deleteStockIdList);
         stockDomainService.updateBatchById(updateStockDoList);
         stockDomainService.saveBatch(addStockDoList);
 

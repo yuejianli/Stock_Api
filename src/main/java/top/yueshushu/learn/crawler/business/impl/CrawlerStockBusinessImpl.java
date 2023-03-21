@@ -2,6 +2,7 @@ package top.yueshushu.learn.crawler.business.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.crawler.business.CrawlerStockBusiness;
 import top.yueshushu.learn.crawler.entity.StockBigDealInfo;
 import top.yueshushu.learn.crawler.service.CrawlerStockService;
@@ -37,9 +38,10 @@ public class CrawlerStockBusinessImpl implements CrawlerStockBusiness {
 
     @Override
     public OutputResult stockAsync(StockRo stockRo) {
-        return crawlerStockService.stockAsync(
+        crawlerStockService.stockAsync(
                 stockRo
         );
+        return OutputResult.buildSucc(ResultCode.STOCK_ASYNC_SUCCESS);
     }
 
     @Override

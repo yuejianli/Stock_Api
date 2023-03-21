@@ -4,6 +4,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import top.yueshushu.learn.response.PageRo;
 
+import java.util.List;
+
 /**
  * @ClassName:StockRo
  * @Description 股票的相关ro
@@ -40,4 +42,9 @@ public class StockRo  extends PageRo {
      * 搜索的关键字
      */
     private String keyword;
+
+    /**
+     * 股票编码集合
+     */
+    private List<String> codes;
 }

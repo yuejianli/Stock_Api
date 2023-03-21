@@ -50,12 +50,13 @@ public class DefaultStockInfoParser implements StockInfoParser {
                     downloadStockInfo.setCode(tempObject.getString("f12"));
                     downloadStockInfo.setName(tempObject.getString("f14"));
 
-                    //处理类型  1为上海   0为深圳
                     int type = tempObject.getInteger("f13");
                     //进行处理
                     downloadStockInfo.setExchange(type);
                     //设置股票的全称
-                    downloadStockInfo.setFullCode(StockUtil.getFullCode(type, downloadStockInfo.getCode()));
+                    downloadStockInfo.setFullCode(StockUtil.getFullCode(downloadStockInfo.getCode()));
+                    Integer price = tempObject.getInteger("f2");
+                    downloadStockInfo.setCanUse((price == null || price == 0) ? 0 : 1);
 
                     result.add(downloadStockInfo);
                 }

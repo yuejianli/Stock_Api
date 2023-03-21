@@ -7,10 +7,11 @@
         <result property="name" column="name"></result>
         <result property="exchange" column="exchange"></result>
         <result property="fullCode" column="full_code"></result>
+        <result property="canUse" column="can_use"></result>
     </resultMap>
 
     <select id="selectByCodeAndType" resultMap="stockMap">
-        select t.id,t.code,t.name,t.exchange,t.full_code from stock t
+        select t.id,t.code,t.name,t.exchange,t.full_code,t.can_use from stock t
         <where>
             <if test="code != null and code != ''">
                 and (
@@ -21,6 +22,7 @@
             <if test="exchange != null">
                 and t.exchange=#{exchange}
             </if>
+            and can_use = 1
         </where>
         order by t.code+0 asc
     </select>
@@ -28,7 +30,7 @@
         delete from stockDo  where 1=1
     </delete>
     <select id="selectByKeyword" resultMap="stockMap">
-        select t.id,t.code,t.name,t.exchange,t.full_code from stock t
+        select t.id,t.code,t.name,t.exchange,t.full_code,t.can_use from stock t
         <where>
             <if test="keyword != null and keyword != ''">
                 and (
@@ -37,10 +39,11 @@
                 or t.name like concat('%',concat(#{keyword},'%'))
                 )
             </if>
+            and can_use = 1
         </where>
         order by t.code+0 asc
     </select>
     <select id="listAllCode" resultType="java.lang.String">
-        select code from stock order by code
+        select code from stock where can_use = 1 order by code
     </select>
 </mapper>

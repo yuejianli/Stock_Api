@@ -298,6 +298,7 @@ CREATE TABLE `stock`
     `name`        varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '股票的名称',
     `exchange`    tinyint(1)                                             NOT NULL COMMENT '股票的标识 0为深圳 1为上海 2为北京',
     `full_code`   varchar(8) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL COMMENT '股票代码的全称',
+    `can_use`     tinyint(1)                                                  DEFAULT '1' COMMENT '是否可以被使用 1为使用 0为不使用',
     `create_time` timestamp(0)                                           NULL DEFAULT NULL COMMENT '创建时间',
     `create_user` varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '创建人',
     `flag`        tinyint(1)                                             NULL DEFAULT NULL COMMENT '是否删除 1为正常 2为删除',

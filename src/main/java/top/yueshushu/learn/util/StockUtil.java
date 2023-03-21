@@ -1,19 +1,16 @@
 package top.yueshushu.learn.util;
 
 import cn.hutool.core.util.RandomUtil;
-import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import top.yueshushu.learn.common.SystemConst;
 import top.yueshushu.learn.enumtype.ExchangeMarketType;
 import top.yueshushu.learn.enumtype.ExchangeType;
-import top.yueshushu.learn.enumtype.StockType;
 import top.yueshushu.learn.mode.dto.PoundageDto;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 /**
  * @ClassName:StockUtil
@@ -241,15 +238,6 @@ public class StockUtil {
         shThreeList=Arrays.asList("009","126","110","201","202","203","204");
     }
 
-    public static String getFullCode(Integer type,String code){
-        Assert.notNull(type,"类型不能为空");
-        Assert.notNull(code,"股票代码不能为空");
-        ExchangeType exchangeType = ExchangeType.getExchangeType(type);
-        if(exchangeType==null){
-            return code;
-        }
-        return exchangeType.getDesc()+code;
-    }
     public static String getFullCode(String stockCode){
         if (!StringUtils.hasText(stockCode)||stockCode.length()<3) {
             return stockCode;
@@ -320,35 +308,5 @@ public class StockUtil {
 
     private static boolean isCodeStart(String code, List<String> list01, List<String> list02, List<String> list03) {
         return isCodeStart(code, list01) || isCodeStart(code, list02) || isCodeStart(code, list03);
-    }
-
-    public static int getStockType(String exchange, String code) {
-        if (exchange == null) {
-            exchange = StockUtil.getExchange(code);
-        }
-        if (ExchangeType.SH.equals(ExchangeType.prefix(exchange))) {
-            if (CODES_SH_INDEX.contains(code)) {
-                return StockType.Index.value();
-            }
-        } else if (ExchangeType.SZ.equals(ExchangeType.prefix(exchange))) {
-            if (CODES_SZ_INDEX.contains(code)) {
-                return StockType.Index.value();
-            }
-        } else {
-            if (CODES_BJ_INDEX.contains(code)) {
-                return StockType.Index.value();
-            }
-        }
-
-        if (isCodeStart(code, CODES_SH_A, CODES_SZ_A, CODES_BJ_A)) {
-            return StockType.A.value();
-        }
-        if (isCodeStart(code, CODES_SH_ETF, CODES_SZ_ETF, CODES_BJ_ETF)) {
-            return StockType.ETF.value();
-        }
-        if (isCodeStart(code, CODES_SH_CB, CODES_SZ_CB, CODES_BJ_CB)) {
-            return StockType.CB.value();
-        }
-        throw new NoSuchElementException("no stock type exchange " + exchange + ", code " + code);
     }
 }

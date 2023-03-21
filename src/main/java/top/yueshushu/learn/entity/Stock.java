@@ -1,11 +1,6 @@
 package top.yueshushu.learn.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -27,6 +22,7 @@ public class Stock implements Serializable {
     private String name;
     private Integer exchange;
     private String fullCode;
+    private Integer canUse;
     private Date createTime;
     private String createUser;
     private Integer flag;

@@ -30,4 +30,8 @@ public class DownloadStockInfo implements Serializable {
      * 股票编码的全称
      */
     private String fullCode;
+    /**
+     * 是否可用  0 为不可用  1为可用
+     */
+    private Integer canUse;
 }

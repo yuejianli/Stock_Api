@@ -1,14 +1,10 @@
 package top.yueshushu.learn.mode.vo;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -29,6 +25,8 @@ public class StockVo implements Serializable {
     private Integer exchange;
     @ApiModelProperty("股票代码的全称")
     private String fullCode;
+    @ApiModelProperty("是否可以被使用 1为使用 0为不使用")
+    private Integer canUse;
     @ApiModelProperty("创建时间")
     private Date createTime;
     @ApiModelProperty("创建人")

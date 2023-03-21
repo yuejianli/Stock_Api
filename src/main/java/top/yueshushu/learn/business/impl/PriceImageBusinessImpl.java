@@ -15,6 +15,7 @@ import top.yueshushu.learn.crawler.service.CrawlerStockService;
 import top.yueshushu.learn.domainservice.StockDomainService;
 import top.yueshushu.learn.enumtype.DBStockType;
 import top.yueshushu.learn.enumtype.KType;
+import top.yueshushu.learn.helper.DateHelper;
 import top.yueshushu.learn.service.StockSelectedService;
 import top.yueshushu.learn.service.StockService;
 
@@ -48,6 +49,8 @@ public class PriceImageBusinessImpl implements PriceImageBusiness {
     private StockDomainService stockDomainService;
     @Value("${uploadFilePath}")
     private String uploadFilePath;
+    @Resource
+    private DateHelper dateHelper;
 
     @Override
     public void batchSavePriceImage(List<String> codeList, Boolean asyncPool) {
@@ -89,7 +92,7 @@ public class PriceImageBusinessImpl implements PriceImageBusiness {
             int maxIndex = Math.min(i + BATCH_NUMBER, size);
             saveImageSelected(filterCodeList.subList(i, maxIndex));
         }
-        log.info("总同步时间是:" + timeInterval.interval());
+        log.info("总同步时间是:" + timeInterval.intervalSecond());
     }
 
     private List<String> saveImageSelected(List<String> codeList) {
@@ -109,7 +112,7 @@ public class PriceImageBusinessImpl implements PriceImageBusiness {
 
     private void getAndSaveImage(List<String> resultCodeList, List<String> listFullCode) {
         //2. 如果没有的话，创建文件夹
-        String date = DateUtil.format(new Date(), Const.STOCK_DATE_FORMAT);
+        String date = DateUtil.format(dateHelper.getBeforeLastWorking(new Date()), Const.STOCK_DATE_FORMAT);
         File imageDirection = new File(uploadFilePath + File.separator + "images" + File.separator + date);
         if (!imageDirection.exists()) {
             imageDirection.mkdirs();

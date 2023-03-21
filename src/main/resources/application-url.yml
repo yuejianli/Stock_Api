@@ -10,8 +10,8 @@ default:
   # 展示今天的股票信息
   show_day_url: https://hq.sinajs.cn/list={0}
   # 展示所有的股票信息
-  all_stock_url: >
-    https://20.push2.eastmoney.com/api/qt/clist/get?pn=1&pz=10000000&np=1&fid=f3&fields={0}&fs=m:0+t:6,m:0+t:13,m:0+t:80,m:1+t:2,m:1+t:23,b:MK0021,b:MK0022,b:MK0023,b:MK0024
+  all_stock_url: "https://20.push2.eastmoney.com/api/qt/clist/get?pn=1&pz=10000000&np=1&
+  fid=f3&fields={0}&fs=m:0+t:6,m:0+t:13,m:0+t:80,m:1+t:2,m:1+t:23,b:MK0021,b:MK0022,b:MK0023,b:MK0024"
   # 查询这个股票的历史信息
   stock_history_url: >
     http://push2his.eastmoney.com/api/qt/stock/kline/get?

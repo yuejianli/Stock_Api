@@ -9,13 +9,13 @@ import org.springframework.util.Assert;
  */
 public enum ExchangeType {
     /**
-     * 上海
-     */
-    SH(0, "sh"),
-    /**
      * 深圳
      */
-    SZ(1, "sz"),
+    SZ(0, "sz"),
+    /**
+     * 上海
+     */
+    SH(1, "sh"),
     /**
      * 北京
      */

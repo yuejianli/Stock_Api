@@ -48,11 +48,11 @@ public enum StockCodeType {
     public static StockCodeType getTypeByStockCode(String code) {
         Assert.notNull(code, "code编号不能为空");
         // 如果以 60 开头
-        if (code.startsWith("60")) {
+        if (code.startsWith("6")) {
             return StockCodeType.SH;
-        } else if (code.startsWith("00")) {
+        } else if (code.startsWith("0")) {
             return StockCodeType.SZ;
-        } else if (code.startsWith("30")) {
+        } else if (code.startsWith("3")) {
             return StockCodeType.CY;
         } else if (code.startsWith("83")) {
             return StockCodeType.BJ;

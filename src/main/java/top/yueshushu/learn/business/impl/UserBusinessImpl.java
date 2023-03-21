@@ -216,6 +216,14 @@ public class UserBusinessImpl implements UserBusiness {
         if (!user.getAccount().equals(account)) {
             return OutputResult.buildAlert(ResultCode.NO_AUTH);
         }
-        return OutputResult.buildSucc(userService.getUserByAccount(account));
+        User accountUser = userService.getUserByAccount(account);
+        // 对一些重要的数据,进行隐藏
+        accountUser.setDingUserId(null);
+        accountUser.setWxUserId(null);
+        accountUser.setRebootId(null);
+        accountUser.setRoleName(null);
+        accountUser.setRoleId(null);
+        accountUser.setPassword("");
+        return OutputResult.buildSucc(accountUser);
     }
 }

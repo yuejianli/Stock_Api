@@ -3,6 +3,7 @@ package top.yueshushu.learn.crawler.service.impl;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.TimeInterval;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import top.yueshushu.learn.assembler.StockAssembler;
@@ -103,6 +104,7 @@ public class CrawlerStockServiceImpl implements CrawlerStockService {
     }
 
     @Override
+    @Async
     public OutputResult stockAsync(StockRo stockRo) {
         //时间计数器
         TimeInterval timer = DateUtil.timer();
@@ -129,7 +131,7 @@ public class CrawlerStockServiceImpl implements CrawlerStockService {
                     }
                 }
         );
-        if (CollectionUtils.isEmpty(stockList)){
+        if (CollectionUtils.isEmpty(stockList)) {
             return OutputResult.buildSucc(ResultCode.STOCK_ASYNC_NO_CHANGE);
         }
         log.info("本次同步时增加的股票编码依次为:{}",
@@ -138,9 +140,12 @@ public class CrawlerStockServiceImpl implements CrawlerStockService {
                 ).collect(
                         Collectors.toList()
                 ));
-        stockDomainService.saveBatch(stockList,1000);
+        boolean saveBatch = stockDomainService.saveBatch(stockList, 100);
+        if (!saveBatch) {
+            log.info("同步数据失败 {}");
+        }
         log.info("同步信息到数据库共用时 {}", timer.intervalMs());
-        return OutputResult.buildSucc(ResultCode.STOCK_ASYNC_SUCCESS);
+        return OutputResult.buildSucc();
     }
 
     @Override

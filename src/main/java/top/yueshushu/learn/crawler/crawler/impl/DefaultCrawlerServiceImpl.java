@@ -71,7 +71,7 @@ public class DefaultCrawlerServiceImpl implements CrawlerService {
     @Override
     public List<DownloadStockInfo> getStockList() {
         //处理，拼接成信息
-        String url = MessageFormat.format(defaultProperties.getAllStockUrl(), "f12,f13,f14");
+        String url = MessageFormat.format(defaultProperties.getAllStockUrl(), "f2,f12,f13,f14");
         try {
             //获取内容
             String content = restTemplate.getForObject(url, String.class);

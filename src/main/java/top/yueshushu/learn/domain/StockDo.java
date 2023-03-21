@@ -1,14 +1,14 @@
 package top.yueshushu.learn.domain;
 
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableField;
-import java.io.Serializable;
-import java.util.Date;
-
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * <p>
@@ -54,6 +54,10 @@ public class StockDo implements Serializable {
      */
     @TableField("full_code")
     private String fullCode;
+
+
+    @TableField("can_use")
+    private Integer canUse;
 
     /**
      * 创建时间

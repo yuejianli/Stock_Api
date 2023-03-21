@@ -1,12 +1,14 @@
 package top.yueshushu.learn.controller;
 
 import io.swagger.annotations.ApiOperation;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import top.yueshushu.learn.annotation.AuthToken;
+import top.yueshushu.learn.business.PriceImageBusiness;
 import top.yueshushu.learn.business.StockCrawlerBusiness;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.crawler.entity.DBStockInfo;
@@ -30,11 +32,13 @@ import java.util.List;
 public class StockCrawlerController {
     @Resource
     private StockCrawlerBusiness stockCrawlerBusiness;
+    @Resource
+    private PriceImageBusiness priceImageBusiness;
 
     @ApiOperation("查询股票的基本信息")
     @PostMapping("/getStockInfo")
     public OutputResult<StockShowInfo> getStockInfo(@RequestBody StockRo stockRo) {
-        if (!StringUtils.hasText(stockRo.getCode())){
+        if (!StringUtils.hasText(stockRo.getCode())) {
             return OutputResult.buildAlert(
                     ResultCode.STOCK_CODE_IS_EMPTY
             );
@@ -49,19 +53,34 @@ public class StockCrawlerController {
                     ResultCode.STOCK_CODE_IS_EMPTY
             );
         }
-        if (stockRo.getType() == null){
+        if (stockRo.getType() == null) {
             return OutputResult.buildAlert(
                     ResultCode.STOCK_KLINE_IS_EMPTY
             );
         }
         return stockCrawlerBusiness.getStockKline(stockRo);
     }
+
+    @ApiOperation("同步股票的K线图")
+    @PostMapping("/saveStockKline")
+    public OutputResult saveStockKline(@RequestBody StockRo stockRo) {
+        if (!CollectionUtils.isEmpty(stockRo.getCodes())) {
+            return OutputResult.buildAlert(
+                    ResultCode.STOCK_CODE_IS_EMPTY
+            );
+        }
+        // 处理一下图片保存信息。
+        priceImageBusiness.batchSavePriceImage(stockRo.getCodes(), true);
+        return stockCrawlerBusiness.getStockKline(stockRo);
+    }
+
     @ApiOperation("股票列表同步")
     @PostMapping("/stockAsync")
     @AuthToken
     public OutputResult<String> stockAsync(@RequestBody StockRo stockRo) {
         return stockCrawlerBusiness.stockAsync(stockRo);
     }
+
     /**
      * 关于历史记录的处理
      */
