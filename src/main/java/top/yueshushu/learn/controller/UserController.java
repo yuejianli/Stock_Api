@@ -9,8 +9,10 @@ import top.yueshushu.learn.annotation.AuthToken;
 import top.yueshushu.learn.business.UserBusiness;
 import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.common.ResultCode;
+import top.yueshushu.learn.enumtype.DataFlagType;
+import top.yueshushu.learn.mode.ro.QueryUserRo;
 import top.yueshushu.learn.mode.ro.UserRo;
-import top.yueshushu.learn.mode.vo.AddUserRequestVo;
+import top.yueshushu.learn.mode.vo.AdminOperateUserRequestVo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.util.RedisUtil;
 import top.yueshushu.learn.util.SelectConditionUtil;
@@ -91,8 +93,51 @@ public class UserController extends BaseController {
     @PostMapping("/addUser")
     @ApiOperation("添加用户信息")
     @AuthToken
-    public OutputResult addUser(@RequestBody AddUserRequestVo addUserRequestVo) {
-        return userBusiness.addUser(addUserRequestVo, ThreadLocalUtils.getUser());
+    public OutputResult addUser(@RequestBody AdminOperateUserRequestVo adminOperateUserRequestVo) {
+        return userBusiness.addUser(adminOperateUserRequestVo, ThreadLocalUtils.getUser());
     }
+
+    @PostMapping("/updateUser")
+    @ApiOperation("更新用户信息")
+    @AuthToken
+    public OutputResult updateUser(@RequestBody AdminOperateUserRequestVo adminOperateUserRequestVo) {
+        return userBusiness.updateUser(adminOperateUserRequestVo, ThreadLocalUtils.getUser());
+    }
+
+    @PostMapping("/deleteUser")
+    @ApiOperation("删除用户")
+    @AuthToken
+    public OutputResult deleteUser(@RequestBody AdminOperateUserRequestVo adminOperateUserRequestVo) {
+        return userBusiness.deleteUser(adminOperateUserRequestVo.getId(), ThreadLocalUtils.getUser());
+    }
+
+    @PostMapping("/enable")
+    @ApiOperation("启用用户")
+    @AuthToken
+    public OutputResult enable(@RequestBody AdminOperateUserRequestVo adminOperateUserRequestVo) {
+        return userBusiness.changeStatus(adminOperateUserRequestVo.getId(), DataFlagType.NORMAL, ThreadLocalUtils.getUser());
+    }
+
+    @PostMapping("/disable")
+    @ApiOperation("禁用用户")
+    @AuthToken
+    public OutputResult disable(@RequestBody AdminOperateUserRequestVo adminOperateUserRequestVo) {
+        return userBusiness.changeStatus(adminOperateUserRequestVo.getId(), DataFlagType.DELETE, ThreadLocalUtils.getUser());
+    }
+
+    @PostMapping("/list")
+    @ApiOperation("查询用户列表")
+    @AuthToken
+    public OutputResult list(@RequestBody QueryUserRo queryUserRo) {
+        return userBusiness.list(queryUserRo, ThreadLocalUtils.getUser());
+    }
+
+    @PostMapping("/getInfo")
+    @ApiOperation("获取当前用户信息")
+    @AuthToken
+    public OutputResult getInfo(@RequestBody QueryUserRo queryUserRo) {
+        return userBusiness.getInfo(queryUserRo.getAccount(), ThreadLocalUtils.getUser());
+    }
+
 
 }

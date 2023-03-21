@@ -3,8 +3,10 @@ package top.yueshushu.learn.mode.ro;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import top.yueshushu.learn.response.PageRo;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 用途描述
@@ -14,7 +16,7 @@ import java.io.Serializable;
  */
 @ApiModel("角色Ro")
 @Data
-public class RoleRo implements Serializable {
+public class RoleRo extends PageRo implements Serializable {
     @ApiModelProperty("角色id")
     private Integer id;
 
@@ -23,4 +25,7 @@ public class RoleRo implements Serializable {
 
     @ApiModelProperty("角色描述")
     private String description;
+
+    @ApiModelProperty("配置的资源信息列表")
+    private List<Integer> menuIdList;
 }

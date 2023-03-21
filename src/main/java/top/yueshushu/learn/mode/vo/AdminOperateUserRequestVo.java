@@ -12,10 +12,16 @@ import java.math.BigDecimal;
  * @date 2022-11-14
  */
 @Data
-public class AddUserRequestVo implements Serializable {
+public class AdminOperateUserRequestVo implements Serializable {
+    private Integer id;
     private String account;
     private String name;
+    private String password;
+    private String phone;
     private String email;
+    private String dingUserId;
     private String wxUserId;
+    private Integer rebootId = 1;
+    private Integer roleId;
     private BigDecimal totalMoney = new BigDecimal(200000);
 }

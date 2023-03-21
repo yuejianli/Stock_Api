@@ -27,4 +27,6 @@ public class User {
     private Date lastLoginTime;
     private Integer status;
     private Integer flag;
+    private Integer roleId;
+    private String roleName;
 }

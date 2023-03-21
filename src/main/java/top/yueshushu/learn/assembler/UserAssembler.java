@@ -3,7 +3,7 @@ package top.yueshushu.learn.assembler;
 import org.mapstruct.Mapper;
 import top.yueshushu.learn.domain.UserDo;
 import top.yueshushu.learn.entity.User;
-import top.yueshushu.learn.mode.vo.AddUserRequestVo;
+import top.yueshushu.learn.mode.vo.AdminOperateUserRequestVo;
 
 /**
  * @Description 用户转换器
@@ -30,8 +30,8 @@ public interface UserAssembler {
     /**
      * 添加用户时转换信息
      *
-     * @param addUserRequestVo
+     * @param adminOperateUserRequestVo
      */
-    User addUserToEntity(AddUserRequestVo addUserRequestVo);
+    User addUserToEntity(AdminOperateUserRequestVo adminOperateUserRequestVo);
 
 }

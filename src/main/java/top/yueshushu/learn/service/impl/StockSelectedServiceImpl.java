@@ -513,7 +513,7 @@ public class StockSelectedServiceImpl implements StockSelectedService {
                 () -> {
                     crawlerStockHistoryService.txMoneyTodayStockHistory(resultCodeList, stockService.listFullCode(resultCodeList));
                     try {
-                        TimeUnit.MILLISECONDS.sleep(200);
+                        TimeUnit.MILLISECONDS.sleep(500);
                     } catch (Exception e) {
                     }
                 }

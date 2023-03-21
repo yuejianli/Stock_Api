@@ -65,6 +65,9 @@ public class Const {
 
 
     public static final String ASYNC_SERVICE_EXECUTOR_BEAN_NAME = "asyncServiceExecutor";
+
+    public static final String SIMPLE_ASYNC_SERVICE_EXECUTOR_BEAN_NAME = "simpleAsyncServiceExecutor";
+
     public static final String HOLIDAY_CALENDAR_CACHE = "holiday_calendar";
 
     public static final String KEY_AUTH_USER_ID = "user_id";

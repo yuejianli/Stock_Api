@@ -42,7 +42,7 @@ public class PriceImageBusinessImpl implements PriceImageBusiness {
     @Resource
     private StockService stockService;
     @SuppressWarnings("all")
-    @Resource(name = Const.ASYNC_SERVICE_EXECUTOR_BEAN_NAME)
+    @Resource(name = Const.SIMPLE_ASYNC_SERVICE_EXECUTOR_BEAN_NAME)
     private AsyncTaskExecutor executor;
     @Resource
     private StockDomainService stockDomainService;
@@ -99,7 +99,7 @@ public class PriceImageBusinessImpl implements PriceImageBusiness {
                 () -> {
                     getAndSaveImage(resultCodeList, stockService.listFullCode(resultCodeList));
                     try {
-                        TimeUnit.MILLISECONDS.sleep(200);
+                        TimeUnit.MILLISECONDS.sleep(500);
                     } catch (Exception e) {
                     }
                 }

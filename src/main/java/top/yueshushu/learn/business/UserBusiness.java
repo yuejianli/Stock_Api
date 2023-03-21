@@ -1,8 +1,10 @@
 package top.yueshushu.learn.business;
 
 import top.yueshushu.learn.entity.User;
+import top.yueshushu.learn.enumtype.DataFlagType;
+import top.yueshushu.learn.mode.ro.QueryUserRo;
 import top.yueshushu.learn.mode.ro.UserRo;
-import top.yueshushu.learn.mode.vo.AddUserRequestVo;
+import top.yueshushu.learn.mode.vo.AdminOperateUserRequestVo;
 import top.yueshushu.learn.response.OutputResult;
 
 /**
@@ -52,10 +54,26 @@ public interface UserBusiness {
     /**
      * 新增用户信息
      *
-     * @param addUserRequestVo 新增用户信息
-     * @param currentUser      当前用户
+     * @param adminOperateUserRequestVo 新增用户信息
+     * @param currentUser               当前用户
      */
-    OutputResult addUser(AddUserRequestVo addUserRequestVo, User currentUser);
+    OutputResult addUser(AdminOperateUserRequestVo adminOperateUserRequestVo, User currentUser);
+
+    /**
+     * 更新用户信息
+     *
+     * @param adminOperateUserRequestVo 更新用户信息
+     * @param currentUser               当前用户
+     */
+    OutputResult updateUser(AdminOperateUserRequestVo adminOperateUserRequestVo, User currentUser);
+
+    /**
+     * 删除用户
+     *
+     * @param id          要处理的用户id
+     * @param currentUser 当前用户
+     */
+    OutputResult deleteUser(Integer id, User currentUser);
 
     /**
      * 是否是超级用户  id=1 为超级用户
@@ -63,4 +81,16 @@ public interface UserBusiness {
      * @param user 当前用户
      */
     boolean isSuperUser(User user);
+
+    OutputResult list(QueryUserRo queryUserRo, User user);
+
+    OutputResult changeStatus(Integer id, DataFlagType statusType, User user);
+
+    /**
+     * 获取当前用户的信息
+     *
+     * @param account 账号
+     * @param user    当前用户
+     */
+    OutputResult getInfo(String account, User user);
 }

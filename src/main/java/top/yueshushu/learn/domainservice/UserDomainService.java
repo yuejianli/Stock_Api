@@ -2,6 +2,8 @@ package top.yueshushu.learn.domainservice;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import top.yueshushu.learn.domain.UserDo;
+import top.yueshushu.learn.entity.User;
+import top.yueshushu.learn.mode.ro.QueryUserRo;
 
 import java.util.List;
 
@@ -36,4 +38,8 @@ public interface UserDomainService extends IService<UserDo> {
      * 查询正在使用的用户列表信息
      */
     List<Integer> listUseUserIds();
+
+    List<User> listByCondition(QueryUserRo queryUserRo);
+
+    User getByCondition(QueryUserRo queryUserRo);
 }

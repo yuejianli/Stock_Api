@@ -24,4 +24,6 @@ public class Role implements Serializable {
     private Date createTime;
 
     private Date updateTime;
+
+    private Integer flag;
 }

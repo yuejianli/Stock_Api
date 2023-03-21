@@ -2,6 +2,8 @@ package top.yueshushu.learn.service.impl;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.crypto.digest.MD5;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -13,8 +15,12 @@ import top.yueshushu.learn.domainservice.UserDomainService;
 import top.yueshushu.learn.entity.User;
 import top.yueshushu.learn.enumtype.DataFlagType;
 import top.yueshushu.learn.init.InitDataMethods;
+import top.yueshushu.learn.mode.ro.QueryUserRo;
 import top.yueshushu.learn.mode.ro.UserRo;
 import top.yueshushu.learn.response.OutputResult;
+import top.yueshushu.learn.response.PageResponse;
+import top.yueshushu.learn.service.RoleService;
+import top.yueshushu.learn.service.UserRoleService;
 import top.yueshushu.learn.service.UserService;
 import top.yueshushu.learn.service.cache.UserCacheService;
 import top.yueshushu.learn.util.JwtUtils;
@@ -51,6 +57,10 @@ public class UserServiceImpl implements UserService {
     private RedisUtil redisUtil;
     @Resource
     private InitDataMethods initDataMethods;
+    @Resource
+    private RoleService roleService;
+    @Resource
+    private UserRoleService userRoleService;
 
     /**
      * 用户登录
@@ -131,7 +141,11 @@ public class UserServiceImpl implements UserService {
         UserDo userDo = userDomainService.getByAccount(user.getAccount());
         if (null == userDo) {
             userDo = userAssembler.entityToDo(user);
-            userDo.setPassword(generateDefaultPassword());
+            if (StringUtils.hasText(user.getPassword())) {
+                userDo.setPassword((String) convertPassWord(user.getPassword()).getData());
+            } else {
+                userDo.setPassword(generateDefaultPassword());
+            }
             userDo.setCreateTime(DateUtil.date());
             userDo.setUpdateTime(DateUtil.date());
             userDo.setStatus(DataFlagType.NORMAL.getCode());
@@ -141,12 +155,24 @@ public class UserServiceImpl implements UserService {
         } else {
             // 存在的话，进行更新。
             UserDo editUserDo = userAssembler.entityToDo(user);
+            if (StringUtils.hasText(user.getPassword())) {
+                editUserDo.setPassword((String) convertPassWord(user.getPassword()).getData());
+            }
             editUserDo.setId(userDo.getId());
             // 进行更新
             userDomainService.updateById(editUserDo);
         }
         return getUserByAccount(user.getAccount());
 
+    }
+
+    @Override
+    public OutputResult<PageResponse<User>> pageList(QueryUserRo queryUserRo) {
+        // 进行查询
+        Page<Object> objectPage = PageHelper.startPage(queryUserRo.getPageNum(), queryUserRo.getPageSize());
+        List<User> userList = userDomainService.listByCondition(queryUserRo);
+
+        return OutputResult.buildSucc(new PageResponse<>(objectPage.getTotal(), userList));
     }
 
     /**
@@ -182,9 +208,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserByAccount(String account) {
-        return userAssembler.doToEntity(
-                userDomainService.getByAccount(account)
-        );
+        QueryUserRo queryUserRo = new QueryUserRo();
+        queryUserRo.setAccount(account);
+        return userDomainService.getByCondition(queryUserRo);
     }
 
     @Override

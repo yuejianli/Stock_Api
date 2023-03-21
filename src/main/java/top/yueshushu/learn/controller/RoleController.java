@@ -31,6 +31,42 @@ public class RoleController {
     @PostMapping("/list")
     @AuthToken
     public OutputResult list(@RequestBody RoleRo roleRo) {
-        return OutputResult.buildSucc();
+        return roleBusiness.list(roleRo);
     }
+
+    @ApiOperation("添加角色列表")
+    @PostMapping("/add")
+    @AuthToken
+    public OutputResult add(@RequestBody RoleRo roleRo) {
+        return roleBusiness.add(roleRo);
+    }
+
+    @ApiOperation("修改角色列表")
+    @PostMapping("/update")
+    @AuthToken
+    public OutputResult update(@RequestBody RoleRo roleRo) {
+        return roleBusiness.update(roleRo);
+    }
+
+    @ApiOperation("删除角色列表")
+    @PostMapping("/delete")
+    @AuthToken
+    public OutputResult delete(@RequestBody RoleRo roleRo) {
+        return roleBusiness.delete(roleRo);
+    }
+
+    @ApiOperation("查询角色id 配置的资源列表")
+    @PostMapping("/findMenuByRoleId")
+    @AuthToken
+    public OutputResult findMenuByRoleId(@RequestBody RoleRo roleRo) {
+        return roleBusiness.findMenuByRoleId(roleRo);
+    }
+
+    @ApiOperation("配置角色资源列表")
+    @PostMapping("/configMenuList")
+    @AuthToken
+    public OutputResult configMenuList(@RequestBody RoleRo roleRo) {
+        return roleBusiness.configMenuList(roleRo);
+    }
+
 }

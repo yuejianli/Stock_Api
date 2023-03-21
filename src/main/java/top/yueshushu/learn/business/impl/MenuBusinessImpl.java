@@ -1,9 +1,9 @@
 package top.yueshushu.learn.business.impl;
 
+import cn.hutool.core.lang.tree.Tree;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import top.yueshushu.learn.business.MenuBusiness;
-import top.yueshushu.learn.mode.vo.MenuVo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.service.MenuService;
 
@@ -24,5 +24,15 @@ public class MenuBusinessImpl implements MenuBusiness {
     @Override
     public OutputResult getMenuListByUid(Integer userId) {
         return menuService.getMenuListByUid(userId);
+    }
+
+    @Override
+    public OutputResult getAllMenuList() {
+        return menuService.getAllMenuList();
+    }
+
+    @Override
+    public OutputResult<List<Tree<String>>> treeAllMenuList() {
+        return menuService.treeAllMenuList();
     }
 }

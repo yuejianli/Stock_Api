@@ -1,7 +1,12 @@
 package top.yueshushu.learn.mapper;
 
-import top.yueshushu.learn.domain.UserDo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
+import top.yueshushu.learn.domain.UserDo;
+import top.yueshushu.learn.entity.User;
+import top.yueshushu.learn.mode.ro.QueryUserRo;
+
+import java.util.List;
 
 /**
  * <p>
@@ -12,5 +17,10 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @since 2022-01-02
  */
 public interface UserDoMapper extends BaseMapper<UserDo> {
-
+    /**
+     * 根据信息进行查询
+     *
+     * @param queryUserRo 查询对象
+     */
+    List<User> listByCondition(@Param("queryUserRo") QueryUserRo queryUserRo);
 }

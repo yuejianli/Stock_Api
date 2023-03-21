@@ -29,12 +29,21 @@ public class ExecutorConfig {
     private String namePrefix;
 
     /**
-     * 其他场景的异步线程池
+     * 主要异步线程池
      */
     @Bean(name = Const.ASYNC_SERVICE_EXECUTOR_BEAN_NAME)
     public Executor asyncServiceExecutor() {
         log.info("start asyncServiceExecutor");
         return buildExecutor(corePoolSize, maxPoolSize, queueCapacity, namePrefix, Thread.NORM_PRIORITY);
+    }
+
+    /**
+     * 简单的异步线程池
+     */
+    @Bean(name = Const.SIMPLE_ASYNC_SERVICE_EXECUTOR_BEAN_NAME)
+    public Executor simpleAsyncServiceExecutor() {
+        log.info("start asyncServiceExecutor");
+        return buildExecutor(5, 5, 5, Const.SIMPLE_ASYNC_SERVICE_EXECUTOR_BEAN_NAME, Thread.NORM_PRIORITY);
     }
 
     private Executor buildExecutor(int corePoolSize, int maxPoolSize, int queueCapacity, String namePrefix, int threadPriority) {

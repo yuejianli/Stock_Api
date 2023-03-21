@@ -17,6 +17,8 @@ public class ResultCode {
     public static final ResultCode SUCCESS = new ResultCode(true, 20000, "操作成功");
     public static final ResultCode ALERT = new ResultCode(false, 30000, "传入信息有误");
     public static final ResultCode FAIL = new ResultCode(false, 50000, "操作失败");
+
+    public static final ResultCode INVALID_PARAM = new ResultCode(false, 3000001, "操作失败");
     /**
      * 爬虫 提示信息：  200 10 （编排）+ 001 (三位随机)
      */
@@ -55,6 +57,12 @@ public class ResultCode {
     public static final ResultCode USER_DISABLE =
             new ResultCode(false, 10010009, "用户已经被禁用");
 
+    public static final ResultCode ROLE_EXIST =
+            new ResultCode(false, 10010010, "角色名称已经存在");
+    public static final ResultCode ROLE_USER_EXIST =
+            new ResultCode(false, 10010011, "角色已经配置了用户，不能直接删除角色");
+    public static final ResultCode ROLE_MENU_NOT_CONFIG =
+            new ResultCode(false, 10010012, "请为该角色配置资源");
     /**
      * 交易用户层提示信息：  100 11 （编排）+ 001 (三位随机)
      */

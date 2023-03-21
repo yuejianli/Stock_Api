@@ -6,8 +6,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import top.yueshushu.learn.domain.UserDo;
 import top.yueshushu.learn.domainservice.UserDomainService;
+import top.yueshushu.learn.entity.User;
 import top.yueshushu.learn.enumtype.DataFlagType;
 import top.yueshushu.learn.mapper.UserDoMapper;
+import top.yueshushu.learn.mode.ro.QueryUserRo;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -62,5 +64,16 @@ public class UserDomainServiceImpl extends ServiceImpl<UserDoMapper, UserDo>
                 .stream().map(
                         UserDo::getId
                 ).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<User> listByCondition(QueryUserRo queryUserRo) {
+        return userDoMapper.listByCondition(queryUserRo);
+    }
+
+    @Override
+    public User getByCondition(QueryUserRo queryUserRo) {
+        List<User> userList = listByCondition(queryUserRo);
+        return CollectionUtils.isEmpty(userList) ? null : userList.get(0);
     }
 }

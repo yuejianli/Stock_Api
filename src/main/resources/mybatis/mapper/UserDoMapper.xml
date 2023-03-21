@@ -20,6 +20,11 @@
         <result column="flag" property="flag" />
     </resultMap>
 
+    <resultMap id="userMap" extends="BaseResultMap" type="top.yueshushu.learn.entity.User">
+        <result column="roleId" property="roleId" />
+        <result column="roleName" property="roleName" />
+    </resultMap>
+
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id, account, name, password, phone, email, wx_user_id,
@@ -27,4 +32,30 @@
         create_time, update_time, last_login_time, status, flag
     </sql>
 
+    <select id="listByCondition" resultType="top.yueshushu.learn.entity.User">
+        select  u.id, u.account, u.password,u.name, u.phone, u.email, u.wx_user_id,
+        u.ding_user_id,u.reboot_id,
+        u.create_time, u.update_time, u.last_login_time, u.status, u.flag , r.id as roleId, r.name as roleName
+        from user u left join user_role ur
+        on u.id = ur.user_id
+        left join  role r on ur.role_id = r.id
+        <where>
+            <if test="queryUserRo.status != null">
+                and u.status = #{queryUserRo.status}
+            </if>
+            <if test="queryUserRo.id != null">
+                and u.id = #{queryUserRo.id}
+            </if>
+            <if test="queryUserRo.flag != null">
+                and u.flag = #{queryUserRo.flag}
+            </if>
+            <if test="queryUserRo.account != null and queryUserRo.account != ''">
+                and u.account = #{queryUserRo.account}
+            </if>
+            <if test="queryUserRo.keyword != null and queryUserRo.keyword != ''">
+                and ( u.account like concat('%',concat(#{queryUserRo.keyword},'%'))
+                or  u.name like concat('%',concat(#{queryUserRo.keyword},'%') )
+            </if>
+        </where>
+    </select>
 </mapper>

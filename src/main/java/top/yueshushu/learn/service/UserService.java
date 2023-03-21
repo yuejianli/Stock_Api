@@ -1,8 +1,10 @@
 package top.yueshushu.learn.service;
 
 import top.yueshushu.learn.entity.User;
+import top.yueshushu.learn.mode.ro.QueryUserRo;
 import top.yueshushu.learn.mode.ro.UserRo;
 import top.yueshushu.learn.response.OutputResult;
+import top.yueshushu.learn.response.PageResponse;
 
 import java.util.List;
 
@@ -96,4 +98,9 @@ public interface UserService  {
      * @param user 用户信息
      */
     User operateUser(User user);
+
+    /**
+     * 查询用户列表集合信息
+     */
+    OutputResult<PageResponse<User>> pageList(QueryUserRo queryUserRo);
 }
