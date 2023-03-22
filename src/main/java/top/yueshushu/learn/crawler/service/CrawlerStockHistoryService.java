@@ -45,4 +45,10 @@ public interface CrawlerStockHistoryService {
      */
     OutputResult txMoneyTodayStockHistory(List<String> codeList, List<String> fullCodeList);
 
+    /**
+     * 股票指数信息
+     *
+     * @param pointCodeList 指数列表
+     */
+    void syncPointHistory(List<String> pointCodeList);
 }

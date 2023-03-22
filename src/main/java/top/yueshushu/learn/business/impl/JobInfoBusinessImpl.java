@@ -34,6 +34,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -427,7 +428,9 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
                     }
                     // 处理一下图片保存信息。
                     priceImageBusiness.batchSavePriceImage(null, true);
-
+                    priceImageBusiness.batchSavePriceImageByFullCode(Arrays.asList(
+                            "sh000001", "sh000300", "sz399001", "sz399006"
+                    ), false);
                 }
                 default: {
                     break;

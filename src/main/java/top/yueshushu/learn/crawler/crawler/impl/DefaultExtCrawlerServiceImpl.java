@@ -1,6 +1,7 @@
 package top.yueshushu.learn.crawler.crawler.impl;
 
 import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -39,6 +40,8 @@ public class DefaultExtCrawlerServiceImpl implements ExtCrawlerService {
     // 版块同步历史时使用
     public static final String CB_ASYNC_BK = "jQuery112306604961992080225_1676594063938";
     public static final String CB_STOCK_INDEX = "jQuery112405795797323925824_1676954612820";
+
+    public static final String CB_POINT_INDEX = "jQuery35107684066764588213_1679400827360";
     @Resource
     private CloseableHttpClient httpClient;
     @Resource
@@ -242,6 +245,23 @@ public class DefaultExtCrawlerServiceImpl implements ExtCrawlerService {
         } catch (Exception e) {
             log.error("获取 股票指数列表出错", e);
             return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public TxStockHistoryInfo parsePointHistory(String pointCode, DateTime beforeLastWorking) {
+        try {
+            //获取内容
+            String url = MessageFormat.format(extendProperties.getPointHistoryUrl(), CB_POINT_INDEX, pointCode);
+            String content = restTemplate.getForObject(url, String.class);
+            //将内容进行转换，解析
+            String cb = CB_POINT_INDEX;
+            content = content.substring(cb.length() + 1);
+            content = content.substring(0, content.length() - 2);
+            return stockInfoParser.parsePointIndex(content);
+        } catch (Exception e) {
+            log.error("获取 股票指数列表出错", e);
+            return null;
         }
     }
 

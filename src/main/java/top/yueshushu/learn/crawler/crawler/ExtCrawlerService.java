@@ -1,5 +1,6 @@
 package top.yueshushu.learn.crawler.crawler;
 
+import cn.hutool.core.date.DateTime;
 import top.yueshushu.learn.crawler.entity.*;
 import top.yueshushu.learn.enumtype.BKType;
 import top.yueshushu.learn.enumtype.DBStockType;
@@ -84,5 +85,9 @@ public interface ExtCrawlerService {
 
     default List<StockIndexInfo> findStockIndex() {
         return Collections.EMPTY_LIST;
+    }
+
+    default TxStockHistoryInfo parsePointHistory(String pointCode, DateTime beforeLastWorking) {
+        return null;
     }
 }

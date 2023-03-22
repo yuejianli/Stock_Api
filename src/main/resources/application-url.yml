@@ -78,3 +78,6 @@ extend:
   stockIndex: "https://push2.eastmoney.com/api/qt/clist/get?pi=0&pz=10&po=1&np=1&fields=f1,f2,f3,f4,f12,f13,f14\
   &fltt=2&invt=2&ut=433fd2d0e98eaf36ad3d5001f088614d&wbp2u=|0|0|0|web\
   &fs=i:1.000001,i:0.399001,i:0.399006,i:1.000300&cb={0}&_=1676954612821"
+  # 股票指数历史
+  point_history_url: "http://push2.eastmoney.com/api/qt/stock/get?cb={0}&fields=f43,f44,f45,f46,f47,f48,f60,f169,f170,f171,f168,f57,f58\
+  &secid={1}&_=1679400827361"

@@ -68,6 +68,14 @@ public class PriceImageBusinessImpl implements PriceImageBusiness {
         }
     }
 
+    @Override
+    public void batchSavePriceImageByFullCode(List<String> fullCodeList, Boolean asyncPool) {
+        if (CollectionUtils.isEmpty(fullCodeList)) {
+            return;
+        }
+        getAndSaveImage(fullCodeList, fullCodeList);
+    }
+
     private void syncPoolHistory(List<String> codeSelectedList, DBStockType dbStockType) {
         //1. 查询出所有的股票和对应的股票 full code 列表
         List<String> allCodeList = stockDomainService.listCodeByType(dbStockType);

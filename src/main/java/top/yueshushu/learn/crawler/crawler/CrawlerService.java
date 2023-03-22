@@ -109,14 +109,13 @@ public interface CrawlerService {
     List<StockHistoryCsvInfo> parseEasyMoneyYesHistory(List<String> codeList, DateTime beforeLastWorking);
 
     /**
-     * 东方财富，同步股票交易信息
+     * 腾讯财富，同步股票交易信息
      *
      * @param codeList          股票编码集合
      * @param beforeLastWorking 最近的一个工作日
      * @return 腾讯接口, 解析历史数据。
      */
     List<TxStockHistoryInfo> parseTxMoneyYesHistory(List<String> codeList, DateTime beforeLastWorking);
-
 
     /**
      * 新浪财富,获取大单数据

@@ -83,4 +83,8 @@ public interface StockInfoParser {
     default List<StockIndexInfo> parseStockIndex(String content) {
         return Collections.EMPTY_LIST;
     }
+
+    default TxStockHistoryInfo parsePointIndex(String content) {
+        return null;
+    }
 }

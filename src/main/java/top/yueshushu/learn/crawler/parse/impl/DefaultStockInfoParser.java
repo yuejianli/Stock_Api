@@ -7,6 +7,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
+import top.yueshushu.learn.common.Const;
 import top.yueshushu.learn.crawler.entity.*;
 import top.yueshushu.learn.crawler.parse.StockInfoParser;
 import top.yueshushu.learn.enumtype.DBStockType;
@@ -375,6 +376,32 @@ public class DefaultStockInfoParser implements StockInfoParser {
                 }
         );
         return result;
+    }
+
+    @Override
+    public TxStockHistoryInfo parsePointIndex(String content) {
+        //将内容转换成json
+        JSONObject jsonObject = JSONObject.parseObject(content);
+        //获取里面的data.diff 内容，是个列表对象
+        JSONObject data = jsonObject.getJSONObject("data");
+        if (ObjectUtils.isEmpty(data)) {
+            return null;
+        }
+        TxStockHistoryInfo txStockHistoryInfo = new TxStockHistoryInfo();
+        txStockHistoryInfo.setCode(data.getString("f57"));
+        txStockHistoryInfo.setName(data.getString("f58"));
+        txStockHistoryInfo.setCurrDate(DateUtil.format(new Date(), Const.SIMPLE_DATE_FORMAT));
+        txStockHistoryInfo.setClosingPrice(BigDecimalUtil.divByHundred(new BigDecimal(data.getInteger("f43"))));
+        txStockHistoryInfo.setOpeningPrice(BigDecimalUtil.divByHundred(new BigDecimal(data.getInteger("f46"))));
+        txStockHistoryInfo.setYesClosingPrice(BigDecimalUtil.divByHundred(new BigDecimal(data.getInteger("f60"))));
+        txStockHistoryInfo.setHighestPrice(BigDecimalUtil.divByHundred(new BigDecimal(data.getInteger("f44"))));
+        txStockHistoryInfo.setLowestPrice(BigDecimalUtil.divByHundred(new BigDecimal(data.getInteger("f45"))));
+        txStockHistoryInfo.setAmplitude(BigDecimalUtil.divByHundred(new BigDecimal(data.getInteger("f169"))));
+        txStockHistoryInfo.setAmplitudeProportion(BigDecimalUtil.divByHundred(new BigDecimal(data.getInteger("f170"))));
+        txStockHistoryInfo.setChangingProportion(BigDecimalUtil.divByHundred(new BigDecimal(data.getInteger("f168"))));
+        txStockHistoryInfo.setTradingVolume(data.getInteger("f47") * 100);
+        txStockHistoryInfo.setTradingValue(new BigDecimal(data.getString("f48")));
+        return txStockHistoryInfo;
     }
 
     private Integer convertTypeByCode(String code) {

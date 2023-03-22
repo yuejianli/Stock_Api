@@ -502,8 +502,18 @@ public class StockSelectedServiceImpl implements StockSelectedService {
         //}
         List<String> codeSelectedList = syncSelectedCodeHistory(stockSelectedDomainService.findCodeList(null));
         syncShAndSZCodeHistory(codeSelectedList, DBStockType.SH_SZ_CY);
+        // 同步指数信息.
+        syncPointHistory(Arrays.asList("1.000001", "0.399001", "0.399006", "1.000300"));
 
+    }
 
+    /**
+     * 同步指数列表信息
+     *
+     * @param pointCodeList 指数列表
+     */
+    public void syncPointHistory(List<String> pointCodeList) {
+        crawlerStockHistoryService.syncPointHistory(pointCodeList);
     }
 
     private List<String> syncSelectedCodeHistory(List<String> codeList) {

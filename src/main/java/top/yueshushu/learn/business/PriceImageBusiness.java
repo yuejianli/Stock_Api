@@ -17,4 +17,12 @@ public interface PriceImageBusiness {
      * @param asyncPool 是否同步池里面的
      */
     void batchSavePriceImage(List<String> codeList, Boolean asyncPool);
+
+    /**
+     * 根据股票全编码进行同步保存分时图图片
+     *
+     * @param fullCodeList 股票全编码列表
+     * @param asyncPool    是否同步池里面的
+     */
+    void batchSavePriceImageByFullCode(List<String> fullCodeList, Boolean asyncPool);
 }

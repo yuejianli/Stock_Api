@@ -10,6 +10,7 @@ import org.springframework.util.CollectionUtils;
 import top.yueshushu.learn.assembler.StockHistoryAssembler;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.crawler.crawler.CrawlerService;
+import top.yueshushu.learn.crawler.crawler.ExtCrawlerService;
 import top.yueshushu.learn.crawler.entity.StockHistoryCsvInfo;
 import top.yueshushu.learn.crawler.entity.TxStockHistoryInfo;
 import top.yueshushu.learn.crawler.service.CrawlerStockHistoryService;
@@ -45,16 +46,18 @@ public class CrawlerStockHistoryServiceImpl implements CrawlerStockHistoryServic
     private StockHistoryAssembler stockHistoryAssembler;
     @Resource
     private DateHelper dateHelper;
+    @Resource
+    private ExtCrawlerService extCrawlerService;
 
     @Override
     public OutputResult stockCrawlerHistoryAsync(StockRo stockRo) {
-       try{
-           //时间计数器
-           TimeInterval timer = DateUtil.timer();
-           timer.start();
-           //处理读取数据
-           List<StockHistoryCsvInfo> stockHistoryCsvInfoList = crawlerService.parseStockHistoryList(
-                   "1"+stockRo.getCode(),
+        try {
+            //时间计数器
+            TimeInterval timer = DateUtil.timer();
+            timer.start();
+            //处理读取数据
+            List<StockHistoryCsvInfo> stockHistoryCsvInfoList = crawlerService.parseStockHistoryList(
+                    "1" + stockRo.getCode(),
                    stockRo.getStartDate(), stockRo.getEndDate());
            if(CollectionUtils.isEmpty(stockHistoryCsvInfoList)){
                log.error("未获取到股票{} 的在 {} 和{} 之间的历史数据",
@@ -194,5 +197,38 @@ public class CrawlerStockHistoryServiceImpl implements CrawlerStockHistoryServic
     @Override
     public OutputResult txMoneyTodayStockHistory(List<String> codeList, List<String> fullCodeList) {
         return txMoneyStockHistoryAsync(codeList, fullCodeList, DateUtil.date());
+    }
+
+    @Override
+    public void syncPointHistory(List<String> pointCodeList) {
+        if (CollectionUtils.isEmpty(pointCodeList)) {
+            return;
+        }
+        DateTime beforeLastWorking = dateHelper.getBeforeLastWorking(DateUtil.date());
+
+        // 上一个交易日的数据查询出来了。 进行同步
+        List<StockHistoryDo> stockHistoryDoList = new ArrayList<>();
+
+        for (String pointCode : pointCodeList) {
+            //处理读取数据
+            TxStockHistoryInfo txStockHistoryInfo = extCrawlerService.parsePointHistory(pointCode, beforeLastWorking);
+            if (txStockHistoryInfo == null) {
+                continue;
+            }
+            ZoneId zoneId = ZoneId.systemDefault();
+            LocalDateTime localDateTime = beforeLastWorking.toInstant().atZone(zoneId).toLocalDateTime();
+            StockHistoryDo stockHistoryDo = stockHistoryAssembler.txInfoToDo(txStockHistoryInfo);
+            stockHistoryDo.setCurrDate(localDateTime);
+            stockHistoryDoList.add(stockHistoryDo);
+        }
+        log.info("指数集合{}在 东方财富网站同步最近的股票记录,共需要同步有{}条", pointCodeList, stockHistoryDoList.size());
+        if (!CollectionUtil.isEmpty(stockHistoryDoList)) {
+            // 先删除之前已经同步过的历史数据
+            stockHistoryDomainService.deleteHasAsyncData(pointCodeList, beforeLastWorking);
+        }
+        boolean saveFlag = stockHistoryDomainService.saveBatch(stockHistoryDoList);
+        if (!saveFlag) {
+            log.error("保存股票历史记录失败,请及时进行处理 {}", pointCodeList);
+        }
     }
 }

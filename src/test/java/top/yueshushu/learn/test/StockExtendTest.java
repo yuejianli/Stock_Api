@@ -17,6 +17,7 @@ import top.yueshushu.learn.business.StockPoolBusiness;
 import top.yueshushu.learn.crawler.crawler.CrawlerService;
 import top.yueshushu.learn.crawler.crawler.ExtCrawlerService;
 import top.yueshushu.learn.crawler.entity.*;
+import top.yueshushu.learn.crawler.service.CrawlerStockHistoryService;
 import top.yueshushu.learn.enumtype.DBStockType;
 import top.yueshushu.learn.enumtype.StockCodeType;
 import top.yueshushu.learn.enumtype.StockPoolType;
@@ -25,10 +26,7 @@ import top.yueshushu.learn.mode.ro.StockBKMoneyStatRo;
 import top.yueshushu.learn.service.StockPoolHistoryService;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @ClassName:StockCacheTest
@@ -54,6 +52,8 @@ public class StockExtendTest {
     private DateHelper dateHelper;
     @Resource
     private BKBusiness bkBusiness;
+    @Resource
+    private CrawlerStockHistoryService crawlerStockHistoryService;
 
     @Test
     public void hotMapTest() {
@@ -298,6 +298,12 @@ public class StockExtendTest {
             result.add(stockPoolInfo);
         }
         return result;
+    }
+
+    @Test
+    public void pointTest() {
+        // 同步指数信息.
+        crawlerStockHistoryService.syncPointHistory(Arrays.asList("1.000001", "0.399001", "0.399006", "1.000300"));
     }
 
 }

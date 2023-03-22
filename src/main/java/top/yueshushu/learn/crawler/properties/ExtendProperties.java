@@ -123,4 +123,7 @@ public class ExtendProperties implements Serializable {
      */
     @Value("${extend.stockIndex}")
     private String stockIndexUrl;
+
+    @Value("${extend.point_history_url}")
+    private String pointHistoryUrl;
 }
