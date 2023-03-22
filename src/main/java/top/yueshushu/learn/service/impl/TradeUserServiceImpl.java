@@ -132,6 +132,19 @@ public class TradeUserServiceImpl implements TradeUserService {
         tradeUserDomainService.updateById(editTradeUserDo);
     }
 
+    @Override
+    public boolean configTradeUser(Integer userId) {
+        //根据id 去查询对应的交易账户
+        TradeUser tradeUser = tradeUserAssembler.doToEntity(tradeUserDomainService.getByUserId(userId));
+        if (null == tradeUser) {
+            return false;
+        }
+        if (!StringUtils.hasText(tradeUser.getAccount())) {
+            return false;
+        }
+        return true;
+    }
+
     /**
      * 密码转换
      *

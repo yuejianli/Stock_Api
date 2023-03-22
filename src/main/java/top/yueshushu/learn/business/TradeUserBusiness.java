@@ -1,5 +1,6 @@
 package top.yueshushu.learn.business;
 
+import top.yueshushu.learn.enumtype.MockType;
 import top.yueshushu.learn.mode.ro.TradeUserRo;
 import top.yueshushu.learn.response.OutputResult;
 
@@ -23,4 +24,12 @@ public interface TradeUserBusiness {
      * @param tradeUserRo 交易用户对象
      */
     OutputResult editInfo(TradeUserRo tradeUserRo);
+
+    /**
+     * 员工是否进行了配置
+     *
+     * @param userId   员工id
+     * @param mockType 类型
+     */
+    boolean configTradeUser(Integer userId, MockType mockType);
 }

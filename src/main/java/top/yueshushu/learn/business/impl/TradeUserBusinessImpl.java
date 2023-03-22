@@ -3,6 +3,7 @@ package top.yueshushu.learn.business.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import top.yueshushu.learn.business.TradeUserBusiness;
+import top.yueshushu.learn.enumtype.MockType;
 import top.yueshushu.learn.mode.ro.TradeUserRo;
 import top.yueshushu.learn.mode.vo.MenuVo;
 import top.yueshushu.learn.mode.vo.TradeUserVo;
@@ -57,5 +58,16 @@ public class TradeUserBusinessImpl implements TradeUserBusiness {
         tradeUserService.editInfo(tradeUserRo);
 
         return OutputResult.buildSucc();
+    }
+
+    @Override
+    public boolean configTradeUser(Integer userId, MockType mockType) {
+        if (mockType == null) {
+            return false;
+        }
+        if (MockType.MOCK.equals(mockType)) {
+            return true;
+        }
+        return tradeUserService.configTradeUser(userId);
     }
 }

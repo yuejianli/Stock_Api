@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import top.yueshushu.learn.annotation.AuthToken;
 import top.yueshushu.learn.business.TradePositionBusiness;
+import top.yueshushu.learn.business.TradeUserBusiness;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.enumtype.MockType;
 import top.yueshushu.learn.mode.ro.TradePositionRo;
@@ -36,22 +37,28 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/tradePosition")
 @Api("持仓信息")
-public class TradePositionController extends BaseController{
+public class TradePositionController extends BaseController {
     @Resource
     private TradePositionBusiness tradePositionBusiness;
+    @Resource
+    private TradeUserBusiness tradeUserBusiness;
 
     @PostMapping("/list")
     @ApiOperation("查询当前我的持仓")
     @AuthToken
-    public OutputResult list(@RequestBody TradePositionRo tradePositionRo){
+    public OutputResult list(@RequestBody TradePositionRo tradePositionRo) {
         tradePositionRo.setUserId(getUserId());
-        if (tradePositionRo.getMockType()==null){
+        if (tradePositionRo.getMockType() == null) {
             return OutputResult.buildFail(ResultCode.TRADE_MOCK_TYPE_IS_EMPTY);
         }
         MockType mockType = MockType.getMockType(tradePositionRo.getMockType());
         if (mockType == null) {
             return OutputResult.buildFail(ResultCode.TRADE_MOCK_TYPE_NOT_EXIST);
         }
+        if (!tradeUserBusiness.configTradeUser(getUserId(), mockType)) {
+            return OutputResult.buildAlert(ResultCode.TRADE_USER_NO_CONFIG);
+        }
+
         List<TradePositionVo> data;
         if (MockType.MOCK.equals(mockType)) {
             data = (List<TradePositionVo>) tradePositionBusiness.mockList(tradePositionRo).getData();

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import top.yueshushu.learn.annotation.AuthToken;
 import top.yueshushu.learn.business.TradeEntrustBusiness;
+import top.yueshushu.learn.business.TradeUserBusiness;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.enumtype.MockType;
 import top.yueshushu.learn.mode.ro.TradeEntrustRo;
@@ -32,21 +33,26 @@ import javax.annotation.Resource;
 public class TradeEntrustController extends BaseController {
     @Resource
     private TradeEntrustBusiness tradeEntrustBusiness;
+    @Resource
+    private TradeUserBusiness tradeUserBusiness;
 
     @PostMapping("/list")
     @ApiOperation("查询今日委托信息")
     @AuthToken
-    public OutputResult list(@RequestBody TradeEntrustRo tradeEntrustRo){
+    public OutputResult list(@RequestBody TradeEntrustRo tradeEntrustRo) {
         tradeEntrustRo.setUserId(getUserId());
-        if (tradeEntrustRo.getMockType()==null){
+        if (tradeEntrustRo.getMockType() == null) {
             return OutputResult.buildFail(ResultCode.TRADE_MOCK_TYPE_IS_EMPTY);
         }
         MockType mockType = MockType.getMockType(tradeEntrustRo.getMockType());
-        if (mockType == null){
+        if (mockType == null) {
             return OutputResult.buildFail(ResultCode.TRADE_MOCK_TYPE_NOT_EXIST);
         }
+        if (!tradeUserBusiness.configTradeUser(getUserId(), mockType)) {
+            return OutputResult.buildAlert(ResultCode.TRADE_USER_NO_CONFIG);
+        }
 
-        if (MockType.MOCK.equals(mockType)){
+        if (MockType.MOCK.equals(mockType)) {
             return tradeEntrustBusiness.mockList(tradeEntrustRo);
         }
         return PageUtil.pageResult(tradeEntrustBusiness.realList(tradeEntrustRo).getData(), tradeEntrustRo.getPageNum(), tradeEntrustRo.getPageSize());
@@ -55,14 +61,17 @@ public class TradeEntrustController extends BaseController {
     @PostMapping("/history")
     @ApiOperation("查询历史委托信息")
     @AuthToken
-    public OutputResult history(@RequestBody TradeEntrustRo tradeEntrustRo){
+    public OutputResult history(@RequestBody TradeEntrustRo tradeEntrustRo) {
         tradeEntrustRo.setUserId(getUserId());
-        if (tradeEntrustRo.getMockType()==null){
+        if (tradeEntrustRo.getMockType() == null) {
             return OutputResult.buildFail(ResultCode.TRADE_MOCK_TYPE_IS_EMPTY);
         }
         MockType mockType = MockType.getMockType(tradeEntrustRo.getMockType());
         if (mockType == null) {
             return OutputResult.buildFail(ResultCode.TRADE_MOCK_TYPE_NOT_EXIST);
+        }
+        if (!tradeUserBusiness.configTradeUser(getUserId(), mockType)) {
+            return OutputResult.buildAlert(ResultCode.TRADE_USER_NO_CONFIG);
         }
 
         if (MockType.MOCK.equals(mockType)) {

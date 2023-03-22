@@ -35,4 +35,11 @@ public interface TradeUserService {
      * @param tradeUserRo 交易用户信息
      */
     void editInfo(TradeUserRo tradeUserRo);
+
+    /**
+     * 判断员工是否配置了交易用户
+     *
+     * @param userId 员工编号
+     */
+    boolean configTradeUser(Integer userId);
 }

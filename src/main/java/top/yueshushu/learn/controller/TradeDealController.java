@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import top.yueshushu.learn.annotation.AuthToken;
 import top.yueshushu.learn.business.TradeDealBusiness;
+import top.yueshushu.learn.business.TradeUserBusiness;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.enumtype.MockType;
 import top.yueshushu.learn.mode.ro.TradeDealRo;
@@ -28,23 +29,27 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/tradeDeal")
-public class TradeDealController extends BaseController{
+public class TradeDealController extends BaseController {
     @Resource
     private TradeDealBusiness tradeDealBusiness;
+    @Resource
+    private TradeUserBusiness tradeUserBusiness;
 
     @PostMapping("/list")
     @ApiOperation("查询今日成交")
     @AuthToken
-    public OutputResult list(@RequestBody TradeDealRo tradeDealRo){
+    public OutputResult list(@RequestBody TradeDealRo tradeDealRo) {
         tradeDealRo.setUserId(getUserId());
-        if (tradeDealRo.getMockType()==null){
+        if (tradeDealRo.getMockType() == null) {
             return OutputResult.buildFail(ResultCode.TRADE_MOCK_TYPE_IS_EMPTY);
         }
         MockType mockType = MockType.getMockType(tradeDealRo.getMockType());
         if (mockType == null) {
             return OutputResult.buildFail(ResultCode.TRADE_MOCK_TYPE_NOT_EXIST);
         }
-
+        if (!tradeUserBusiness.configTradeUser(getUserId(), mockType)) {
+            return OutputResult.buildAlert(ResultCode.TRADE_USER_NO_CONFIG);
+        }
         if (MockType.MOCK.equals(mockType)) {
             return tradeDealBusiness.mockList(tradeDealRo);
         }
@@ -54,16 +59,20 @@ public class TradeDealController extends BaseController{
     @PostMapping("/history")
     @ApiOperation("查询历史成交")
     @AuthToken
-    public OutputResult history(@RequestBody TradeDealRo tradeDealRo){
+    public OutputResult history(@RequestBody TradeDealRo tradeDealRo) {
         tradeDealRo.setUserId(getUserId());
-        if (tradeDealRo.getMockType()==null){
+        if (tradeDealRo.getMockType() == null) {
             return OutputResult.buildFail(ResultCode.TRADE_MOCK_TYPE_IS_EMPTY);
         }
         MockType mockType = MockType.getMockType(tradeDealRo.getMockType());
-        if (mockType == null){
+        if (mockType == null) {
             return OutputResult.buildFail(ResultCode.TRADE_MOCK_TYPE_NOT_EXIST);
         }
-        if (MockType.MOCK.equals(mockType)){
+        if (!tradeUserBusiness.configTradeUser(getUserId(), mockType)) {
+            return OutputResult.buildAlert(ResultCode.TRADE_USER_NO_CONFIG);
+        }
+
+        if (MockType.MOCK.equals(mockType)) {
             return tradeDealBusiness.mockHistoryList(tradeDealRo);
         }
         return tradeDealBusiness.realHistoryList(tradeDealRo);
