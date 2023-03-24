@@ -74,7 +74,8 @@ public class ResultCode {
             new ResultCode(false, 10011003, "当前登录用户未关联交易用户");
     public static final ResultCode TRADE_USER_NO_CONFIG =
             new ResultCode(false, 10011004, "当前登录用户未配置东方财富用户,请联系管理员进行配置");
-
+    public static final ResultCode TRADE_USER_NO_LOGIN =
+            new ResultCode(false, 10011005, "当前登录用户配置的东方财富用户账号未登录或者登录失效");
     /**
      * 股票信息提示信息：  100 12 （编排）+ 001 (三位随机)
      */

@@ -6,6 +6,7 @@ import org.springframework.util.ObjectUtils;
 import top.yueshushu.learn.assembler.TradeMoneyAssembler;
 import top.yueshushu.learn.business.TradeMoneyBusiness;
 import top.yueshushu.learn.enumtype.TradeRealValueType;
+import top.yueshushu.learn.exception.TradeUserException;
 import top.yueshushu.learn.mode.ro.TradeMoneyRo;
 import top.yueshushu.learn.mode.vo.TradeMoneyVo;
 import top.yueshushu.learn.response.OutputResult;
@@ -39,7 +40,7 @@ public class TradeMoneyBusinessImpl implements TradeMoneyBusiness {
     }
 
     @Override
-    public OutputResult realInfo(TradeMoneyRo tradeMoneyRo) {
+    public OutputResult realInfo(TradeMoneyRo tradeMoneyRo) throws TradeUserException {
         // 对数据进行处理。
         Object realEasyMoneyCache = tradeCacheService.getRealEasyMoneyCache(TradeRealValueType.TRADE_MONEY, tradeMoneyRo.getUserId());
         if (!ObjectUtils.isEmpty(realEasyMoneyCache)) {
@@ -50,11 +51,6 @@ public class TradeMoneyBusinessImpl implements TradeMoneyBusiness {
         if (!tradeMoneyVoOutputResult.getSuccess()) {
             return tradeMoneyVoOutputResult;
         }
-        //获取数据
-//        TradeMoneyVo tradeMoneyVo = tradeMoneyVoOutputResult.getData();
-//        TradeMoney tradeMoney = tradeMoneyAssembler.voToEntity(tradeMoneyVo);
-//        //进行更新
-//       tradeMoneyService.updateMoney(tradeMoney);
         tradeCacheService.buildRealEasyMoneyCache(TradeRealValueType.TRADE_MONEY, tradeMoneyRo.getUserId(), tradeMoneyVoOutputResult.getData(), null);
         return tradeMoneyVoOutputResult;
     }

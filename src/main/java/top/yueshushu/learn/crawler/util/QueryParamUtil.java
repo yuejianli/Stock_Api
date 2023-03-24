@@ -1,5 +1,7 @@
 package top.yueshushu.learn.crawler.util;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Map;
@@ -12,6 +14,7 @@ import java.util.Map;
  * @Version 1.0
  * @Since 1.0
  **/
+@Slf4j
 public class QueryParamUtil {
 
     public static String getUrlWithQueryString(String url, Map<String, String> params) {
@@ -64,7 +67,7 @@ public class QueryParamUtil {
         try {
             return URLEncoder.encode(input, "utf-8");
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            log.error("异常信息", e);
         }
 
         return input;

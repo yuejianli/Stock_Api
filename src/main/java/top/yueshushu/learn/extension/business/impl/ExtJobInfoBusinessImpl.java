@@ -264,7 +264,7 @@ public class ExtJobInfoBusinessImpl implements ExtJobInfoBusiness {
         try {
             countDownLatch.await(4, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            log.error("异常信息", e);
         }
         return responseMap;
     }

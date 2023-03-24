@@ -2,6 +2,7 @@ package top.yueshushu.learn.business;
 
 import top.yueshushu.learn.entity.User;
 import top.yueshushu.learn.enumtype.MockType;
+import top.yueshushu.learn.exception.TradeUserException;
 import top.yueshushu.learn.mode.ro.TradePositionRo;
 import top.yueshushu.learn.mode.vo.AddPositionVo;
 import top.yueshushu.learn.response.OutputResult;
@@ -28,7 +29,7 @@ public interface TradePositionBusiness {
      * @param tradePositionRo 股票持仓对象
      * @return 查询真实的股票当前的持仓记录信息
      */
-    OutputResult realList(TradePositionRo tradePositionRo);
+    OutputResult realList(TradePositionRo tradePositionRo) throws TradeUserException;
 
     /**
      * 记录用户今日的盈亏数

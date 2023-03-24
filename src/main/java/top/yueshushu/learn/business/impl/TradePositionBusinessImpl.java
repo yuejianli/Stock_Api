@@ -21,6 +21,7 @@ import top.yueshushu.learn.enumtype.EntrustStatusType;
 import top.yueshushu.learn.enumtype.MockType;
 import top.yueshushu.learn.enumtype.SelectedType;
 import top.yueshushu.learn.enumtype.TradeRealValueType;
+import top.yueshushu.learn.exception.TradeUserException;
 import top.yueshushu.learn.helper.DateHelper;
 import top.yueshushu.learn.mode.dto.TradeEntrustQueryDto;
 import top.yueshushu.learn.mode.ro.TradePositionRo;
@@ -88,17 +89,17 @@ public class TradePositionBusinessImpl implements TradePositionBusiness {
     }
 
     @Override
-    public OutputResult realList(TradePositionRo tradePositionRo) {
+    public OutputResult realList(TradePositionRo tradePositionRo) throws TradeUserException {
         // 对数据进行处理。
         Object realEasyMoneyCache = tradeCacheService.getRealEasyMoneyCache(TradeRealValueType.TRADE_POSITION, tradePositionRo.getUserId());
-        List<TradePositionVo> tradePositionVoList = new ArrayList<>();
+        List<TradePositionVo> tradePositionVoList;
         if (!ObjectUtils.isEmpty(realEasyMoneyCache)) {
             tradePositionVoList = (List<TradePositionVo>) realEasyMoneyCache;
         } else {
             log.info(">>>此次员工{}查询需要同步真实的持仓数据", tradePositionRo.getUserId());
             OutputResult<List<TradePositionVo>> outputResult = tradePositionService.realList(tradePositionRo);
             if (!outputResult.getSuccess()) {
-                return outputResult;
+                throw new TradeUserException("无权限查询真实的持仓情况");
             }
             //获取到最新的持仓信息，更新到相应的数据库中.
             tradePositionVoList = outputResult.getData();

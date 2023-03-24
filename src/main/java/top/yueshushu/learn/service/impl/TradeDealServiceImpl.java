@@ -23,6 +23,7 @@ import top.yueshushu.learn.enumtype.DataFlagType;
 import top.yueshushu.learn.enumtype.EntrustType;
 import top.yueshushu.learn.enumtype.MockType;
 import top.yueshushu.learn.enumtype.TradeRealValueType;
+import top.yueshushu.learn.exception.TradeUserException;
 import top.yueshushu.learn.helper.TradeRequestHelper;
 import top.yueshushu.learn.mode.dto.TradeDealQueryDto;
 import top.yueshushu.learn.mode.ro.TradeDealRo;
@@ -93,22 +94,29 @@ public class TradeDealServiceImpl implements TradeDealService {
         log.info("用户{},成交买入委托单{},添加成交记录成功", tradeEntrustDo.getUserId(), tradeEntrustDo.getId());
         tradeDealDomainService.save(tradeDealDo);
     }
+
     /**
      * 正式盘的处理方式
+     *
      * @param tradeDealRo
      * @return
      */
     @Override
-    public OutputResult<List<TradeDealVo>> realList(TradeDealRo tradeDealRo) {
+    public OutputResult<List<TradeDealVo>> realList(TradeDealRo tradeDealRo) throws TradeUserException {
         //获取响应信息
-        TradeResultVo<GetDealDataResponse> tradeResultVo = tradeRequestHelper.listRealDeal(tradeDealRo.getUserId());
+        TradeResultVo<GetDealDataResponse> tradeResultVo;
+        try {
+            tradeResultVo = tradeRequestHelper.listRealDeal(tradeDealRo.getUserId());
+        } catch (Exception e) {
+            throw new TradeUserException("无权限查询真实的 历史委托单信息");
+        }
         if (!tradeResultVo.getSuccess()) {
             return OutputResult.buildAlert(ResultCode.TRADE_DEAL_FAIL);
         }
         List<GetDealDataResponse> data = tradeResultVo.getData();
 
         List<TradeDealVo> tradeDealVoList = new ArrayList<>();
-        for(GetDealDataResponse getDealDataResponse:data) {
+        for (GetDealDataResponse getDealDataResponse : data) {
             TradeDealVo tradeDealVo = new TradeDealVo();
             tradeDealVo.setCode(getDealDataResponse.getZqdm());
             tradeDealVo.setName(getDealDataResponse.getZqmc());
@@ -161,13 +169,19 @@ public class TradeDealServiceImpl implements TradeDealService {
      * @return
      */
     @Override
-    public List<TradeDealVo> realHistoryList(TradeDealRo tradeDealRo) {
+    public List<TradeDealVo> realHistoryList(TradeDealRo tradeDealRo) throws TradeUserException {
         Object realEasyMoneyCache = tradeCacheService.getRealEasyMoneyCache(TradeRealValueType.TRADE_DEAL_HISTORY, tradeDealRo.getUserId());
         if (!ObjectUtils.isEmpty(realEasyMoneyCache)) {
             return (List<TradeDealVo>) realEasyMoneyCache;
         }
         //获取响应信息
-        TradeResultVo<GetHisDealDataResponse> tradeResultVo = tradeRequestHelper.listRealHistoryDeal(tradeDealRo.getUserId());
+        TradeResultVo<GetHisDealDataResponse> tradeResultVo;
+        try {
+            tradeResultVo = tradeRequestHelper.listRealHistoryDeal(tradeDealRo.getUserId());
+        } catch (Exception e) {
+            throw new TradeUserException("无权限查询真实的 历史成交单信息");
+        }
+
         if (!tradeResultVo.getSuccess()) {
             return null;
         }
@@ -227,7 +241,7 @@ public class TradeDealServiceImpl implements TradeDealService {
     }
 
     @Override
-    public void syncEasyMoneyToDB(Integer userId, MockType mockType) {
+    public void syncEasyMoneyToDB(Integer userId, MockType mockType) throws TradeUserException {
         TradeDealRo tradeDealRo = new TradeDealRo();
         tradeDealRo.setUserId(userId);
         List<TradeDealVo> tradeDealVoList = realList(tradeDealRo).getData();

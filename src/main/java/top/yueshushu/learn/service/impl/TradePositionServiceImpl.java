@@ -18,6 +18,7 @@ import top.yueshushu.learn.domainservice.TradePositionHistoryDomainService;
 import top.yueshushu.learn.entity.TradePosition;
 import top.yueshushu.learn.enumtype.MockType;
 import top.yueshushu.learn.enumtype.SelectedType;
+import top.yueshushu.learn.exception.TradeUserException;
 import top.yueshushu.learn.helper.TradeRequestHelper;
 import top.yueshushu.learn.mode.ro.TradePositionRo;
 import top.yueshushu.learn.mode.vo.TradePositionVo;
@@ -106,17 +107,23 @@ public class TradePositionServiceImpl implements TradePositionService {
         ).collect(Collectors.toList());
         tradePositionHistoryDomainService.saveBatch(tradePositionHistoryDoList);
     }
+
     @Override
-    public OutputResult<List<TradePositionVo>> realList(TradePositionRo tradePositionRo) {
+    public OutputResult<List<TradePositionVo>> realList(TradePositionRo tradePositionRo) throws TradeUserException {
         //获取响应信息
-        TradeResultVo<GetStockListResponse> tradeResultVo = tradeRequestHelper.findRealPosition(tradePositionRo.getUserId());
+        TradeResultVo<GetStockListResponse> tradeResultVo = null;
+        try {
+            tradeResultVo = tradeRequestHelper.findRealPosition(tradePositionRo.getUserId());
+        } catch (Exception e) {
+            throw new TradeUserException("无权限查询真实的持仓情况");
+        }
         if (!tradeResultVo.getSuccess()) {
             return OutputResult.buildAlert(ResultCode.TRADE_POSITION_FAIL);
         }
-        log.info(">>>用户{}获取真实的持仓信息成功",tradePositionRo.getUserId());
+        log.info(">>>用户{}获取真实的持仓信息成功", tradePositionRo.getUserId());
         List<GetStockListResponse> data = tradeResultVo.getData();
         List<TradePositionVo> tradePositionVoList = new ArrayList<>();
-        for(GetStockListResponse getStockListResponse:data) {
+        for (GetStockListResponse getStockListResponse : data) {
             TradePositionVo tradePositionVo = new TradePositionVo();
             tradePositionVo.setCode(getStockListResponse.getZqdm());
             tradePositionVo.setName(getStockListResponse.getZqmc());
@@ -165,7 +172,12 @@ public class TradePositionServiceImpl implements TradePositionService {
     public void syncEasyMoneyToDB(Integer userId, MockType mockType) {
         TradePositionRo tradePositionRo = new TradePositionRo();
         tradePositionRo.setUserId(userId);
-        List<TradePositionVo> tradePositionVoList = realList(tradePositionRo).getData();
+        List<TradePositionVo> tradePositionVoList = null;
+        try {
+            tradePositionVoList = realList(tradePositionRo).getData();
+        } catch (TradeUserException e) {
+            log.error("异常信息", e);
+        }
         // 没有持仓记录
         if (CollectionUtils.isEmpty(tradePositionVoList)) {
             return;

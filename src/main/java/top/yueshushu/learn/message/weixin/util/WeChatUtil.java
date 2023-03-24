@@ -1,21 +1,19 @@
 package top.yueshushu.learn.message.weixin.util;
 
 import com.alibaba.fastjson.JSONObject;
+import lombok.extern.slf4j.Slf4j;
+import top.yueshushu.learn.message.weixin.model.AccessToken;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URL;
 import java.text.MessageFormat;
-
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-
-import lombok.extern.slf4j.Slf4j;
-import top.yueshushu.learn.message.weixin.model.AccessToken;
 
 /**
  * @Description 微信工具使用
@@ -81,7 +79,7 @@ public class WeChatUtil {
             jsonObject = JSONObject.parseObject(buffer.toString());
             return jsonObject;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("异常信息", e);
             return null;
         }
     }

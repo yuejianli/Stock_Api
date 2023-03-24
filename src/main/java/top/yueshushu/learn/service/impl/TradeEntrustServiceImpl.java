@@ -20,6 +20,7 @@ import top.yueshushu.learn.domain.TradeEntrustDo;
 import top.yueshushu.learn.domainservice.TradeEntrustDomainService;
 import top.yueshushu.learn.entity.TradeEntrust;
 import top.yueshushu.learn.enumtype.*;
+import top.yueshushu.learn.exception.TradeUserException;
 import top.yueshushu.learn.helper.TradeRequestHelper;
 import top.yueshushu.learn.mode.dto.TradeEntrustQueryDto;
 import top.yueshushu.learn.mode.ro.TradeEntrustRo;
@@ -81,20 +82,26 @@ public class TradeEntrustServiceImpl implements TradeEntrustService {
 
     /**
      * 正式盘的处理方式
+     *
      * @param tradeEntrustRo
      * @return
      */
     @Override
-    public OutputResult<List<TradeEntrustVo>> realList(TradeEntrustRo tradeEntrustRo) {
+    public OutputResult<List<TradeEntrustVo>> realList(TradeEntrustRo tradeEntrustRo) throws TradeUserException {
         //获取响应信息
-        TradeResultVo<GetOrdersDataResponse> tradeResultVo = tradeRequestHelper.findRealEntrust(tradeEntrustRo.getUserId());
+        TradeResultVo<GetOrdersDataResponse> tradeResultVo;
+        try {
+            tradeResultVo = tradeRequestHelper.findRealEntrust(tradeEntrustRo.getUserId());
+        } catch (Exception e) {
+            throw new TradeUserException("无权限查询真实的 今日委托单信息");
+        }
         if (!tradeResultVo.getSuccess()) {
             return OutputResult.buildAlert(ResultCode.TRADE_ENTRUST_FAIL);
         }
         List<GetOrdersDataResponse> data = tradeResultVo.getData();
 
         List<TradeEntrustVo> tradeEntrustVoList = new ArrayList<>();
-        for(GetOrdersDataResponse getOrdersDataResponse:data) {
+        for (GetOrdersDataResponse getOrdersDataResponse : data) {
             TradeEntrustVo tradeEntrustVo = new TradeEntrustVo();
             tradeEntrustVo.setCode(getOrdersDataResponse.getZqdm());
             tradeEntrustVo.setName(getOrdersDataResponse.getZqmc());
@@ -224,7 +231,7 @@ public class TradeEntrustServiceImpl implements TradeEntrustService {
      * @return
      */
     @Override
-    public List<TradeEntrustVo> realHistoryList(TradeEntrustRo tradeEntrustRo) {
+    public List<TradeEntrustVo> realHistoryList(TradeEntrustRo tradeEntrustRo) throws TradeUserException {
         Object realEasyMoneyCache = tradeCacheService.getRealEasyMoneyCache(TradeRealValueType.TRADE_ENTRUST_HISTORY, tradeEntrustRo.getUserId());
         if (!ObjectUtils.isEmpty(realEasyMoneyCache)) {
             return (List<TradeEntrustVo>) realEasyMoneyCache;
@@ -232,14 +239,19 @@ public class TradeEntrustServiceImpl implements TradeEntrustService {
 
         //获取响应信息
         TradeResultVo<GetHisOrdersDataResponse> tradeResultVo =
-                tradeRequestHelper.findRealHistoryEntrust(tradeEntrustRo.getUserId());
+                null;
+        try {
+            tradeResultVo = tradeRequestHelper.findRealHistoryEntrust(tradeEntrustRo.getUserId());
+        } catch (Exception e) {
+            throw new TradeUserException("无权限查询真实的 历史委托单信息");
+        }
         if (!tradeResultVo.getSuccess()) {
-            return null;
+            return Collections.emptyList();
         }
         List<GetHisOrdersDataResponse> data = tradeResultVo.getData();
 
         List<TradeEntrustVo> tradeEntrustVoList = new ArrayList<>();
-        for(GetHisOrdersDataResponse getOrdersDataResponse : data) {
+        for (GetHisOrdersDataResponse getOrdersDataResponse : data) {
             TradeEntrustVo tradeEntrustVo = new TradeEntrustVo();
             tradeEntrustVo.setCode(getOrdersDataResponse.getZqdm());
             tradeEntrustVo.setName(getOrdersDataResponse.getZqmc());
@@ -289,7 +301,11 @@ public class TradeEntrustServiceImpl implements TradeEntrustService {
     public void syncEasyMoneyToDB(Integer userId, MockType mockType) {
         TradeEntrustRo tradeEntrustRo = new TradeEntrustRo();
         tradeEntrustRo.setUserId(userId);
-        syncRealEntrustByUserId(userId, realHistoryList(tradeEntrustRo));
+        try {
+            syncRealEntrustByUserId(userId, realHistoryList(tradeEntrustRo));
+        } catch (TradeUserException e) {
+            log.error("异常信息", e);
+        }
     }
     @Override
     public OutputResult<PageResponse<TradeEntrustVo>> mockHistoryList(TradeEntrustRo tradeEntrustRo) {

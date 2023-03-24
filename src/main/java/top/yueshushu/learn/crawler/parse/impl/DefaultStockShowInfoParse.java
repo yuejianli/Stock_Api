@@ -135,9 +135,9 @@ public class DefaultStockShowInfoParse implements StockShowInfoParse {
             try {
                 BeanUtils.setProperty(result, property, bigDecimal);
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
+                log.error("异常信息", e);
             } catch (InvocationTargetException e) {
-                e.printStackTrace();
+                log.error("异常信息", e);
             }
         }
         /*如果当前时间在下午三点之后*/

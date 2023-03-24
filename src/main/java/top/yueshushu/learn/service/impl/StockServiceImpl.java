@@ -10,6 +10,8 @@ import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.domain.StockDo;
 import top.yueshushu.learn.domainservice.StockDomainService;
 import top.yueshushu.learn.entity.Stock;
+import top.yueshushu.learn.enumtype.StockCodeType;
+import top.yueshushu.learn.mode.dto.StockQueryDto;
 import top.yueshushu.learn.mode.ro.StockRo;
 import top.yueshushu.learn.mode.vo.StockVo;
 import top.yueshushu.learn.response.OutputResult;
@@ -42,8 +44,31 @@ public class StockServiceImpl implements StockService {
     @Override
     public OutputResult pageStock(StockRo stockRo) {
         Page<Object> pageGithubResult = PageHelper.startPage(stockRo.getPageNum(), stockRo.getPageSize());
-        List<StockDo> stockDoInfoList = stockDomainService.selectByKeyword(stockRo.getKeyword());
-        if (CollectionUtils.isEmpty(stockDoInfoList)){
+        StockQueryDto stockQueryDto = new StockQueryDto();
+        stockQueryDto.setKeyword(stockRo.getKeyword());
+
+        StockCodeType typeByCode = StockCodeType.getTypeByCode(stockRo.getType());
+        if (typeByCode != null) {
+            switch (typeByCode) {
+                case SH: {
+                    stockQueryDto.setPrefix("6");
+                    break;
+                }
+                case SZ: {
+                    stockQueryDto.setPrefix("0");
+                    break;
+                }
+                case CY: {
+                    stockQueryDto.setPrefix("3");
+                    break;
+                }
+                default: {
+                    break;
+                }
+            }
+        }
+        List<StockDo> stockDoInfoList = stockDomainService.findByCondition(stockQueryDto);
+        if (CollectionUtils.isEmpty(stockDoInfoList)) {
             return OutputResult.buildSucc(
                     PageResponse.emptyPageResponse()
             );
@@ -51,7 +76,7 @@ public class StockServiceImpl implements StockService {
 
         List<StockVo> pageResultList = new ArrayList<>(stockDoInfoList.size());
         stockDoInfoList.forEach(
-                n->{
+                n -> {
                     pageResultList.add(
                             stockAssembler.entityToVo(
                                     stockAssembler.doToEntity(

@@ -12,6 +12,7 @@ import top.yueshushu.learn.business.TradeMoneyBusiness;
 import top.yueshushu.learn.business.TradeUserBusiness;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.enumtype.MockType;
+import top.yueshushu.learn.exception.TradeUserException;
 import top.yueshushu.learn.mode.ro.TradeMoneyRo;
 import top.yueshushu.learn.response.OutputResult;
 
@@ -37,7 +38,7 @@ public class TradeMoneyController extends BaseController {
     @PostMapping("/info")
     @ApiOperation("查询资金信息")
     @AuthToken
-    public OutputResult list(@RequestBody TradeMoneyRo tradeMoneyRo) {
+    public OutputResult list(@RequestBody TradeMoneyRo tradeMoneyRo) throws TradeUserException {
         tradeMoneyRo.setUserId(getUserId());
         if (tradeMoneyRo.getMockType() == null) {
             return OutputResult.buildFail(ResultCode.TRADE_MOCK_TYPE_IS_EMPTY);

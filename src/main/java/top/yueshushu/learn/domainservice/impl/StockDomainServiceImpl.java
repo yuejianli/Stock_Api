@@ -9,6 +9,7 @@ import top.yueshushu.learn.domainservice.StockDomainService;
 import top.yueshushu.learn.enumtype.DBStockType;
 import top.yueshushu.learn.enumtype.StockCodeType;
 import top.yueshushu.learn.mapper.StockDoMapper;
+import top.yueshushu.learn.mode.dto.StockQueryDto;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -83,5 +84,10 @@ public class StockDomainServiceImpl extends ServiceImpl<StockDoMapper, StockDo>
                 .in(
                         StockDo::getCode, codeList
                 ).list();
+    }
+
+    @Override
+    public List<StockDo> findByCondition(StockQueryDto stockQueryDto) {
+        return stockDoMapper.findByCondition(stockQueryDto);
     }
 }

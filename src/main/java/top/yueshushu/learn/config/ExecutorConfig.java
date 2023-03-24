@@ -19,11 +19,11 @@ import java.util.concurrent.ThreadPoolExecutor;
 @EnableAsync
 public class ExecutorConfig {
 
-    @Value("${async.executor.thread.core_pool_size:200}")
+    @Value("${async.executor.thread.core_pool_size:50}")
     private int corePoolSize;
     @Value("${async.executor.thread.max_pool_size:200}")
     private int maxPoolSize;
-    @Value("${async.executor.thread.queue_capacity:100}")
+    @Value("${async.executor.thread.queue_capacity:50}")
     private int queueCapacity;
     @Value("${async.executor.thread.name.prefix:stock-async-service-}")
     private String namePrefix;

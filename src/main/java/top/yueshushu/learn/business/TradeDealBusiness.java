@@ -1,5 +1,6 @@
 package top.yueshushu.learn.business;
 
+import top.yueshushu.learn.exception.TradeUserException;
 import top.yueshushu.learn.mode.ro.TradeDealRo;
 import top.yueshushu.learn.mode.vo.TradeDealVo;
 import top.yueshushu.learn.response.OutputResult;
@@ -30,7 +31,7 @@ public interface TradeDealBusiness {
      * @param tradeDealRo 成交对象
      * @return 查询真实的今日成交信息
      */
-    OutputResult<List<TradeDealVo>> realList(TradeDealRo tradeDealRo);
+    OutputResult<List<TradeDealVo>> realList(TradeDealRo tradeDealRo) throws TradeUserException;
 
     /**
      * 查询虚拟的历史成交信息
@@ -46,5 +47,5 @@ public interface TradeDealBusiness {
      * @param tradeDealRo 成交对象
      * @return 查询真实的历史成交信息
      */
-    OutputResult<PageResponse<TradeDealVo>> realHistoryList(TradeDealRo tradeDealRo);
+    OutputResult<PageResponse<TradeDealVo>> realHistoryList(TradeDealRo tradeDealRo) throws TradeUserException;
 }

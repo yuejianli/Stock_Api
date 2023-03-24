@@ -1,19 +1,19 @@
 package top.yueshushu.learn.controller;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.annotation.Resource;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import top.yueshushu.learn.annotation.AuthToken;
 import top.yueshushu.learn.business.MoneyBusiness;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.mode.ro.MoneyRo;
 import top.yueshushu.learn.response.OutputResult;
+
+import javax.annotation.Resource;
 
 /**
  * @ClassName:MoneyController
@@ -28,6 +28,8 @@ import top.yueshushu.learn.response.OutputResult;
 public class MoneyController {
     @Resource
     private MoneyBusiness moneyBusiness;
+
+    @AuthToken
     @PostMapping("/clearMoney")
     @ApiOperation("股票清仓")
     public OutputResult clearMoney(@RequestBody MoneyRo moneyRo){
@@ -40,6 +42,7 @@ public class MoneyController {
     }
 
     @ApiOperation("股票补仓")
+    @AuthToken
     @PostMapping("/coverMoney")
     public OutputResult coverMoney(@RequestBody MoneyRo moneyRo){
         //进行相关参数的验证
@@ -51,6 +54,7 @@ public class MoneyController {
     }
 
     @ApiOperation("股票减仓")
+    @AuthToken
     @PostMapping("/reduceMoney")
     public OutputResult reduceMoney(@RequestBody MoneyRo moneyRo){
         //进行相关参数的验证

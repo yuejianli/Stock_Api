@@ -13,6 +13,7 @@ import top.yueshushu.learn.business.TradePositionBusiness;
 import top.yueshushu.learn.business.TradeUserBusiness;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.enumtype.MockType;
+import top.yueshushu.learn.exception.TradeUserException;
 import top.yueshushu.learn.mode.ro.TradePositionRo;
 import top.yueshushu.learn.mode.vo.AddPositionVo;
 import top.yueshushu.learn.mode.vo.TradePositionShowVo;
@@ -46,7 +47,7 @@ public class TradePositionController extends BaseController {
     @PostMapping("/list")
     @ApiOperation("查询当前我的持仓")
     @AuthToken
-    public OutputResult list(@RequestBody TradePositionRo tradePositionRo) {
+    public OutputResult list(@RequestBody TradePositionRo tradePositionRo) throws TradeUserException {
         tradePositionRo.setUserId(getUserId());
         if (tradePositionRo.getMockType() == null) {
             return OutputResult.buildFail(ResultCode.TRADE_MOCK_TYPE_IS_EMPTY);

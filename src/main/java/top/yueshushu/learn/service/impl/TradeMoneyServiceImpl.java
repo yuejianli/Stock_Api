@@ -12,7 +12,6 @@ import top.yueshushu.learn.api.responseparse.ResponseParser;
 import top.yueshushu.learn.assembler.TradeMoneyAssembler;
 import top.yueshushu.learn.assembler.TradeMoneyHistoryAssembler;
 import top.yueshushu.learn.business.AutoLoginBusiness;
-import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.config.TradeClient;
 import top.yueshushu.learn.domain.TradeMoneyDo;
 import top.yueshushu.learn.domain.TradeMoneyHistoryDo;
@@ -20,6 +19,7 @@ import top.yueshushu.learn.domainservice.TradeMoneyDomainService;
 import top.yueshushu.learn.domainservice.TradeMoneyHistoryDomainService;
 import top.yueshushu.learn.entity.TradeMoney;
 import top.yueshushu.learn.enumtype.MockType;
+import top.yueshushu.learn.exception.TradeUserException;
 import top.yueshushu.learn.mode.ro.TradeMoneyRo;
 import top.yueshushu.learn.mode.vo.TradeMoneyVo;
 import top.yueshushu.learn.response.OutputResult;
@@ -83,13 +83,18 @@ public class TradeMoneyServiceImpl implements TradeMoneyService {
     }
 
     @Override
-    public OutputResult<TradeMoneyVo> realInfo(TradeMoneyRo tradeMoneyRo) {
+    public OutputResult<TradeMoneyVo> realInfo(TradeMoneyRo tradeMoneyRo) throws TradeUserException {
         //获取响应信息
-        TradeResultVo<GetAssetsResponse> tradeResultVo = getAssetsResponse(tradeMoneyRo.getUserId());
-        TradeMoneyVo tradeMoneyVo = new TradeMoneyVo();
-        if (!tradeResultVo.getSuccess()) {
-            return OutputResult.buildAlert(ResultCode.TRADE_MONEY_FAIL);
+        TradeResultVo<GetAssetsResponse> tradeResultVo;
+        try {
+            tradeResultVo = getAssetsResponse(tradeMoneyRo.getUserId());
+        } catch (Exception e) {
+            throw new TradeUserException("无权限查询真实的资金");
         }
+        if (!tradeResultVo.getSuccess()) {
+            throw new TradeUserException("无权限查询真实的资金");
+        }
+        TradeMoneyVo tradeMoneyVo = new TradeMoneyVo();
         List<GetAssetsResponse> data = tradeResultVo.getData();
         GetAssetsResponse response = data.get(0);
         tradeMoneyVo.setUseMoney(new BigDecimal(response.getKyzj()));
@@ -133,7 +138,12 @@ public class TradeMoneyServiceImpl implements TradeMoneyService {
         tradeMoneyRo.setUserId(userId);
         tradeMoneyRo.setMockType(MockType.REAL.getCode());
         // 获取真实的数据
-        OutputResult<TradeMoneyVo> tradeMoneyVoOutputResult = realInfo(tradeMoneyRo);
+        OutputResult<TradeMoneyVo> tradeMoneyVoOutputResult = null;
+        try {
+            tradeMoneyVoOutputResult = realInfo(tradeMoneyRo);
+        } catch (TradeUserException e) {
+            log.error("异常信息", e);
+        }
         if (!tradeMoneyVoOutputResult.getSuccess()) {
             // 如果失败， 则自动登录一下.
             boolean flag = autoLoginBusiness.autoLogin(userId);
@@ -146,7 +156,11 @@ public class TradeMoneyServiceImpl implements TradeMoneyService {
             } catch (Exception e) {
 
             }
-            tradeMoneyVoOutputResult = realInfo(tradeMoneyRo);
+            try {
+                tradeMoneyVoOutputResult = realInfo(tradeMoneyRo);
+            } catch (TradeUserException e) {
+                log.error("异常信息", e);
+            }
         }
         TradeMoneyVo tradeMoneyVo = tradeMoneyVoOutputResult.getData();
         if (tradeMoneyVo == null) {

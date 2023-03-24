@@ -384,7 +384,7 @@ public class StatBusinessImpl implements StatBusiness {
         try {
             countDownLatch.await();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            log.error("异常信息", e);
         }
         List<StockRelationVo> resultList =
                 ten10VoList.stream().sorted(Comparator.comparing(StockRelationVo::getCode)).collect(Collectors.toList());

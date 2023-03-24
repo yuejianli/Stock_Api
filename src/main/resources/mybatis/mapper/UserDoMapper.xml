@@ -9,6 +9,7 @@
         <result column="name" property="name" />
         <result column="password" property="password" />
         <result column="phone" property="phone" />
+        <result column="token" property="token" />
         <result column="email" property="email" />
         <result column="wx_user_id" property="wxUserId"/>
         <result column="ding_user_id" property="dingUserId"/>
@@ -27,14 +28,14 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, account, name, password, phone, email, wx_user_id,
+        id, account, name, password, token,phone, email, wx_user_id,
         ding_user_id,reboot_id,
         create_time, update_time, last_login_time, status, flag
     </sql>
 
     <select id="listByCondition" resultType="top.yueshushu.learn.entity.User">
         select  u.id, u.account, u.password,u.name, u.phone, u.email, u.wx_user_id,
-        u.ding_user_id,u.reboot_id,
+        u.ding_user_id,u.reboot_id,u.token,
         u.create_time, u.update_time, u.last_login_time, u.status, u.flag , r.id as roleId, r.name as roleName
         from user u left join user_role ur
         on u.id = ur.user_id

@@ -69,7 +69,7 @@ public class DefaultDailyTradingInfoParse implements DailyTradingInfoParse {
                     }
             );
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("异常信息", e);
         }
         //删除文件
         downloadFile.delete();

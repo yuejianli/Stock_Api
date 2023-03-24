@@ -145,7 +145,7 @@ public class UserBusinessImpl implements UserBusiness {
         if (!isSuperUser(currentUser) && !currentUser.getAccount().equals(adminOperateUserRequestVo.getAccount())) {
             return OutputResult.buildFail(ResultCode.NO_AUTH);
         }
-        // 添加用户操作
+        // 修改用户用户操作
         User user = userAssembler.addUserToEntity(adminOperateUserRequestVo);
         userService.operateUser(user);
 

@@ -6,6 +6,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import top.yueshushu.learn.business.TradeEntrustBusiness;
 import top.yueshushu.learn.enumtype.TradeRealValueType;
+import top.yueshushu.learn.exception.TradeUserException;
 import top.yueshushu.learn.mode.ro.TradeEntrustRo;
 import top.yueshushu.learn.mode.vo.TradeEntrustVo;
 import top.yueshushu.learn.response.OutputResult;
@@ -38,7 +39,7 @@ public class TradeEntrustBusinessImpl implements TradeEntrustBusiness {
     }
 
     @Override
-    public OutputResult<List<TradeEntrustVo>> realList(TradeEntrustRo tradeEntrustRo) {
+    public OutputResult<List<TradeEntrustVo>> realList(TradeEntrustRo tradeEntrustRo) throws TradeUserException {
         Object realEasyMoneyCache = tradeCacheService.getRealEasyMoneyCache(TradeRealValueType.TRADE_ENTRUST, tradeEntrustRo.getUserId());
         if (!ObjectUtils.isEmpty(realEasyMoneyCache)) {
             return OutputResult.buildSucc((List<TradeEntrustVo>) realEasyMoneyCache);
@@ -46,7 +47,7 @@ public class TradeEntrustBusinessImpl implements TradeEntrustBusiness {
         log.info(">>>此次员工{}查询需要同步真实的今日委托数据", tradeEntrustRo.getUserId());
         OutputResult<List<TradeEntrustVo>> outputResult = tradeEntrustService.realList(tradeEntrustRo);
         if (!outputResult.getSuccess()) {
-            return outputResult;
+            throw new TradeUserException("无权限查询真实的 今日委托单信息");
         }
         //获取到最新的持仓信息，更新到相应的数据库中.
         List<TradeEntrustVo> tradePositionVoList = outputResult.getData();
@@ -61,10 +62,10 @@ public class TradeEntrustBusinessImpl implements TradeEntrustBusiness {
     }
 
     @Override
-    public OutputResult<PageResponse<TradeEntrustVo>> realHistoryList(TradeEntrustRo tradeEntrustRo) {
+    public OutputResult<PageResponse<TradeEntrustVo>> realHistoryList(TradeEntrustRo tradeEntrustRo) throws TradeUserException {
         List<TradeEntrustVo> tradeEntrustVoList = tradeEntrustService.realHistoryList(tradeEntrustRo);
         if (CollectionUtils.isEmpty(tradeEntrustVoList)) {
-            return OutputResult.buildSucc(PageResponse.emptyPageResponse());
+            throw new TradeUserException("无权限查询真实的 历史委托单信息");
         }
         return PageUtil.pageResult(tradeEntrustVoList, tradeEntrustRo.getPageNum(), tradeEntrustRo.getPageSize());
     }

@@ -13,6 +13,7 @@ import top.yueshushu.learn.business.TradeEntrustBusiness;
 import top.yueshushu.learn.business.TradeUserBusiness;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.enumtype.MockType;
+import top.yueshushu.learn.exception.TradeUserException;
 import top.yueshushu.learn.mode.ro.TradeEntrustRo;
 import top.yueshushu.learn.response.OutputResult;
 import top.yueshushu.learn.util.PageUtil;
@@ -39,7 +40,7 @@ public class TradeEntrustController extends BaseController {
     @PostMapping("/list")
     @ApiOperation("查询今日委托信息")
     @AuthToken
-    public OutputResult list(@RequestBody TradeEntrustRo tradeEntrustRo) {
+    public OutputResult list(@RequestBody TradeEntrustRo tradeEntrustRo) throws TradeUserException {
         tradeEntrustRo.setUserId(getUserId());
         if (tradeEntrustRo.getMockType() == null) {
             return OutputResult.buildFail(ResultCode.TRADE_MOCK_TYPE_IS_EMPTY);
@@ -61,7 +62,7 @@ public class TradeEntrustController extends BaseController {
     @PostMapping("/history")
     @ApiOperation("查询历史委托信息")
     @AuthToken
-    public OutputResult history(@RequestBody TradeEntrustRo tradeEntrustRo) {
+    public OutputResult history(@RequestBody TradeEntrustRo tradeEntrustRo) throws TradeUserException {
         tradeEntrustRo.setUserId(getUserId());
         if (tradeEntrustRo.getMockType() == null) {
             return OutputResult.buildFail(ResultCode.TRADE_MOCK_TYPE_IS_EMPTY);

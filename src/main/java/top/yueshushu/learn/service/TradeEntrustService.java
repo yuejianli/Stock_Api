@@ -2,6 +2,7 @@ package top.yueshushu.learn.service;
 
 import top.yueshushu.learn.entity.TradeEntrust;
 import top.yueshushu.learn.enumtype.MockType;
+import top.yueshushu.learn.exception.TradeUserException;
 import top.yueshushu.learn.mode.ro.TradeEntrustRo;
 import top.yueshushu.learn.mode.vo.TradeEntrustVo;
 import top.yueshushu.learn.response.OutputResult;
@@ -36,10 +37,11 @@ public interface TradeEntrustService {
 
     /**
      * 查询真实的今日委托信息
+     *
      * @param tradeEntrustRo 委托对象
      * @return 查询真实的今日委托信息
      */
-    OutputResult<List<TradeEntrustVo>> realList(TradeEntrustRo tradeEntrustRo);
+    OutputResult<List<TradeEntrustVo>> realList(TradeEntrustRo tradeEntrustRo) throws TradeUserException;
 
     /**
      * 同步今日委托信息
@@ -62,7 +64,7 @@ public interface TradeEntrustService {
      * @param tradeEntrustRo 委托对象
      * @return 查询真实的历史委托信息
      */
-    List<TradeEntrustVo> realHistoryList(TradeEntrustRo tradeEntrustRo);
+    List<TradeEntrustVo> realHistoryList(TradeEntrustRo tradeEntrustRo) throws TradeUserException;
 
     /**
      * 同步东方财富委托信息到数据库

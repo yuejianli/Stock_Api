@@ -273,7 +273,7 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
                                         try {
                                             TimeUnit.SECONDS.sleep(1);
                                         } catch (InterruptedException e) {
-                                            e.printStackTrace();
+                                            log.error("异常信息", e);
                                         }
                                     }
                             );

@@ -157,6 +157,8 @@ public class UserServiceImpl implements UserService {
             UserDo editUserDo = userAssembler.entityToDo(user);
             if (StringUtils.hasText(user.getPassword())) {
                 editUserDo.setPassword((String) convertPassWord(user.getPassword()).getData());
+            } else {
+                editUserDo.setPassword(null);
             }
             editUserDo.setId(userDo.getId());
             // 进行更新

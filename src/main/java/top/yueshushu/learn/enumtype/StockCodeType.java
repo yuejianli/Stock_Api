@@ -30,7 +30,9 @@ public enum StockCodeType {
      * @return
      */
     public static StockCodeType getTypeByCode(Integer code) {
-        Assert.notNull(code, "code编号不能为空");
+        if (code == null) {
+            return null;
+        }
         for (StockCodeType configCodeType : StockCodeType.values()) {
             if (configCodeType.code.equals(code)) {
                 return configCodeType;

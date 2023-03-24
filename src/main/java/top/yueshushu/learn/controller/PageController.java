@@ -1,5 +1,6 @@
 package top.yueshushu.learn.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +17,7 @@ import java.io.IOException;
  * @Version 1.0
  **/
 @Controller
+@Slf4j
 public class PageController {
 
     @Value("${login.noLoginUrl}")
@@ -41,7 +43,7 @@ public class PageController {
         try {
             httpServletResponse.sendRedirect(noLoginUrl);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("异常信息", e);
         }
     }
 }

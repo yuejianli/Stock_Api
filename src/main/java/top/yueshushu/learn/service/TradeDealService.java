@@ -2,6 +2,7 @@ package top.yueshushu.learn.service;
 
 import top.yueshushu.learn.domain.TradeEntrustDo;
 import top.yueshushu.learn.enumtype.MockType;
+import top.yueshushu.learn.exception.TradeUserException;
 import top.yueshushu.learn.mode.ro.TradeDealRo;
 import top.yueshushu.learn.mode.vo.TradeDealVo;
 import top.yueshushu.learn.response.OutputResult;
@@ -35,10 +36,11 @@ public interface TradeDealService {
 
     /**
      * 查询真实的今日成交信息
+     *
      * @param tradeDealRo 成交对象
      * @return 查询真实的今日成交信息
      */
-    OutputResult<List<TradeDealVo>> realList(TradeDealRo tradeDealRo);
+    OutputResult<List<TradeDealVo>> realList(TradeDealRo tradeDealRo) throws TradeUserException;
 
     /**
      * 查询虚拟的历史成交信息
@@ -54,7 +56,7 @@ public interface TradeDealService {
      * @param tradeDealRo 成交对象
      * @return 查询真实的历史成交信息
      */
-    List<TradeDealVo> realHistoryList(TradeDealRo tradeDealRo);
+    List<TradeDealVo> realHistoryList(TradeDealRo tradeDealRo) throws TradeUserException;
 
     /**
      * 同步今日成交记录
@@ -70,5 +72,5 @@ public interface TradeDealService {
      * @param userId   用户编号
      * @param mockType 类型
      */
-    void syncEasyMoneyToDB(Integer userId, MockType mockType);
+    void syncEasyMoneyToDB(Integer userId, MockType mockType) throws TradeUserException;
 }

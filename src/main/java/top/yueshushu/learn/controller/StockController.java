@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import top.yueshushu.learn.annotation.AuthToken;
 import top.yueshushu.learn.business.StockBusiness;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.enumtype.DBStockType;
@@ -35,13 +36,16 @@ import java.util.List;
 public class StockController {
     @Resource
     private StockBusiness stockBusiness;
+
     @PostMapping("/list")
+    @AuthToken
     @ApiOperation("查询所有的股票信息")
     public OutputResult<StockInfo> list(@RequestBody StockRo stockRo){
         return stockBusiness.listStock(stockRo);
     }
 
     @PostMapping("/stockInfo")
+    @AuthToken
     @ApiOperation("根据股票编码,获取股票的相关信息")
     public OutputResult<StockVo> getStockInfo(@RequestBody StockRo stockRo) {
         if (!StringUtils.hasText(stockRo.getCode())) {
@@ -53,6 +57,7 @@ public class StockController {
     }
 
     @PostMapping("/listDbType")
+    @AuthToken
     @ApiOperation("查询所有的股票类型信息")
     public OutputResult<List<DistVo>> listDbType() {
 

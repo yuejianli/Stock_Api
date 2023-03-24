@@ -46,4 +46,30 @@
     <select id="listAllCode" resultType="java.lang.String">
         select code from stock where can_use = 1 order by code
     </select>
+
+    <select id="findByCondition" resultMap="stockMap">
+        select t.id,t.code,t.name,t.exchange,t.full_code,t.can_use from stock t
+        <where>
+            <if test="stockQueryDto.keyword != null and stockQueryDto.keyword != ''">
+                and (
+                t.code like concat('%',concat(#{stockQueryDto.keyword},'%'))
+                or t.full_code like concat('%',concat(#{stockQueryDto.keyword},'%'))
+                or t.name like concat('%',concat(#{stockQueryDto.keyword},'%'))
+                )
+            </if>
+            <if test="stockQueryDto.canUse != null">
+                and t.can_use = #{stockQueryDto.canUse}
+            </if>
+            <if test="stockQueryDto.code != null and stockQueryDto.code != ''">
+                and t.code = #{stockQueryDto.code}
+            </if>
+            <if test="stockQueryDto.exchange != null">
+                and t.exchange=#{stockQueryDto.exchange}
+            </if>
+            <if test="stockQueryDto.prefix != null and stockQueryDto.prefix != ''">
+                and t.code like concat(#{stockQueryDto.prefix},'%')
+            </if>
+        </where>
+        order by t.code+0 asc
+    </select>
 </mapper>

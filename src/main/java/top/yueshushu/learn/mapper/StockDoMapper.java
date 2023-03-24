@@ -1,8 +1,9 @@
 package top.yueshushu.learn.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 import top.yueshushu.learn.domain.StockDo;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import top.yueshushu.learn.mode.dto.StockQueryDto;
 
 import java.util.List;
 
@@ -43,4 +44,11 @@ public interface StockDoMapper extends BaseMapper<StockDo> {
      * @return 查询所有的股票编码列表集合
      */
     List<String> listAllCode();
+
+    /**
+     * 根据条码查询信息
+     *
+     * @param stockQueryDto 条件
+     */
+    List<StockDo> findByCondition(@Param("stockQueryDto") StockQueryDto stockQueryDto);
 }

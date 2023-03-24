@@ -69,11 +69,14 @@ public class AutoLoginBusinessImpl implements AutoLoginBusiness {
 
         TradeMoneyRo tradeMoneyRo = new TradeMoneyRo();
         tradeMoneyRo.setUserId(userId);
-        OutputResult<TradeMoneyVo> tradeMoneyVoOutputResult = tradeMoneyService.realInfo(tradeMoneyRo);
-        if (tradeMoneyVoOutputResult.getSuccess()) {
-            return true;
-        }
+        try {
+            OutputResult<TradeMoneyVo> tradeMoneyVoOutputResult = tradeMoneyService.realInfo(tradeMoneyRo);
+            if (tradeMoneyVoOutputResult.getSuccess()) {
+                return true;
+            }
+        } catch (Exception e) {
 
+        }
         // 不成功，才进行自动登录操作。
         String base64Url = tradeMethodBusiness.yzm(userId).getData();
         if (!StringUtils.hasText(base64Url)) {

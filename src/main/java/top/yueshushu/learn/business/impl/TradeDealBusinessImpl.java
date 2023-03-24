@@ -6,6 +6,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import top.yueshushu.learn.business.TradeDealBusiness;
 import top.yueshushu.learn.enumtype.TradeRealValueType;
+import top.yueshushu.learn.exception.TradeUserException;
 import top.yueshushu.learn.mode.ro.TradeDealRo;
 import top.yueshushu.learn.mode.vo.TradeDealVo;
 import top.yueshushu.learn.response.OutputResult;
@@ -38,7 +39,7 @@ public class TradeDealBusinessImpl implements TradeDealBusiness {
     }
 
     @Override
-    public OutputResult<List<TradeDealVo>> realList(TradeDealRo tradeDealRo) {
+    public OutputResult<List<TradeDealVo>> realList(TradeDealRo tradeDealRo) throws TradeUserException {
         Object realEasyMoneyCache = tradeCacheService.getRealEasyMoneyCache(TradeRealValueType.TRADE_DEAL, tradeDealRo.getUserId());
         if (!ObjectUtils.isEmpty(realEasyMoneyCache)) {
             return OutputResult.buildSucc((List<TradeDealVo>) realEasyMoneyCache);
@@ -46,7 +47,7 @@ public class TradeDealBusinessImpl implements TradeDealBusiness {
         log.info(">>>此次员工{}查询需要同步真实的今日成交数据", tradeDealRo.getUserId());
         OutputResult<List<TradeDealVo>> outputResult = tradeDealService.realList(tradeDealRo);
         if (!outputResult.getSuccess()) {
-            return outputResult;
+            throw new TradeUserException("无权限查询真实的 今日成交单信息");
         }
         //获取到最新的持仓信息，更新到相应的数据库中.
         List<TradeDealVo> tradeDealVoList = outputResult.getData();
@@ -61,11 +62,11 @@ public class TradeDealBusinessImpl implements TradeDealBusiness {
     }
 
     @Override
-    public OutputResult<PageResponse<TradeDealVo>> realHistoryList(TradeDealRo tradeDealRo) {
+    public OutputResult<PageResponse<TradeDealVo>> realHistoryList(TradeDealRo tradeDealRo) throws TradeUserException {
         List<TradeDealVo> tradeDealVoList = tradeDealService.realHistoryList(tradeDealRo);
         if (CollectionUtils.isEmpty(tradeDealVoList)) {
             // 为空
-            return OutputResult.buildSucc(PageResponse.emptyPageResponse());
+            throw new TradeUserException("无权限查询真实的 历史成交单信息");
         }
         List<TradeDealVo> list = PageUtil.startPage(tradeDealVoList, tradeDealRo.getPageNum(),
                 tradeDealRo.getPageSize());

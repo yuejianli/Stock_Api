@@ -1,5 +1,7 @@
 package top.yueshushu.learn.crawler.util;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,6 +15,7 @@ import java.net.URL;
  * @Author 岳建立
  * @Date 2021/11/12 22:02
  **/
+@Slf4j
 public class ImageUtil {
     /**
      * 根据地址获得数据的字节流
@@ -33,7 +36,8 @@ public class ImageUtil {
             byte[] btImg = readInputStream(inStream);
             return btImg;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("异常信息", e);
+            ;
         }
         return null;
     }
@@ -52,7 +56,7 @@ public class ImageUtil {
             byte[] btImg = readInputStream(inStream);
             return btImg;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("异常信息", e);
         }
         return null;
     }

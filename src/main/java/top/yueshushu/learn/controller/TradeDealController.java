@@ -11,6 +11,7 @@ import top.yueshushu.learn.business.TradeDealBusiness;
 import top.yueshushu.learn.business.TradeUserBusiness;
 import top.yueshushu.learn.common.ResultCode;
 import top.yueshushu.learn.enumtype.MockType;
+import top.yueshushu.learn.exception.TradeUserException;
 import top.yueshushu.learn.mode.ro.TradeDealRo;
 import top.yueshushu.learn.mode.vo.TradeDealVo;
 import top.yueshushu.learn.response.OutputResult;
@@ -38,7 +39,7 @@ public class TradeDealController extends BaseController {
     @PostMapping("/list")
     @ApiOperation("查询今日成交")
     @AuthToken
-    public OutputResult list(@RequestBody TradeDealRo tradeDealRo) {
+    public OutputResult list(@RequestBody TradeDealRo tradeDealRo) throws TradeUserException {
         tradeDealRo.setUserId(getUserId());
         if (tradeDealRo.getMockType() == null) {
             return OutputResult.buildFail(ResultCode.TRADE_MOCK_TYPE_IS_EMPTY);
@@ -56,10 +57,11 @@ public class TradeDealController extends BaseController {
         OutputResult<List<TradeDealVo>> listOutputResult = tradeDealBusiness.realList(tradeDealRo);
         return PageUtil.pageResult(listOutputResult.getData(), tradeDealRo.getPageNum(), tradeDealRo.getPageSize());
     }
+
     @PostMapping("/history")
     @ApiOperation("查询历史成交")
     @AuthToken
-    public OutputResult history(@RequestBody TradeDealRo tradeDealRo) {
+    public OutputResult history(@RequestBody TradeDealRo tradeDealRo) throws TradeUserException {
         tradeDealRo.setUserId(getUserId());
         if (tradeDealRo.getMockType() == null) {
             return OutputResult.buildFail(ResultCode.TRADE_MOCK_TYPE_IS_EMPTY);

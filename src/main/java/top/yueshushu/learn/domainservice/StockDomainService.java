@@ -3,6 +3,7 @@ package top.yueshushu.learn.domainservice;
 import com.baomidou.mybatisplus.extension.service.IService;
 import top.yueshushu.learn.domain.StockDo;
 import top.yueshushu.learn.enumtype.DBStockType;
+import top.yueshushu.learn.mode.dto.StockQueryDto;
 
 import java.util.List;
 
@@ -54,4 +55,11 @@ public interface StockDomainService extends IService<StockDo> {
      * @return 返回股票对应的集合信息
      */
     List<StockDo> listByCodes(List<String> codeList);
+
+    /**
+     * 根据条码查询股票信息
+     *
+     * @param stockQueryDto 查询条码
+     */
+    List<StockDo> findByCondition(StockQueryDto stockQueryDto);
 }

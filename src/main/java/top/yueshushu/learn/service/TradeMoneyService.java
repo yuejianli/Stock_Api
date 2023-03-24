@@ -2,6 +2,7 @@ package top.yueshushu.learn.service;
 
 import top.yueshushu.learn.entity.TradeMoney;
 import top.yueshushu.learn.enumtype.MockType;
+import top.yueshushu.learn.exception.TradeUserException;
 import top.yueshushu.learn.mode.ro.TradeMoneyRo;
 import top.yueshushu.learn.mode.vo.TradeMoneyVo;
 import top.yueshushu.learn.response.OutputResult;
@@ -39,14 +40,14 @@ public interface TradeMoneyService {
 	 * @return 查询虚拟的股票当前的持仓记录信息
 	 */
 	OutputResult<TradeMoneyVo> mockInfo(TradeMoneyRo tradeMoneyRo);
-	
-	/**
-	 * 查询真实的股票当前的持仓记录信息
-	 *
-	 * @param tradeMoneyRo 股票持仓对象
-	 * @return 查询真实的股票当前的持仓记录信息
+
+    /**
+     * 查询真实的股票当前的持仓记录信息
+     *
+     * @param tradeMoneyRo 股票持仓对象
+     * @return 查询真实的股票当前的持仓记录信息
      */
-    OutputResult<TradeMoneyVo> realInfo(TradeMoneyRo tradeMoneyRo);
+    OutputResult<TradeMoneyVo> realInfo(TradeMoneyRo tradeMoneyRo) throws TradeUserException;
 
 	/**
 	 * 保存金额的历史记录处理
