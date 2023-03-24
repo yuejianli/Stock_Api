@@ -127,7 +127,7 @@ public class PriceImageBusinessImpl implements PriceImageBusiness {
         }
         // 2. 获取分时图的 base64
         for (String fullCode : listFullCode) {
-            Object data = crawlerStockService.getCrawlerLine(fullCode, KType.MIN.getCode()).getData();
+            Object data = crawlerStockService.getCrawlerLineByFullCode(fullCode, KType.MIN.getCode()).getData();
             if (ObjectUtils.isEmpty(data)) {
                 log.error("获取股票 {} 价格分时图出错", fullCode);
                 continue;

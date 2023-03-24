@@ -68,32 +68,37 @@ public class CrawlerStockServiceImpl implements CrawlerStockService {
 
     @Override
     public OutputResult getCrawlerLine(String code, Integer type) {
+        Stock stock = stockAssembler.doToEntity(
+                stockDomainService.getByFullCode(code)
+        );
+        if (null == stock) {
+            return OutputResult.buildAlert(ResultCode.STOCK_CODE_ERROR);
+        }
+        return getCrawlerLineByFullCode(stock.getFullCode(), type);
+    }
+
+    @Override
+    public OutputResult getCrawlerLineByFullCode(String fullCode, Integer type) {
         //获取类型
         KType kType = Optional.ofNullable(KType.getKType(type)).orElse(
                 KType.MIN
         );
-        Stock stock = stockAssembler.doToEntity(
-                stockDomainService.getByFullCode(code)
-        );
-        if(null ==stock){
-            return OutputResult.buildAlert(ResultCode.STOCK_CODE_ERROR);
-        }
-        String result="";
-        switch (kType){
-            case MIN:{
-                result=crawlerService.getMinUrl(stock.getFullCode());
+        String result = "";
+        switch (kType) {
+            case MIN: {
+                result = crawlerService.getMinUrl(fullCode);
                 break;
             }
-            case DAY:{
-                result=crawlerService.getDayUrl(stock.getFullCode());
+            case DAY: {
+                result = crawlerService.getDayUrl(fullCode);
                 break;
             }
             case WEEK:{
-                result=crawlerService.getWeekUrl(stock.getFullCode());
+                result = crawlerService.getWeekUrl(fullCode);
                 break;
             }
             case MONTH:{
-                result=crawlerService.getMonthUrl(stock.getFullCode());
+                result = crawlerService.getMonthUrl(fullCode);
                 break;
             }
             default:{
