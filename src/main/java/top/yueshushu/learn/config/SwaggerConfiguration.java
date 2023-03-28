@@ -55,7 +55,7 @@ public class SwaggerConfiguration implements Serializable {
                 .title("Stock")
                 .description("股票信息模块")
                 .termsOfServiceUrl("http://localhost/")
-                .contact(new Contact("岳建立","https://www.yueshushu.top/stock","1290513799@qq.com"))
+                .contact(new Contact("岳建立", "https://www.yueshushu.top/Stock", "1290513799@qq.com"))
                 .version("1.0")
                 .build();
     }

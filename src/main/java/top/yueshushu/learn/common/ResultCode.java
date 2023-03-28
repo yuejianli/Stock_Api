@@ -18,7 +18,7 @@ public class ResultCode {
     public static final ResultCode ALERT = new ResultCode(false, 30000, "传入信息有误");
     public static final ResultCode FAIL = new ResultCode(false, 50000, "操作失败");
 
-    public static final ResultCode INVALID_PARAM = new ResultCode(false, 3000001, "操作失败");
+    public static final ResultCode INVALID_PARAM = new ResultCode(false, 3000001, "参数不正确");
     /**
      * 爬虫 提示信息：  200 10 （编排）+ 001 (三位随机)
      */

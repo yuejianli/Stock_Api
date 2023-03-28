@@ -10,6 +10,7 @@ import top.yueshushu.learn.business.AutoLoginBusiness;
 import top.yueshushu.learn.business.TradeMethodBusiness;
 import top.yueshushu.learn.business.TradeUserBusiness;
 import top.yueshushu.learn.entity.User;
+import top.yueshushu.learn.enumtype.MockType;
 import top.yueshushu.learn.enumtype.TradeRealValueType;
 import top.yueshushu.learn.helper.DateHelper;
 import top.yueshushu.learn.message.dingtalk.DingTalkService;
@@ -64,6 +65,10 @@ public class AutoLoginBusinessImpl implements AutoLoginBusiness {
         if (!dateHelper.isTradeTime(DateUtil.date())) {
             return false;
         }
+        boolean configTradeUser = tradeUserBusiness.configTradeUser(userId, MockType.REAL);
+        if (!configTradeUser) {
+            return false;
+        }
         // 先调用一下查询资金的方法，如果查询不出来，则说明过期了。
         tradeCacheService.removeRealEasyMoneyCache(TradeRealValueType.TRADE_MONEY, userId);
 
@@ -75,7 +80,11 @@ public class AutoLoginBusinessImpl implements AutoLoginBusiness {
                 return true;
             }
         } catch (Exception e) {
-
+            User user = userService.getById(userId);
+            String message = MessageFormat.format(
+                    "用户 :{0} 于 {1} 登录信息失效，请尽快重新登录", user.getName(), DateUtil.now()
+            );
+            weChatService.sendTextMessage(user.getId(), message);
         }
         // 不成功，才进行自动登录操作。
         String base64Url = tradeMethodBusiness.yzm(userId).getData();
@@ -96,7 +105,7 @@ public class AutoLoginBusinessImpl implements AutoLoginBusiness {
             User user = userService.getById(userId);
             String message = MessageFormat.format(
                     "用户 :{0} 执行自动登录, 运行 {1}",
-                    user.getName(), flag == true ? "成功" : "失败"
+                    user.getName(), flag ? "成功" : "失败"
             );
             weChatService.sendTextMessage(user.getId(), message);
             dingTalkService.sendTextMessage(user.getId(), message);
