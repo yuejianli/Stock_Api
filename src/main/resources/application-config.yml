@@ -66,3 +66,12 @@ multipart:
 jasypt:
   encryptor:
     bean: CodeEncrypBean
+# 线程池配置
+async:
+  executor:
+    thread:
+      core_pool_size: 20
+      max_pool_size: 20
+      queue_capacity: 999
+      name:
+        prefix: stock-async-service-

@@ -132,7 +132,7 @@ public class JobInfoBusinessImpl implements JobInfoBusiness {
             return OutputResult.buildAlert(ResultCode.JOB_ID_NOT_EXIST);
         }
         //是获取股票实时价格的任务，并且是自动运行。 非时间，不执行。
-        if ((JobInfoType.STOCK_PRICE.equals(jobInfoType))) {
+        if ((JobInfoType.STOCK_PRICE.equals(jobInfoType) && EntrustType.AUTO.getCode().equals(triggerType))) {
             if (!dateHelper.isWorkingDay(DateUtil.date()) || !MyDateUtil.isPriceTime()) {
                 return OutputResult.buildSucc();
             }
