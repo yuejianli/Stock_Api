@@ -46,7 +46,7 @@
 # 目录结构
 
 ├─main │ ├─java │ │ └─top │ │ └─yueshushu │ │ └─learn │ │ ├─annotation @AuthToken 注解， 登录权限使用 │ │ ├─aop LogAspect 访问日志 │
-│ ├─api 东财实际请求使用， 抄袭 群主的 │ │ │ ├─request │ │ │ ├─response │ │ │ └─responseparse │ │ ├─assembler 实体类转换 │ │ ├─business
+│ ├─api 实际请求使用， 抄袭 群主的 │ │ │ ├─request │ │ │ ├─response │ │ │ └─responseparse │ │ ├─assembler 实体类转换 │ │ ├─business
 业务处理接口， 在 Controller 层下方 │ │ │ └─impl 业务处理接口实现 │ │ ├─common 公共配置变量 和错误码 │ │ ├─config 组件配置信息 │ │ ├─controller 业务控制器， 最上方
 │ │ ├─crawler 爬虫相关的业务处理 │ │ │ ├─business 爬虫 Business │ │ │ │ └─impl │ │ │ ├─crawler 爬虫处理 │ │ │ │ └─impl │ │ │ ├─entity
 爬虫结果实体封装 │ │ │ ├─parse 解析爬虫结果，转换成实体类 │ │ │ │ └─impl │ │ │ ├─properties 网址 url 配置信息， 与 application-url 相关。 │ │ │
