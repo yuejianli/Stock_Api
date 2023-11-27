@@ -24,6 +24,28 @@
 
 3. 如果被挤掉了， 可以换其它的账号进行登录。
 
+
+这是第一版本，是免费开源的。  第二版本，楼主正在编写中， 暂时不准备免费提供出来。
+如果有人需要的话， 可以联系楼主， 付费。
+
+![image](https://github.com/yuejianli/Stock_Api/assets/33589800/3b516e9a-d434-4157-b810-e4939a2c28d2)
+
+
+![image](https://github.com/yuejianli/Stock_Api/assets/33589800/f3d9822f-d525-4d0b-83c8-d331052a5778)
+
+
+
+
+![image](https://github.com/yuejianli/Stock_Api/assets/33589800/426a35cf-91c4-410f-846e-6bb3e19434ff)
+
+
+![image](https://github.com/yuejianli/Stock_Api/assets/33589800/e741118a-9001-4392-acdf-357361d79768)
+
+
+![image](https://github.com/yuejianli/Stock_Api/assets/33589800/4cfaee64-4283-4710-b5a7-0a8527683b73)
+
+![Uploading image.png…]()
+
 # 技术选型
 
 采用的是, SpringBoot + MybatisPlus + Vue
