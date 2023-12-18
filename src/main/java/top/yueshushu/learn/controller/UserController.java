@@ -1,6 +1,7 @@
 package top.yueshushu.learn.controller;
 
 
+import cn.hutool.core.date.DateUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.util.StringUtils;
@@ -36,6 +37,15 @@ public class UserController extends BaseController {
     private UserBusiness userBusiness;
     @Resource
     private RedisUtil redisUtil;
+
+
+    @GetMapping("/info")
+    @ApiOperation("信息")
+    public OutputResult info() {
+        return OutputResult.buildSucc("不要炒股,A股是个坑人货" + DateUtil.now());
+    }
+
+
 
     @PostMapping("/login")
     @ApiOperation("用户登录信息")
